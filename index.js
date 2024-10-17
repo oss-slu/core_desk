@@ -2,87 +2,112 @@ import express from "express";
 import passport from "passport";
 import { Strategy as SamlStrategy } from "passport-saml";
 import bodyParser from "body-parser";
-import session from "express-session";
 import samlConfig from "./saml-config.js";
 import cors from "cors";
 import jwt from "jsonwebtoken";
+import { router } from "express-file-routing";
+import dotenv from "dotenv";
+import { prisma } from "./util/prisma.js";
+import { LogType } from "@prisma/client";
+dotenv.config();
 
 const app = express();
 
-// Enable CORS
-app.use(cors());
-
-// Configure session middleware
+// Enable CORS for your React app
 app.use(
-  session({
-    secret: "your-secret-key", // Replace with a secure key
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }, // Set `secure: true` in production with HTTPS
+  cors({
+    // origin: "http://localhost:3152", // Allow requests from your React app
+    // optionsSuccessStatus: 200,
   })
 );
 
-// Initialize passport and sessions
+// Initialize passport
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(passport.initialize());
-app.use(passport.session()); // Add this for session support
 
 // Passport SAML strategy
 passport.use(
-  new SamlStrategy(samlConfig, (profile, done) => {
-    const user = {
-      id: profile.nameID,
-      email:
+  new SamlStrategy(samlConfig, async (profile, done) => {
+    try {
+      const userEmail =
         profile.email ||
         profile[
           "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
-        ],
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-    };
-    return done(null, user);
+        ];
+
+      // Check if the user exists in the database
+      let user = await prisma.user.findUnique({
+        where: { email: userEmail },
+      });
+
+      // If user doesn't exist, create a new user
+      if (!user) {
+        user = await prisma.user.create({
+          data: {
+            email: userEmail,
+            firstName: profile.firstName,
+            lastName: profile.lastName,
+          },
+        });
+
+        await prisma.logs.create({
+          data: {
+            userId: user.id,
+            type: LogType.USER_CREATED,
+          },
+        });
+      } else {
+        await prisma.logs.create({
+          data: {
+            userId: user.id,
+            type: LogType.USER_LOGIN,
+          },
+        });
+      }
+
+      // Pass the user to the next middleware
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
   })
 );
 
-// Serialize and deserialize user (required for sessions)
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
-
-passport.deserializeUser((user, done) => {
-  done(null, user);
-});
-
 // SAML Login Route
+// app.get("/login", passport.authenticate("saml", { session: false }));
 app.get("/login", (req, res) => {
-  res.json({ message: "Login route", url: samlConfig.login });
+  res.json({
+    url: samlConfig.login,
+  });
 });
 
 // SAML Assertion Consumer Service (ACS) Endpoint
 app.post(
   "/assertion",
-  passport.authenticate("saml", { failureRedirect: "/error" }),
+  passport.authenticate("saml", { failureRedirect: "/error", session: false }),
   (req, res) => {
-    res.send(`Hello, ${req.user.firstName}!`);
+    // Generate JWT
+    const token = jwt.sign(
+      {
+        id: req.user.id,
+        email: req.user.email,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+    // Send token to the client
+    res.redirect(process.env.BASE_URL + "?token=" + token);
   }
 );
 
-// Logout Route
-app.get("/logout", (req, res) => {
-  req.logout(() => {
-    res.redirect("/");
-  });
-});
+app.use("/api", await router());
 
 // Error Route
 app.get("/error", (req, res) => {
   res.send("Login Failed");
-});
-
-// Display user info
-app.get("/", (req, res) => {
-  res.send(`Hello, ${req.user ? JSON.stringify(req.user) : "Guest"}!`);
 });
 
 // Server Setup
