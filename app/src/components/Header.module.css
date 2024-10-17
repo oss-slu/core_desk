@@ -1,0 +1,15 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 20px;
+  height: 60px;
+  border-bottom: 2px solid var(--tblr-border-color);
+  max-width: 1200px;
+  margin: auto;
+}
+
+.headerLogo {
+  height: 100%;
+}

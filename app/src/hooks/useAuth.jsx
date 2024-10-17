@@ -22,17 +22,13 @@ export const AuthProvider = ({ children }) => {
     const token = url.searchParams.get("token");
     if (token) {
       localStorage.setItem("token", token);
-      console.log("Token set");
       url.searchParams.delete("token");
       window.history.replaceState({}, document.title, url);
-    } else {
-      console.log("No token found in URL");
-      console.log(localStorage.getItem("token"));
     }
   };
 
   const login = async () => {
-    const r = await fetch(u("/login"));
+    const r = await fetch(u("/api/auth/login"));
     const { url } = await r.json();
     window.location.href = url;
   };
@@ -68,6 +64,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     setLoggedIn(false);
+    document.location.reload();
   };
 
   useEffect(() => {

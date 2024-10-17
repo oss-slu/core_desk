@@ -2,7 +2,7 @@ import express from "express";
 import passport from "passport";
 import { Strategy as SamlStrategy } from "passport-saml";
 import bodyParser from "body-parser";
-import samlConfig from "./saml-config.js";
+import samlConfig from "./config/saml-config.js";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import { router } from "express-file-routing";
@@ -73,14 +73,6 @@ passport.use(
     }
   })
 );
-
-// SAML Login Route
-// app.get("/login", passport.authenticate("saml", { session: false }));
-app.get("/login", (req, res) => {
-  res.json({
-    url: samlConfig.login,
-  });
-});
 
 // SAML Assertion Consumer Service (ACS) Endpoint
 app.post(
