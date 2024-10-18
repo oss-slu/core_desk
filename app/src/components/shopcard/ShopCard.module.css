@@ -1,0 +1,21 @@
+.shopCard {
+  background-size: cover;
+  background-position: center;
+  aspect-ratio: 5/3;
+  width: 100%;
+}
+
+.shopCardlink {
+  width: 50%;
+  max-width: 300px;
+  text-decoration: none;
+  color: inherit;
+  display: inline-block;
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+
+.shopCardlink > * {
+  color: inherit;
+  text-decoration: none;
+}

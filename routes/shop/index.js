@@ -1,16 +1,7 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "../../util/prisma.js";
 import { verifyAuth } from "../../util/verifyAuth.js";
-
-const SHOP_SELECT = {
-  id: true,
-  name: true,
-  address: true,
-  phone: true,
-  email: true,
-  description: true,
-  imageUrl: true,
-};
+import { SHOP_SELECT } from "./shared.js";
 
 export const get = [
   verifyAuth,

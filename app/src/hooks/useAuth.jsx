@@ -21,7 +21,7 @@ export const AuthProvider = ({ children }) => {
     const url = new URL(window.location.href);
     const token = url.searchParams.get("token");
     if (token) {
-      localStorage.setItem("token", token);
+      console.log("Setting token", token);
       url.searchParams.delete("token");
       window.history.replaceState({}, document.title, url);
     }
@@ -30,7 +30,7 @@ export const AuthProvider = ({ children }) => {
   const login = async () => {
     const r = await fetch(u("/api/auth/login"));
     const { url } = await r.json();
-    window.location.href = url;
+    window.location.href = url + "?RelayState=" + window.location.href;
   };
 
   const fetchUser = async () => {
@@ -64,7 +64,6 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("token");
     setUser(null);
     setLoggedIn(false);
-    document.location.reload();
   };
 
   useEffect(() => {

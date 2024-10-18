@@ -56,8 +56,17 @@ model UserShop {
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
   shopId String
 
+  accountType AccountType
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum AccountType {
+  CUSTOMER
+  OPERATOR
+  ADMIN
+  INSTRUCTOR
 }
 
 model Shop {

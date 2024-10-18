@@ -1,21 +1,16 @@
 import React from "react";
-import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Header } from "./components/Header";
+import { Header } from "./components/header/Header";
 
-const Home = () => {
-  const { user } = useAuth();
-
-  return (
-    <>
-      <h1>Welcome to React Vite Micro App!</h1>
-      <p>Hard to get more minimal than this React app.</p>
-      {JSON.stringify(user)}
-    </>
-  );
-};
+import { Home } from "./routes/home";
+import { useAuth } from "./hooks/useAuth";
+import { Button } from "tabler-react-2/dist/button";
 
 export default () => {
+  const { user, loggedIn, loading, login } = useAuth();
+
+  if (loading) return null;
+
   return (
     <div>
       <Header />
@@ -30,7 +25,22 @@ export default () => {
       >
         <Router>
           <Routes>
-            <Route path="/" element={<Home />} />
+            {loggedIn ? (
+              <Route path="/" element={<Home />} />
+            ) : (
+              <Route
+                path="/"
+                element={
+                  <div>
+                    <h1>Welcome to SLU Open Project</h1>
+                    <p>Please log in to continue</p>
+                    <Button variant="primary" onClick={login}>
+                      Login
+                    </Button>
+                  </div>
+                }
+              />
+            )}
           </Routes>
         </Router>
       </div>

@@ -1,9 +1,9 @@
 import React from "react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../../hooks/useAuth";
 import styles from "./Header.module.css";
-import logo from "../assets/slucam-logo-color.png";
+import logo from "../../assets/slucam-logo-color.png";
 import { Dropdown } from "tabler-react-2/dist/dropdown";
-import { IconLogin2, IconLogout, IconUserPlus } from "@tabler/icons-react";
+import { IconLogin2, IconLogout } from "@tabler/icons-react";
 
 export const Header = () => {
   const { user, loggedIn, login, logout } = useAuth();
