@@ -9,6 +9,7 @@ export const get = [
         email: req.user.email,
         firstName: req.user.firstName,
         lastName: req.user.lastName,
+        admin: req.user.admin,
       },
     });
   },
