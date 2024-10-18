@@ -81,3 +81,103 @@ const { user } = useAuth();
 > }
 */
 ```
+
+## Shops
+
+Shops are centers that host printers or other equipment. They are the highest level of "campus" in the application.
+
+### GET `/api/shop`
+
+This endpoint returns a JSON object with a `shops` key that contains an array of shop objects. This endpoint requires a valid JWT in the `Authorization` header.
+
+```json
+{
+  "shops": [
+    {
+      "id": "cm2dz5xdz0002665mvd5j491p",
+      "name": "SLU Center for Additive Manufacturing",
+      "address": null,
+      "phone": null,
+      "email": "slu.cam@slu.edu",
+      "description": null,
+      "imageUrl": null
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "count": 1,
+    "offset": 0
+  }
+}
+```
+
+}
+
+### POST `/api/shop`
+
+This endpoint creates a new shop. It requires a valid JWT in the `Authorization` header, and a JSON object in the request body with the following keys:
+
+- `name` (string): The name of the shop
+- `address` (string?): The address of the shop
+- `phone` (string?): The phone number of the shop
+- `email` (string?): The email of the shop
+- `website` (string?): The website of the shop
+- `description` (string?): A description of the shop
+- `imageUrl` (string?): A URL to an image of the shop
+
+The API will respond with a JSON object containing the content of a traditional GET request to the shop endpoint with the new shop included, the standard meta object, and a `newShop` key that contains the new shop object.
+
+#### Request body:
+
+```json
+{
+  "name": "Academic Tech Commons at Pius III Memorial Library",
+  "email": "atc@slu.edu",
+  "phone": "555-555-5555",
+  "address": "3650 Lindell Blvd, St. Louis, Missouri",
+  "description": "3d printers and more advanced printers in the ATC in the library's first floor",
+  "website": "https://www.slu.edu/library/services/academic-technology-commons/index.php",
+  "imageUrl": "https://www.slu.edu/library/services/academic-technology-commons/-img/academic-technology-commons-01.jpg"
+}
+```
+
+#### Response:
+
+```json
+{
+  "newShop": {
+    "id": "cm2exf9h60000lrscxidsipw0",
+    "name": "Academic Tech Commons at Pius III Memorial Library",
+    "address": "3650 Lindell Blvd, St. Louis, Missouri",
+    "phone": "555-555-5555",
+    "email": "atc@slu.edu",
+    "description": "3d printers and more advanced printers in the ATC in the library's first floor",
+    "imageUrl": "https://www.slu.edu/library/services/academic-technology-commons/-img/academic-technology-commons-01.jpg"
+  },
+  "shops": [
+    {
+      "id": "cm2dz5xdz0002665mvd5j491p",
+      "name": "SLU Center for Additive Manufacturing",
+      "address": null,
+      "phone": null,
+      "email": "slu.cam@slu.edu",
+      "description": null,
+      "imageUrl": null
+    },
+    {
+      "id": "cm2exf9h60000lrscxidsipw0",
+      "name": "Academic Tech Commons at Pius III Memorial Library",
+      "address": "3650 Lindell Blvd, St. Louis, Missouri",
+      "phone": "555-555-5555",
+      "email": "atc@slu.edu",
+      "description": "3d printers and more advanced printers in the ATC in the library's first floor",
+      "imageUrl": "https://www.slu.edu/library/services/academic-technology-commons/-img/academic-technology-commons-01.jpg"
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "count": 2,
+    "offset": 0
+  }
+}
+```

@@ -14,24 +14,30 @@ datasource db {
 }
 
 model user {
-  id       String   @id @default(cuid())
-  email    String   @unique
+  id        String @id @default(cuid())
+  email     String @unique
   firstName String
   lastName  String
 
-  logs     logs[]
+  logs  logs[]
+  shops UserShop[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model logs {
-  id      String   @id @default(cuid())
+  id      String  @id @default(cuid())
   type    LogType
   message String?
+  from String? @db.MediumText
+  to String? @db.MediumText
 
-  user    user?     @relation(fields: [userId], references: [id])
-  userId  String?
+  user   user?   @relation(fields: [userId], references: [id])
+  userId String?
+
+  shop   Shop?   @relation(fields: [shopId], references: [id])
+  shopId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -40,4 +46,33 @@ model logs {
 enum LogType {
   USER_LOGIN
   USER_CREATED
+  SHOP_CREATED
+}
+
+model UserShop {
+  id     String @id @default(cuid())
+  user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Shop {
+  id          String  @id @default(cuid())
+  name        String
+  address     String?
+  phone       String?
+  email       String?
+  website     String?
+  description String?
+  imageUrl    String?
+
+  logs  logs[]
+  users UserShop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
