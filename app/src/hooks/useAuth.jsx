@@ -22,6 +22,7 @@ export const AuthProvider = ({ children }) => {
     const token = url.searchParams.get("token");
     if (token) {
       console.log("Setting token", token);
+      localStorage.setItem("token", token);
       url.searchParams.delete("token");
       window.history.replaceState({}, document.title, url);
     }

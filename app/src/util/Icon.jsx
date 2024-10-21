@@ -5,6 +5,6 @@ export const Icon = ({ i, size }) => (
     style={{
       fontSize: size,
     }}
-    class={`ti ti-${i}`}
+    className={`ti ti-${i}`}
   ></i>
 );

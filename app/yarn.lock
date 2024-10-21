@@ -1141,10 +1141,10 @@
   resolved "https://registry.yarnpkg.com/@rollup/rollup-win32-x64-msvc/-/rollup-win32-x64-msvc-4.24.0.tgz#0574d7e87b44ee8511d08cc7f914bcb802b70818"
   integrity sha512-fbMkAF7fufku0N2dE5TBXcNlg0pt0cJue4xBRE2Qc5Vqikxr4VCgKj/ht6SMdFcOacVA9rqF70APJ8RN/4vMJw==
 
-"@tabler/icons-react@^3.14.0":
+"@tabler/icons-webfont@^3.19.0":
   version "3.19.0"
-  resolved "https://registry.yarnpkg.com/@tabler/icons-react/-/icons-react-3.19.0.tgz#9b5a421bf69875677fde52e7de73b4e6b5571e57"
-  integrity sha512-AqEWGI0tQWgqo6ZjMO5yJ9sYT8oXLuAM/up0hN9iENS6IdtNZryKrkNSiMgpwweNTpl8wFFG/dAZ959S91A/uQ==
+  resolved "https://registry.yarnpkg.com/@tabler/icons-webfont/-/icons-webfont-3.19.0.tgz#d103a26aee6a0baa1c533b9e1b3955c4d83a53f5"
+  integrity sha512-c3axiLTjFFbR+LCqGD4MkWSguIb3KdFacCrwVoytVEMAgqvg12YeqJ9b6EGbpnoHcvve5ZvN5kGJtBVV7r1SQw==
   dependencies:
     "@tabler/icons" "3.19.0"
 
@@ -1813,16 +1813,15 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-tabler-react-2@^0.1.30:
-  version "0.1.30"
-  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.30.tgz#ec4212f0a08b1138087bd8ffea6cb31489805080"
-  integrity sha512-DrZxnfYA6RIq7oH8T3byW2dBbtaKG1yNMHHhaGbHaPKoci8A6S8gPUi3TSdPYsjT+eV+tZ/oEc4G8Gff4OijtQ==
+tabler-react-2@^0.1.31:
+  version "0.1.31"
+  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.31.tgz#79ccf7cb7366d382e152c3af532fbd3bcaa0a70d"
+  integrity sha512-N4OEbAX+zE1BB1Hnaq9mNkpORJ/PbbtXpGnG1JlDzriT7JNkLoSW2MDqO3L0s+kNs6UkqMHF0W5SyISObEFc3A==
   dependencies:
     "@babel/cli" "^7.24.8"
     "@babel/core" "^7.24.8"
     "@babel/preset-env" "^7.24.8"
     "@babel/preset-react" "^7.24.7"
-    "@tabler/icons-react" "^3.14.0"
     classnames "^2.5.1"
     prop-types "^15.8.1"
     react "^18.3.1"
