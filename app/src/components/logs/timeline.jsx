@@ -73,7 +73,7 @@ const switchLogForContent = (log) => {
         description: `User ${log.user.firstName} ${
           log.user.lastName
         } was connected to shop ${log.shop?.name} as a ${
-          log.to ? JSON.parse(log.to).accountType.toLowerCase() : "..."
+          log.to ? JSON.parse(log.to)?.accountType?.toLowerCase() : "..."
         }.`,
       };
     case "USER_DISCONNECTED_FROM_SHOP":

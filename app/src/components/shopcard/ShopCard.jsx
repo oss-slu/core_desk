@@ -31,7 +31,7 @@ export const ShopCard = ({ shop }) => {
       }, ${COLOR_PAIRS(shop.color)[1]})`;
 
   return (
-    <Link className={styles.shopCardlink} to={`/shop/${shop.id}`}>
+    <Link className={styles.shopCardlink} to={`/shops/${shop.id}`}>
       <Card style={{ backgroundImage }} className={styles.shopCard}>
         <H2>{shop.name}</H2>
       </Card>

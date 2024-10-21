@@ -13,5 +13,9 @@ export const authFetch = async (url, options) => {
       "Content-Type": "application/json",
     },
   });
+  if (res.status === 401) {
+    localStorage.removeItem("token");
+    window.fetchUser();
+  }
   return res;
 };

@@ -8,28 +8,32 @@ export const get = [
   async (req, res) => {
     try {
       const shops = await prisma.shop.findMany({
-        where: {
-          users: {
-            some: {
-              userId: req.user.id,
-              active: true,
+        where: req.user.admin
+          ? {}
+          : {
+              users: {
+                some: {
+                  userId: req.user.id,
+                  active: true,
+                },
+              },
             },
-          },
-        },
         select: SHOP_SELECT,
         take: req.query.limit ? parseInt(req.query.limit) : 20,
         skip: req.query.offset ? parseInt(req.query.offset) : 0,
       });
 
       const totalShops = await prisma.shop.count({
-        where: {
-          users: {
-            some: {
-              userId: req.user.id,
-              active: true,
+        where: req.user.admin
+          ? {}
+          : {
+              users: {
+                some: {
+                  userId: req.user.id,
+                  active: true,
+                },
+              },
             },
-          },
-        },
       });
 
       res.json({

@@ -10,6 +10,8 @@ import dotenv from "dotenv";
 import { prisma } from "./util/prisma.js";
 import { LogType } from "@prisma/client";
 dotenv.config();
+import { createRouteHandler } from "uploadthing/express";
+import { uploadRouter } from "./config/uploadthing.js";
 
 const app = express();
 
@@ -108,7 +110,27 @@ app.post(
 
 app.use(express.json());
 
+app.use(
+  "/api/files/upload",
+  createRouteHandler({
+    router: uploadRouter,
+    config: {
+      token: process.env.UPLOADTHING_TOKEN,
+      callbackUrl: process.env.TUNNEL_URL + "/api/files/callback",
+    },
+  })
+);
+
 app.use("/api", await router());
+
+app.all("/log", (req, res) => {
+  console.log(req.body, req.headers);
+  res.send("ok");
+});
+
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
 
 // Error Route
 app.get("/error", (req, res) => {

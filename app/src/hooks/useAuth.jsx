@@ -21,7 +21,6 @@ export const AuthProvider = ({ children }) => {
     const url = new URL(window.location.href);
     const token = url.searchParams.get("token");
     if (token) {
-      console.log("Setting token", token);
       localStorage.setItem("token", token);
       url.searchParams.delete("token");
       window.history.replaceState({}, document.title, url);
@@ -68,6 +67,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    window.fetchUser = fetchUser;
     fetchUser();
   }, []);
 

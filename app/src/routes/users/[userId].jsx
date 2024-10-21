@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
 import { Loading } from "../../components/loading/loading";
 import { Page, sidenavItems } from "../../components/page/page";
@@ -16,6 +16,7 @@ import { useModal } from "tabler-react-2/dist/modal";
 import { useShops } from "../../hooks/useShops";
 import { Spinner } from "tabler-react-2/dist/spinner";
 import { Alert } from "tabler-react-2/dist/alert";
+import { useConfirm } from "tabler-react-2/dist/modal/confirm";
 const { H1, H2, H3 } = Typography;
 
 const AddUserToShopForm = ({ user, onFinish }) => {
@@ -145,19 +146,38 @@ export const UserPage = () => {
     changeUserRole,
   } = useShops();
 
+  const { confirm, ConfirmModal } = useConfirm({
+    title: "Are you sure you want to disconnect?",
+    text:
+      activeUser.id === user.id ? (
+        "You are about to disconnect yourself from this shop. This will remove your access to this shop. In order to rejoin, you will need to be re-added by an admin."
+      ) : (
+        <>
+          You are about to disconnect {user.firstName} from this shop. This will
+          remove their access to this shop. You will have to re-add them if they
+          need access again. They will be able to re-join the shop automatically
+          if they follow a billing group link.
+        </>
+      ),
+  });
+
   if (loading) return <Loading />;
 
   return (
     <Page sidenavItems={sidenavItems("Users", activeUser?.admin)}>
       {SuspendConfirmModal}
       {UnSuspendConfirmModal}
+      {ConfirmModal}
       <Util.Row gap={2}>
         <Avatar size="xl" dicebear initials={user.id} />
         <Util.Col>
           <H1>
             {user.firstName} {user.lastName}
           </H1>
-          <p>{user.email}</p>
+          <span>
+            <Link to={`mailto:${user.email}`}>{user.email}</Link>
+          </span>
+          <Util.Spacer size={1} />
           <Util.Row gap={0.5}>
             {user.isMe && (
               <Badge color="green" soft>
@@ -347,6 +367,7 @@ export const UserPage = () => {
                     variant="danger"
                     outline
                     onClick={async () => {
+                      if (!(await confirm())) return;
                       await removeUserFromShop(user.id, context.shop.id);
                       refetch(false);
                     }}

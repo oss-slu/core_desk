@@ -7,6 +7,7 @@ import { useAuth } from "./hooks/useAuth";
 import { Button } from "tabler-react-2/dist/button";
 import { UsersPage } from "./routes/users";
 import { UserPage } from "./routes/users/[userId]";
+import { ShopPage } from "./routes/shops/[shopId]";
 
 export default () => {
   const { user, loggedIn, loading, login } = useAuth();
@@ -33,6 +34,8 @@ export default () => {
 
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/users/:userId" element={<UserPage />} />
+
+                <Route path="/shops/:shopId" element={<ShopPage />} />
               </>
             ) : (
               <Route
