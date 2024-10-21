@@ -76,7 +76,7 @@ export const Page = ({ children, sidenavItems: _sidenavItems }) => {
         display: "flex",
         flexDirection: "row",
         width: "100%",
-        minHeight: "calc(100vh - 100px)",
+        minHeight: "calc(100vh - 70px)",
         gap: 10,
       }}
     >

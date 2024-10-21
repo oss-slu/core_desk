@@ -23,7 +23,18 @@ export const get = [
         return res.status(404).json({ error: "Shop not found" });
       }
 
-      res.json(shop);
+      const userShop = await prisma.userShop.findFirst({
+        where: {
+          userId: req.user.id,
+          shopId: shop.id,
+        },
+        select: {
+          accountType: true,
+          accountTitle: true,
+        },
+      });
+
+      res.json({ shop, userShop });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Something went wrong" });

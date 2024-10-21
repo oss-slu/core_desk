@@ -5,8 +5,6 @@ import "@uploadthing/react/styles.css";
 
 const _UploadDropzone = generateUploadDropzone({
   url: u("/api/files/upload"),
-  metadata: { hello: "WORLD1" },
-  headers: { hello: "WORLD2" },
 });
 
 export const UploadDropzone = (scope) => {
@@ -14,10 +12,7 @@ export const UploadDropzone = (scope) => {
     <_UploadDropzone
       endpoint="files"
       headers={{
-        "x-scope": scope,
-      }}
-      metadata={{
-        hello: "WORLD3",
+        "x-scope": JSON.stringify(scope),
       }}
     />
   );

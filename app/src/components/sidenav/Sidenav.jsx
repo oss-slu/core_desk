@@ -53,6 +53,7 @@ export const Sidenav = ({ items }) => {
         <Icon i={collapsed ? "chevron-right" : "chevron-left"} size={18} />
         {collapsed ? "" : "Collapse"}
       </Button>
+      <div style={{ height: 20 }} />
     </nav>
   );
 };

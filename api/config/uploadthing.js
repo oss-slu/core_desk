@@ -6,9 +6,14 @@ export const uploadRouter = {
   files: f({
     blob: {
       maxFileSize: "128MB",
-      maxFileCount: 50,
+      maxFileCount: 150,
     },
-  }).onUploadComplete((data) => {
-    console.log("upload completed", data);
-  }),
+  })
+    .middleware(async ({ req, res }) => {
+      console.log("middleware", req.body, req.headers["x-scope"]);
+      return { scope: JSON.parse(req.headers["x-scope"]) };
+    })
+    .onUploadComplete((data) => {
+      // console.log("upload completed!", data);
+    }),
 };

@@ -1894,10 +1894,10 @@ supports-preserve-symlinks-flag@^1.0.0:
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
 
-tabler-react-2@^0.1.35:
-  version "0.1.35"
-  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.35.tgz#edc203db8528f19389271bafaf5e4c8bb64ba40f"
-  integrity sha512-YVzvFwpoXJyrUm5qyyUlsPN6WpDDmIIGSSwsyfuyxymvLdTXUhL14g/KpsrFGngcEdmWZZXNxkd89AG186Ztdw==
+tabler-react-2@^0.1.36:
+  version "0.1.36"
+  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.36.tgz#d20139a9dc1e5bc8e0728a2e7660d8600d3fa596"
+  integrity sha512-L464csMT2Gyitk9fvM5FaGsReJL7FdN6BexFcZanhRzqAv5B2CsjLTjYjFk3+V3eSKiU++OaR9M75DYevOUsPw==
   dependencies:
     "@babel/cli" "^7.24.8"
     "@babel/core" "^7.24.8"
