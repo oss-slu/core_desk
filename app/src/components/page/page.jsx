@@ -1,6 +1,6 @@
 import React from "react";
 import { Sidenav } from "../sidenav/Sidenav";
-import { House } from "@phosphor-icons/react";
+import { Icon } from "../../util/Icon";
 import { useAuth } from "../../hooks/useAuth";
 
 const sidenavItems = (activeText, userIsAdmin) => [
@@ -9,8 +9,7 @@ const sidenavItems = (activeText, userIsAdmin) => [
     href: `/`,
     text: `Home`,
     active: activeText === "Home",
-    icon: "🏠",
-    icon: <House size={18} />,
+    icon: <Icon i={"home"} size={18} />,
   },
   // {
   //   type: "item",
