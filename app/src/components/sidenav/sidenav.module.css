@@ -4,8 +4,7 @@
   gap: 8px;
   padding: 8px;
   border-right: 2px solid #e0e0e0;
-  max-width: 200px;
-  min-width: 180px;
+  width: 200px;
   margin-top: -10px;
   padding-left: 0;
 }
