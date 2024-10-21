@@ -6,5 +6,7 @@ export const Icon = ({ i, size }) => (
       fontSize: size,
     }}
     className={`ti ti-${i}`}
-  ></i>
+  >
+    {JSON.stringify(size)}
+  </i>
 );

@@ -12,6 +12,7 @@ export const get = [
           users: {
             some: {
               userId: req.user.id,
+              active: true,
             },
           },
         },

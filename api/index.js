@@ -94,7 +94,7 @@ app.post(
         lastName: req.user.lastName,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "3h" }
     );
 
     const relayState = req.body.RelayState;

@@ -24,6 +24,8 @@ model user {
   jobs  Job[]
 
   admin  Boolean @default(false)
+  suspended Boolean @default(false)
+  suspensionReason String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -53,6 +55,14 @@ enum LogType {
   USER_LOGIN
   USER_CREATED
   SHOP_CREATED
+  USER_CONNECTED_TO_SHOP
+  USER_DISCONNECTED_FROM_SHOP
+  USER_SHOP_ROLE_CHANGED
+  USER_PROMOTED_TO_ADMIN
+  USER_DEMOTED_FROM_ADMIN
+  USER_SUSPENSION_APPLIED
+  USER_SUSPENSION_REMOVED
+  USER_SUSPENSION_CHANGED
 }
 
 model UserShop {
@@ -64,6 +74,8 @@ model UserShop {
 
   accountType AccountType @default(CUSTOMER)
   accountTitle String?
+
+  active Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -86,12 +98,25 @@ model Shop {
   description String?
   imageUrl    String?
 
+  color Color?
+
   logs  logs[]
   users UserShop[]
   jobs  Job[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Color {
+  RED
+  BLUE
+  GREEN
+  YELLOW
+  ORANGE
+  PURPLE
+  PINK
+  TEAL
 }
 
 model Job {

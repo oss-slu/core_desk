@@ -38,6 +38,9 @@ export const get = [
       },
       include: {
         shops: {
+          where: {
+            active: true,
+          },
           select: {
             shop: true,
             createdAt: true,
@@ -47,6 +50,9 @@ export const get = [
         },
         jobs: true,
         logs: {
+          orderBy: {
+            createdAt: "desc",
+          },
           include: {
             user: {
               select: {
@@ -63,7 +69,11 @@ export const get = [
         },
         _count: {
           select: {
-            shops: true,
+            shops: {
+              where: {
+                active: true,
+              },
+            },
             jobs: true,
           },
         },

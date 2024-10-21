@@ -12,7 +12,11 @@ export const get = [
       include: {
         _count: {
           select: {
-            shops: true,
+            shops: {
+              where: {
+                active: true,
+              },
+            },
             jobs: true,
           },
         },

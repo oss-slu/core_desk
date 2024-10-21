@@ -53,6 +53,11 @@ export const UsersPage = () => {
                       (Your account)
                     </Badge>
                   )}
+                  {context.suspended && (
+                    <Badge color="red" soft>
+                      Suspended
+                    </Badge>
+                  )}
                 </>
               ),
               sortable: true,
@@ -65,13 +70,18 @@ export const UsersPage = () => {
               accessor: "admin",
               render: (v, context) =>
                 v ? (
-                  <>
+                  <Util.Row gap={0.5} wrap>
                     {context.admin && (
                       <Badge color="green" soft>
                         Admin
                       </Badge>
                     )}
-                  </>
+                    {context.suspended && (
+                      <Badge color="red" soft>
+                        Suspended
+                      </Badge>
+                    )}
+                  </Util.Row>
                 ) : (
                   "No"
                 ),

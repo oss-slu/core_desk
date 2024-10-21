@@ -6,4 +6,5 @@ export const SHOP_SELECT = {
   email: true,
   description: true,
   imageUrl: true,
+  color: true,
 };
