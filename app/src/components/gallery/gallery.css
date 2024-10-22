@@ -1,0 +1,9 @@
+.image-gallery-image {
+  width: 100%;
+  object-fit: cover !important;
+}
+
+.image-gallery-icon {
+  /* Hard drop-shadow with 2px spread */
+  filter: drop-shadow(0 0px 1px rgba(0, 0, 0, 0.5)) !important;
+}

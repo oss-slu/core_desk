@@ -1,13 +1,13 @@
 import React from "react";
-import { Page, sidenavItems } from "../../components/page/page";
-import { useAuth } from "../../hooks/useAuth";
-import { Loading } from "../../components/loading/loading";
+import { Page, sidenavItems } from "../../../components/page/page";
+import { useAuth } from "../../../hooks/useAuth";
+import { Loading } from "../../../components/loading/loading";
 import { Typography } from "tabler-react-2";
-import { UploadDropzone } from "../../components/upload/uploader";
-import { Icon } from "../../util/Icon";
+import { UploadDropzone } from "../../../components/upload/uploader";
+import { Icon } from "../../../util/Icon";
 import { useParams } from "react-router-dom";
 const { H1 } = Typography;
-import { useShop } from "../../hooks/useShop";
+import { useShop } from "../../../hooks/useShop";
 
 export const shopSidenavItems = (
   activeText,

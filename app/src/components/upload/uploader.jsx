@@ -10,10 +10,16 @@ const _UploadDropzone = generateUploadDropzone({
   url: u("/api/files/upload"),
 });
 
-export const UploadDropzone = ({ scope, metadata, onUploadComplete }) => {
+export const UploadDropzone = ({
+  scope,
+  metadata,
+  onUploadComplete,
+  dropzoneAppearance,
+}) => {
   return (
     <>
       <_UploadDropzone
+        appearance={dropzoneAppearance}
         endpoint="files"
         headers={{
           "x-scope": scope,

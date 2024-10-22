@@ -1,14 +1,12 @@
 import React from "react";
-import { Page } from "../../../components/page/page";
-import { Icon } from "../../../util/Icon";
+import { Page } from "../../../../components/page/page";
+import { Icon } from "../../../../util/Icon";
 import { useParams } from "react-router-dom";
 import { Typography, Util } from "tabler-react-2";
-import { useJob } from "../../../hooks/useJob";
-import { Loading } from "../../../components/loading/loading";
-import { UploadDropzone } from "../../../components/upload/uploader";
-import { Table } from "tabler-react-2/dist/table";
-import { RenderMedia } from "../../../components/media/renderMedia";
-import { JobItem } from "../../../components/jobitem/JobItem";
+import { useJob } from "../../../../hooks/useJob";
+import { Loading } from "../../../../components/loading/loading";
+import { UploadDropzone } from "../../../../components/upload/uploader";
+import { JobItem } from "../../../../components/jobitem/JobItem";
 const { H1, H2 } = Typography;
 
 export const JobPage = () => {

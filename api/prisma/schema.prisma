@@ -50,6 +50,12 @@ model logs {
   jobItem JobItem? @relation(fields: [jobItemId], references: [id])
   jobItemId String?
 
+  resource Resource? @relation(fields: [resourceId], references: [id])
+  resourceId String?
+
+  resourceImage ResourceImage? @relation(fields: [resourceImageId], references: [id])
+  resourceImageId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -74,6 +80,12 @@ enum LogType {
   JOB_ITEM_DELETED
   JOB_ITEM_MODIFIED
   JOB_ITEM_STATUS_CHANGED
+  RESOURCE_CREATED
+  RESOURCE_MODIFIED
+  RESOURCE_DELETED
+  RESOURCE_IMAGE_CREATED
+  RESOURCE_IMAGE_MODIFIED
+  RESOURCE_IMAGE_DELETED
 }
 
 model UserShop {
@@ -115,8 +127,66 @@ model Shop {
   users UserShop[]
   jobs  Job[]
 
+  resources Resource[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Resource {
+  id          String  @id @default(cuid())
+  title       String
+  description String? @db.MediumText
+  images      ResourceImage[]
+  public      Boolean @default(false)
+
+  primaryCategory String?
+  secondaryCategory String?
+
+  shop   Shop   @relation(fields: [shopId], references: [id])
+  shopId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quantity Int?
+  quantityPublic Boolean @default(true)
+
+  costPerUnit Float?
+  fixedCost Float?
+  costPerTime Float?
+  costPerMaterial Float?
+  costPerProcessingTime Float?
+  costingPublic Boolean @default(true)
+
+  userSuppliedMaterial SuppliedMaterialLevels @default(NEVER)
+
+  logs  logs[]
+}
+
+model ResourceImage {
+  id          String  @id @default(cuid())
+
+  fileKey String
+  fileUrl String
+  fileName String
+  fileType String
+
+  description String?
+
+  resource Resource @relation(fields: [resourceId], references: [id])
+  resourceId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  logs  logs[]
+}
+
+enum SuppliedMaterialLevels {
+  ALWAYS
+  SOMETIMES
+  NEVER
+  SPECIAL
 }
 
 enum Color {

@@ -1,10 +1,10 @@
 import React from "react";
-import { useAuth } from "../hooks/useAuth";
-import { useShops } from "../hooks/useShops";
-import { Loading } from "../components/loading/loading";
+import { useAuth } from "../../hooks/useAuth";
+import { useShops } from "../../hooks/useShops";
+import { Loading } from "../../components/loading/loading";
 import { Typography } from "tabler-react-2";
-import { ShopCard } from "../components/shopcard/ShopCard";
-import { Page, sidenavItems } from "../components/page/page";
+import { ShopCard } from "../../components/shopcard/ShopCard";
+import { Page, sidenavItems } from "../../components/page/page";
 const { H1 } = Typography;
 
 export const Shops = () => {

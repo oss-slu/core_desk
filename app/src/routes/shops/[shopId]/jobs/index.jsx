@@ -1,16 +1,17 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import { Page } from "../../../components/page/page";
-import { useShop } from "../../../hooks/useShop";
-import { shopSidenavItems } from "../[shopId]";
-import { useAuth } from "../../../hooks/useAuth";
+import { Page } from "../../../../components/page/page";
+import { useShop } from "../../../../hooks/useShop";
+import { shopSidenavItems } from "../../[shopId]/index";
+import { useAuth } from "../../../../hooks/useAuth";
 import { Typography, Util } from "tabler-react-2";
 const { H1, H3 } = Typography;
-import { useJobs } from "../../../hooks/useJobs";
+import { useJobs } from "../../../../hooks/useJobs";
 import { Button } from "tabler-react-2/dist/button";
 import { Table } from "tabler-react-2/dist/table";
 import Badge from "tabler-react-2/dist/badge";
 import moment from "moment";
+import { Loading } from "../../../../components/loading/loading";
 
 const switchStatusForBadge = (status) => {
   switch (status) {
@@ -65,6 +66,21 @@ export const Jobs = () => {
     ModalElement,
     createJob,
   } = useJobs(shopId);
+
+  if (jobsLoading) {
+    return (
+      <Page
+        sidenavItems={shopSidenavItems(
+          "Jobs",
+          shopId,
+          user.admin,
+          userShop.accountType
+        )}
+      >
+        <Loading />
+      </Page>
+    );
+  }
 
   return (
     <Page

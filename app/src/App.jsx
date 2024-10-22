@@ -7,11 +7,13 @@ import { useAuth } from "./hooks/useAuth";
 import { Button } from "tabler-react-2/dist/button";
 import { UsersPage } from "./routes/users";
 import { UserPage } from "./routes/users/[userId]";
-import { ShopPage } from "./routes/shops/[shopId]";
+import { ShopPage } from "./routes/shops/[shopId]/index";
 import { Shops } from "./routes/shops";
-import { Jobs } from "./routes/shops/jobs/index";
-import { JobPage } from "./routes/shops/jobs/[jobId]";
+import { Jobs } from "./routes/shops/[shopId]/jobs";
+import { JobPage } from "./routes/shops/[shopId]/jobs/[jobId]";
 import { Toaster } from "react-hot-toast";
+import { ResourcesPage } from "./routes/shops/[shopId]/resources";
+import { ResourcePage } from "./routes/shops/[shopId]/resources/[resourceId]";
 
 export default () => {
   const { user, loggedIn, loading, login } = useAuth();
@@ -46,6 +48,14 @@ export default () => {
                 <Route
                   path="/shops/:shopId/jobs/:jobId"
                   element={<JobPage />}
+                />
+                <Route
+                  path="/shops/:shopId/resources"
+                  element={<ResourcesPage />}
+                />
+                <Route
+                  path="/shops/:shopId/resources/:resourceId"
+                  element={<ResourcePage />}
                 />
               </>
             ) : (
