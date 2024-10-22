@@ -34,5 +34,6 @@ export const useResource = (shopId, resourceId) => {
     loading,
     opLoading,
     error,
+    refetch: fetchResource,
   };
 };

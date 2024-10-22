@@ -13,7 +13,7 @@ export const ResourcePage = () => {
   const { shopId, resourceId } = useParams();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
-  const { resource, loading } = useResource(shopId, resourceId);
+  const { resource, loading, refetch } = useResource(shopId, resourceId);
 
   if (loading) {
     return (
@@ -46,6 +46,7 @@ export const ResourcePage = () => {
           display: "none",
         },
       }}
+      onUploadComplete={refetch}
     />
   );
 
@@ -81,14 +82,18 @@ export const ResourcePage = () => {
                   images={resource.images}
                   height={200}
                   lastSlide={
-                    <div style={{ padding: 8 }}>
-                      <HereUploadDropzone />
-                    </div>
+                    (user.admin || userShop.accountType === "ADMIN") && (
+                      <div style={{ padding: 8 }}>
+                        <HereUploadDropzone />
+                      </div>
+                    )
                   }
                 />
               </div>
-            ) : (
+            ) : user.admin || userShop.accountType === "ADMIN" ? (
               <HereUploadDropzone />
+            ) : (
+              <i>No images found</i>
             )}
           </div>
         </div>
