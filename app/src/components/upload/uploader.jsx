@@ -10,13 +10,14 @@ const _UploadDropzone = generateUploadDropzone({
   url: u("/api/files/upload"),
 });
 
-export const UploadDropzone = ({ scope, onUploadComplete }) => {
+export const UploadDropzone = ({ scope, metadata, onUploadComplete }) => {
   return (
     <>
       <_UploadDropzone
         endpoint="files"
         headers={{
-          "x-scope": JSON.stringify(scope),
+          "x-scope": scope,
+          "x-metadata": JSON.stringify(metadata),
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         }}
         onUploadError={(error) => {

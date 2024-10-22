@@ -8,6 +8,7 @@ import { useJobItem } from "../../hooks/useJobItem";
 import { useParams } from "react-router-dom";
 import { Spinner } from "tabler-react-2/dist/spinner";
 const { H3 } = Typography;
+import styles from "./jobItem.module.css";
 
 function downloadFile(url, filename) {
   fetch(url)
@@ -62,14 +63,14 @@ export const JobItem = ({ item: _item }) => {
 
   return (
     <Card>
-      {ModalElement}
+      <div className={styles.modal}>{ModalElement}</div>
       <Util.Row gap={1}>
         <RenderMedia mediaUrl={item.fileUrl} fileType={item.fileType} />
         <div>
           <H3>{item.title}</H3>
           <Util.Row gap={1}>
             <Button onClick={modal}>
-              <Icon i="cube" size={18} />
+              <Icon i="cube" size={20} />
             </Button>
             <Button
               onClick={() => {
@@ -77,7 +78,7 @@ export const JobItem = ({ item: _item }) => {
               }}
               download
             >
-              <Icon i="download" size={18} /> Download
+              <Icon i="download" size={20} />
             </Button>
             {opLoading ? (
               <Spinner />

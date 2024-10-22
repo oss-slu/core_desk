@@ -33,6 +33,16 @@ export const RenderMedia = ({ mediaUrl, fileType, big = false }) => {
     );
   }
 
+  if (fileType === "pdf") {
+    return (
+      <iframe
+        src={mediaUrl}
+        className={classNames(styles.image, big ? styles.big : "")}
+        title="PDF"
+      />
+    );
+  }
+
   return (
     <div className={classNames(styles.unsupported, big ? styles.big : "")}>
       {fileType}

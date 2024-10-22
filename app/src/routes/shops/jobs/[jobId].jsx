@@ -39,7 +39,8 @@ export const JobPage = () => {
       <H1>{job.title}</H1>
       <p>{job.description}</p>
       <UploadDropzone
-        scope={{
+        scope={"job.fileupload"}
+        metadata={{
           jobId,
           shopId,
         }}
