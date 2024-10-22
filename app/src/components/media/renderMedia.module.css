@@ -23,3 +23,9 @@
   font-size: 10px;
   width: 70%;
 }
+
+.big {
+  width: 100%;
+  max-width: unset;
+  height: 300px;
+}

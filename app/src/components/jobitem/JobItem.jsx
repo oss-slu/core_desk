@@ -3,6 +3,7 @@ import { Card, Util, Typography, DropdownInput } from "tabler-react-2";
 import { RenderMedia } from "../media/renderMedia";
 import { Button } from "tabler-react-2/dist/button";
 import { Icon } from "../../util/Icon";
+import { useModal } from "tabler-react-2/dist/modal";
 const { H3 } = Typography;
 
 function downloadFile(url, filename) {
@@ -21,13 +22,26 @@ function downloadFile(url, filename) {
 }
 
 export const JobItem = ({ item }) => {
+  const { modal, ModalElement } = useModal({
+    title: item.title,
+    text: (
+      <div>
+        <RenderMedia big mediaUrl={item.fileUrl} fileType={item.fileType} />
+      </div>
+    ),
+  });
+
   return (
     <Card>
+      {ModalElement}
       <Util.Row gap={1}>
         <RenderMedia mediaUrl={item.fileUrl} fileType={item.fileType} />
         <div>
           <H3>{item.title}</H3>
           <Util.Row gap={1}>
+            <Button onClick={modal}>
+              <Icon i="cube" size={18} />
+            </Button>
             <Button
               onClick={() => {
                 downloadFile(item.fileUrl, item.title);

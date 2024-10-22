@@ -13,7 +13,7 @@ const { H1, H2 } = Typography;
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
-  const { job, loading } = useJob(shopId, jobId);
+  const { job, loading, refetch: refetchJobs } = useJob(shopId, jobId);
 
   if (loading) return <Loading />;
 
@@ -42,6 +42,9 @@ export const JobPage = () => {
         scope={{
           jobId,
           shopId,
+        }}
+        onUploadComplete={() => {
+          refetchJobs();
         }}
       />
       <Util.Spacer size={1} />

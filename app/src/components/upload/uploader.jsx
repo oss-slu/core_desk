@@ -10,7 +10,7 @@ const _UploadDropzone = generateUploadDropzone({
   url: u("/api/files/upload"),
 });
 
-export const UploadDropzone = ({ scope }) => {
+export const UploadDropzone = ({ scope, onUploadComplete }) => {
   return (
     <>
       <_UploadDropzone
@@ -23,6 +23,7 @@ export const UploadDropzone = ({ scope }) => {
           toast.error("Upload error: " + error);
         }}
         onClientUploadComplete={(f) => {
+          onUploadComplete();
           f.forEach((file) =>
             toast.success(`File ${file.name} uploaded successfully`)
           );
