@@ -1,12 +1,12 @@
 import React from "react";
 import { Link, useParams } from "react-router-dom";
-import { Page } from "../../components/page/page";
-import { useShop } from "../../hooks/useShop";
-import { shopSidenavItems } from "./[shopId]";
-import { useAuth } from "../../hooks/useAuth";
+import { Page } from "../../../components/page/page";
+import { useShop } from "../../../hooks/useShop";
+import { shopSidenavItems } from "../[shopId]";
+import { useAuth } from "../../../hooks/useAuth";
 import { Typography, Util } from "tabler-react-2";
 const { H1, H3 } = Typography;
-import { useJobs } from "../../hooks/useJobs";
+import { useJobs } from "../../../hooks/useJobs";
 import { Button } from "tabler-react-2/dist/button";
 import { Table } from "tabler-react-2/dist/table";
 import Badge from "tabler-react-2/dist/badge";
@@ -94,7 +94,7 @@ export const Jobs = () => {
               label: "Title",
               accessor: "title",
               render: (title, context) => (
-                <Link to={`/shops/${shopId}/job/${context.id}`}>{title}</Link>
+                <Link to={`/shops/${shopId}/jobs/${context.id}`}>{title}</Link>
               ),
               sortable: true,
             },

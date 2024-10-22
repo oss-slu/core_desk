@@ -47,6 +47,9 @@ model logs {
   job    Job?    @relation(fields: [jobId], references: [id])
   jobId String?
 
+  jobItem JobItem? @relation(fields: [jobItemId], references: [id])
+  jobItemId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -145,19 +148,27 @@ model Job {
   dueDate DateTime?
 
   logs  logs[]
-  items JobItems[]
+  items JobItem[]
 
   status ProgressStatus @default(NOT_STARTED)
 }
 
-model JobItems {
+model JobItem {
   id          String  @id @default(cuid())
   title       String
   status     ProgressStatus @default(NOT_STARTED)
+
+  fileKey String
+  fileUrl String
+  fileName String
+  fileType String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
   jobId String
   job Job @relation(fields: [jobId], references: [id])
+  logs logs[]
 }
 
 enum ProgressStatus {

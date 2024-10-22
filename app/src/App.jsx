@@ -9,7 +9,9 @@ import { UsersPage } from "./routes/users";
 import { UserPage } from "./routes/users/[userId]";
 import { ShopPage } from "./routes/shops/[shopId]";
 import { Shops } from "./routes/shops";
-import { Jobs } from "./routes/shops/jobs";
+import { Jobs } from "./routes/shops/jobs/index";
+import { JobPage } from "./routes/shops/jobs/[jobId]";
+import { Toaster } from "react-hot-toast";
 
 export default () => {
   const { user, loggedIn, loading, login } = useAuth();
@@ -18,6 +20,7 @@ export default () => {
 
   return (
     <div>
+      <Toaster />
       <Header />
       <div
         style={{
@@ -40,6 +43,10 @@ export default () => {
                 <Route path="/shops" element={<Shops />} />
                 <Route path="/shops/:shopId" element={<ShopPage />} />
                 <Route path="/shops/:shopId/jobs" element={<Jobs />} />
+                <Route
+                  path="/shops/:shopId/jobs/:jobId"
+                  element={<JobPage />}
+                />
               </>
             ) : (
               <Route

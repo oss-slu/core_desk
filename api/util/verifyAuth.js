@@ -29,3 +29,31 @@ export const verifyAuth = async (req, res, next) => {
     res.sendStatus(401); // Unauthorized
   }
 };
+
+export const verifyAuthAlone = async (auth) => {
+  const token = auth.split(" ")[1];
+
+  // Verify the token
+  return new Promise((resolve, reject) => {
+    try {
+      jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
+        if (err) {
+          return reject(err);
+        }
+
+        const _user = await prisma.user.findUnique({
+          where: { id: user.id },
+        });
+
+        if (!_user) {
+          return reject("User not found");
+        }
+
+        resolve(_user);
+      });
+    } catch (error) {
+      console.log("Error verifying token");
+      console.error(error);
+    }
+  });
+};
