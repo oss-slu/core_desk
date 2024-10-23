@@ -5,7 +5,6 @@ export const useShop = (shopId) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [shop, setShop] = useState({});
-  const [userShop, setUserShop] = useState({});
 
   const fetchShop = async () => {
     try {
@@ -13,7 +12,6 @@ export const useShop = (shopId) => {
       const r = await authFetch(`/api/shop/${shopId}`);
       const data = await r.json();
       setShop(data.shop);
-      setUserShop(data.userShop);
       setLoading(false);
     } catch (error) {
       setError(error);
@@ -25,5 +23,5 @@ export const useShop = (shopId) => {
     fetchShop();
   }, []);
 
-  return { shop, userShop, loading, error, refetch: fetchShop };
+  return { shop, loading, error, refetch: fetchShop };
 };

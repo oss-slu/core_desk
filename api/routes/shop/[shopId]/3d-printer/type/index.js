@@ -1,7 +1,7 @@
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 
-export const get = async (req, res) => [
+export const get = [
   verifyAuth,
   async (req, res) => {
     const { shopId } = req.params;
@@ -27,7 +27,7 @@ export const get = async (req, res) => [
   },
 ];
 
-export const post = async (req, res) => [
+export const post = [
   verifyAuth,
   async (req, res) => {
     const userShop = await prisma.userShop.findFirst({

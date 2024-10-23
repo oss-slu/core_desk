@@ -1,7 +1,7 @@
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 
-export const get = async (req, res) => [
+export const get = [
   verifyAuth,
   async (req, res) => {
     const userShop = await prisma.userShop.findFirst({
@@ -16,7 +16,7 @@ export const get = async (req, res) => [
       return res.status(401).json({ error: "Unauthorized" });
     }
 
-    const types = await prisma.printer3dMaterial.findMany({
+    const materials = await prisma.printer3dMaterial.findMany({
       where: {
         active: true,
         printer3dType: {
@@ -25,11 +25,11 @@ export const get = async (req, res) => [
         },
       },
     });
-    res.json({ types });
+    res.json({ materials });
   },
 ];
 
-export const post = async (req, res) => [
+export const post = [
   verifyAuth,
   async (req, res) => {
     const { type, description, manufacturer, printerTypeId } = req.body;
@@ -54,7 +54,7 @@ export const post = async (req, res) => [
       },
     });
 
-    const types = await prisma.printer3dMaterial.findMany({
+    const materials = await prisma.printer3dMaterial.findMany({
       where: {
         active: true,
         printer3dType: {
@@ -74,6 +74,6 @@ export const post = async (req, res) => [
       },
     });
 
-    res.json({ types });
+    res.json({ materials });
   },
 ];

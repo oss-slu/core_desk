@@ -1,6 +1,34 @@
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 
+export const get = [
+  verifyAuth,
+  async (req, res) => {
+    const { typeId } = req.params;
+    const { shopId } = req.params;
+
+    const userShop = await prisma.userShop.findFirst({
+      where: {
+        userId: req.user.id,
+        shopId,
+        active: true,
+      },
+    });
+
+    if (!userShop) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const type = await prisma.printer3dType.findFirst({
+      where: {
+        id: typeId,
+      },
+    });
+
+    res.json({ type });
+  },
+];
+
 export const del = [
   verifyAuth,
   async (req, res) => {
