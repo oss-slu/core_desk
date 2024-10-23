@@ -2,6 +2,11 @@ import { createUploadthing } from "uploadthing/express";
 import { verifyAuthAlone } from "../util/verifyAuth.js";
 import { prisma } from "../util/prisma.js";
 import { UploadThingError } from "uploadthing/server";
+import { UTApi } from "uploadthing/server";
+
+export const utapi = new UTApi({
+  token: process.env.UPLOADTHING_TOKEN,
+});
 
 const f = createUploadthing();
 

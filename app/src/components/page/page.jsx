@@ -81,7 +81,9 @@ export const Page = ({ children, sidenavItems: _sidenavItems }) => {
       }}
     >
       <Sidenav items={_sidenavItems} />
-      <div style={{ width: "100%", overflowX: "hidden" }}>{children}</div>
+      <div style={{ width: "100%", overflowX: "hidden", marginBottom: 100 }}>
+        {children}
+      </div>
     </div>
   );
 };

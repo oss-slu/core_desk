@@ -8,6 +8,11 @@
   border-bottom: 2px solid var(--tblr-border-color);
   max-width: 1400px;
   margin: auto;
+
+  position: sticky;
+  top: 0;
+  background-color: var(--tblr-body-bg);
+  z-index: 1000;
 }
 
 .headerLogo {

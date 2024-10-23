@@ -27,22 +27,54 @@ export const get = [
         where: {
           shopId,
           public: true,
+          active: true,
         },
         include: {
-          images: true,
+          images: {
+            where: {
+              active: true,
+            },
+          },
         },
       });
     } else {
       resources = await prisma.resource.findMany({
         where: {
           shopId,
+          active: true,
         },
         include: {
-          images: true,
+          images: {
+            where: {
+              active: true,
+            },
+          },
           // logs: true,
         },
       });
     }
+
+    resources = resources.map((resource) => {
+      if (
+        req.user.admin ||
+        userShop.accountType === "ADMIN" ||
+        userShop.accountType === "OPERATOR"
+      ) {
+        return resource;
+      }
+
+      if (resource.quantityPublic) delete resource.quantity;
+
+      if (resource.costingPublic) {
+        delete resource.costPerMaterial;
+        delete resource.costPerProcessingTime;
+        delete resource.costPerTime;
+        delete resource.costPerUnit;
+        delete resource.fixedCost;
+      }
+
+      return resource;
+    });
 
     res.json({ resources });
   },

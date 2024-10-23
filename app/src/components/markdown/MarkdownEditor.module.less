@@ -1,0 +1,39 @@
+.mde {
+  font-family: var(--tblr-font-sans-serif);
+  background-color: var(--tblr-bg-forms);
+  border: var(--tblr-border-width) solid var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  color: var(--tblr-body-color);
+
+  --admonitionTipBg: #fff;
+  --admonitionTipBorder: var(--tblr-success);
+
+  --admonitionInfoBg: #fff;
+  --admonitionInfoBorder: var(--tblr-primary);
+
+  --admonitionCautionBg: #fff;
+  --admonitionCautionBorder: var(--tblr-warning);
+
+  --admonitionDangerBg: #fff;
+  --admonitionDangerBorder: var(--tblr-danger);
+
+  --admonitionNoteBg: #fff;
+  --admonitionNoteBorder: var(--tblr-purple);
+
+  // aria-label="editable markdown"
+  [aria-label="editable markdown"] {
+    min-height: 225px;
+    max-height: 500px;
+    overflow-y: auto;
+  }
+}
+
+.mde:focus-within {
+  color: inherit;
+  background-color: var(--tblr-bg-forms);
+  border-color: #90b5e2;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(32, 107, 196, 0.25);
+}

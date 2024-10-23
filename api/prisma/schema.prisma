@@ -118,7 +118,7 @@ model Shop {
   phone       String?
   email       String?
   website     String?
-  description String?
+  description String? @db.MediumText
   imageUrl    String?
 
   color Color?
@@ -143,11 +143,18 @@ model Resource {
   primaryCategory String?
   secondaryCategory String?
 
+  resourceType ResourceType?
+
+  printer3dType Printer3dType? @relation(fields: [printer3dTypeId], references: [id])
+  printer3dTypeId String?
+
   shop   Shop   @relation(fields: [shopId], references: [id])
   shopId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  active Boolean @default(true)
 
   quantity Int?
   quantityPublic Boolean @default(true)
@@ -164,6 +171,17 @@ model Resource {
   logs  logs[]
 }
 
+model Printer3dType {
+  id          String  @id @default(cuid())
+  type       String
+  description String? @db.MediumText
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  resources Resource[]
+}
+
 model ResourceImage {
   id          String  @id @default(cuid())
 
@@ -174,12 +192,25 @@ model ResourceImage {
 
   description String?
 
+  active Boolean @default(true)
+
   resource Resource @relation(fields: [resourceId], references: [id])
   resourceId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   logs  logs[]
+}
+
+enum ResourceType {
+  OTHER
+  INSTRUMENT
+  TOOL
+  PRINTER
+  PRINTER_3D
+  LASER_CUTTER
+  CNC
+
 }
 
 enum SuppliedMaterialLevels {
@@ -203,7 +234,7 @@ enum Color {
 model Job {
   id          String  @id @default(cuid())
   title       String
-  description String?
+  description String? @db.MediumText
   imageUrl    String?
 
   createdAt DateTime @default(now())

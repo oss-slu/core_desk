@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Page, sidenavItems } from "../../../components/page/page";
 import { useAuth } from "../../../hooks/useAuth";
 import { Loading } from "../../../components/loading/loading";
-import { Typography } from "tabler-react-2";
+import { Typography, Util } from "tabler-react-2";
 import { UploadDropzone } from "../../../components/upload/uploader";
 import { Icon } from "../../../util/Icon";
 import { useParams } from "react-router-dom";
-const { H1 } = Typography;
+const { H1, H2 } = Typography;
 import { useShop } from "../../../hooks/useShop";
+import { Button } from "tabler-react-2/dist/button";
+import { MarkdownRender } from "../../../components/markdown/MarkdownRender";
+import { MarkdownEditor } from "../../../components/markdown/MarkdownEditor";
 
 export const shopSidenavItems = (
   activeText,
@@ -111,11 +114,13 @@ export const shopSidenavItems = (
 export const ShopPage = () => {
   const { user, loading } = useAuth();
   const { shopId } = useParams();
-  const { shop, userShop } = useShop(shopId);
+  const { shop, userShop, updateShop, opLoading } = useShop(shopId);
+  const [editing, setEditing] = useState(false);
+  const [newDescription, setNewDescription] = useState(shop.description);
 
   if (loading)
     return (
-      <Page sidenavItems={shopSidenavItems("Shops", shopId, false)}>
+      <Page sidenavItems={shopSidenavItems("Home", shopId, false)}>
         <Loading />
       </Page>
     );
@@ -123,15 +128,51 @@ export const ShopPage = () => {
   return (
     <Page
       sidenavItems={shopSidenavItems(
-        "Shops",
+        "Home",
         shopId,
         user.admin,
         userShop.accountType
       )}
     >
-      <H1>Shop</H1>
-      {userShop.accountType}
-      <UploadDropzone />
+      <Util.Row style={{ justifyContent: "space-between" }}>
+        <H1>{shop.name}</H1>
+        {user.admin || userShop.accountType === "ADMIN"
+          ? !editing && (
+              <Button onClick={() => setEditing(true)}>
+                <Icon i="pencil" /> Edit Shop
+              </Button>
+            )
+          : null}
+      </Util.Row>
+      <Util.Spacer size={1} />
+      {editing ? (
+        <>
+          <Util.Row style={{ justifyContent: "space-between" }}>
+            <H2>Editing shop description</H2>
+            <Button
+              onClick={async () => {
+                console.log(newDescription);
+                await updateShop({ description: newDescription });
+                setEditing(false);
+              }}
+              loading={opLoading}
+            >
+              Save
+            </Button>
+          </Util.Row>
+          <Util.Spacer size={1} />
+          <MarkdownEditor
+            value={shop.description || ""}
+            onChange={(description) => {
+              setNewDescription(description);
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <MarkdownRender markdown={shop.description || ""} />
+        </>
+      )}
     </Page>
   );
 };

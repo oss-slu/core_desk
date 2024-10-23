@@ -3,7 +3,6 @@ import { authFetch } from "../util/url";
 
 export const useShop = (shopId) => {
   const [loading, setLoading] = useState(true);
-  const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [shop, setShop] = useState({});
   const [userShop, setUserShop] = useState({});
@@ -22,38 +21,9 @@ export const useShop = (shopId) => {
     }
   };
 
-  const updateShop = async (data) => {
-    try {
-      setOpLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
-      });
-      const updatedShop = await r.json();
-      if (updatedShop.shop) {
-        setShop(updatedShop.shop);
-        setOpLoading(false);
-      } else {
-        setError(updatedShop);
-        setOpLoading(false);
-      }
-    } catch (error) {
-      setError(error);
-      setOpLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchShop();
   }, []);
 
-  return {
-    shop,
-    userShop,
-    loading,
-    error,
-    refetch: fetchShop,
-    updateShop,
-    opLoading,
-  };
+  return { shop, userShop, loading, error, refetch: fetchShop };
 };
