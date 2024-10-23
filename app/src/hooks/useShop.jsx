@@ -45,7 +45,7 @@ export const useShop = (shopId) => {
 
   useEffect(() => {
     fetchShop();
-  }, []);
+  }, [shopId]);
 
   return {
     shop,

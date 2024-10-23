@@ -15,6 +15,7 @@ import { Toaster } from "react-hot-toast";
 import { ResourcesPage } from "./routes/shops/[shopId]/resources";
 import { ResourcePage } from "./routes/shops/[shopId]/resources/[resourceId]";
 import { Printing3d } from "./routes/shops/[shopId]/3d-printing";
+import { NotFound } from "./components/404/404";
 
 export default () => {
   const { user, loggedIn, loading, login } = useAuth();
@@ -62,6 +63,8 @@ export default () => {
                   path="/shops/:shopId/3d-printing"
                   element={<Printing3d />}
                 />
+
+                <Route path="*" element={<NotFound />} />
               </>
             ) : (
               <Route

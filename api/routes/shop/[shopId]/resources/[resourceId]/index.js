@@ -183,6 +183,6 @@ export const del = [
       },
     });
 
-    res.json({ message: "Resource deleted" });
+    res.json({ success: true });
   },
 ];

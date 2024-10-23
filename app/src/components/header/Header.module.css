@@ -18,3 +18,16 @@
 .headerLogo {
   height: 100%;
 }
+
+.headerGroup {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.headerTitle {
+  font-size: 1rem;
+  color: var(--tblr-text-color);
+  margin: 0;
+}

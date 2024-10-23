@@ -17,6 +17,7 @@ import { useShops } from "../../hooks/useShops";
 import { Spinner } from "tabler-react-2/dist/spinner";
 import { Alert } from "tabler-react-2/dist/alert";
 import { useConfirm } from "tabler-react-2/dist/modal/confirm";
+import { NotFound } from "../../components/404/404";
 const { H1, H2, H3 } = Typography;
 
 const AddUserToShopForm = ({ user, onFinish }) => {
@@ -162,6 +163,7 @@ export const UserPage = () => {
   });
 
   if (loading) return <Loading />;
+  if (!user) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenavItems("Users", activeUser?.admin)}>
