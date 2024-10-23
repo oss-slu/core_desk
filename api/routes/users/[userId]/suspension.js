@@ -103,58 +103,65 @@ export const del = [
 export const put = [
   verifyAuth,
   async (req, res) => {
-    // Change suspension reason
-    if (!req.user.admin) {
-      res.status(403).json({
-        message: "You are not authorized to perform this action",
+    try {
+      // Change suspension reason
+      if (!req.user.admin) {
+        res.status(403).json({
+          message: "You are not authorized to perform this action",
+        });
+        return;
+      }
+
+      let user = await prisma.user.findUnique({
+        where: {
+          id: req.params.userId,
+        },
       });
-      return;
-    }
 
-    let user = await prisma.user.findUnique({
-      where: {
-        id: req.params.userId,
-      },
-    });
+      if (!user) {
+        res.status(404).json({
+          message: "User not found",
+        });
+        return;
+      }
 
-    if (!user) {
-      res.status(404).json({
-        message: "User not found",
+      if (!user.suspended) {
+        res.status(400).json({
+          message: "User is not suspended",
+        });
+        return;
+      }
+
+      await prisma.user.update({
+        where: {
+          id: req.params.userId,
+        },
+        data: {
+          suspensionReason: req.body.reason,
+        },
       });
-      return;
-    }
 
-    if (!user.suspended) {
-      res.status(400).json({
-        message: "User is not suspended",
+      await prisma.logs.create({
+        data: {
+          userId: req.params.userId,
+          type: LogType.USER_SUSPENSION_CHANGED,
+          from: JSON.stringify({
+            reason: user.suspensionReason,
+          }),
+          to: JSON.stringify({
+            reason: req.body.reason,
+          }),
+        },
       });
-      return;
+
+      res.json({
+        message: "Suspension reason has been updated",
+      });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({
+        message: "An error occurred",
+      });
     }
-
-    await prisma.user.update({
-      where: {
-        id: req.params.userId,
-      },
-      data: {
-        suspensionReason: req.body.reason,
-      },
-    });
-
-    await prisma.logs.create({
-      data: {
-        userId: req.params.userId,
-        type: LogType.USER_SUSPENSION_CHANGED,
-        from: JSON.stringify({
-          reason: user.suspensionReason,
-        }),
-        to: JSON.stringify({
-          reason: req.body.reason,
-        }),
-      },
-    });
-
-    res.json({
-      message: "Suspension reason has been updated",
-    });
   },
 ];

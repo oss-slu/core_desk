@@ -4,52 +4,57 @@ import { verifyAuth } from "../../util/verifyAuth.js";
 export const get = [
   verifyAuth,
   async (req, res) => {
-    if (!req.user.admin) {
-      return res.status(403).json({});
-    }
+    try {
+      if (!req.user.admin) {
+        return res.status(403).json({});
+      }
 
-    let users = await prisma.user.findMany({
-      include: {
-        _count: {
-          select: {
-            shops: {
-              where: {
-                active: true,
+      let users = await prisma.user.findMany({
+        include: {
+          _count: {
+            select: {
+              shops: {
+                where: {
+                  active: true,
+                },
               },
+              jobs: true,
             },
-            jobs: true,
           },
         },
-      },
-      take: req.query.limit ? parseInt(req.query.limit) : 20,
-      skip: req.query.offset ? parseInt(req.query.offset) : 0,
-    });
+        take: req.query.limit ? parseInt(req.query.limit) : 20,
+        skip: req.query.offset ? parseInt(req.query.offset) : 0,
+      });
 
-    users = users.map((user) => ({
-      ...user,
-      name: `${user.firstName} ${user.lastName}`,
-      isMe: user.id === req.user.id,
-      shopCount: user._count.shops,
-      jobCount: user._count.jobs,
-      _count: undefined,
-    }));
+      users = users.map((user) => ({
+        ...user,
+        name: `${user.firstName} ${user.lastName}`,
+        isMe: user.id === req.user.id,
+        shopCount: user._count.shops,
+        jobCount: user._count.jobs,
+        _count: undefined,
+      }));
 
-    // Remove undefined values
-    users = users.map((user) =>
-      Object.fromEntries(
-        Object.entries(user).filter(([_, v]) => v !== undefined)
-      )
-    );
+      // Remove undefined values
+      users = users.map((user) =>
+        Object.fromEntries(
+          Object.entries(user).filter(([_, v]) => v !== undefined)
+        )
+      );
 
-    const count = await prisma.user.count();
+      const count = await prisma.user.count();
 
-    return res.json({
-      users,
-      meta: {
-        total: count,
-        count: users.length,
-        offset: req.query.offset ? parseInt(req.query.offset) : 0,
-      },
-    });
+      return res.json({
+        users,
+        meta: {
+          total: count,
+          count: users.length,
+          offset: req.query.offset ? parseInt(req.query.offset) : 0,
+        },
+      });
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ message: "An error occurred" });
+    }
   },
 ];

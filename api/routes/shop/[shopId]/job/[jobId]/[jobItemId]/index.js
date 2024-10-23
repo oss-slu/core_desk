@@ -6,21 +6,26 @@ import { utapi } from "../../../../../../config/uploadthing.js";
 export const get = [
   verifyAuth,
   async (req, res) => {
-    const { shopId, jobId, jobItemId } = req.params;
-    const userId = req.user.id;
+    try {
+      const { shopId, jobId, jobItemId } = req.params;
+      const userId = req.user.id;
 
-    const item = await prisma.jobItem.findFirst({
-      where: {
-        id: jobItemId,
-        jobId,
-      },
-    });
+      const item = await prisma.jobItem.findFirst({
+        where: {
+          id: jobItemId,
+          jobId,
+        },
+      });
 
-    if (!item) {
-      return res.status(404).json({ error: "Not found" });
+      if (!item) {
+        return res.status(404).json({ error: "Not found" });
+      }
+
+      return res.json({ item });
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ error: "An error occurred" });
     }
-
-    return res.json({ item });
   },
 ];
 
