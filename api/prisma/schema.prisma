@@ -56,6 +56,12 @@ model logs {
   resourceImage ResourceImage? @relation(fields: [resourceImageId], references: [id])
   resourceImageId String?
 
+  printer3dType Printer3dType? @relation(fields: [printer3dTypeId], references: [id])
+  printer3dTypeId String?
+
+  printer3dMaterial Printer3dMaterial? @relation(fields: [printer3dMaterialId], references: [id])
+  printer3dMaterialId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -86,6 +92,12 @@ enum LogType {
   RESOURCE_IMAGE_CREATED
   RESOURCE_IMAGE_MODIFIED
   RESOURCE_IMAGE_DELETED
+  PRINTER_3D_TYPE_CREATED
+  PRINTER_3D_TYPE_MODIFIED
+  PRINTER_3D_TYPE_DELETED
+  PRINTER_3D_MATERIAL_CREATED
+  PRINTER_3D_MATERIAL_MODIFIED
+  PRINTER_3D_MATERIAL_DELETED
 }
 
 model UserShop {
@@ -128,6 +140,9 @@ model Shop {
   jobs  Job[]
 
   resources Resource[]
+
+  printer3dTypes Printer3dType[]
+  printer3dMaterials Printer3dMaterial[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -178,8 +193,34 @@ model Printer3dType {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  active Boolean @default(true)
 
   resources Resource[]
+  materials Printer3dMaterial[]
+
+  shopId String
+  shop Shop @relation(fields: [shopId], references: [id])
+
+  logs  logs[]
+}
+
+model Printer3dMaterial {
+  id          String  @id @default(cuid())
+  type       String
+  description String? @db.MediumText
+  manufacturer String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  active Boolean @default(true)
+
+  printer3dType Printer3dType @relation(fields: [printer3dTypeId], references: [id])
+  printer3dTypeId String
+
+  shopId String
+  shop Shop @relation(fields: [shopId], references: [id])
+
+  logs  logs[]
 }
 
 model ResourceImage {

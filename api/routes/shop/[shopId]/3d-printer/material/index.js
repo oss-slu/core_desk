@@ -1,0 +1,79 @@
+import { prisma } from "../../../../../util/prisma.js";
+import { verifyAuth } from "../../../../../util/verifyAuth.js";
+
+export const get = async (req, res) => [
+  verifyAuth,
+  async (req, res) => {
+    const userShop = await prisma.userShop.findFirst({
+      where: {
+        userId: req.user.id,
+        shopId: req.params.shopId,
+        active: true,
+      },
+    });
+
+    if (!userShop) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const types = await prisma.printer3dMaterial.findMany({
+      where: {
+        active: true,
+        printer3dType: {
+          active: true,
+          type: req.query.type,
+        },
+      },
+    });
+    res.json({ types });
+  },
+];
+
+export const post = async (req, res) => [
+  verifyAuth,
+  async (req, res) => {
+    const { type, description, manufacturer, printerTypeId } = req.body;
+    const userShop = await prisma.userShop.findFirst({
+      where: {
+        userId: req.user.id,
+        shopId: req.params.shopId,
+        active: true,
+      },
+    });
+
+    if (!userShop || !userShop.accountType === "admin" || !req.user.admin) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const printer3dMaterial = await prisma.printer3dMaterial.create({
+      data: {
+        type,
+        description,
+        manufacturer,
+        printer3dTypeId: printerTypeId,
+      },
+    });
+
+    const types = await prisma.printer3dMaterial.findMany({
+      where: {
+        active: true,
+        printer3dType: {
+          active: true,
+          type: req.query.type,
+        },
+      },
+    });
+
+    await prisma.logs.create({
+      data: {
+        userId: req.user.id,
+        type: LogType.PRINTER_3D_MATERIAL_CREATED,
+        printer3dMaterialId: printer3dMaterial.id,
+        printer3dTypeId: printerTypeId,
+        shopId: req.params.shopId,
+      },
+    });
+
+    res.json({ types });
+  },
+];
