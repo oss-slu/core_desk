@@ -344,6 +344,7 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
         onChange={(e) => setCr({ ...cr, quantity: e })}
         placeholder="What is the quantity of this resource?"
         type="number"
+        onWheel={(e) => e.target.blur()}
       />
       <Switch
         label="Should the quantity be displayed to customers?"
@@ -351,6 +352,7 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
         onChange={(e) => setCr({ ...cr, quantityPublic: e })}
       />
       <H3>Resource Costing</H3>
+      <Text>All costing information should be in dollars.</Text>
       <Input
         label={
           <>
@@ -361,6 +363,9 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
         onChange={(e) => setCr({ ...cr, fixedCost: e })}
         placeholder="What is the fixed cost of this resource?"
         type="number"
+        onWheel={(e) => e.target.blur()}
+        icon={<Icon i="currency-dollar" />}
+        iconPos="leading"
       />
       <Input
         label={
@@ -373,6 +378,9 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
         onChange={(e) => setCr({ ...cr, costPerUnit: e })}
         placeholder="What is the cost per unit of this resource?"
         type="number"
+        onWheel={(e) => e.target.blur()}
+        icon={<Icon i="currency-dollar" />}
+        iconPos="leading"
       />
       <Input
         label={
@@ -384,18 +392,38 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
         onChange={(e) => setCr({ ...cr, costPerTime: e })}
         placeholder="What is the cost per time of this resource?"
         type="number"
+        onWheel={(e) => e.target.blur()}
+        icon={<Icon i="currency-dollar" />}
+        iconPos="leading"
       />
-      <Input
-        label={
-          <>
-            Cost Per Material <Help text={COSTING.costPerMaterial} />
-          </>
-        }
-        value={cr.costPerMaterial}
-        onChange={(e) => setCr({ ...cr, costPerMaterial: e })}
-        placeholder="What is the cost per material of this resource?"
-        type="number"
-      />
+      <Util.Row gap={1}>
+        <Input
+          label={
+            <>
+              Cost Per Material <Help text={COSTING.costPerMaterial} />
+            </>
+          }
+          value={cr.costPerMaterial}
+          onChange={(e) => setCr({ ...cr, costPerMaterial: e })}
+          placeholder="What is the cost per material of this resource?"
+          type="number"
+          onWheel={(e) => e.target.blur()}
+          style={{ flex: 1 }}
+          icon={<Icon i="currency-dollar" />}
+          iconPos="leading"
+        />
+        <Input
+          label={
+            <>
+              Material descriptor <Help text={COSTING.materialDescriptor} />
+            </>
+          }
+          value={cr.materialLabel}
+          onChange={(e) => setCr({ ...cr, materialLabel: e })}
+          placeholder="How do you describe a singular quantity of this resource? e.g. gram, sheet, roll, etc."
+          style={{ width: "70%" }}
+        />
+      </Util.Row>
 
       <label className="form-label">
         Can customers provide their own materials?
@@ -424,6 +452,9 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
         onChange={(e) => setCr({ ...cr, costPerProcessingTime: e })}
         placeholder="What is the cost per processing time of this resource?"
         type="number"
+        onWheel={(e) => e.target.blur()}
+        icon={<Icon i="currency-dollar" />}
+        iconPos="leading"
       />
 
       <Switch
@@ -572,6 +603,25 @@ const COSTING = {
         The cost per processing time is the cost of the processing time used in
         the job. This is a way to charge for the processing, design, or
         engineering time used in the job. This is typically per hour.
+      </p>
+    </div>
+  ),
+  materialDescriptor: (
+    <div>
+      <p>
+        The material descriptor is a way to describe the quantity of material
+        used in the job. This should be a way to describe the quantity of
+        material used in the job. For example, gram, sheet, roll, etc.
+        Gramatically, this should be a singular noun.
+      </p>
+      <p>
+        For <b>3d printers</b>, this value should be gram, or in the case of
+        resin printers, possibly milliliter.
+      </p>
+      <p>
+        This is not used for any calculations or logic, but will help your
+        operators understand the quantity of material they are entering and help
+        your customers understand the quantity of material they are using.
       </p>
     </div>
   ),

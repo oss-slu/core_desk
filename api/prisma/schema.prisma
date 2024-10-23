@@ -178,6 +178,7 @@ model Resource {
   fixedCost Float?
   costPerTime Float?
   costPerMaterial Float?
+  materialLabel String?
   costPerProcessingTime Float?
   costingPublic Boolean @default(true)
 

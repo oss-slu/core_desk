@@ -24,7 +24,7 @@
     "react-stl-viewer": "^2.5.0",
     "remark-admonitions": "^1.2.1",
     "remark-gfm": "^4.0.0",
-    "tabler-react-2": "^0.1.37",
+    "tabler-react-2": "^0.1.38",
     "three": "^0.169.0",
     "uploadthing": "^7.1.0"
   },
