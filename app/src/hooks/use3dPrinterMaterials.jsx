@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 
-export const use3dPrinterMaterials = (shopId) => {
+export const use3dPrinterMaterials = (shopId, typeId) => {
   const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [printerMaterials, setPrinterMaterials] = useState({});
+  const [printerMaterials, setPrinterMaterials] = useState([]);
 
   const fetchMaterials = async (shouldUpdateLoading = true) => {
     try {
       shouldUpdateLoading && setLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/3d-printer/material`);
+      const r = await authFetch(
+        `/api/shop/${shopId}/3d-printer/material${
+          typeId ? `?type=${typeId}` : ""
+        }`
+      );
       const data = await r.json();
       if (data.materials) {
         setPrinterMaterials(data.materials);

@@ -184,6 +184,8 @@ model Resource {
 
   userSuppliedMaterial SuppliedMaterialLevels @default(NEVER)
 
+  jobItems JobItem[]
+
   logs  logs[]
 }
 
@@ -198,6 +200,8 @@ model Printer3dType {
 
   resources Resource[]
   materials Printer3dMaterial[]
+
+  jobItems JobItem[]
 
   shopId String
   shop Shop @relation(fields: [shopId], references: [id])
@@ -214,6 +218,8 @@ model Printer3dMaterial {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   active Boolean @default(true)
+
+  jobItems JobItem[]
 
   printer3dType Printer3dType @relation(fields: [printer3dTypeId], references: [id])
   printer3dTypeId String
@@ -252,7 +258,6 @@ enum ResourceType {
   PRINTER_3D
   LASER_CUTTER
   CNC
-
 }
 
 enum SuppliedMaterialLevels {
@@ -305,6 +310,17 @@ model JobItem {
   fileUrl String
   fileName String
   fileType String
+
+  resource Resource? @relation(fields: [resourceId], references: [id])
+  resourceId String?
+
+  resourceType ResourceType?
+
+  printer3dType Printer3dType? @relation(fields: [printer3dTypeId], references: [id])
+  printer3dTypeId String?
+
+  printer3dMaterial Printer3dMaterial? @relation(fields: [printer3dMaterialId], references: [id])
+  printer3dMaterialId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

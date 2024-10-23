@@ -1,7 +1,7 @@
 .image {
   min-width: 200px;
   max-width: 200px;
-  height: 100px;
+  height: 150px;
   object-fit: contain;
   border: 2px solid var(--tblr-border-color);
 }
@@ -9,7 +9,7 @@
 .unsupported {
   min-width: 200px;
   max-width: 200px;
-  height: 100px;
+  height: 150px;
   display: flex;
   justify-content: center;
   align-items: center;

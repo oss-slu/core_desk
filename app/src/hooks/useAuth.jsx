@@ -7,6 +7,7 @@ import React, {
   useCallback,
 } from "react";
 import { u } from "../util/url";
+import { emitter } from "../util/mitt";
 
 // Create Auth Context
 const AuthContext = createContext();
@@ -69,6 +70,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     window.fetchUser = fetchUser;
     fetchUser();
+  }, []);
+
+  useEffect(() => {
+    emitter.on("logout", () => {
+      logout();
+    });
   }, []);
 
   return (

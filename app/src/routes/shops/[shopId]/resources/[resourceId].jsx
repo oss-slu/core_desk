@@ -32,6 +32,7 @@ import { Alert } from "tabler-react-2/dist/alert";
 import { Table } from "tabler-react-2/dist/table";
 import { useModal } from "tabler-react-2/dist/modal";
 import { Spinner } from "tabler-react-2/dist/spinner";
+import { RESOURCE_TYPES } from "../../../../util/constants";
 
 export const ResourcePage = () => {
   const { shopId, resourceId } = useParams();
@@ -286,15 +287,7 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
             )}
           </label>
           <DropdownInput
-            values={[
-              { id: "PRINTER_3D", label: "3D Printer" },
-              { id: "LASER_CUTTER", label: "Laser Cutter" },
-              { id: "CNC", label: "CNC Machine" },
-              { id: "PRINTER", label: "Printer" },
-              { id: "INSTRUMENT", label: "Instrument" },
-              { id: "TOOL", label: "Tool" },
-              { id: "OTHER", label: "Other" },
-            ]}
+            values={RESOURCE_TYPES}
             label="Resource Type"
             value={cr.resourceType}
             onChange={(e) => setCr({ ...cr, resourceType: e.id })}

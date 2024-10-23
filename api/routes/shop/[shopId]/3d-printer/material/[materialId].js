@@ -61,7 +61,7 @@ export const del = [
         active: true,
         printer3dType: {
           active: true,
-          type: req.query.type,
+          id: req.query.type,
         },
       },
       include: {
@@ -123,7 +123,7 @@ export const put = [
         active: true,
         printer3dType: {
           active: true,
-          type: req.query.type,
+          id: req.query.type,
         },
       },
       include: {

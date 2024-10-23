@@ -1,3 +1,5 @@
+import { emitter } from "./mitt";
+
 export const u = (path) =>
   process.env.NODE_ENV === "development"
     ? `http://localhost:3000${path}`
@@ -16,6 +18,7 @@ export const authFetch = async (url, options) => {
   if (res.status === 401) {
     localStorage.removeItem("token");
     window.fetchUser();
+    emitter.emit("logout");
   }
   return res;
 };

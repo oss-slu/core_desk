@@ -4033,6 +4033,11 @@ minimatch@^3.1.1:
   dependencies:
     brace-expansion "^1.1.7"
 
+mitt@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.npmjs.org/mitt/-/mitt-3.0.1.tgz"
+  integrity sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==
+
 mmd-parser@^1.0.4:
   version "1.0.4"
   resolved "https://registry.npmjs.org/mmd-parser/-/mmd-parser-1.0.4.tgz"
@@ -4583,10 +4588,10 @@ suspend-react@^0.1.3:
   resolved "https://registry.npmjs.org/suspend-react/-/suspend-react-0.1.3.tgz"
   integrity sha512-aqldKgX9aZqpoDp3e8/BZ8Dm7x1pJl+qI3ZKxDN0i/IQTWUwBx/ManmlVJ3wowqbno6c2bmiIfs+Um6LbsjJyQ==
 
-tabler-react-2@^0.1.38:
-  version "0.1.38"
-  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.38.tgz#ec9b3b1ceed8382cacc185a9317544c2fb639a3b"
-  integrity sha512-fih6ZTQT+vk2u7Qw2IDiJlnRhhH6yNXT58X6IwlhdTlL5yzZqkuRiPWoGqzLN6W+xFzHLEa+i+IC52ef8NHOLA==
+tabler-react-2@^0.1.39:
+  version "0.1.39"
+  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.39.tgz#76ecd990efe0d062d5e13a712a15aa8dcc30ac59"
+  integrity sha512-7NTuyuRWHf3DCDyDUdXMUNp03HysNR0tRKFuYW+OV51+rpeHR0HDQJQ1B8L6IQAirzmppalpG72p6fTTB4lRow==
   dependencies:
     "@babel/cli" "^7.24.8"
     "@babel/core" "^7.24.8"

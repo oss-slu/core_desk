@@ -40,7 +40,6 @@ export const patch = [
 
     let job;
     if (userShop.accountType === "CUSTOMER" && !req.user.admin) {
-      console.log("CUSTOMER");
       job = await prisma.job.findFirst({
         where: {
           id: jobId,
@@ -49,7 +48,6 @@ export const patch = [
         },
       });
     } else {
-      console.log("NOT CUSTOMER", jobId, shopId);
       job = await prisma.job.findFirst({
         where: {
           id: jobId,
@@ -62,6 +60,8 @@ export const patch = [
     if (!job) {
       return res.status(404).json({ error: "Not found" });
     }
+
+    console.log(req.body.data);
 
     const updatedItem = await prisma.jobItem.update({
       where: {
