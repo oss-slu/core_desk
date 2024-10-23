@@ -1,3 +1,4 @@
+import { LogType } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 
@@ -55,9 +56,36 @@ export const del = [
       },
     });
 
+    // Update all materials to inactive
+
+    await prisma.printer3dMaterial.updateMany({
+      where: {
+        printer3dTypeId: typeId,
+      },
+      data: {
+        active: false,
+      },
+    });
+
     const types = await prisma.printer3dType.findMany({
       where: {
         active: true,
+      },
+      include: {
+        materials: {
+          where: {
+            active: true,
+          },
+        },
+        _count: {
+          select: {
+            materials: {
+              where: {
+                active: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -112,6 +140,22 @@ export const put = [
     const types = await prisma.printer3dType.findMany({
       where: {
         active: true,
+      },
+      include: {
+        materials: {
+          where: {
+            active: true,
+          },
+        },
+        _count: {
+          select: {
+            materials: {
+              where: {
+                active: true,
+              },
+            },
+          },
+        },
       },
     });
 

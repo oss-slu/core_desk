@@ -1,3 +1,4 @@
+import { LogType } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 
@@ -23,6 +24,9 @@ export const get = [
           active: true,
           type: req.query.type,
         },
+      },
+      include: {
+        printer3dType: true,
       },
     });
     res.json({ materials });
@@ -51,6 +55,7 @@ export const post = [
         description,
         manufacturer,
         printer3dTypeId: printerTypeId,
+        shopId: req.params.shopId,
       },
     });
 
@@ -61,6 +66,9 @@ export const post = [
           active: true,
           type: req.query.type,
         },
+      },
+      include: {
+        printer3dType: true,
       },
     });
 

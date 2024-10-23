@@ -8,3 +8,7 @@ export { useUsers } from "./useUsers";
 export { useJobItem } from "./useJobItem";
 export { useResources } from "./useResources";
 export { useResource } from "./useResource";
+export { use3dPrinterTypes } from "./use3dPrinterTypes";
+export { use3dPrinterType } from "./use3dPrinterType";
+export { use3dPrinterMaterials } from "./use3dPrinterMaterials";
+// export { use3dPrinterMaterial } from "./use3dPrinterMaterial";

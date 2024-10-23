@@ -38,28 +38,28 @@ model logs {
   from String? @db.MediumText
   to String? @db.MediumText
 
-  user   user?   @relation(fields: [userId], references: [id])
+  user   user?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
 
-  shop   Shop?   @relation(fields: [shopId], references: [id])
+  shop   Shop?   @relation(fields: [shopId], references: [id], onDelete: Cascade)
   shopId String?
 
-  job    Job?    @relation(fields: [jobId], references: [id])
+  job    Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   jobId String?
 
-  jobItem JobItem? @relation(fields: [jobItemId], references: [id])
+  jobItem JobItem? @relation(fields: [jobItemId], references: [id], onDelete: Cascade)
   jobItemId String?
 
-  resource Resource? @relation(fields: [resourceId], references: [id])
+  resource Resource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
   resourceId String?
 
-  resourceImage ResourceImage? @relation(fields: [resourceImageId], references: [id])
+  resourceImage ResourceImage? @relation(fields: [resourceImageId], references: [id], onDelete: Cascade)
   resourceImageId String?
 
-  printer3dType Printer3dType? @relation(fields: [printer3dTypeId], references: [id])
+  printer3dType Printer3dType? @relation(fields: [printer3dTypeId], references: [id], onDelete: Cascade)
   printer3dTypeId String?
 
-  printer3dMaterial Printer3dMaterial? @relation(fields: [printer3dMaterialId], references: [id])
+  printer3dMaterial Printer3dMaterial? @relation(fields: [printer3dMaterialId], references: [id], onDelete: Cascade)
   printer3dMaterialId String?
 
   createdAt DateTime @default(now())

@@ -64,6 +64,9 @@ export const del = [
           type: req.query.type,
         },
       },
+      include: {
+        printer3dType: true,
+      },
     });
 
     await prisma.logs.create({
@@ -122,6 +125,9 @@ export const put = [
           active: true,
           type: req.query.type,
         },
+      },
+      include: {
+        printer3dType: true,
       },
     });
 

@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 
-export const use3dPrinterTypes = (shopId) => {
+export const use3dPrinterMaterials = (shopId) => {
   const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [printerTypes, setPrinterTypes] = useState({});
+  const [printerMaterials, setPrinterMaterials] = useState({});
 
-  const fetchTypes = async (shouldUpdateLoading = true) => {
+  const fetchMaterials = async (shouldUpdateLoading = true) => {
     try {
       shouldUpdateLoading && setLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/3d-printer/type`);
+      const r = await authFetch(`/api/shop/${shopId}/3d-printer/material`);
       const data = await r.json();
-      if (data.types) {
-        setPrinterTypes(data.types);
+      if (data.materials) {
+        setPrinterMaterials(data.materials);
         setLoading(false);
       } else {
         setError(data.error);
@@ -25,46 +25,55 @@ export const use3dPrinterTypes = (shopId) => {
     }
   };
 
-  const createType = async (type, description) => {
+  const createMaterial = async (
+    type,
+    description,
+    manufacturer,
+    printerTypeId
+  ) => {
     try {
       setOpLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/3d-printer/type`, {
+      const r = await authFetch(`/api/shop/${shopId}/3d-printer/material`, {
         method: "POST",
-        body: JSON.stringify({ type, description }),
+        body: JSON.stringify({
+          type,
+          description,
+          manufacturer,
+          printerTypeId,
+        }),
       });
       const data = await r.json();
-      if (data.types) {
-        setPrinterTypes(data.types);
+      if (data.materials) {
+        setPrinterMaterials(data.materials);
         setOpLoading(false);
+        return true;
       } else {
         setError(data.error);
         setOpLoading(false);
+        return false;
       }
     } catch (error) {
       setError(error);
       setOpLoading(false);
+      return false;
     }
   };
 
-  const deleteType = async (typeId) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this type? This is irreversible and will delete all associated materials."
-      )
-    ) {
+  const deleteMaterial = async (materialId) => {
+    if (!window.confirm("Are you sure you want to delete this material?")) {
       return;
     }
     try {
       setOpLoading(true);
       const r = await authFetch(
-        `/api/shop/${shopId}/3d-printer/type/${typeId}`,
+        `/api/shop/${shopId}/3d-printer/material/${materialId}`,
         {
           method: "DELETE",
         }
       );
       const data = await r.json();
-      if (data.types) {
-        setPrinterTypes(data.types);
+      if (data.materials) {
+        setPrinterMaterials(data.materials);
         setOpLoading(false);
       } else {
         setError(data.error);
@@ -77,16 +86,16 @@ export const use3dPrinterTypes = (shopId) => {
   };
 
   useEffect(() => {
-    fetchTypes();
+    fetchMaterials();
   }, []);
 
   return {
-    printerTypes,
+    printerMaterials,
     loading,
     error,
-    refetch: fetchTypes,
+    refetch: fetchMaterials,
     opLoading,
-    createType,
-    deleteType,
+    createMaterial,
+    deleteMaterial,
   };
 };

@@ -1,3 +1,4 @@
+import { LogType } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 
@@ -21,6 +22,22 @@ export const get = [
     const types = await prisma.printer3dType.findMany({
       where: {
         active: true,
+      },
+      include: {
+        materials: {
+          where: {
+            active: true,
+          },
+        },
+        _count: {
+          select: {
+            materials: {
+              where: {
+                active: true,
+              },
+            },
+          },
+        },
       },
     });
     res.json({ types });
@@ -48,12 +65,29 @@ export const post = [
       data: {
         type,
         description,
+        shopId: req.params.shopId,
       },
     });
 
     const types = await prisma.printer3dType.findMany({
       where: {
         active: true,
+      },
+      include: {
+        materials: {
+          where: {
+            active: true,
+          },
+        },
+        _count: {
+          select: {
+            materials: {
+              where: {
+                active: true,
+              },
+            },
+          },
+        },
       },
     });
 

@@ -62,5 +62,6 @@ export const use3dPrinterType = (shopId, typeId) => {
     refetch: fetchType,
     opLoading,
     updateType,
+    deleteType,
   };
 };
