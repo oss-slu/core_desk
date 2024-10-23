@@ -17,7 +17,7 @@ export const get = [
     });
 
     if (!userShop) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.status(400).json({ error: "Unauthorized" });
     }
 
     const material = await prisma.printer3dMaterial.findFirst({
@@ -41,8 +41,8 @@ export const del = [
       },
     });
 
-    if (!userShop || !userShop.accountType === "admin" || !req.user.admin) {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (!userShop || !userShop.accountType === "ADMIN" || !req.user.admin) {
+      return res.status(400).json({ error: "Unauthorized" });
     }
 
     const { materialId } = req.params;
@@ -98,8 +98,8 @@ export const put = [
       },
     });
 
-    if (!userShop || !userShop.accountType === "admin" || !req.user.admin) {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (!userShop || !userShop.accountType === "ADMIN" || !req.user.admin) {
+      return res.status(400).json({ error: "Unauthorized" });
     }
 
     const originalMaterial = await prisma.printer3dMaterial.findFirst({

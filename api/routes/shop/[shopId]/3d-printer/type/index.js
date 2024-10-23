@@ -15,8 +15,10 @@ export const get = [
       },
     });
 
-    if (!userShop) {
-      return res.status(401).json({ error: "Unauthorized" });
+    console.log(userShop, req.user.admin);
+
+    if (!userShop && !req.user.admin) {
+      return res.status(400).json({ error: "Unauthorized" });
     }
 
     const types = await prisma.printer3dType.findMany({
@@ -55,8 +57,8 @@ export const post = [
       },
     });
 
-    if (!userShop || !userShop.accountType === "admin" || !req.user.admin) {
-      return res.status(401).json({ error: "Unauthorized" });
+    if (!userShop || !userShop.accountType === "ADMIN" || !req.user.admin) {
+      return res.status(400).json({ error: "Unauthorized" });
     }
 
     const { type, description } = req.body;

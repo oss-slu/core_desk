@@ -2,7 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Page } from "../../../../components/page/page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useResource, useShop } from "../../../../hooks";
+import {
+  use3dPrinterTypes,
+  useAuth,
+  useResource,
+  useShop,
+} from "../../../../hooks";
 import { Loading } from "../../../../components/loading/loading";
 import {
   Card,
@@ -26,6 +31,7 @@ import { MarkdownRender } from "../../../../components/markdown/MarkdownRender";
 import { Alert } from "tabler-react-2/dist/alert";
 import { Table } from "tabler-react-2/dist/table";
 import { useModal } from "tabler-react-2/dist/modal";
+import { Spinner } from "tabler-react-2/dist/spinner";
 
 export const ResourcePage = () => {
   const { shopId, resourceId } = useParams();
@@ -210,6 +216,8 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
     text: "Hello World",
   });
 
+  const { printerTypes, loading: printerTypesLoading } = use3dPrinterTypes();
+
   const Help = ({ text }) => (
     <a
       onClick={() =>
@@ -267,29 +275,55 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
         onChange={(e) => setCr({ ...cr, title: e })}
         placeholder="The name of the resource. Typically a machine name"
       />
-      <label className="form-label">
-        Resource Type{" "}
-        {!cr.resourceType && (
-          <i className="text-red">
-            Costing will not be available without resource type
-          </i>
+      <Util.Row gap={1}>
+        <div>
+          <label className="form-label">
+            Resource Type{" "}
+            {!cr.resourceType && (
+              <i className="text-red">
+                Costing will not be available without resource type
+              </i>
+            )}
+          </label>
+          <DropdownInput
+            values={[
+              { id: "PRINTER_3D", label: "3D Printer" },
+              { id: "LASER_CUTTER", label: "Laser Cutter" },
+              { id: "CNC", label: "CNC Machine" },
+              { id: "PRINTER", label: "Printer" },
+              { id: "INSTRUMENT", label: "Instrument" },
+              { id: "TOOL", label: "Tool" },
+              { id: "OTHER", label: "Other" },
+            ]}
+            label="Resource Type"
+            value={cr.resourceType}
+            onChange={(e) => setCr({ ...cr, resourceType: e.id })}
+            prompt="Select a resource type"
+          />
+        </div>
+        {cr.resourceType === "PRINTER_3D" && (
+          <>
+            <div>
+              <label className="form-label">Printer type</label>
+              {printerTypesLoading ? (
+                <Spinner />
+              ) : (
+                <DropdownInput
+                  values={
+                    printerTypes.map((type) => ({
+                      id: type.id,
+                      label: type.type,
+                    })) || []
+                  }
+                  value={cr.printer3dTypeId}
+                  onChange={(e) => setCr({ ...cr, printer3dTypeId: e.id })}
+                  prompt="Select a printer type"
+                />
+              )}
+            </div>
+          </>
         )}
-      </label>
-      <DropdownInput
-        values={[
-          { id: "PRINTER_3D", label: "3D Printer" },
-          { id: "LASER_CUTTER", label: "Laser Cutter" },
-          { id: "CNC", label: "CNC Machine" },
-          { id: "PRINTER", label: "Printer" },
-          { id: "INSTRUMENT", label: "Instrument" },
-          { id: "TOOL", label: "Tool" },
-          { id: "OTHER", label: "Other" },
-        ]}
-        label="Resource Type"
-        value={cr.resourceType}
-        onChange={(e) => setCr({ ...cr, resourceType: e.id })}
-        prompt="Select a resource type"
-      />
+      </Util.Row>
       <Util.Spacer size={1} />
       <Input
         label="Category"

@@ -18,7 +18,7 @@ export const post = [
     });
 
     if (!userShop) {
-      return res.status(401).json({ error: "Unauthorized" });
+      return res.status(400).json({ error: "Unauthorized" });
     }
 
     const { title, description, dueDate } = req.body;
