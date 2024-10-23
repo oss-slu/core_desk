@@ -31,7 +31,7 @@ function downloadFile(url, filename) {
     });
 }
 
-const switchStatusToUI = (status) => {
+export const switchStatusToUI = (status) => {
   switch (status) {
     case "IN_PROGRESS":
       return ["In Progress", "yellow"];
@@ -50,22 +50,29 @@ const switchStatusToUI = (status) => {
   }
 };
 
-export const JobItem = ({ item: _item }) => {
+export const JobItem = ({ item: _item, refetchJobs }) => {
   const { shopId, jobId } = useParams();
 
-  const { item, opLoading, updateJob } = useJobItem(shopId, jobId, _item.id, {
-    initialValue: _item,
-    fetchJobItem: false,
-  });
+  const { item, opLoading, updateJob, deleteJobItem } = useJobItem(
+    shopId,
+    jobId,
+    _item.id,
+    {
+      initialValue: _item,
+      fetchJobItem: false,
+    }
+  );
 
   const { modal, ModalElement } = useModal({
-    title: item.title,
+    title: item?.title,
     text: (
       <div>
-        <RenderMedia big mediaUrl={item.fileUrl} fileType={item.fileType} />
+        <RenderMedia big mediaUrl={item?.fileUrl} fileType={item?.fileType} />
       </div>
     ),
   });
+
+  if (!item) return null;
 
   return (
     <Card>
@@ -80,16 +87,36 @@ export const JobItem = ({ item: _item }) => {
         <div style={{ minWidth: 300, maxWidth: 300.1 }}>
           <H3>{item.title}</H3>
           <Util.Row gap={1}>
-            <Button onClick={modal}>
+            <Button
+              onClick={modal}
+              style={{
+                padding: "0.4375rem",
+              }}
+            >
               <Icon i="cube" size={20} />
             </Button>
             <Button
               onClick={() => {
                 downloadFile(item.fileUrl, item.title);
               }}
+              style={{
+                padding: "0.4375rem",
+              }}
               download
             >
               <Icon i="download" size={20} />
+            </Button>
+            <Button
+              onClick={() => {
+                deleteJobItem(refetchJobs);
+              }}
+              style={{
+                padding: "0.4375rem",
+              }}
+              variant="danger"
+              outline
+            >
+              <Icon i="trash" size={20} />
             </Button>
             {opLoading ? (
               <Spinner />
@@ -151,13 +178,14 @@ export const JobItem = ({ item: _item }) => {
   );
 };
 
-const LoadableDropdownInput = ({
+export const LoadableDropdownInput = ({
   values,
   value,
   onChange,
   prompt,
   loading,
   label,
+  doTheColorThing = false,
 }) => {
   if (loading)
     return (
@@ -176,6 +204,10 @@ const LoadableDropdownInput = ({
         value={value}
         onChange={onChange}
         prompt={prompt}
+        color={doTheColorThing ? switchStatusToUI(value)[1] : null}
+        data-value={value}
+        data-color={doTheColorThing ? switchStatusToUI(value)[1] : null}
+        outline={doTheColorThing}
       />
     </>
   );

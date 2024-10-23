@@ -1,19 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Page } from "../../../../components/page/page";
 import { Icon } from "../../../../util/Icon";
 import { useParams } from "react-router-dom";
-import { Typography, Util } from "tabler-react-2";
+import { Typography, Util, Input } from "tabler-react-2";
 import { useJob } from "../../../../hooks/useJob";
 import { Loading } from "../../../../components/loading/loading";
 import { UploadDropzone } from "../../../../components/upload/uploader";
-import { JobItem } from "../../../../components/jobitem/JobItem";
-const { H1, H2 } = Typography;
+import {
+  JobItem,
+  LoadableDropdownInput,
+} from "../../../../components/jobitem/JobItem";
+import { Button } from "tabler-react-2/dist/button";
+const { H1, H2, H3 } = Typography;
+import moment from "moment";
+import Badge from "tabler-react-2/dist/badge";
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
-  const { job, loading, refetch: refetchJobs } = useJob(shopId, jobId);
+  const {
+    job: uncontrolledJob,
+    loading,
+    refetch: refetchJobs,
+    opLoading,
+    updateJob,
+  } = useJob(shopId, jobId);
 
-  if (loading) return <Loading />;
+  const [editing, setEditing] = useState(false);
+  const [job, setJob] = useState(uncontrolledJob);
+
+  useEffect(() => {
+    setJob(uncontrolledJob);
+  }, [uncontrolledJob]);
+
+  if (loading || !job.id) return <Loading />;
 
   return (
     <Page
@@ -34,23 +53,116 @@ export const JobPage = () => {
         },
       ]}
     >
-      <H1>{job.title}</H1>
-      <p>{job.description}</p>
-      <UploadDropzone
-        scope={"job.fileupload"}
-        metadata={{
-          jobId,
-          shopId,
+      <Util.Row
+        gap={1}
+        style={{
+          alignItems: "flex-start",
         }}
-        onUploadComplete={() => {
-          refetchJobs();
-        }}
-      />
+      >
+        <div style={{ width: "50%" }}>
+          <Util.Row style={{ justifyContent: "space-between" }} gap={1} wrap>
+            {editing ? (
+              <Input
+                value={job.title}
+                label="Title"
+                onChange={(e) => setJob({ ...job, title: e })}
+              />
+            ) : (
+              <H1>{job.title}</H1>
+            )}
+            {editing ? (
+              <Button
+                loading={opLoading}
+                onClick={async () => {
+                  await updateJob(job);
+                  setEditing(false);
+                }}
+                variant="primary"
+              >
+                Save
+              </Button>
+            ) : (
+              <Button loading={opLoading} onClick={() => setEditing(true)}>
+                Edit
+              </Button>
+            )}
+          </Util.Row>
+          {editing ? (
+            <>
+              <Input
+                value={job.description}
+                label="Description"
+                onChange={(e) => setJob({ ...job, description: e })}
+              />
+              <Input
+                type="date"
+                value={job.dueDate.split("T")[0]}
+                label="Due Date"
+                onChange={(e) =>
+                  setJob({
+                    ...job,
+                    dueDate: new Date(e + "T00:00:00").toISOString(),
+                  })
+                }
+              />
+            </>
+          ) : (
+            <>
+              <p>{job.description}</p>
+              <H3>Upcoming Deadline</H3>
+              <p>
+                {moment(job.dueDate).format("MM/DD/YYYY")} (
+                {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
+                {new Date(job.dueDate) < new Date() &&
+                  !(
+                    new Date(job.dueDate).toDateString() ===
+                    new Date().toDateString()
+                  ) && <Badge color="red">Overdue</Badge>}
+                {/* Today warning */}{" "}
+                {new Date(job.dueDate).toDateString() ===
+                  new Date().toDateString() && (
+                  <Badge color="yellow">Due Today</Badge>
+                )}
+              </p>
+              <H3>Status</H3>
+              <LoadableDropdownInput
+                loading={opLoading}
+                prompt={"Select a status"}
+                values={[
+                  { id: "IN_PROGRESS", label: "In Progress" },
+                  { id: "COMPLETED", label: "Completed" },
+                  { id: "NOT_STARTED", label: "Not Started" },
+                  { id: "CANCELLED", label: "Cancelled" },
+                  { id: "WONT_DO", label: "Won't Do" },
+                  { id: "WAITING", label: "Waiting" },
+                ]}
+                value={job.status}
+                onChange={(value) => {
+                  updateJob({ status: value.id });
+                }}
+                doTheColorThing={true}
+              />
+            </>
+          )}
+        </div>
+        <div style={{ flex: 1 }}>
+          <UploadDropzone
+            scope={"job.fileupload"}
+            metadata={{
+              jobId,
+              shopId,
+            }}
+            onUploadComplete={() => {
+              refetchJobs();
+            }}
+          />
+        </div>
+      </Util.Row>
       <Util.Spacer size={1} />
       <H2>Items</H2>
       <Util.Col gap={0.5}>
         {job.items.map((item) => (
-          <JobItem key={item.id} item={item} />
+          <JobItem key={item.id} item={item} refetchJobs={refetchJobs} />
         ))}
       </Util.Col>
     </Page>

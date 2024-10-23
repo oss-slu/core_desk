@@ -28,7 +28,7 @@ const CreateJobModalContent = ({ onSubmit }) => {
       <Input
         type="date"
         label="Due Date"
-        onChange={setDueDate}
+        onChange={(e) => setDueDate(e)}
         value={dueDate}
       />
       {title.length > 1 && dueDate.length > 1 ? (

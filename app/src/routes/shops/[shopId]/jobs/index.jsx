@@ -12,12 +12,14 @@ import { Table } from "tabler-react-2/dist/table";
 import Badge from "tabler-react-2/dist/badge";
 import moment from "moment";
 import { Loading } from "../../../../components/loading/loading";
+import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
+import { Icon } from "../../../../util/Icon";
 
 const switchStatusForBadge = (status) => {
   switch (status) {
     case "IN_PROGRESS":
       return (
-        <Badge color="blue" soft>
+        <Badge color="yellow" soft>
           In Progress
         </Badge>
       );
@@ -35,19 +37,19 @@ const switchStatusForBadge = (status) => {
       );
     case "CANCELLED":
       return (
-        <Badge color="grey" soft>
+        <Badge color="secondary" soft>
           Cancelled
         </Badge>
       );
     case "WONT_DO":
       return (
-        <Badge color="grey" soft>
+        <Badge color="secondary" soft>
           Won't Do
         </Badge>
       );
     case "WAITING":
       return (
-        <Badge color="yellow" soft>
+        <Badge color="blue" soft>
           Waiting
         </Badge>
       );
@@ -122,6 +124,50 @@ export const Jobs = () => {
             {
               label: "Items",
               accessor: "itemsCount",
+            },
+            {
+              label: "Progress",
+              accessor: "progress",
+              render: (d, _) => (
+                <Util.Row gap={1}>
+                  {_.itemsCount === 0 ? (
+                    <PieProgressChart
+                      complete={0}
+                      inProgress={0}
+                      notStarted={0}
+                      exclude={1}
+                    />
+                  ) : (
+                    <PieProgressChart
+                      complete={d.completedCount / _.itemsCount}
+                      inProgress={d.inProgressCount / _.itemsCount}
+                      notStarted={d.notStartedCount / _.itemsCount}
+                      exclude={d.excludedCount / _.itemsCount}
+                    />
+                  )}
+                  <div style={{ fontSize: 10 }}>
+                    <span className="text-success">
+                      <Icon i="circle-check" size={10} /> {d.completedCount} /{" "}
+                      {_.itemsCount} Completed
+                    </span>
+                    <br />
+                    <span className="text-yellow">
+                      <Icon i="progress" size={10} /> {d.inProgressCount} /{" "}
+                      {_.itemsCount} In Progress
+                    </span>
+                    <br />
+                    <span className="text-danger">
+                      <Icon i="minus" size={10} /> {d.notStartedCount} /{" "}
+                      {_.itemsCount} Not Started
+                    </span>
+                    <br />
+                    <span className="text-gray-400">
+                      <Icon i="x" size={10} /> {d.excludedCount} /{" "}
+                      {_.itemsCount} Excluded
+                    </span>
+                  </div>
+                </Util.Row>
+              ),
             },
             {
               label: "Status",

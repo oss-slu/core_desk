@@ -62,7 +62,19 @@ export const get = [
       include: {
         _count: {
           select: {
-            items: true,
+            items: {
+              where: {
+                active: true,
+              },
+            }, // Total count of items
+          },
+        },
+        items: {
+          where: {
+            active: true,
+          },
+          select: {
+            status: true,
           },
         },
       },
@@ -72,7 +84,26 @@ export const get = [
 
     jobs = jobs.map((job) => {
       job.itemsCount = job._count.items;
+
+      job.progress = {};
+
+      // Sort progress into buckets
+      job.progress.completedCount = job.items.filter(
+        (item) => item.status === "COMPLETED"
+      ).length;
+      job.progress.inProgressCount = job.items.filter(
+        (item) => item.status === "IN_PROGRESS"
+      ).length;
+      job.progress.notStartedCount = job.items.filter(
+        (item) => item.status === "NOT_STARTED"
+      ).length;
+      job.progress.excludedCount =
+        job.items.filter((item) => item.status === "CANCELLED").length +
+        job.items.filter((item) => item.status === "WONT_DO").length +
+        job.items.filter((item) => item.status === "WAITING").length;
+
       delete job._count;
+      delete job.items;
       return job;
     });
 

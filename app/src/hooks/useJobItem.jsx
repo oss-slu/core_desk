@@ -53,8 +53,40 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
       );
       const newData = await res.json();
       if (newData.item) {
+        console.log(newData.item);
         setItem(newData.item);
         setOpLoading(false);
+      } else {
+        setError("Internal server error");
+        setOpLoading(false);
+      }
+    } catch (error) {
+      setOpLoading(false);
+      setError(error);
+    }
+  };
+
+  const deleteJobItem = async (refetchJobs) => {
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this item? You cannot undo this action."
+      )
+    )
+      return;
+    try {
+      setOpLoading(true);
+      setError(null);
+      const res = await authFetch(
+        `/api/shop/${shopId}/job/${jobId}/${jobItemId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        setItem(null);
+        setOpLoading(false);
+        refetchJobs && refetchJobs(false);
       } else {
         setError("Internal server error");
         setOpLoading(false);
@@ -69,5 +101,13 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
     fetchJobItem(shouldFetchJobItem);
   }, [jobId]);
 
-  return { item, loading, error, refetch: fetchJobItem, updateJob, opLoading };
+  return {
+    item,
+    loading,
+    error,
+    refetch: fetchJobItem,
+    updateJob,
+    opLoading,
+    deleteJobItem,
+  };
 };

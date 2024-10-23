@@ -91,7 +91,7 @@ export const use3dPrinterMaterials = (shopId, typeId) => {
 
   useEffect(() => {
     fetchMaterials();
-  }, []);
+  }, [typeId]);
 
   return {
     printerMaterials,
