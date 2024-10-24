@@ -67,7 +67,7 @@ export const useJobs = (shopId) => {
         body: JSON.stringify({ title, description, dueDate }),
       });
       const data = await r.json();
-      document.location.href = `/shop/${shopId}/job/${data.job.id}`;
+      document.location.href = `/shops/${shopId}/job/${data.job.id}`;
 
       setOpLoading(false);
     } catch (error) {

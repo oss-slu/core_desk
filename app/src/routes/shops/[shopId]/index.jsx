@@ -105,13 +105,6 @@ export const shopSidenavItems = (
         text: "Users",
         active: activeText === "Users",
         icon: <Icon i="users-group" size={18} />,
-      },
-      {
-        type: "item",
-        text: "Settings",
-        active: activeText === "Settings",
-        href: `/shops/${shopId}/settings`,
-        icon: <Icon i="settings" size={18} />,
       }
     );
   }

@@ -163,11 +163,15 @@ export const JobPage = () => {
       </Util.Row>
       <Util.Spacer size={1} />
       <H2>Items</H2>
-      <Util.Col gap={0.5}>
-        {job.items.map((item) => (
-          <JobItem key={item.id} item={item} refetchJobs={refetchJobs} />
-        ))}
-      </Util.Col>
+      {job.items?.length === 0 ? (
+        <i>This job has no items. You can attach files in the dropzone above</i>
+      ) : (
+        <Util.Col gap={0.5}>
+          {job.items?.map((item) => (
+            <JobItem key={item.id} item={item} refetchJobs={refetchJobs} />
+          ))}
+        </Util.Col>
+      )}
     </Page>
   );
 };
