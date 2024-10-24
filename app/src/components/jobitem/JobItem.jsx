@@ -142,13 +142,14 @@ export const JobItem = ({ item: _item, refetchJobs }) => {
           <Util.Spacer size={1} />
           <LoadableDropdownInput
             loading={opLoading}
-            prompt={"Select a fulfillment type"}
-            label="Fulfillment Type"
+            prompt={"Select a technology"}
+            label="Technology Type"
             values={[
               ...RESOURCE_TYPES,
               {
                 id: null,
-                label: "Select a fulfillment type",
+                label: "Select a technology type",
+                dropdownText: "None",
               },
             ]}
             value={item.resourceType}
@@ -168,6 +169,10 @@ export const JobItem = ({ item: _item, refetchJobs }) => {
               printerTypeId={item.printer3dTypeId}
               opLoading={opLoading}
               onChange={(value) => updateJob({ printer3dMaterialId: value.id })}
+              disabled={
+                item.printer3dTypeId === null || item.printer3dTypeId === ""
+              }
+              disabledText={"Select a printer type first"}
             />
           </div>
         ) : (
@@ -186,6 +191,8 @@ export const LoadableDropdownInput = ({
   loading,
   label,
   doTheColorThing = false,
+  disabled = false,
+  disabledText,
 }) => {
   if (loading)
     return (
@@ -196,6 +203,15 @@ export const LoadableDropdownInput = ({
         </Button>
       </>
     );
+
+  if (disabled)
+    return (
+      <>
+        <label className="form-label">{label}</label>
+        <Button disabled>{disabledText || prompt}</Button>
+      </>
+    );
+
   return (
     <>
       <label className="form-label">{label}</label>
@@ -285,10 +301,17 @@ const PrinterTypePicker = ({ value, onChange, opLoading }) => {
         </Button>
       ) : (
         <DropdownInput
-          values={printerTypes.map((printerType) => ({
-            id: printerType.id,
-            label: printerType.type,
-          }))}
+          values={[
+            ...printerTypes.map((printerType) => ({
+              id: printerType.id,
+              label: printerType.type,
+            })),
+            {
+              id: null,
+              label: "Select a printer type",
+              dropdownText: "None",
+            },
+          ]}
           value={value}
           onChange={(value) => {
             setSelectedPrinterType(value);
@@ -306,6 +329,8 @@ const PrinterMaterialPicker = ({
   printerTypeId,
   onChange,
   opLoading,
+  disabled = false,
+  disabledText,
 }) => {
   const { shopId } = useParams();
   const { printerMaterials, loading } = use3dPrinterMaterials(
@@ -324,6 +349,8 @@ const PrinterMaterialPicker = ({
       }))}
       value={value}
       onChange={onChange}
+      disabled={disabled}
+      disabledText={disabledText}
     />
   );
 };
