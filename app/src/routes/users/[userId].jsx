@@ -150,20 +150,20 @@ export const UserPage = () => {
   const { confirm, ConfirmModal } = useConfirm({
     title: "Are you sure you want to disconnect?",
     text:
-      activeUser.id === user.id ? (
+      activeUser?.id === user?.id ? (
         "You are about to disconnect yourself from this shop. This will remove your access to this shop. In order to rejoin, you will need to be re-added by an admin."
       ) : (
         <>
-          You are about to disconnect {user.firstName} from this shop. This will
-          remove their access to this shop. You will have to re-add them if they
-          need access again. They will be able to re-join the shop automatically
-          if they follow a billing group link.
+          You are about to disconnect {user?.firstName} from this shop. This
+          will remove their access to this shop. You will have to re-add them if
+          they need access again. They will be able to re-join the shop
+          automatically if they follow a billing group link.
         </>
       ),
   });
 
   if (loading) return <Loading />;
-  if (!user) return <NotFound />;
+  if (!user?.id) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenavItems("Users", activeUser?.admin)}>

@@ -33,6 +33,7 @@ import { Table } from "tabler-react-2/dist/table";
 import { useModal } from "tabler-react-2/dist/modal";
 import { Spinner } from "tabler-react-2/dist/spinner";
 import { RESOURCE_TYPES } from "../../../../util/constants";
+import { NotFound } from "../../../../components/404/404";
 
 export const ResourcePage = () => {
   const { shopId, resourceId } = useParams();
@@ -84,6 +85,10 @@ export const ResourcePage = () => {
       onUploadComplete={onComplete}
     />
   );
+
+  if (!resource) {
+    return <NotFound />;
+  }
 
   return (
     <Page

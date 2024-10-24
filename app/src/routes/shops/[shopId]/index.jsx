@@ -11,6 +11,7 @@ import { useShop } from "../../../hooks/useShop";
 import { Button } from "tabler-react-2/dist/button";
 import { MarkdownRender } from "../../../components/markdown/MarkdownRender";
 import { MarkdownEditor } from "../../../components/markdown/MarkdownEditor";
+import { NotFound } from "../../../components/404/404";
 
 export const shopSidenavItems = (
   activeText,
@@ -123,7 +124,7 @@ export const ShopPage = () => {
   const { shopId } = useParams();
   const { shop, userShop, updateShop, opLoading } = useShop(shopId);
   const [editing, setEditing] = useState(false);
-  const [newDescription, setNewDescription] = useState(shop.description);
+  const [newDescription, setNewDescription] = useState(shop?.description);
 
   if (loading)
     return (
@@ -131,6 +132,8 @@ export const ShopPage = () => {
         <Loading />
       </Page>
     );
+
+  if (!shop) return <NotFound />;
 
   return (
     <Page

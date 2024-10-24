@@ -14,6 +14,7 @@ import { Button } from "tabler-react-2/dist/button";
 const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
+import { NotFound } from "../../../../components/404/404";
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
@@ -32,7 +33,9 @@ export const JobPage = () => {
     setJob(uncontrolledJob);
   }, [uncontrolledJob]);
 
-  if (loading || !job.id) return <Loading />;
+  if (loading) return <Loading />;
+
+  if (!job) return <NotFound />;
 
   return (
     <Page
