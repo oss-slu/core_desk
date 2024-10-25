@@ -21,6 +21,8 @@
     "express-file-routing": "^3.0.3",
     "express-session": "^1.18.1",
     "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
+    "nodemon": "^3.1.7",
     "passport": "^0.7.0",
     "passport-saml": "^3.2.4",
     "uploadthing": "^7.1.0"
@@ -29,5 +31,9 @@
     "eslint": "^9.13.0",
     "eslint-plugin-prisma": "^0.0.1",
     "prisma": "5.21.0"
+  },
+  "imports": {
+    "#prisma": "./util/prisma.js",
+    "#verifyAuth": "./util/verifyAuth.js"
   }
 }
