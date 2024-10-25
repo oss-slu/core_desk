@@ -26,6 +26,8 @@
     "uploadthing": "^7.1.0"
   },
   "devDependencies": {
+    "eslint": "^9.13.0",
+    "eslint-plugin-prisma": "^0.0.1",
     "prisma": "5.21.0"
   }
 }

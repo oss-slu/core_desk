@@ -58,7 +58,7 @@ export const del = [
 
     // Update all materials to inactive
 
-    await prisma.printer3dMaterial.updateMany({
+    await prisma.material.updateMany({
       where: {
         printer3dTypeId: typeId,
       },

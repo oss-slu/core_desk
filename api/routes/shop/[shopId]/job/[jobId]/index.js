@@ -9,11 +9,30 @@ export const get = [
       const { shopId, jobId } = req.params;
       const userId = req.user.id;
 
+      const userShop = await prisma.userShop.findFirst({
+        where: {
+          userId,
+          shopId,
+          active: true,
+        },
+      });
+
+      if (!userShop) {
+        return res
+          .status(400)
+          .json({ error: "You are not a member of this shop" });
+      }
+
+      const shouldLoadAll =
+        req.user.admin ||
+        userShop.accountType === "ADMIN" ||
+        userShop.accountType === "OPERATOR";
+
       const job = await prisma.job.findFirst({
         where: {
           id: jobId,
           shopId,
-          userId,
+          userId: shouldLoadAll ? undefined : userId,
         },
         include: {
           items: {
@@ -47,6 +66,7 @@ export const put = [
         where: {
           userId,
           shopId,
+          active: true,
         },
       });
 
@@ -56,20 +76,17 @@ export const put = [
 
       let job;
 
-      if (userShop.accountType === "CUSTOMER" && !req.user.admin) {
-        job = await prisma.job.findFirst({
-          where: {
-            id: jobId,
-            userId: req.user.id,
-          },
-        });
-      } else {
-        job = await prisma.job.findFirst({
-          where: {
-            id: jobId,
-          },
-        });
-      }
+      const shouldLoadAll =
+        req.user.admin ||
+        userShop.accountType === "ADMIN" ||
+        userShop.accountType === "OPERATOR";
+
+      job = await prisma.job.findFirst({
+        where: {
+          id: jobId,
+          userId: shouldLoadAll ? undefined : userId,
+        },
+      });
 
       if (!job) {
         return res.status(404).json({ error: "Not found" });

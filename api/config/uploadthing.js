@@ -17,12 +17,13 @@ export const uploadRouter = {
       maxFileCount: 150,
     },
   })
-    .middleware(async ({ req, res }) => {
+    .middleware(async ({ req }) => {
       let user = null;
 
       try {
         user = await verifyAuthAlone(req.headers.authorization);
       } catch (error) {
+        console.log(error);
         throw new UploadThingError("You must be logged in to upload files");
       }
 
@@ -113,6 +114,7 @@ export const uploadRouter = {
       }
     })
     .onUploadComplete((data) => {
+      data;
       // console.log("upload completed!", data);
     }),
 };

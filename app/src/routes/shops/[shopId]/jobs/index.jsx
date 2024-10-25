@@ -14,6 +14,7 @@ import moment from "moment";
 import { Loading } from "../../../../components/loading/loading";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
 import { Icon } from "../../../../util/Icon";
+import { Avatar } from "tabler-react-2/dist/avatar";
 
 const switchStatusForBadge = (status) => {
   switch (status) {
@@ -117,6 +118,16 @@ export const Jobs = () => {
               sortable: true,
             },
             {
+              label: "Submitter",
+              accessor: "user.name",
+              render: (name, context) => (
+                <Util.Row gap={0.5}>
+                  <Avatar size="sm" dicebear initials={context.user.id} />
+                  {name}
+                </Util.Row>
+              ),
+            },
+            {
               label: "Description",
               accessor: "description",
               render: (d) => d.slice(0, 35).concat(d.length > 35 ? "..." : ""),
@@ -178,7 +189,20 @@ export const Jobs = () => {
             {
               label: "Due Date",
               accessor: "dueDate",
-              render: (d) => moment(d).format("MM/DD/YYYY"),
+              render: (d) => (
+                <>
+                  {moment(d).format("MM/DD/YYYY")} ({moment(d).fromNow()}){" "}
+                  {/* Overdue warning */}
+                  {new Date(d) < new Date() &&
+                    !(
+                      new Date(d).toDateString() === new Date().toDateString()
+                    ) && <Badge color="red">Overdue</Badge>}
+                  {/* Today warning */}{" "}
+                  {new Date(d).toDateString() === new Date().toDateString() && (
+                    <Badge color="yellow">Due Today</Badge>
+                  )}
+                </>
+              ),
               sortable: true,
             },
           ]}

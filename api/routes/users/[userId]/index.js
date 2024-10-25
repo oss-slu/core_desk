@@ -6,8 +6,7 @@ export const get = [
   async (req, res) => {
     try {
       if (!req.user.admin) {
-        if (req.user.id == req.params.userId) {
-        } else {
+        if (req.user.id !== req.params.userId) {
           // Return a very basic profile including only the user's name and id
           let user = await prisma.user.findUnique({
             where: {

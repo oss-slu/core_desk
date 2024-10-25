@@ -10,6 +10,18 @@ export const get = [
       const { shopId, jobId, jobItemId } = req.params;
       const userId = req.user.id;
 
+      const userShop = await prisma.userShop.findFirst({
+        where: {
+          userId,
+          shopId,
+          active: true,
+        },
+      });
+
+      if (!userShop) {
+        return res.status(404).json({ error: "Not found" });
+      }
+
       const item = await prisma.jobItem.findFirst({
         where: {
           id: jobItemId,

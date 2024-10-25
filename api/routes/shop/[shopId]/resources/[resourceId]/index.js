@@ -100,8 +100,6 @@ export const put = [
       if (data.costPerUnit) data.costPerUnit = parseFloat(data.costPerUnit);
       if (data.fixedCost) data.fixedCost = parseFloat(data.fixedCost);
       if (data.costPerTime) data.costPerTime = parseFloat(data.costPerTime);
-      if (data.costPerMaterial)
-        data.costPerMaterial = parseFloat(data.costPerMaterial);
       if (data.costPerProcessingTime)
         data.costPerProcessingTime = parseFloat(data.costPerProcessingTime);
 

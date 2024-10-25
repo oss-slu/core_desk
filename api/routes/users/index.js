@@ -38,7 +38,7 @@ export const get = [
       // Remove undefined values
       users = users.map((user) =>
         Object.fromEntries(
-          Object.entries(user).filter(([_, v]) => v !== undefined)
+          Object.entries(user).filter(([, v]) => v !== undefined)
         )
       );
 

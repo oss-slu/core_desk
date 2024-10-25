@@ -58,11 +58,28 @@ export const get = [
       const { shopId } = req.params;
       const userId = req.user.id;
 
+      const userShop = await prisma.userShop.findFirst({
+        where: {
+          userId,
+          shopId,
+          active: true,
+        },
+      });
+
+      if (!userShop) {
+        return res.status(400).json({ error: "Unauthorized" });
+      }
+
+      const shouldLoadAll =
+        req.user.admin ||
+        userShop.accountType === "ADMIN" ||
+        userShop.accountType === "OPERATOR";
+
       let jobs = await prisma.job.findMany({
         where: {
           shopId,
           user: {
-            id: userId,
+            id: shouldLoadAll ? undefined : userId,
           },
         },
         include: {
@@ -81,6 +98,13 @@ export const get = [
             },
             select: {
               status: true,
+            },
+          },
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              id: true,
             },
           },
         },
@@ -107,6 +131,8 @@ export const get = [
           job.items.filter((item) => item.status === "CANCELLED").length +
           job.items.filter((item) => item.status === "WONT_DO").length +
           job.items.filter((item) => item.status === "WAITING").length;
+
+        job.user.name = `${job.user.firstName} ${job.user.lastName}`;
 
         delete job._count;
         delete job.items;

@@ -219,7 +219,7 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
 
   const { modal, ModalElement } = useModal({
     title: "Help",
-    text: "Hello World",
+    text: "",
   });
 
   const { printerTypes, loading: printerTypesLoading } = use3dPrinterTypes();
@@ -394,35 +394,6 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
         icon={<Icon i="currency-dollar" />}
         iconPos="leading"
       />
-      <Util.Row gap={1}>
-        <Input
-          label={
-            <>
-              Cost Per Material <Help text={COSTING.costPerMaterial} />
-            </>
-          }
-          value={cr.costPerMaterial}
-          onChange={(e) => setCr({ ...cr, costPerMaterial: e })}
-          placeholder="What is the cost per material of this resource?"
-          type="number"
-          onWheel={(e) => e.target.blur()}
-          style={{ flex: 1 }}
-          icon={<Icon i="currency-dollar" />}
-          iconPos="leading"
-        />
-        <Input
-          label={
-            <>
-              Material descriptor <Help text={COSTING.materialDescriptor} />
-            </>
-          }
-          value={cr.materialLabel}
-          onChange={(e) => setCr({ ...cr, materialLabel: e })}
-          placeholder="How do you describe a singular quantity of this resource? e.g. gram, sheet, roll, etc."
-          style={{ width: "70%" }}
-        />
-      </Util.Row>
-
       <label className="form-label">
         Can customers provide their own materials?
       </label>
@@ -582,44 +553,13 @@ const COSTING = {
       </p>
     </div>
   ),
-  costPerMaterial: (
-    <div>
-      <p>
-        The cost per material is the cost of the material used in the job. This
-        is a way to charge for the material used in the job.
-      </p>
-      <p>
-        For <b>3d printers</b>, this value gets multiplied by the volume of
-        material used in grams, so this value should be the <b>cost per gram</b>
-        .
-      </p>
-    </div>
-  ),
+
   costPerProcessingTime: (
     <div>
       <p>
         The cost per processing time is the cost of the processing time used in
         the job. This is a way to charge for the processing, design, or
         engineering time used in the job. This is typically per hour.
-      </p>
-    </div>
-  ),
-  materialDescriptor: (
-    <div>
-      <p>
-        The material descriptor is a way to describe the quantity of material
-        used in the job. This should be a way to describe the quantity of
-        material used in the job. For example, gram, sheet, roll, etc.
-        Gramatically, this should be a singular noun.
-      </p>
-      <p>
-        For <b>3d printers</b>, this value should be gram, or in the case of
-        resin printers, possibly milliliter.
-      </p>
-      <p>
-        This is not used for any calculations or logic, but will help your
-        operators understand the quantity of material they are entering and help
-        your customers understand the quantity of material they are using.
       </p>
     </div>
   ),

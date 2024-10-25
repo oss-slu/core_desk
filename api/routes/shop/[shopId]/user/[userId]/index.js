@@ -102,19 +102,6 @@ export const post = [
           userId: userId,
           shopId: shopId,
           to: JSON.stringify(connection),
-          message: `Added user ${
-            user.firstName + " " + user.lastName
-          } to shop ${shop.name} as a${
-            req.body.role === "CUSTOMER"
-              ? " customer"
-              : req.body.role === "OPERATOR"
-              ? "n operator"
-              : req.body.role === "ADMIN"
-              ? "n admin"
-              : req.body.role === "INSTRUCTOR"
-              ? "n instructor"
-              : ""
-          }`,
           type: LogType.USER_CONNECTED_TO_SHOP,
         },
       });

@@ -91,22 +91,13 @@ export const shopSidenavItems = (
   }
 
   if (accountType === "ADMIN" || isGlobalAdmin) {
-    items.push(
-      {
-        type: "item",
-        href: `/shops/${shopId}/3d-printing`,
-        text: "3D Printing",
-        active: activeText === "3D Printing",
-        icon: <Icon i="printer" size={18} />,
-      },
-      {
-        type: "item",
-        href: `/shops/${shopId}/users`,
-        text: "Users",
-        active: activeText === "Users",
-        icon: <Icon i="users-group" size={18} />,
-      }
-    );
+    items.push({
+      type: "item",
+      href: `/shops/${shopId}/users`,
+      text: "Users",
+      active: activeText === "Users",
+      icon: <Icon i="users-group" size={18} />,
+    });
   }
 
   return items;

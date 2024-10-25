@@ -20,7 +20,7 @@ export const get = [
       return res.status(400).json({ error: "Unauthorized" });
     }
 
-    const material = await prisma.printer3dMaterial.findFirst({
+    const material = await prisma.material.findFirst({
       where: {
         id: materialId,
       },
@@ -47,7 +47,7 @@ export const del = [
 
     const { materialId } = req.params;
 
-    const updatedMaterial = await prisma.printer3dMaterial.update({
+    const updatedMaterial = await prisma.material.update({
       where: {
         id: materialId,
       },
@@ -56,7 +56,7 @@ export const del = [
       },
     });
 
-    const materials = await prisma.printer3dMaterial.findMany({
+    const materials = await prisma.material.findMany({
       where: {
         active: true,
         printer3dType: {
@@ -73,7 +73,7 @@ export const del = [
       data: {
         userId: req.user.id,
         type: LogType.PRINTER_3D_MATERIAL_DELETED,
-        printer3dMaterialId: materialId,
+        materialId: materialId,
         printer3dTypeId: updatedMaterial.printer3dTypeId,
         shopId: req.params.shopId,
       },
@@ -102,13 +102,13 @@ export const put = [
       return res.status(400).json({ error: "Unauthorized" });
     }
 
-    const originalMaterial = await prisma.printer3dMaterial.findFirst({
+    const originalMaterial = await prisma.material.findFirst({
       where: {
         id: materialId,
       },
     });
 
-    const updatedMaterial = await prisma.printer3dMaterial.update({
+    const updatedMaterial = await prisma.material.update({
       where: {
         id: materialId,
       },
@@ -118,7 +118,7 @@ export const put = [
       },
     });
 
-    const materials = await prisma.printer3dMaterial.findMany({
+    const materials = await prisma.material.findMany({
       where: {
         active: true,
         printer3dType: {
@@ -135,7 +135,7 @@ export const put = [
       data: {
         userId: req.user.id,
         type: LogType.PRINTER_3D_MATERIAL_MODIFIED,
-        printer3dMaterialId: materialId,
+        materialId: materialId,
         printer3dTypeId: updatedMaterial.printer3dTypeId,
         shopId: req.params.shopId,
         from: JSON.stringify(originalMaterial),

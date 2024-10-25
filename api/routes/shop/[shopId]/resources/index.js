@@ -67,7 +67,6 @@ export const get = [
         if (resource.quantityPublic) delete resource.quantity;
 
         if (resource.costingPublic) {
-          delete resource.costPerMaterial;
           delete resource.costPerProcessingTime;
           delete resource.costPerTime;
           delete resource.costPerUnit;

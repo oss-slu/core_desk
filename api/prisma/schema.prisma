@@ -56,11 +56,11 @@ model logs {
   resourceImage ResourceImage? @relation(fields: [resourceImageId], references: [id], onDelete: Cascade)
   resourceImageId String?
 
-  printer3dType Printer3dType? @relation(fields: [printer3dTypeId], references: [id], onDelete: Cascade)
-  printer3dTypeId String?
+  material Material? @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  materialId String?
 
-  printer3dMaterial Printer3dMaterial? @relation(fields: [printer3dMaterialId], references: [id], onDelete: Cascade)
-  printer3dMaterialId String?
+  resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
+  resourceTypeId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -139,10 +139,10 @@ model Shop {
   users UserShop[]
   jobs  Job[]
 
+  resourceTypes ResourceType[]
   resources Resource[]
 
-  printer3dTypes Printer3dType[]
-  printer3dMaterials Printer3dMaterial[]
+  materials Material[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -158,10 +158,8 @@ model Resource {
   primaryCategory String?
   secondaryCategory String?
 
-  resourceType ResourceType?
-
-  printer3dType Printer3dType? @relation(fields: [printer3dTypeId], references: [id])
-  printer3dTypeId String?
+  resourceType ResourceType @relation(fields: [resourceTypeId], references: [id])
+  resourceTypeId String
 
   shop   Shop   @relation(fields: [shopId], references: [id])
   shopId String
@@ -177,7 +175,6 @@ model Resource {
   costPerUnit Float?
   fixedCost Float?
   costPerTime Float?
-  costPerMaterial Float?
   materialLabel String?
   costPerProcessingTime Float?
   costingPublic Boolean @default(true)
@@ -189,27 +186,7 @@ model Resource {
   logs  logs[]
 }
 
-model Printer3dType {
-  id          String  @id @default(cuid())
-  type       String
-  description String? @db.MediumText
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  active Boolean @default(true)
-
-  resources Resource[]
-  materials Printer3dMaterial[]
-
-  jobItems JobItem[]
-
-  shopId String
-  shop Shop @relation(fields: [shopId], references: [id])
-
-  logs  logs[]
-}
-
-model Printer3dMaterial {
+model Material {
   id          String  @id @default(cuid())
   type       String
   description String? @db.MediumText
@@ -221,11 +198,12 @@ model Printer3dMaterial {
 
   jobItems JobItem[]
 
-  printer3dType Printer3dType @relation(fields: [printer3dTypeId], references: [id])
-  printer3dTypeId String
-
   shopId String
   shop Shop @relation(fields: [shopId], references: [id])
+
+  costPerUnit Float?
+  unitDescriptor String?
+  costPublic Boolean @default(true)
 
   logs  logs[]
 }
@@ -250,14 +228,32 @@ model ResourceImage {
   logs  logs[]
 }
 
-enum ResourceType {
-  OTHER
-  INSTRUMENT
-  TOOL
-  PRINTER
-  PRINTER_3D
-  LASER_CUTTER
-  CNC
+// enum ResourceType {
+//   OTHER
+//   INSTRUMENT
+//   TOOL
+//   PRINTER
+//   PRINTER_3D
+//   LASER_CUTTER
+//   CNC
+// }
+
+model ResourceType {
+  id          String  @id @default(cuid())
+  type       String
+  description String? @db.MediumText
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  active Boolean @default(true)
+
+  shopId String
+  shop Shop @relation(fields: [shopId], references: [id])
+
+  resources Resource[]
+  jobItems JobItem[]
+
+  logs  logs[]
 }
 
 enum SuppliedMaterialLevels {
@@ -314,13 +310,11 @@ model JobItem {
   resource Resource? @relation(fields: [resourceId], references: [id])
   resourceId String?
 
-  resourceType ResourceType?
+  resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id])
+  resourceTypeId String?
 
-  printer3dType Printer3dType? @relation(fields: [printer3dTypeId], references: [id])
-  printer3dTypeId String?
-
-  printer3dMaterial Printer3dMaterial? @relation(fields: [printer3dMaterialId], references: [id])
-  printer3dMaterialId String?
+  material Material? @relation(fields: [materialId], references: [id])
+  materialId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

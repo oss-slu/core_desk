@@ -17,7 +17,7 @@ export const get = [
       return res.status(400).json({ error: "Unauthorized" });
     }
 
-    const materials = await prisma.printer3dMaterial.findMany({
+    const materials = await prisma.material.findMany({
       where: {
         active: true,
         printer3dType: {
@@ -49,7 +49,7 @@ export const post = [
       return res.status(400).json({ error: "Unauthorized" });
     }
 
-    const printer3dMaterial = await prisma.printer3dMaterial.create({
+    const material = await prisma.material.create({
       data: {
         type,
         description,
@@ -59,7 +59,7 @@ export const post = [
       },
     });
 
-    const materials = await prisma.printer3dMaterial.findMany({
+    const materials = await prisma.material.findMany({
       where: {
         active: true,
         printer3dType: {
@@ -76,7 +76,7 @@ export const post = [
       data: {
         userId: req.user.id,
         type: LogType.PRINTER_3D_MATERIAL_CREATED,
-        printer3dMaterialId: printer3dMaterial.id,
+        materialId: material.id,
         printer3dTypeId: printerTypeId,
         shopId: req.params.shopId,
       },

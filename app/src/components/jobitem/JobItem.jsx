@@ -165,10 +165,10 @@ export const JobItem = ({ item: _item, refetchJobs }) => {
             />
             <Util.Spacer size={1} />
             <PrinterMaterialPicker
-              value={item.printer3dMaterialId}
+              value={item.materialId}
               printerTypeId={item.printer3dTypeId}
               opLoading={opLoading}
-              onChange={(value) => updateJob({ printer3dMaterialId: value.id })}
+              onChange={(value) => updateJob({ materialId: value.id })}
               disabled={
                 item.printer3dTypeId === null || item.printer3dTypeId === ""
               }
