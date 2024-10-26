@@ -2,13 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Page } from "../../../../components/page/page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
-import {
-  use3dPrinterTypes,
-  useAuth,
-  useResource,
-  useResourceTypes,
-  useShop,
-} from "../../../../hooks";
+import { useAuth, useResource, useShop } from "../../../../hooks";
 import { Loading } from "../../../../components/loading/loading";
 import {
   Typography,
@@ -29,7 +23,6 @@ import { MarkdownRender } from "../../../../components/markdown/MarkdownRender";
 import { Alert } from "tabler-react-2/dist/alert";
 import { Table } from "tabler-react-2/dist/table";
 import { useModal } from "tabler-react-2/dist/modal";
-import { Spinner } from "tabler-react-2/dist/spinner";
 import { NotFound } from "../../../../components/404/404";
 import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";
 
@@ -208,7 +201,7 @@ const objectsAreEqual = (o1, o2) => {
 
 const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
   const [cr, setCr] = useState(resource);
-  const { shopId } = useParams();
+
   useEffect(() => {
     setCr(resource);
   }, [resource]);
@@ -222,8 +215,6 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
     title: "Help",
     text: "",
   });
-
-  const { printerTypes, loading: printerTypesLoading } = use3dPrinterTypes();
 
   const Help = ({ text }) => (
     <a

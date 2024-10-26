@@ -59,7 +59,7 @@ export const useResourceTypes = (shopId) => {
     }
   };
 
-  const { modal, ModalElement, close } = useModal({
+  const { modal, ModalElement } = useModal({
     title: "Create a new Resource Type",
     text: <CreateResourceModalContent onSubmit={_createResourceType} />,
   });

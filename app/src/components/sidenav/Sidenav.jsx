@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
 import styles from "./sidenav.module.css";
 import { Button } from "tabler-react-2/dist/button";
 import { Util } from "tabler-react-2";
@@ -14,13 +13,6 @@ export const Sidenav = ({ items }) => {
     const newCollapsed = !collapsed;
     localStorage.setItem("collapsed", newCollapsed);
     setCollapsed(newCollapsed);
-  };
-
-  const IconComponent = ({ icon }) => {
-    if (icon) {
-      return icon;
-    }
-    return null;
   };
 
   return (

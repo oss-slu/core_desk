@@ -12,7 +12,7 @@ import { Typography, Util, Alert, DropdownInput } from "tabler-react-2";
 import { Button } from "tabler-react-2/dist/button";
 import { Loading } from "../../../components/loading/loading";
 import { Table } from "tabler-react-2/dist/table";
-import { Modal, useModal } from "tabler-react-2/dist/modal";
+import { Modal } from "tabler-react-2/dist/modal";
 import { Input } from "tabler-react-2";
 import Badge from "tabler-react-2/dist/badge";
 import { Icon } from "../../../util/Icon";
@@ -21,7 +21,7 @@ const { H1, H2, Text } = Typography;
 
 export const Printing3d = () => {
   const { shopId } = useParams();
-  const { shop, loading } = useShop(shopId);
+  const { shop } = useShop(shopId);
   const { user } = useAuth();
   const {
     loading: typesLoading,
@@ -311,39 +311,4 @@ const MaterialForm = ({ onSave, loading, onClose, printerTypes }) => {
       </Button>
     </>
   );
-};
-
-const HELP = {
-  costPerMaterial: (
-    <div>
-      <p>
-        The cost per material is the cost of the material used in the job. This
-        is a way to charge for the material used in the job.
-      </p>
-      <p>
-        For <b>3d printers</b>, this value gets multiplied by the volume of
-        material used in grams, so this value should be the <b>cost per gram</b>
-        .
-      </p>
-    </div>
-  ),
-  materialDescriptor: (
-    <div>
-      <p>
-        The material descriptor is a way to describe the quantity of material
-        used in the job. This should be a way to describe the quantity of
-        material used in the job. For example, gram, sheet, roll, etc.
-        Gramatically, this should be a singular noun.
-      </p>
-      <p>
-        For <b>3d printers</b>, this value should be gram, or in the case of
-        resin printers, possibly milliliter.
-      </p>
-      <p>
-        This is not used for any calculations or logic, but will help your
-        operators understand the quantity of material they are entering and help
-        your customers understand the quantity of material they are using.
-      </p>
-    </div>
-  ),
 };

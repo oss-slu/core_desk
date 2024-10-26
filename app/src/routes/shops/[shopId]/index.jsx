@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Page, sidenavItems } from "../../../components/page/page";
+import { Page } from "../../../components/page/page";
 import { useAuth } from "../../../hooks/useAuth";
 import { Loading } from "../../../components/loading/loading";
 import { Typography, Util } from "tabler-react-2";
-import { UploadDropzone } from "../../../components/upload/uploader";
 import { Icon } from "../../../util/Icon";
 import { useParams } from "react-router-dom";
 const { H1, H2 } = Typography;

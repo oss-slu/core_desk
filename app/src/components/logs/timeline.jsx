@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Timeline } from "tabler-react-2/dist/timeline";
 import { Icon } from "../../util/Icon";
 import moment from "moment";
@@ -156,7 +156,7 @@ const switchLogForContent = (log) => {
 };
 
 export const LogTimeline = ({ logs }) => {
-  const [logTypes, setLogTypes] = useState([
+  const [logTypes] = useState([
     "USER_CREATED",
     "USER_LOGIN",
     "SHOP_CREATED",

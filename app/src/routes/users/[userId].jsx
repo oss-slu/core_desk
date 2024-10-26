@@ -105,6 +105,7 @@ const AddUserToShop = ({ user, shops, loading, onFinish }) => {
     <div>
       {ModalElement}
       <Button
+        loading={loading}
         onClick={() =>
           modal({
             text: (
@@ -129,7 +130,6 @@ export const UserPage = () => {
     user,
     loading,
     refetch,
-    opLoading: userOpLoading,
     SuspendConfirmModal,
     UnSuspendConfirmModal,
     suspendUser,

@@ -64,7 +64,7 @@ export const sidenavItems = (activeText, userIsAdmin) => {
 };
 
 export const Page = ({ children, sidenavItems: _sidenavItems }) => {
-  const { user, loading } = useAuth();
+  const { loading } = useAuth();
 
   if (loading) {
     return <div>Loading...</div>;

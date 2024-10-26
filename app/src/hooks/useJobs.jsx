@@ -3,7 +3,6 @@ import { authFetch } from "../util/url";
 import { useModal } from "tabler-react-2/dist/modal";
 import { Input } from "tabler-react-2";
 import { Button } from "tabler-react-2/dist/button";
-import { useNavigate } from "react-router-dom";
 
 const CreateJobModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
@@ -56,8 +55,6 @@ export const useJobs = (shopId) => {
   const [meta, setMeta] = useState(null);
   const [opLoading, setOpLoading] = useState(false);
 
-  const navigate = useNavigate();
-
   const _createJob = async (title, description, dueDate) => {
     try {
       setOpLoading(true);
@@ -75,7 +72,7 @@ export const useJobs = (shopId) => {
     }
   };
 
-  const { modal, ModalElement, close } = useModal({
+  const { modal, ModalElement } = useModal({
     title: "Create a new Job",
     text: <CreateJobModalContent onSubmit={_createJob} />,
   });
@@ -110,5 +107,6 @@ export const useJobs = (shopId) => {
     refetch: fetchJobs,
     ModalElement,
     createJob,
+    opLoading,
   };
 };

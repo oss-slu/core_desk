@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Typography, Util } from "tabler-react-2";
+import { Card, Typography } from "tabler-react-2";
 const { H2 } = Typography;
 import styles from "./ShopCard.module.css";
 import { Link } from "react-router-dom";

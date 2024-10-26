@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 import toast from "react-hot-toast";
-import { useConfirm } from "tabler-react-2/dist/modal/confirm";
 
 export const useResource = (shopId, resourceId) => {
   const [resource, setResource] = useState(null);

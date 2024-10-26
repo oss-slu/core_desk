@@ -10,7 +10,6 @@ import {
 } from "../../../../hooks";
 import { Typography, Util, Button, Card } from "tabler-react-2";
 import { Loading } from "../../../../components/loading/loading";
-import { Table } from "tabler-react-2/dist/table";
 import { Icon } from "../../../../util/Icon";
 const { H1, H2 } = Typography;
 

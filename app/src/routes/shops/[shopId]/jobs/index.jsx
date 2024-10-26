@@ -84,7 +84,7 @@ const switchStatusForBadge = (status) => {
 export const Jobs = () => {
   const { user } = useAuth();
   const { shopId } = useParams();
-  const { shop, userShop } = useShop(shopId);
+  const { userShop } = useShop(shopId);
   const {
     jobs,
     loading: jobsLoading,
@@ -99,8 +99,11 @@ export const Jobs = () => {
   ]);
   const [startDateFilter, setStartDateFilter] = useState(null);
   const [endDateFilter, setEndDateFilter] = useState(null);
+
+  // eslint-disable-next-line no-unused-vars
   const [createdAtDateStartFilter, setCreatedAtDateStartFilter] =
     useState(null);
+  // eslint-disable-next-line no-unused-vars
   const [createdAtDateEndFilter, setCreatedAtDateEndFilter] = useState(null);
   const [submitterFilter, setSubmitterFilter] = useState(null);
 

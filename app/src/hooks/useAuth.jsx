@@ -1,11 +1,5 @@
 // AuthContext.js
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-} from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { u } from "../util/url";
 import { emitter } from "../util/mitt";
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 
 // Module-level variables for caching

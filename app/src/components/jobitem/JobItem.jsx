@@ -9,12 +9,7 @@ import { useParams } from "react-router-dom";
 import { Spinner } from "tabler-react-2/dist/spinner";
 const { H3 } = Typography;
 import styles from "./jobItem.module.css";
-import {
-  use3dPrinterMaterials,
-  use3dPrinterTypes,
-  useResources,
-} from "../../hooks";
-import { RESOURCE_TYPES } from "../../util/constants";
+import { use3dPrinterMaterials, use3dPrinterTypes } from "../../hooks";
 import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 
@@ -179,50 +174,6 @@ export const JobItem = ({ item: _item, refetchJobs }) => {
         </Util.Responsive>
       </Util.Responsive>
     </Card>
-  );
-};
-
-const ResourcePicker = ({ value, onChange, opLoading }) => {
-  const { shopId } = useParams();
-  const { resources, loading } = useResources(shopId);
-
-  const [selectedResource, setSelectedResource] = useState({
-    id: value,
-    label: "Select a resource",
-  });
-
-  if (loading)
-    return (
-      <>
-        <label className="form-label">Resource</label>
-        <Button loading disabled>
-          Loading...
-        </Button>
-      </>
-    );
-
-  return (
-    <>
-      <label className="form-label">Resource</label>
-      {opLoading ? (
-        <Button disabled loading>
-          {selectedResource.label}
-        </Button>
-      ) : (
-        <DropdownInput
-          values={resources.map((resource) => ({
-            id: resource.id,
-            label: resource.title,
-          }))}
-          value={value}
-          onChange={(value) => {
-            setSelectedResource(value);
-            onChange(value.id);
-          }}
-          prompt="Select a fulfillment type"
-        />
-      )}
-    </>
   );
 };
 

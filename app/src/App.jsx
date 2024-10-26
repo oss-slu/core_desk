@@ -16,8 +16,9 @@ import { ResourcesPage } from "./routes/shops/[shopId]/resources";
 import { ResourcePage } from "./routes/shops/[shopId]/resources/[resourceId]";
 import { NotFound } from "./components/404/404";
 
+// eslint-disable-next-line
 export default () => {
-  const { user, loggedIn, loading, login } = useAuth();
+  const { loggedIn, loading, login } = useAuth();
 
   if (loading) return null;
 

@@ -7,7 +7,6 @@ import { useModal } from "tabler-react-2/dist/modal";
 import { Table } from "tabler-react-2/dist/table";
 import { useUsers } from "../../hooks/useUsers";
 import { Spinner } from "tabler-react-2/dist/spinner";
-import { Button } from "tabler-react-2/dist/button";
 import { Avatar } from "tabler-react-2/dist/avatar";
 import { Icon } from "../../util/Icon";
 import { Link } from "react-router-dom";

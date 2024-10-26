@@ -2,8 +2,6 @@ import React from "react";
 import { generateUploadDropzone } from "@uploadthing/react";
 import { u } from "../../util/url.js";
 import "@uploadthing/react/styles.css";
-import { Util } from "tabler-react-2";
-import { Alert } from "tabler-react-2/dist/alert/index.js";
 import toast from "react-hot-toast";
 
 const _UploadDropzone = generateUploadDropzone({

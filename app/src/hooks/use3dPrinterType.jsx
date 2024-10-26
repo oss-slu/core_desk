@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 
 export const use3dPrinterType = (shopId, typeId) => {
+  console.error("use3dPrinterType deprecated");
+
   const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -62,6 +64,5 @@ export const use3dPrinterType = (shopId, typeId) => {
     refetch: fetchType,
     opLoading,
     updateType,
-    deleteType,
   };
 };

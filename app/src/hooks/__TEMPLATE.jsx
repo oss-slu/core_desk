@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 
 export const useShop = (shopId) => {
@@ -50,5 +50,5 @@ export const useShop = (shopId) => {
     fetchShop();
   }, []);
 
-  return { shop, loading, error, refetch: fetchShop, updateShop };
+  return { shop, loading, error, refetch: fetchShop, updateShop, opLoading };
 };

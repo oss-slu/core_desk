@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import {
   AdmonitionDirectiveDescriptor,
   BlockTypeSelect,
@@ -17,7 +17,6 @@ import {
   listsPlugin,
   markdownShortcutPlugin,
   MDXEditor,
-  quotePlugin,
   Separator,
   toolbarPlugin,
   UndoRedo,
