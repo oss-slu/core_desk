@@ -1,6 +1,6 @@
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
-import { Loading } from "../components/loading/loading";
+import { Loading } from "../components/loading/Loading";
 import { Typography } from "tabler-react-2";
 import { Page, sidenavItems } from "../components/page/page";
 const { H1 } = Typography;
