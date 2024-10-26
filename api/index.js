@@ -123,6 +123,8 @@ app.use(
 
 app.use("/api", await router());
 
+app.use(express.static("../app/dist"));
+
 app.all("/log", (req, res) => {
   console.log(req.body, req.headers);
   res.send("ok");
