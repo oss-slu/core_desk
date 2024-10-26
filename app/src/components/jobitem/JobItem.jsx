@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Util, Typography, DropdownInput, Input } from "tabler-react-2";
+import { Card, Util, Typography, DropdownInput } from "tabler-react-2";
 import { RenderMedia } from "../media/renderMedia";
 import { Button } from "tabler-react-2/dist/button";
 import { Icon } from "../../util/Icon";
@@ -15,6 +15,8 @@ import {
   useResources,
 } from "../../hooks";
 import { RESOURCE_TYPES } from "../../util/constants";
+import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
+import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 
 function downloadFile(url, filename) {
   fetch(url)
@@ -53,7 +55,7 @@ export const switchStatusToUI = (status) => {
 export const JobItem = ({ item: _item, refetchJobs }) => {
   const { shopId, jobId } = useParams();
 
-  const { item, opLoading, updateJob, deleteJobItem } = useJobItem(
+  const { item, opLoading, updateJobItem, deleteJobItem } = useJobItem(
     shopId,
     jobId,
     _item.id,
@@ -77,155 +79,100 @@ export const JobItem = ({ item: _item, refetchJobs }) => {
   return (
     <Card>
       <div className={styles.modal}>{ModalElement}</div>
-      <Util.Row
-        gap={1}
-        style={{
-          alignItems: "flex-start",
-        }}
-      >
+      <Util.Responsive gap={1} align="start" threshold={600}>
         <RenderMedia mediaUrl={item.fileUrl} fileType={item.fileType} />
-        <div style={{ minWidth: 300, maxWidth: 300.1 }}>
-          <H3>{item.title}</H3>
-          <Util.Row gap={1}>
-            <Button
-              onClick={modal}
-              style={{
-                padding: "0.4375rem",
-              }}
-            >
-              <Icon i="cube" size={20} />
-            </Button>
-            <Button
-              onClick={() => {
-                downloadFile(item.fileUrl, item.title);
-              }}
-              style={{
-                padding: "0.4375rem",
-              }}
-              download
-            >
-              <Icon i="download" size={20} />
-            </Button>
-            <Button
-              onClick={() => {
-                deleteJobItem(refetchJobs);
-              }}
-              style={{
-                padding: "0.4375rem",
-              }}
-              variant="danger"
-              outline
-            >
-              <Icon i="trash" size={20} />
-            </Button>
-            {opLoading ? (
-              <Spinner />
-            ) : (
-              <DropdownInput
-                values={[
-                  { id: "IN_PROGRESS", label: "In Progress" },
-                  { id: "COMPLETED", label: "Completed" },
-                  { id: "NOT_STARTED", label: "Not Started" },
-                  { id: "CANCELLED", label: "Cancelled" },
-                  { id: "WONT_DO", label: "Won't Do" },
-                  { id: "WAITING", label: "Waiting" },
-                ]}
-                value={item.status}
-                onChange={(value) => {
-                  updateJob({ status: value.id });
+        <Util.Responsive gap={1} align="start" threshold={800}>
+          <div style={{ minWidth: 300, maxWidth: 300.1 }}>
+            <H3>{item.title}</H3>
+            <Util.Row gap={1}>
+              <Button
+                onClick={modal}
+                style={{
+                  padding: "0.4375rem",
                 }}
-                color={switchStatusToUI(item.status)[1]}
+              >
+                <Icon i="cube" size={20} />
+              </Button>
+              <Button
+                onClick={() => {
+                  downloadFile(item.fileUrl, item.title);
+                }}
+                style={{
+                  padding: "0.4375rem",
+                }}
+                download
+              >
+                <Icon i="download" size={20} />
+              </Button>
+              <Button
+                onClick={() => {
+                  deleteJobItem(refetchJobs);
+                }}
+                style={{
+                  padding: "0.4375rem",
+                }}
+                variant="danger"
                 outline
-              />
-            )}
-          </Util.Row>
-          <Util.Spacer size={1} />
-          <LoadableDropdownInput
-            loading={opLoading}
-            prompt={"Select a technology"}
-            label="Technology Type"
-            values={[
-              ...RESOURCE_TYPES,
-              {
-                id: null,
-                label: "Select a technology type",
-                dropdownText: "None",
-              },
-            ]}
-            value={item.resourceType}
-            onChange={(value) => updateJob({ resourceType: value.id })}
-          />
-        </div>
-        {item.resourceType === "PRINTER_3D" ? (
-          <div>
-            <PrinterTypePicker
-              value={item.printer3dTypeId}
-              opLoading={opLoading}
-              onChange={(value) => updateJob({ printer3dTypeId: value.id })}
-            />
+              >
+                <Icon i="trash" size={20} />
+              </Button>
+              {opLoading ? (
+                <Spinner />
+              ) : (
+                <DropdownInput
+                  values={[
+                    { id: "IN_PROGRESS", label: "In Progress" },
+                    { id: "COMPLETED", label: "Completed" },
+                    { id: "NOT_STARTED", label: "Not Started" },
+                    { id: "CANCELLED", label: "Cancelled" },
+                    { id: "WONT_DO", label: "Won't Do" },
+                    { id: "WAITING", label: "Waiting" },
+                  ]}
+                  value={item.status}
+                  onChange={(value) => {
+                    updateJobItem({ status: value.id });
+                  }}
+                  color={switchStatusToUI(item.status)[1]}
+                  outline
+                />
+              )}
+            </Util.Row>
             <Util.Spacer size={1} />
-            <PrinterMaterialPicker
-              value={item.materialId}
-              printerTypeId={item.printer3dTypeId}
-              opLoading={opLoading}
-              onChange={(value) => updateJob({ materialId: value.id })}
-              disabled={
-                item.printer3dTypeId === null || item.printer3dTypeId === ""
-              }
-              disabledText={"Select a printer type first"}
+
+            <ResourceTypePicker
+              value={item.resourceTypeId}
+              loading={opLoading}
+              onChange={(value) => updateJobItem({ resourceTypeId: value })}
+              includeNone={true}
             />
           </div>
-        ) : (
-          <i>Select a fulfillment type to see more options</i>
-        )}
-      </Util.Row>
+          {item.resourceType === "PRINTER_3D" ? (
+            <div>
+              <PrinterTypePicker
+                value={item.printer3dTypeId}
+                opLoading={opLoading}
+                onChange={(value) =>
+                  updateJobItem({ printer3dTypeId: value.id })
+                }
+              />
+              <Util.Spacer size={1} />
+              <PrinterMaterialPicker
+                value={item.materialId}
+                printerTypeId={item.printer3dTypeId}
+                opLoading={opLoading}
+                onChange={(value) => updateJobItem({ materialId: value.id })}
+                disabled={
+                  item.printer3dTypeId === null || item.printer3dTypeId === ""
+                }
+                disabledText={"Select a printer type first"}
+              />
+            </div>
+          ) : (
+            <i>Select a fulfillment type to see more options</i>
+          )}
+        </Util.Responsive>
+      </Util.Responsive>
     </Card>
-  );
-};
-
-export const LoadableDropdownInput = ({
-  values,
-  value,
-  onChange,
-  prompt,
-  loading,
-  label,
-  doTheColorThing = false,
-  disabled = false,
-  disabledText,
-}) => {
-  if (loading)
-    return (
-      <>
-        <label className="form-label">{label}</label>
-        <Button loading disabled>
-          {prompt}
-        </Button>
-      </>
-    );
-
-  if (disabled)
-    return (
-      <>
-        <label className="form-label">{label}</label>
-        <Button disabled>{disabledText || prompt}</Button>
-      </>
-    );
-
-  return (
-    <>
-      <label className="form-label">{label}</label>
-      <DropdownInput
-        values={values}
-        value={value}
-        onChange={onChange}
-        prompt={prompt}
-        color={doTheColorThing ? switchStatusToUI(value)[1] : null}
-        data-value={value}
-        data-color={doTheColorThing ? switchStatusToUI(value)[1] : null}
-        outline={doTheColorThing}
-      />
-    </>
   );
 };
 

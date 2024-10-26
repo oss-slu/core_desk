@@ -12,3 +12,5 @@ export { use3dPrinterTypes } from "./use3dPrinterTypes";
 export { use3dPrinterType } from "./use3dPrinterType";
 export { use3dPrinterMaterials } from "./use3dPrinterMaterials";
 // export { use3dPrinterMaterial } from "./use3dPrinterMaterial";
+export { useResourceTypes } from "./useResourceTypes";
+export { useResourceType } from "./useResourceType";

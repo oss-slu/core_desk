@@ -6,16 +6,15 @@ import {
   use3dPrinterTypes,
   useAuth,
   useResource,
+  useResourceTypes,
   useShop,
 } from "../../../../hooks";
 import { Loading } from "../../../../components/loading/loading";
 import {
-  Card,
   Typography,
   Util,
   Button,
   Input,
-  Form,
   Switch,
   DropdownInput,
 } from "tabler-react-2";
@@ -23,7 +22,6 @@ import { Gallery } from "../../../../components/gallery/gallery";
 import { UploadDropzone } from "../../../../components/upload/uploader";
 import { Icon } from "../../../../util/Icon";
 const { H1, H2, H3, Text, B } = Typography;
-import { headingsPlugin, MDXEditor, toolbarPlugin } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
 import { MarkdownEditor } from "../../../../components/markdown/MarkdownEditor";
 import Badge from "tabler-react-2/dist/badge";
@@ -32,8 +30,8 @@ import { Alert } from "tabler-react-2/dist/alert";
 import { Table } from "tabler-react-2/dist/table";
 import { useModal } from "tabler-react-2/dist/modal";
 import { Spinner } from "tabler-react-2/dist/spinner";
-import { RESOURCE_TYPES } from "../../../../util/constants";
 import { NotFound } from "../../../../components/404/404";
+import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";
 
 export const ResourcePage = () => {
   const { shopId, resourceId } = useParams();
@@ -99,14 +97,10 @@ export const ResourcePage = () => {
         userShop.accountType
       )}
     >
-      <Util.Row
-        style={{
-          justifyContent: "space-between",
-        }}
-      >
+      <Util.Responsive threshold={800} justify="between">
         <H1>{resource.title}</H1>
         {user.admin || userShop.accountType === "ADMIN" ? (
-          <Util.Row gap={1}>
+          <Util.Row gap={1} justify="start">
             {!isEditingImages && !isEditing && (
               <Button outline onClick={() => setIsEditingImages(true)}>
                 <Icon i="photo" /> Edit Gallery
@@ -122,9 +116,10 @@ export const ResourcePage = () => {
             </Button>
           </Util.Row>
         ) : null}
-      </Util.Row>
+      </Util.Responsive>
       <Util.Hr />
-      <Util.Row gap={1} style={{ alignItems: "flex-start" }}>
+      {/* <Util.Row gap={1} style={{ alignItems: "flex-start" }}> */}
+      <Util.Responsive threshold={800} gap={2}>
         <div style={{ flex: 1 }}>
           <H2>Resource Information</H2>
           <B>Primary Category</B>{" "}
@@ -152,7 +147,11 @@ export const ResourcePage = () => {
             </>
           )}
         </div>
-        <div style={{ width: "50%" }} className="hos-900">
+        <div
+          // style={{ width: "50%" }}
+          // className="hos-900"
+          style={{ flex: 1 }}
+        >
           <H3>Gallery</H3>
           <div
             style={{
@@ -175,7 +174,8 @@ export const ResourcePage = () => {
             )}
           </div>
         </div>
-      </Util.Row>
+      </Util.Responsive>
+      {/* </Util.Row> */}
       <Util.Hr />
       {(user.admin || userShop.accountType === "ADMIN") && isEditing ? (
         <Edit
@@ -208,6 +208,7 @@ const objectsAreEqual = (o1, o2) => {
 
 const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
   const [cr, setCr] = useState(resource);
+  const { shopId } = useParams();
   useEffect(() => {
     setCr(resource);
   }, [resource]);
@@ -283,44 +284,12 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
       />
       <Util.Row gap={1}>
         <div>
-          <label className="form-label">
-            Resource Type{" "}
-            {!cr.resourceType && (
-              <i className="text-red">
-                Costing will not be available without resource type
-              </i>
-            )}
-          </label>
-          <DropdownInput
-            values={RESOURCE_TYPES}
-            label="Resource Type"
-            value={cr.resourceType}
-            onChange={(e) => setCr({ ...cr, resourceType: e.id })}
-            prompt="Select a resource type"
+          <ResourceTypePicker
+            value={cr.resourceTypeId}
+            onChange={(value) => setCr({ ...cr, resourceTypeId: value })}
+            loading={opLoading}
           />
         </div>
-        {cr.resourceType === "PRINTER_3D" && (
-          <>
-            <div>
-              <label className="form-label">Printer type</label>
-              {printerTypesLoading ? (
-                <Spinner />
-              ) : (
-                <DropdownInput
-                  values={
-                    printerTypes.map((type) => ({
-                      id: type.id,
-                      label: type.type,
-                    })) || []
-                  }
-                  value={cr.printer3dTypeId}
-                  onChange={(e) => setCr({ ...cr, printer3dTypeId: e.id })}
-                  prompt="Select a printer type"
-                />
-              )}
-            </div>
-          </>
-        )}
       </Util.Row>
       <Util.Spacer size={1} />
       <Input

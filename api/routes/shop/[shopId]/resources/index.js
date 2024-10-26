@@ -109,16 +109,21 @@ export const post = [
         return res.status(403).send("You are not an admin of this shop");
       }
 
-      const { title } = req.body;
+      const { title, resourceTypeId } = req.body;
 
       if (!title) {
         return res.status(400).send("Title is required");
+      }
+
+      if (!resourceTypeId) {
+        return res.status(400).send("Resource Type is required");
       }
 
       const resource = await prisma.resource.create({
         data: {
           title: title,
           shopId,
+          resourceTypeId,
         },
       });
 
@@ -127,6 +132,7 @@ export const post = [
           userId,
           shopId,
           resourceId: resource.id,
+          resourceTypeId: req.body.resourceTypeId,
           type: LogType.RESOURCE_CREATED,
         },
       });

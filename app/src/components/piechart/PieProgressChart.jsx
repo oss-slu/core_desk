@@ -35,6 +35,7 @@ export const PieProgressChart = ({
         width: 24,
         height: 24,
         borderRadius: "50%",
+        flexShrink: 0,
       }}
     />
   );

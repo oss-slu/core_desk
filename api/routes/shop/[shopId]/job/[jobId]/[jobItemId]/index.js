@@ -47,6 +47,8 @@ export const patch = [
     const { shopId, jobId, jobItemId } = req.params;
     const userId = req.user.id;
 
+    console.log(req.body);
+
     const userShop = await prisma.userShop.findFirst({
       where: {
         userId,
@@ -54,8 +56,6 @@ export const patch = [
         active: true,
       },
     });
-
-    console.log(userShop.accountType, req.user.admin);
 
     let job;
     if (userShop.accountType === "CUSTOMER" && !req.user.admin) {
@@ -73,7 +73,6 @@ export const patch = [
           shopId,
         },
       });
-      console.log(job);
     }
 
     if (!job) {

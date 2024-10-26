@@ -7,6 +7,9 @@
 
 .shopCardlink {
   width: 50%;
+  @media (max-width: 768px) {
+    width: 100%;
+  }
   max-width: 300px;
   text-decoration: none;
   color: inherit;

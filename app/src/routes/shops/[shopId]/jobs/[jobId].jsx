@@ -6,15 +6,13 @@ import { Typography, Util, Input } from "tabler-react-2";
 import { useJob } from "../../../../hooks/useJob";
 import { Loading } from "../../../../components/loading/loading";
 import { UploadDropzone } from "../../../../components/upload/uploader";
-import {
-  JobItem,
-  LoadableDropdownInput,
-} from "../../../../components/jobitem/JobItem";
+import { JobItem } from "../../../../components/jobitem/JobItem";
 import { Button } from "tabler-react-2/dist/button";
 const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
 import { NotFound } from "../../../../components/404/404";
+import { LoadableDropdownInput } from "../../../../components/loadableDropdown/LoadableDropdown";
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
@@ -56,14 +54,9 @@ export const JobPage = () => {
         },
       ]}
     >
-      <Util.Row
-        gap={1}
-        style={{
-          alignItems: "flex-start",
-        }}
-      >
-        <div style={{ width: "50%" }}>
-          <Util.Row style={{ justifyContent: "space-between" }} gap={1} wrap>
+      <Util.Responsive gap={1} align="start" threshold={800}>
+        <div style={{ flex: 1, width: "100%" }}>
+          <Util.Row justify="between" align="center" gap={1} wrap>
             {editing ? (
               <Input
                 value={job.title}
@@ -148,7 +141,7 @@ export const JobPage = () => {
             </>
           )}
         </div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: 1, width: "100%" }}>
           <UploadDropzone
             scope={"job.fileupload"}
             metadata={{
@@ -160,7 +153,7 @@ export const JobPage = () => {
             }}
           />
         </div>
-      </Util.Row>
+      </Util.Responsive>
       <Util.Spacer size={1} />
       <H2>Items</H2>
       {job.items?.length === 0 ? (

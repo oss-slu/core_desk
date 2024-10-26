@@ -5,6 +5,7 @@ import { LogType } from "@prisma/client";
 export const get = [
   verifyAuth,
   async (req, res) => {
+    console.log("HI");
     const { shopId } = req.params;
 
     const userShop = prisma.userShop.findFirst({
@@ -31,9 +32,23 @@ export const get = [
         shopId: shopId,
         active: shouldLoadAll ? undefined : true,
       },
+      include: {
+        resources: {
+          where: {
+            active: true,
+          },
+          include: {
+            images: {
+              where: {
+                active: true,
+              },
+            },
+          },
+        },
+      },
     });
 
-    res.json(resourceTypes);
+    res.json({ resourceTypes });
   },
 ];
 

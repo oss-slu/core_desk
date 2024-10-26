@@ -37,7 +37,7 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
     }
   };
 
-  const updateJob = async (data) => {
+  const updateJobItem = async (data) => {
     try {
       setOpLoading(true);
       setError(null);
@@ -53,7 +53,6 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
       );
       const newData = await res.json();
       if (newData.item) {
-        console.log(newData.item);
         setItem(newData.item);
         setOpLoading(false);
       } else {
@@ -106,7 +105,7 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
     loading,
     error,
     refetch: fetchJobItem,
-    updateJob,
+    updateJobItem,
     opLoading,
     deleteJobItem,
   };

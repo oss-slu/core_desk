@@ -47,7 +47,8 @@ export const useResourceTypes = (shopId) => {
       if (data.resourceType) {
         setResourceTypes([...resourceTypes, data.resourceType]);
         setOpLoading(false);
-        document.location.href = `/shops/${shopId}/resources/type/${data.resourceType.id}`;
+        document.location.hash = "#" + data.resourceType.id;
+        document.location.reload();
       } else {
         setError(data.error);
         setOpLoading(false);
@@ -66,10 +67,15 @@ export const useResourceTypes = (shopId) => {
   const fetchResourceTypes = async () => {
     try {
       setLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/resource/type`);
+      const r = await authFetch(`/api/shop/${shopId}/resources/type`);
       const data = await r.json();
-      setResourceTypes(data.resourceTypes);
-      setLoading(false);
+      if (data.resourceTypes) {
+        setResourceTypes(data.resourceTypes);
+        setLoading(false);
+      } else {
+        setError(data.error);
+        setLoading(false);
+      }
     } catch (error) {
       setError(error);
       setLoading(false);

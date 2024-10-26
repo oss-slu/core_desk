@@ -7,6 +7,7 @@ import { Icon } from "../../util/Icon";
 import { useShop } from "../../hooks/index";
 const IconLogout = () => <Icon i={"logout"} size={18} />;
 const IconLogin2 = () => <Icon i={"login-2"} size={18} />;
+import classNames from "classnames";
 
 export const Header = () => {
   const { user, loggedIn, login, logout } = useAuth();
@@ -25,7 +26,9 @@ export const Header = () => {
     <header className={styles.header}>
       <div className={styles.headerGroup}>
         <img src={logo} className={styles.headerLogo} alt="SLUCAM Logo" />
-        <h1 className={styles.headerTitle}>{shop?.name}</h1>
+        <h1 className={classNames(styles.headerTitle, "hos-600")}>
+          {shop?.name}
+        </h1>
       </div>
       <Dropdown
         prompt={loggedIn ? user?.firstName + " " + user?.lastName : "Account"}

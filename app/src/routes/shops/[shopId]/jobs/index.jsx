@@ -94,7 +94,7 @@ export const Jobs = () => {
         userShop.accountType
       )}
     >
-      <Util.Row style={{ justifyContent: "space-between" }}>
+      <Util.Row justify="between" align="center">
         <div>
           <H1>Jobs</H1>
           <H3>{shop.name}</H3>
@@ -121,17 +121,24 @@ export const Jobs = () => {
               label: "Submitter",
               accessor: "user.name",
               render: (name, context) => (
-                <Util.Row gap={0.5}>
+                <Util.Row gap={0.5} align="center">
                   <Avatar size="sm" dicebear initials={context.user.id} />
-                  {name}
+                  <Util.Col align="start">
+                    {name}
+                    {context.user.id === user.id && (
+                      <Badge color="green" soft>
+                        You
+                      </Badge>
+                    )}
+                  </Util.Col>
                 </Util.Row>
               ),
             },
-            {
-              label: "Description",
-              accessor: "description",
-              render: (d) => d.slice(0, 35).concat(d.length > 35 ? "..." : ""),
-            },
+            // {
+            //   label: "Description",
+            //   accessor: "description",
+            //   render: (d) => d.slice(0, 35).concat(d.length > 35 ? "..." : ""),
+            // },
             {
               label: "Items",
               accessor: "itemsCount",
@@ -140,41 +147,64 @@ export const Jobs = () => {
               label: "Progress",
               accessor: "progress",
               render: (d, _) => (
-                <Util.Row gap={1}>
-                  {_.itemsCount === 0 ? (
-                    <PieProgressChart
-                      complete={0}
-                      inProgress={0}
-                      notStarted={0}
-                      exclude={1}
-                    />
-                  ) : (
-                    <PieProgressChart
-                      complete={d.completedCount / _.itemsCount}
-                      inProgress={d.inProgressCount / _.itemsCount}
-                      notStarted={d.notStartedCount / _.itemsCount}
-                      exclude={d.excludedCount / _.itemsCount}
-                    />
-                  )}
-                  <div style={{ fontSize: 10 }}>
+                <Util.Row gap={1} align="center">
+                  <Util.Col justify="between" gap={1}>
+                    {/* Prevent line break at all */}
+                    <span
+                      style={{
+                        whiteSpace: "nowrap",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                      }}
+                    >
+                      <Icon i="sum" size={14} />
+                      {_.itemsCount}
+                    </span>
+                    {_.itemsCount === 0 ? (
+                      <PieProgressChart
+                        complete={0}
+                        inProgress={0}
+                        notStarted={0}
+                        exclude={1}
+                      />
+                    ) : (
+                      <PieProgressChart
+                        complete={d.completedCount / _.itemsCount}
+                        inProgress={d.inProgressCount / _.itemsCount}
+                        notStarted={d.notStartedCount / _.itemsCount}
+                        exclude={d.excludedCount / _.itemsCount}
+                      />
+                    )}
+                    <div className="sos-600">
+                      <span className="text-success">{d.completedCount}</span>
+                      <span className="text-yellow">{d.inProgressCount}</span>
+                      <span className="text-danger">{d.notStartedCount}</span>
+                      <span className="text-gray-400">{d.excludedCount}</span>
+                    </div>
+                  </Util.Col>
+                  <div style={{ fontSize: 10 }} className="hos-600">
                     <span className="text-success">
                       <Icon i="circle-check" size={10} /> {d.completedCount} /{" "}
-                      {_.itemsCount} Completed
+                      {_.itemsCount}
+                      <span className="hos-900"> Completed</span>
                     </span>
                     <br />
                     <span className="text-yellow">
                       <Icon i="progress" size={10} /> {d.inProgressCount} /{" "}
-                      {_.itemsCount} In Progress
+                      {_.itemsCount}
+                      <span className="hos-900"> In Progress</span>
                     </span>
                     <br />
                     <span className="text-danger">
                       <Icon i="minus" size={10} /> {d.notStartedCount} /{" "}
-                      {_.itemsCount} Not Started
+                      {_.itemsCount}
+                      <span className="hos-900"> Not Started</span>
                     </span>
                     <br />
                     <span className="text-gray-400">
                       <Icon i="x" size={10} /> {d.excludedCount} /{" "}
-                      {_.itemsCount} Excluded
+                      {_.itemsCount}
+                      <span className="hos-900"> Excluded</span>
                     </span>
                   </div>
                 </Util.Row>
