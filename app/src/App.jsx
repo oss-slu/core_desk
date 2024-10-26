@@ -15,6 +15,7 @@ import { Toaster } from "react-hot-toast";
 import { ResourcesPage } from "./routes/shops/[shopId]/resources";
 import { ResourcePage } from "./routes/shops/[shopId]/resources/[resourceId]";
 import { NotFound } from "./components/404/404";
+import { MaterialPage } from "./routes/shops/[shopId]/resources/type/resourceTypeId/materials/[materialId]";
 
 // eslint-disable-next-line
 export default () => {
@@ -58,6 +59,10 @@ export default () => {
                 <Route
                   path="/shops/:shopId/resources/:resourceId"
                   element={<ResourcePage />}
+                />
+                <Route
+                  path="/shops/:shopId/resources/type/:resourceTypeId/materials/:materialId"
+                  element={<MaterialPage />}
                 />
 
                 <Route path="*" element={<NotFound />} />

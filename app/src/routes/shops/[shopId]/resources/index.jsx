@@ -7,6 +7,7 @@ import {
   useAuth,
   useResources,
   useResourceTypes,
+  useMaterials,
 } from "../../../../hooks";
 import { Typography, Util, Button, Card } from "tabler-react-2";
 import { Loading } from "../../../../components/loading/loading";
@@ -22,12 +23,16 @@ export const ResourcesPage = () => {
     ModalElement: CreateResourceModalElement,
     createResource,
   } = useResources(shopId);
+
   const {
     resourceTypes,
     loading: resourceTypesLoading,
     ModalElement: CreateResourceTypeModalElement,
     createResourceType,
   } = useResourceTypes(shopId);
+
+  const { ModalElement: CreateMaterialModalElement, createMaterial } =
+    useMaterials(shopId);
 
   if (loading || resourceTypesLoading)
     return (
@@ -60,6 +65,10 @@ export const ResourcesPage = () => {
               <Icon i="tools" /> Add Resource Type
             </Button>
             {CreateResourceTypeModalElement}
+            <Button onClick={createMaterial}>
+              <Icon i="tools" /> Add Material
+            </Button>
+            {CreateMaterialModalElement}
             <Button onClick={createResource}>
               <Icon i="tool" /> Add Resource
             </Button>
@@ -68,40 +77,12 @@ export const ResourcesPage = () => {
         )}
       </Util.Responsive>
 
+      <Util.Spacer size={1} />
+
       <p>
         Resources are the tools and equipment that are available for use in the
         shop.
       </p>
-
-      {/* TABLE FORMAT */}
-      {/* {resourceTypes.map((resourceType, i) => (
-        <div key={resourceType.id}>
-          {i !== 0 && <Util.Spacer size={3} />}
-          <H2>{resourceType.title}</H2>
-          <Table
-            columns={[
-              {
-                label: "Image",
-                accessor: "images",
-                render: (images, _) => (
-                  <img
-                    src={images[0]?.fileUrl}
-                    style={{ width: 100, height: 100, objectFit: "cover" }}
-                  />
-                ),
-              },
-              {
-                label: "Resource",
-                accessor: "title",
-                render: (title, _) => (
-                  <Link to={`/shops/${shopId}/resources/${_.id}`}>{title}</Link>
-                ),
-              },
-            ]}
-            data={resourceType.resources}
-          />
-        </div>
-      ))} */}
 
       {resourceTypes.map((resourceType) => (
         <div key={resourceType.id}>

@@ -4,9 +4,13 @@ import { Input, Button, Util } from "tabler-react-2";
 import { useModal } from "tabler-react-2/dist/modal";
 import { ResourceTypePicker } from "../components/resourceTypePicker/ResourceTypePicker";
 
-const CreateResourceModalContent = ({ onSubmit }) => {
+const CreateResourceModalContent = ({ onSubmit, _resourceTypeId }) => {
   const [title, setTitle] = useState("");
-  const [resourceTypeId, setResourceTypeId] = useState(null);
+  const [resourceTypeId, setResourceTypeId] = useState(_resourceTypeId);
+
+  useEffect(() => {
+    setResourceTypeId(_resourceTypeId);
+  }, [_resourceTypeId]);
 
   return (
     <div>
@@ -16,7 +20,8 @@ const CreateResourceModalContent = ({ onSubmit }) => {
         onChange={setTitle}
         placeholder={"Bambu Lab X1C"}
       />
-      <ResourceTypePicker value={null} onChange={setResourceTypeId} />
+      {resourceTypeId + "asdf"}
+      <ResourceTypePicker value={resourceTypeId} onChange={setResourceTypeId} />
       <Util.Spacer size={2} />
       {title.length > 1 && resourceTypeId?.toString()?.length > 5 ? (
         <Button

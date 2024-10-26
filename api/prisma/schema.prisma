@@ -197,7 +197,7 @@ model Resource {
 
 model Material {
   id          String  @id @default(cuid())
-  type       String
+  title       String
   description String? @db.MediumText
   manufacturer String?
 
@@ -213,6 +213,9 @@ model Material {
   costPerUnit Float?
   unitDescriptor String?
   costPublic Boolean @default(true)
+
+  resourceTypeId String
+  resourceType ResourceType @relation(fields: [resourceTypeId], references: [id])
 
   logs  logs[]
 }
@@ -261,6 +264,7 @@ model ResourceType {
 
   resources Resource[]
   jobItems JobItem[]
+  materials Material[]
 
   logs  logs[]
 }

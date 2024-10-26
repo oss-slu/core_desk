@@ -234,11 +234,7 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
       {ModalElement}
       <Util.Row gap={2} style={{ justifyContent: "space-between" }}>
         <H2>Edit</H2>
-        {changed && (
-          <i className="text-red">
-            You have unsaved changes. Click "Save" to save your changes.
-          </i>
-        )}
+        {changed && <i className="text-red">You have unsaved changes.</i>}
         <Button
           loading={opLoading}
           disabled={opLoading}

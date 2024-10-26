@@ -66,7 +66,6 @@ export const useUser = (userId) => {
   const suspendUser = async () => {
     setOpLoading(true);
     try {
-      console.log("HI");
       if (await suspendConfirm()) {
         const reason = prompt("Why are you suspending this user?");
         await authFetch(`/api/users/${userId}/suspension`, {

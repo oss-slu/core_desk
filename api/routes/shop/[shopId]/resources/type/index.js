@@ -5,7 +5,6 @@ import { LogType } from "@prisma/client";
 export const get = [
   verifyAuth,
   async (req, res) => {
-    console.log("HI");
     const { shopId } = req.params;
 
     const userShop = prisma.userShop.findFirst({
