@@ -107,7 +107,7 @@ export const JobPage = () => {
               <p>{job.description}</p>
               <H3>Upcoming Deadline</H3>
               <p>
-                {moment(job.dueDate).format("MM/DD/YYYY")} (
+                {moment(job.dueDate).format("MM/DD/YY")} (
                 {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
                 {new Date(job.dueDate) < new Date() &&
                   !(
@@ -131,6 +131,8 @@ export const JobPage = () => {
                   { id: "CANCELLED", label: "Cancelled" },
                   { id: "WONT_DO", label: "Won't Do" },
                   { id: "WAITING", label: "Waiting" },
+                  { id: "WAITING_FOR_PICKUP", label: "Waiting for Pickup" },
+                  { id: "WAITING_FOR_PAYMENT", label: "Waiting for Payment" },
                 ]}
                 value={job.status}
                 onChange={(value) => {

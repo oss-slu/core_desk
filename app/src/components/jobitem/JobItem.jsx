@@ -47,6 +47,10 @@ export const switchStatusToUI = (status) => {
       return ["Won't Do", "secondary"];
     case "WAITING":
       return ["Waiting", "blue"];
+    case "WAITING_FOR_PICKUP":
+      return ["Waiting for Pickup", "teal"];
+    case "WAITING_FOR_PAYMENT":
+      return ["Waiting for Payment", "orange"];
     default:
       return [status, "secondary"];
   }
@@ -127,6 +131,8 @@ export const JobItem = ({ item: _item, refetchJobs }) => {
                     { id: "CANCELLED", label: "Cancelled" },
                     { id: "WONT_DO", label: "Won't Do" },
                     { id: "WAITING", label: "Waiting" },
+                    { id: "WAITING_FOR_PICKUP", label: "Waiting for Pickup" },
+                    { id: "WAITING_FOR_PAYMENT", label: "Waiting for Payment" },
                   ]}
                   value={item.status}
                   onChange={(value) => {

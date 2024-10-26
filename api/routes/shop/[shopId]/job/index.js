@@ -118,9 +118,10 @@ export const get = [
         job.progress = {};
 
         // Sort progress into buckets
-        job.progress.completedCount = job.items.filter(
-          (item) => item.status === "COMPLETED"
-        ).length;
+        job.progress.completedCount =
+          job.items.filter((item) => item.status === "COMPLETED").length +
+          job.items.filter((item) => item.status === "WAITING_FOR_PICKUP")
+            .length;
         job.progress.inProgressCount = job.items.filter(
           (item) => item.status === "IN_PROGRESS"
         ).length;
@@ -130,7 +131,9 @@ export const get = [
         job.progress.excludedCount =
           job.items.filter((item) => item.status === "CANCELLED").length +
           job.items.filter((item) => item.status === "WONT_DO").length +
-          job.items.filter((item) => item.status === "WAITING").length;
+          job.items.filter((item) => item.status === "WAITING").length +
+          job.items.filter((item) => item.status === "WAITING_FOR_PAYMENT")
+            .length;
 
         job.user.name = `${job.user.firstName} ${job.user.lastName}`;
 

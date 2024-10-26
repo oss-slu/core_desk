@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 
-export const useUsers = () => {
+export const useUsers = (shopId) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [users, setUsers] = useState([]);
@@ -10,7 +10,9 @@ export const useUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const r = await authFetch("/api/users");
+      const r = await authFetch(
+        shopId ? `/api/shop/${shopId}/user` : "/api/users"
+      );
       const data = await r.json();
       setUsers(data.users);
       setMeta(data.meta);

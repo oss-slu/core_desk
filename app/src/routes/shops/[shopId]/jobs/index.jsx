@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Page } from "../../../../components/page/page";
 import { useShop } from "../../../../hooks/useShop";
 import { shopSidenavItems } from "../../[shopId]/index";
 import { useAuth } from "../../../../hooks/useAuth";
-import { Typography, Util } from "tabler-react-2";
-const { H1, H3 } = Typography;
+import { Typography, Util, Input } from "tabler-react-2";
+const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { Button } from "tabler-react-2/dist/button";
 import { Table } from "tabler-react-2/dist/table";
@@ -15,6 +15,7 @@ import { Loading } from "../../../../components/loading/loading";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
 import { Icon } from "../../../../util/Icon";
 import { Avatar } from "tabler-react-2/dist/avatar";
+import { ShopUserPicker } from "../../../../components/shopUserPicker/ShopUserPicker";
 
 const switchStatusForBadge = (status) => {
   switch (status) {
@@ -54,13 +55,34 @@ const switchStatusForBadge = (status) => {
           Waiting
         </Badge>
       );
+    case "WAITING_FOR_PICKUP":
+      return (
+        <Badge color="teal" soft>
+          Waiting for Pickup
+        </Badge>
+      );
+    case "WAITING_FOR_PAYMENT":
+      return (
+        <Badge color="orange" soft>
+          Waiting for Payment
+        </Badge>
+      );
     default:
       return "primary";
   }
 };
 
+/*
+{ id: "IN_PROGRESS", label: "In Progress" },
+{ id: "COMPLETED", label: "Completed" },
+{ id: "NOT_STARTED", label: "Not Started" },
+{ id: "CANCELLED", label: "Cancelled" },
+{ id: "WONT_DO", label: "Won't Do" },
+{ id: "WAITING", label: "Waiting" },
+*/
+
 export const Jobs = () => {
-  const { user, loading } = useAuth();
+  const { user } = useAuth();
   const { shopId } = useParams();
   const { shop, userShop } = useShop(shopId);
   const {
@@ -69,6 +91,57 @@ export const Jobs = () => {
     ModalElement,
     createJob,
   } = useJobs(shopId);
+
+  // State variables for filters
+  const [statusFilter, setStatusFilter] = useState([
+    "NOT_STARTED",
+    "IN_PROGRESS",
+  ]);
+  const [startDateFilter, setStartDateFilter] = useState(null);
+  const [endDateFilter, setEndDateFilter] = useState(null);
+  const [createdAtDateStartFilter, setCreatedAtDateStartFilter] =
+    useState(null);
+  const [createdAtDateEndFilter, setCreatedAtDateEndFilter] = useState(null);
+  const [submitterFilter, setSubmitterFilter] = useState(null);
+
+  const statusOptions = [
+    {
+      id: "NOT_STARTED",
+      label: "Not Started",
+      color: "red",
+    },
+    { id: "IN_PROGRESS", label: "In Progress", color: "yellow" },
+    { id: "COMPLETED", label: "Completed", color: "green" },
+    {
+      id: "WAITING",
+      label: "Waiting",
+      color: "blue",
+    },
+    { id: "CANCELLED", label: "Cancelled", color: "secondary" },
+    {
+      id: "WONT_DO",
+      label: "Won't Do",
+      color: "secondary",
+    },
+    {
+      id: "WAITING_FOR_PICKUP",
+      label: "Waiting for Pickup",
+      color: "teal",
+    },
+    {
+      id: "WAITING_FOR_PAYMENT",
+      label: "Waiting for Payment",
+      color: "orange",
+    },
+  ];
+
+  const handleStatusToggle = (id) => {
+    setStatusFilter(
+      statusFilter.includes(id)
+        ? statusFilter.filter((s) => s !== id)
+        : [...statusFilter, id]
+    );
+  };
 
   if (jobsLoading) {
     return (
@@ -85,6 +158,44 @@ export const Jobs = () => {
     );
   }
 
+  // Apply filters to jobs
+  const filteredJobs = jobs.filter((job) => {
+    // Filter by status
+    const statusMatches =
+      statusFilter.length === 0 || statusFilter.includes(job.status);
+
+    // Filter by date range
+    const dueDate = new Date(job.dueDate);
+    const startDateMatches =
+      !startDateFilter || dueDate >= new Date(startDateFilter + "T00:00:00");
+    const endDateMatches =
+      !endDateFilter || dueDate <= new Date(endDateFilter + "T00:00:00");
+
+    // Filter by created date range
+    const createdAtDate = new Date(job.createdAt);
+    const createdAtDateStartMatches =
+      !createdAtDateStartFilter ||
+      createdAtDate >= new Date(createdAtDateStartFilter + "T00:00:00");
+    const createdAtDateEndMatches =
+      !createdAtDateEndFilter ||
+      createdAtDate <= new Date(createdAtDateEndFilter + "T00:00:00");
+
+    // Filter by submitter
+    const submitterId = job.user.id;
+    const submitterMatches =
+      !submitterFilter || submitterId === submitterFilter;
+
+    // Return true if all conditions are met
+    return (
+      statusMatches &&
+      startDateMatches &&
+      endDateMatches &&
+      createdAtDateStartMatches &&
+      createdAtDateEndMatches &&
+      submitterMatches
+    );
+  });
+
   return (
     <Page
       sidenavItems={shopSidenavItems(
@@ -97,14 +208,100 @@ export const Jobs = () => {
       <Util.Row justify="between" align="center">
         <div>
           <H1>Jobs</H1>
-          <H3>{shop.name}</H3>
         </div>
         <Button onClick={createJob}>Create Job</Button>
       </Util.Row>
-      {jobs.length === 0 ? (
+      <Util.Spacer size={1} />
+
+      {/* Filters Section */}
+      <H3>Filters</H3>
+      <Util.Row gap={1}>
+        <Util.Col gap={0.5}>
+          <H4>Status</H4>
+          {/* Render status filter UI here, e.g., checkboxes for each status */}
+          {statusOptions.map(({ id, label, color }) => (
+            <Badge
+              key={id}
+              color={color}
+              soft={!statusFilter.includes(id)}
+              onClick={() => handleStatusToggle(id)}
+            >
+              <Util.Row justify="between" gap={0.5}>
+                {statusFilter.includes(id) ? (
+                  <Icon i="square-check" />
+                ) : (
+                  <Icon i="square" />
+                )}
+                {label}
+              </Util.Row>
+            </Badge>
+          ))}
+          {/* {JSON.stringify(statusFilter)} */}
+        </Util.Col>
+        <Util.Col gap={0}>
+          <H4>Due Date Range</H4>
+          <Input
+            type="date"
+            onChange={(e) => setStartDateFilter(e + "T00:00:00")}
+            value={startDateFilter?.split("T")[0]}
+            icon={startDateFilter && <Icon i="x" />}
+            iconPos="trailing"
+            separated={!!startDateFilter}
+            appendedLinkOnClick={() => setStartDateFilter(null)}
+          />
+          <Input
+            type="date"
+            onChange={(e) => setEndDateFilter(e + "T00:00:00")}
+            value={endDateFilter?.split("T")[0]}
+            icon={endDateFilter && <Icon i="x" />}
+            iconPos="trailing"
+            separated={!!endDateFilter}
+            appendedLinkOnClick={() => setEndDateFilter(null)}
+            style={{
+              marginTop: -12,
+            }}
+          />
+          {/* <H4>Created Date Range</H4>
+          <Input
+            type="date"
+            onChange={(e) => setCreatedAtDateStartFilter(e + "T00:00:00")}
+            value={createdAtDateStartFilter?.split("T")[0]}
+            icon={createdAtDateStartFilter && <Icon i="x" />}
+            iconPos="trailing"
+            separated={!!createdAtDateStartFilter}
+            appendedLinkOnClick={() => setCreatedAtDateStartFilter(null)}
+          />
+          <Input
+            type="date"
+            onChange={(e) => setCreatedAtDateEndFilter(e + "T00:00:00")}
+            value={createdAtDateEndFilter?.split("T")[0]}
+            icon={createdAtDateEndFilter && <Icon i="x" />}
+            iconPos="trailing"
+            separated={!!createdAtDateEndFilter}
+            appendedLinkOnClick={() => setCreatedAtDateEndFilter(null)}
+            style={{
+              marginTop: -12,
+            }}
+          /> */}
+          {/* Render date pickers for start and end dates */}
+          {/* </Util.Col>
+        <Util.Col gap={0}> */}
+          <H4>Submitter</H4>
+          <ShopUserPicker
+            value={submitterFilter}
+            onChange={setSubmitterFilter}
+            includeNone={true}
+          />
+          {/* Render input for submitter name */}
+        </Util.Col>
+      </Util.Row>
+      <Util.Spacer size={2} />
+
+      {/* Jobs Table */}
+      {filteredJobs.length === 0 ? (
         <i>
-          No jobs found. Click the "Create Job" button above to create a new
-          job.
+          No jobs found. Adjust your filters or click the "Create Job" button
+          above to create a new job.
         </i>
       ) : (
         <Table
@@ -142,6 +339,7 @@ export const Jobs = () => {
             {
               label: "Items",
               accessor: "itemsCount",
+              sortable: true,
             },
             {
               label: "Progress",
@@ -221,7 +419,7 @@ export const Jobs = () => {
               accessor: "dueDate",
               render: (d) => (
                 <>
-                  {moment(d).format("MM/DD/YYYY")} ({moment(d).fromNow()}){" "}
+                  {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()}){" "}
                   {/* Overdue warning */}
                   {new Date(d) < new Date() &&
                     !(
@@ -236,7 +434,7 @@ export const Jobs = () => {
               sortable: true,
             },
           ]}
-          data={jobs}
+          data={filteredJobs}
         />
       )}
       {ModalElement}

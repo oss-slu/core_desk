@@ -9,6 +9,7 @@ export const LoadableDropdownInput = ({
   prompt,
   loading,
   label,
+  showLabel = true,
   doTheColorThing = false,
   disabled = false,
   disabledText,
@@ -16,7 +17,7 @@ export const LoadableDropdownInput = ({
   if (loading)
     return (
       <>
-        <label className="form-label">{label}</label>
+        {showLabel && <label className="form-label">{label}</label>}
         <Button loading disabled>
           {prompt}
         </Button>
@@ -26,14 +27,14 @@ export const LoadableDropdownInput = ({
   if (disabled)
     return (
       <>
-        <label className="form-label">{label}</label>
+        {showLabel && <label className="form-label">{label}</label>}
         <Button disabled>{disabledText || prompt}</Button>
       </>
     );
 
   return (
     <>
-      <label className="form-label">{label}</label>
+      {showLabel && <label className="form-label">{label}</label>}
       <DropdownInput
         values={values}
         value={value}

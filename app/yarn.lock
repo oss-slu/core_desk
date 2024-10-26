@@ -5778,10 +5778,10 @@ suspend-react@^0.1.3:
   resolved "https://registry.npmjs.org/suspend-react/-/suspend-react-0.1.3.tgz"
   integrity sha512-aqldKgX9aZqpoDp3e8/BZ8Dm7x1pJl+qI3ZKxDN0i/IQTWUwBx/ManmlVJ3wowqbno6c2bmiIfs+Um6LbsjJyQ==
 
-tabler-react-2@^0.1.47:
-  version "0.1.47"
-  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.47.tgz#2acbac8f0256c141ea143675a62ee9f5f037c79f"
-  integrity sha512-jFUgRmU9KwWd9mEQUCgqFzrIdUcoabGK1Pzy7RA8is+E2bIgQdHFKnlOF3JH7i9/19kqh9X2Ru5TajMN+SKjiA==
+tabler-react-2@^0.1.50:
+  version "0.1.50"
+  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.50.tgz#e7321f559fdb11353aa5d36d2e644154cddbbd2c"
+  integrity sha512-yLmTf9ZhXNBMmF0DC6Frr7uIy//wmtZe/Tw7ziG99xUDA1bPS090kxjHXe9ndriJzDbCVrGZ67wuoat6PTNoEw==
   dependencies:
     "@babel/cli" "^7.24.8"
     "@babel/core" "^7.24.8"
