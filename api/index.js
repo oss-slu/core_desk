@@ -12,6 +12,12 @@ import { LogType } from "@prisma/client";
 dotenv.config();
 import { createRouteHandler } from "uploadthing/express";
 import { uploadRouter } from "./config/uploadthing.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Define __dirname for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
@@ -124,6 +130,10 @@ app.use(
 app.use("/api", await router());
 
 app.use(express.static("../app/dist"));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../app/dist", "index.html"));
+});
 
 app.all("/log", (req, res) => {
   console.log(req.body, req.headers);

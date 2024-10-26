@@ -25,7 +25,9 @@
     "nodemon": "^3.1.7",
     "passport": "^0.7.0",
     "passport-saml": "^3.2.4",
-    "uploadthing": "^7.1.0"
+    "path": "^0.12.7",
+    "uploadthing": "^7.1.0",
+    "url": "^0.11.4"
   },
   "devDependencies": {
     "eslint": "^9.13.0",
