@@ -11,7 +11,7 @@ import { Button } from "tabler-react-2/dist/button";
 import { Table } from "tabler-react-2/dist/table";
 import Badge from "tabler-react-2/dist/badge";
 import moment from "moment";
-import { Loading } from "../../../../components/loading/loading";
+import { Loading } from "../../../../components/loading/Loading";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
 import { Icon } from "../../../../util/Icon";
 import { Avatar } from "tabler-react-2/dist/avatar";

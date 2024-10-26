@@ -4,7 +4,7 @@ import { shopSidenavItems } from "../../../..";
 import { Link, useParams } from "react-router-dom";
 import { useAuth, useMaterial, useShop } from "../../../../../../../hooks";
 import { Typography, Util, Input, Card, Switch } from "tabler-react-2";
-import { Loading } from "../../../../../../../components/loading/loading";
+import { Loading } from "../../../../../../../components/loading/Loading";
 import { Button } from "tabler-react-2/dist/button";
 import { Icon } from "../../../../../../../util/Icon";
 import { ResourceTypePicker } from "../../../../../../../components/resourceTypePicker/ResourceTypePicker";

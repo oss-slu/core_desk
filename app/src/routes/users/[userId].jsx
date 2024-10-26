@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useUser } from "../../hooks/useUser";
-import { Loading } from "../../components/loading/loading";
+import { Loading } from "../../components/loading/Loading";
 import { Page, sidenavItems } from "../../components/page/page";
 import { useAuth } from "../../hooks/useAuth";
 import { Util, Typography, DropdownInput } from "tabler-react-2";

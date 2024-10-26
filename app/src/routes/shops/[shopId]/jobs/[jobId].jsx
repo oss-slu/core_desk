@@ -4,7 +4,7 @@ import { Icon } from "../../../../util/Icon";
 import { useParams } from "react-router-dom";
 import { Typography, Util, Input } from "tabler-react-2";
 import { useJob } from "../../../../hooks/useJob";
-import { Loading } from "../../../../components/loading/loading";
+import { Loading } from "../../../../components/loading/Loading";
 import { UploadDropzone } from "../../../../components/upload/uploader";
 import { JobItem } from "../../../../components/jobitem/JobItem";
 import { Button } from "tabler-react-2/dist/button";

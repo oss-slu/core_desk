@@ -10,7 +10,7 @@ import {
   useMaterials,
 } from "../../../../hooks";
 import { Typography, Util, Button, Card } from "tabler-react-2";
-import { Loading } from "../../../../components/loading/loading";
+import { Loading } from "../../../../components/loading/Loading";
 import { Icon } from "../../../../util/Icon";
 import { Table } from "tabler-react-2/dist/table";
 import { Spinner } from "tabler-react-2/dist/spinner";

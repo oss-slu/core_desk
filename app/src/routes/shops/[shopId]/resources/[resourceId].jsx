@@ -3,7 +3,7 @@ import { Page } from "../../../../components/page/page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
 import { useAuth, useResource, useShop } from "../../../../hooks";
-import { Loading } from "../../../../components/loading/loading";
+import { Loading } from "../../../../components/loading/Loading";
 import {
   Typography,
   Util,
