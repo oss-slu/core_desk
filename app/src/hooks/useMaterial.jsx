@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 
-export const useMaterial = (shopId, resourceId, materialId) => {
+export const useMaterial = (shopId, resourceTypeId, materialId) => {
   const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -11,7 +11,7 @@ export const useMaterial = (shopId, resourceId, materialId) => {
     try {
       shouldSetLoading && setLoading(true);
       const r = await authFetch(
-        `/api/shop/${shopId}/resources/${resourceId}/material/${materialId}`
+        `/api/shop/${shopId}/resources/type/${resourceTypeId}/material/${materialId}`
       );
       const data = await r.json();
       if (data.material) {
@@ -31,7 +31,7 @@ export const useMaterial = (shopId, resourceId, materialId) => {
     try {
       setOpLoading(true);
       const r = await authFetch(
-        `/api/shop/${shopId}/resources/${resourceId}/material/${materialId}`,
+        `/api/shop/${shopId}/resources/type/${resourceTypeId}/material/${materialId}`,
         {
           method: "PUT",
           body: JSON.stringify(data),
@@ -51,6 +51,43 @@ export const useMaterial = (shopId, resourceId, materialId) => {
     }
   };
 
+  const deleteMaterial = async () => {
+    if (!confirm("Are you sure you want to delete this material?")) {
+      return;
+    }
+    try {
+      setOpLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/resources/type/${resourceTypeId}/material/${materialId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      setOpLoading(false);
+      document.location.href = `/shops/${shopId}/resources`;
+    } catch (error) {
+      setError(error);
+      setOpLoading(false);
+    }
+  };
+
+  const deleteMaterialImage = async (imageId) => {
+    try {
+      setOpLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/resources/type/${resourceTypeId}/material/${materialId}/images/${imageId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      setOpLoading(false);
+      fetchMaterial(false);
+    } catch (error) {
+      setError(error);
+      setOpLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchMaterial();
   }, []);
@@ -62,5 +99,7 @@ export const useMaterial = (shopId, resourceId, materialId) => {
     refetch: fetchMaterial,
     updateMaterial,
     opLoading,
+    deleteMaterialImage,
+    deleteMaterial,
   };
 };

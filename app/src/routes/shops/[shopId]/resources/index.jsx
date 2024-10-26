@@ -12,7 +12,9 @@ import {
 import { Typography, Util, Button, Card } from "tabler-react-2";
 import { Loading } from "../../../../components/loading/loading";
 import { Icon } from "../../../../util/Icon";
-const { H1, H2 } = Typography;
+import { Table } from "tabler-react-2/dist/table";
+import { Spinner } from "tabler-react-2/dist/spinner";
+const { H1, H2, H3 } = Typography;
 
 export const ResourcesPage = () => {
   const { shopId } = useParams();
@@ -57,7 +59,7 @@ export const ResourcesPage = () => {
         userShop.accountType
       )}
     >
-      <Util.Responsive threshold={600} justify="between">
+      <Util.Responsive threshold={600} justify="between" align="center">
         <H1>Resources</H1>
         {(user.admin || userShop.accountType === "ADMIN") && (
           <Util.Row gap={1} justify="start">
@@ -66,7 +68,7 @@ export const ResourcesPage = () => {
             </Button>
             {CreateResourceTypeModalElement}
             <Button onClick={createMaterial}>
-              <Icon i="tools" /> Add Material
+              <Icon i="sandbox" /> Add Material
             </Button>
             {CreateMaterialModalElement}
             <Button onClick={createResource}>
@@ -85,20 +87,11 @@ export const ResourcesPage = () => {
       </p>
 
       {resourceTypes.map((resourceType) => (
-        <div key={resourceType.id}>
-          <Util.Hr />
-          <H2 id={resourceType.id}>{resourceType.title}</H2>
-          <Util.Spacer size={1} />
-          <Util.Row gap={1} wrap>
-            {resourceType.resources.map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                resource={resource}
-                shopId={shopId}
-              />
-            ))}
-          </Util.Row>
-        </div>
+        <ResourceType
+          key={resourceType.id}
+          resourceType={resourceType}
+          shopId={shopId}
+        />
       ))}
 
       {/* {resources.length === 0 && <i>No resources found.</i>}
@@ -109,6 +102,85 @@ export const ResourcesPage = () => {
         ))}
       </Util.Row> */}
     </Page>
+  );
+};
+
+const ResourceType = ({ resourceType, shopId }) => {
+  const {
+    materials,
+    loading: materialsLoading,
+    ModalElement: CreateMaterialModalElement,
+    createMaterial,
+  } = useMaterials(shopId, resourceType.id);
+  const { ModalElement: CreateResourceModalElement, createResource } =
+    useResources(shopId, resourceType.id);
+
+  return (
+    <div>
+      {CreateMaterialModalElement}
+      {CreateResourceModalElement}
+      <Util.Hr />
+      <Util.Row justify="between">
+        <H2 id={resourceType.id}>{resourceType.title}</H2>
+        <Util.Row gap={1}>
+          <Button onClick={createMaterial}>
+            <Icon i="sandbox" /> Add Material
+          </Button>
+          <Button onClick={createResource}>
+            <Icon i="tool" /> Add Resource
+          </Button>
+        </Util.Row>
+      </Util.Row>
+      <Util.Spacer size={1} />
+      <Util.Row gap={1} wrap>
+        {resourceType.resources.map((resource) => (
+          <ResourceCard key={resource.id} resource={resource} shopId={shopId} />
+        ))}
+      </Util.Row>
+      <Util.Spacer size={2} />
+      <H3>Materials</H3>
+      {materialsLoading ? (
+        <Spinner />
+      ) : materials.length === 0 ? (
+        <i>
+          No materials found. Click the "Add Material" button to add a new one.
+        </i>
+      ) : (
+        <Table
+          data={materials}
+          columns={[
+            {
+              label: "Title",
+              accessor: "title",
+              render: (title, _) => (
+                <Link
+                  to={`/shops/${shopId}/resources/type/${resourceType.id}/materials/${_.id}`}
+                >
+                  {title}
+                </Link>
+              ),
+            },
+            {
+              label: "Manufacturer",
+              accessor: "manufacturer",
+            },
+            {
+              label: "Cost Per Unit",
+              accessor: "costPerUnit",
+              render: (costPerUnit, _) =>
+                _.costPublic
+                  ? `$${costPerUnit}/${_.unitDescriptor}`
+                  : "Not Public",
+            },
+            {
+              label: "Created At",
+              accessor: "createdAt",
+              render: (createdAt) => new Date(createdAt).toLocaleString(),
+            },
+          ]}
+        />
+      )}
+    </div>
   );
 };
 

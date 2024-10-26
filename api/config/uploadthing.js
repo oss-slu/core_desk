@@ -112,6 +112,43 @@ export const uploadRouter = {
           return { ...metadata, userId: user.id, scope };
         }
       }
+
+      if (
+        scope === "material.msds" ||
+        scope === "material.tds" ||
+        scope === "material.image"
+      ) {
+        const { materialId } = metadata;
+
+        const material = await prisma.material.findFirst({
+          where: {
+            id: materialId,
+          },
+        });
+
+        if (!material) {
+          throw new UploadThingError("Material not found");
+        }
+
+        if (user.admin) {
+          return { ...metadata, userId: user.id, scope };
+        }
+
+        const userShop = await prisma.userShop.findFirst({
+          where: {
+            userId: user.id,
+            shopId: material.shopId,
+          },
+        });
+
+        if (!userShop) {
+          throw new UploadThingError("You do not have access to this shop");
+        }
+
+        if (userShop.accountType === "ADMIN") {
+          return { ...metadata, userId: user.id, scope };
+        }
+      }
     })
     .onUploadComplete((data) => {
       data;

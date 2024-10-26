@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Page } from "../../../../../../../components/page/page";
 import { shopSidenavItems } from "../../../..";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAuth, useMaterial, useShop } from "../../../../../../../hooks";
-import { Typography, Util, Input } from "tabler-react-2";
+import { Typography, Util, Input, Card, Switch } from "tabler-react-2";
 import { Loading } from "../../../../../../../components/loading/loading";
 import { Button } from "tabler-react-2/dist/button";
 import { Icon } from "../../../../../../../util/Icon";
@@ -12,6 +12,8 @@ import Badge from "tabler-react-2/dist/badge";
 import { UploadDropzone } from "../../../../../../../components/upload/uploader";
 import { MarkdownEditor } from "../../../../../../../components/markdown/MarkdownEditor";
 import { MarkdownRender } from "../../../../../../../components/markdown/MarkdownRender";
+import { Gallery } from "../../../../../../../components/gallery/gallery";
+import { Table } from "tabler-react-2/dist/table";
 const { H1, H2, H3, B } = Typography;
 
 const objectsAreEqual = (o1, o2) => {
@@ -22,11 +24,14 @@ export const MaterialPage = () => {
   const { shopId, resourceTypeId, materialId } = useParams();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
-  const { material, loading, updateMaterial, opLoading } = useMaterial(
-    shopId,
-    resourceTypeId,
-    materialId
-  );
+  const {
+    material,
+    loading,
+    updateMaterial,
+    opLoading,
+    deleteMaterialImage,
+    deleteMaterial,
+  } = useMaterial(shopId, resourceTypeId, materialId);
 
   const [nm, setNm] = useState(material);
 
@@ -35,6 +40,7 @@ export const MaterialPage = () => {
   }, [material]);
 
   const [editing, setEditing] = useState(false);
+  const [editingGallery, setEditingGallery] = useState(false);
 
   const [changed, setChanged] = useState(false);
   useEffect(() => {
@@ -54,16 +60,31 @@ export const MaterialPage = () => {
     <Page sidenavItems={shopSidenavItems("Resources", shopId, user, userShop)}>
       <Util.Row justify="between" align="center">
         <H1>{material.title}</H1>
-        {!editing && (
-          <Button onClick={() => setEditing(true)}>
-            <Icon i="edit" />
-            Edit
-          </Button>
+        {!editing && !editingGallery && (
+          <Util.Row gap={1}>
+            <Button onClick={() => setEditingGallery(true)}>
+              <Icon i="photo" />
+              Edit Gallery
+            </Button>
+            <Button onClick={() => setEditing(true)}>
+              <Icon i="edit" />
+              Edit
+            </Button>
+            <Button
+              onClick={deleteMaterial}
+              variant="danger"
+              outline
+              loading={opLoading}
+            >
+              <Icon i="trash" />
+              Delete
+            </Button>
+          </Util.Row>
         )}
       </Util.Row>
       <Util.Hr />
       <Util.Responsive threshold={800} gap={2}>
-        <div>
+        <div style={{ flex: 1 }}>
           <H2>Material Information</H2>
           <B>Manufacturer</B>{" "}
           <Badge color="teal">{material.manufacturer}</Badge>
@@ -76,6 +97,66 @@ export const MaterialPage = () => {
               <Badge color="teal">{material.unitDescriptor}</Badge>
             </>
           )}
+          <Util.Spacer size={2} />
+          <H3>Documentation</H3>
+          <Util.Col gap={1} align="start">
+            <Button
+              ghost
+              href={material.msdsFileUrl ? material.msdsFileUrl : null}
+              target="_blank"
+              disabled
+              variant="primary"
+            >
+              <Icon i="download" />
+              Material Safety Data Sheet
+              {material.msdsFileUrl ? "" : " (Not Available)"}
+            </Button>
+            <Button
+              ghost
+              href={material.tdsFileUrl ? material.tdsFileUrl : null}
+              target="_blank"
+              disabled
+              variant="primary"
+            >
+              <Icon i="download" />
+              Technical Data Sheet
+            </Button>
+          </Util.Col>
+        </div>
+        <div style={{ flex: 1 }}>
+          <H3>Gallery</H3>
+          <div
+            style={{
+              width: "100%",
+              height: 200,
+            }}
+          >
+            {material.images.length > 0 ? (
+              <div
+                style={{
+                  border: "1px solid #e5e5e5",
+                }}
+              >
+                <Gallery images={material.images} height={200} />
+              </div>
+            ) : user.admin || userShop.accountType === "ADMIN" ? (
+              <UploadDropzone
+                scope="material.image"
+                metadata={{ shopId, materialId }}
+                dropzoneAppearance={{
+                  container: {
+                    height: 200,
+                    padding: 10,
+                  },
+                  uploadIcon: {
+                    display: "none",
+                  },
+                }}
+              />
+            ) : (
+              <i>No images found</i>
+            )}
+          </div>
         </div>
       </Util.Responsive>
       <Util.Hr />
@@ -131,6 +212,11 @@ export const MaterialPage = () => {
               }}
             />
           </Util.Row>
+          <Switch
+            label="Show cost information to all shop users"
+            value={material.costPublic}
+            onChange={(e) => setNm({ ...nm, costPublic: e })}
+          />
           <p>
             Cost per unit should be the cost of a single unit of the material,
             and unit descriptor should be this unit. This is the smallest unit
@@ -142,40 +228,188 @@ export const MaterialPage = () => {
 
           <H2>Documentation</H2>
           <H3>MSDS (Material Safety Data Sheet)</H3>
-          <UploadDropzone
-            scope="material.msds"
-            metadata={{ shopId, materialId }}
-            dropzoneAppearance={{
-              container: {
-                height: 200,
-                padding: 10,
-              },
-              uploadIcon: {
-                display: "none",
-              },
-            }}
-          />
+          <Util.Row gap={1}>
+            {material.msdsFileUrl && (
+              <Card
+                style={{
+                  flex: 1,
+                  marginTop: 8,
+                }}
+                title={
+                  <Util.Row gap={0.5} align="center">
+                    Current MSDS
+                    <Button
+                      href={material.msdsFileUrl}
+                      target="_blank"
+                      size="sm"
+                    >
+                      <Icon i="download" />
+                      Download
+                    </Button>
+                  </Util.Row>
+                }
+              >
+                <iframe src={material.msdsFileUrl} style={{ width: "100%" }} />
+              </Card>
+            )}
+            <UploadDropzone
+              scope="material.msds"
+              metadata={{ shopId, materialId }}
+              dropzoneAppearance={{
+                container: {
+                  height: !material.msdsFileUrl ? 200 : null,
+                  padding: 10,
+                  flex: 1,
+                  borderRadius: 4,
+                },
+                uploadIcon: {
+                  display: "none",
+                },
+                button: {
+                  backgroundColor: "var(--tblr-primary)",
+                },
+              }}
+            />
+          </Util.Row>
           <Util.Spacer size={2} />
           <H3>TDS (Technical Data Sheet)</H3>
-          <UploadDropzone
-            scope="material.tds"
-            metadata={{ shopId, materialId }}
-            dropzoneAppearance={{
-              container: {
-                height: 200,
-                padding: 10,
-              },
-              uploadIcon: {
-                display: "none",
-              },
-            }}
-          />
+          <Util.Row gap={1}>
+            {material.tdsFileUrl && (
+              <Card
+                style={{
+                  flex: 1,
+                  marginTop: 8,
+                }}
+                title={
+                  <Util.Row gap={0.5} align="center">
+                    Current TDS
+                    <Button
+                      href={material.tdsFileUrl}
+                      target="_blank"
+                      size="sm"
+                    >
+                      <Icon i="download" />
+                      Download
+                    </Button>
+                  </Util.Row>
+                }
+              >
+                <iframe src={material.tdsFileUrl} style={{ width: "100%" }} />
+              </Card>
+            )}
+            <UploadDropzone
+              scope="material.tds"
+              metadata={{ shopId, materialId }}
+              dropzoneAppearance={{
+                container: {
+                  height: !material.tdsFileUrl ? 200 : null,
+                  padding: 10,
+                  flex: 1,
+                  borderRadius: 4,
+                },
+                uploadIcon: {
+                  display: "none",
+                },
+                button: {
+                  backgroundColor: "var(--tblr-primary)",
+                },
+              }}
+            />
+          </Util.Row>
           <Util.Spacer size={2} />
+          <H2>Description</H2>
           <MarkdownEditor
             value={material.description}
             onChange={(e) => setNm({ ...nm, description: e })}
           />
           <Util.Hr />
+        </div>
+      ) : editingGallery ? (
+        <div>
+          <Util.Row justify="between" align="center">
+            <H3>Material Gallery</H3>
+            <Button
+              loading={opLoading}
+              onClick={async () => {
+                setEditingGallery(false);
+              }}
+              variant="primary"
+            >
+              <Icon i="arrow-left" />
+              Back
+            </Button>
+          </Util.Row>
+          <Util.Spacer size={1} />
+          <Table
+            columns={[
+              {
+                label: "Image",
+                accessor: "fileUrl",
+                render: (url) => (
+                  <img
+                    src={url}
+                    style={{
+                      width: 100,
+                      height: 100,
+                      objectFit: "cover",
+                      borderRadius: 5,
+                    }}
+                  />
+                ),
+              },
+              {
+                label: "File Name",
+                accessor: "fileName",
+                render: (fileName, _) => (
+                  <Link to={_.fileUrl} target="_blank">
+                    {fileName}
+                  </Link>
+                ),
+              },
+              {
+                label: "Uploaded At",
+                accessor: "createdAt",
+                render: (date) => new Date(date).toLocaleString(),
+              },
+              {
+                label: "Delete",
+                accessor: "id",
+                render: (id) => (
+                  <Button
+                    onClick={() => {
+                      deleteMaterialImage(id);
+                    }}
+                    variant="danger"
+                    size="sm"
+                    loading={opLoading}
+                    outline
+                  >
+                    <Icon i="trash" />
+                    Delete this image
+                  </Button>
+                ),
+              },
+            ]}
+            data={material.images}
+          />
+          <Util.Spacer size={1} />
+          <H3>Upload a new image</H3>
+          <UploadDropzone
+            scope="material.image"
+            metadata={{ shopId, materialId }}
+            dropzoneAppearance={{
+              container: {
+                height: 200,
+                padding: 10,
+              },
+              uploadIcon: {
+                display: "none",
+              },
+              button: {
+                backgroundColor: "var(--tblr-primary)",
+              },
+            }}
+          />
         </div>
       ) : (
         <div>

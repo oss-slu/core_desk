@@ -4,12 +4,12 @@ import { useModal } from "tabler-react-2/dist/modal";
 import { Input, Button, Util } from "tabler-react-2";
 import { ResourceTypePicker } from "../components/resourceTypePicker/ResourceTypePicker";
 
-const CreateMaterialModalContent = ({ onSubmit }) => {
+const CreateMaterialModalContent = ({ onSubmit, resourceTypeId }) => {
   const [title, setTitle] = useState("");
   const [manufacturer, setManufacturer] = useState("");
   const [costPerUnit, setCostPerUnit] = useState("");
   const [unitDescriptor, setUnitDescriptor] = useState("");
-  const [resourceType, setResourceType] = useState("");
+  const [resourceType, setResourceType] = useState(resourceTypeId);
 
   const isValid = title.length > 1 && manufacturer.length > 1 && resourceType;
 
@@ -95,7 +95,7 @@ export const useMaterials = (shopId, resourceTypeId) => {
     try {
       setOpLoading(true);
       const response = await authFetch(
-        `/api/shop/${shopId}/resources/${data.resourceTypeId}/material`,
+        `/api/shop/${shopId}/resources/type/${data.resourceTypeId}/material`,
         {
           method: "POST",
           body: JSON.stringify(data),
@@ -105,7 +105,7 @@ export const useMaterials = (shopId, resourceTypeId) => {
       if (result.material) {
         setMaterials([...materials, result.material]);
         setOpLoading(false);
-        document.location.href = `/shops/${shopId}/resources/material/${result.material.id}`;
+        document.location.href = `/shops/${shopId}/resources/type/${resourceTypeId}/materials/${result.material.id}`;
       } else {
         setError(result.error || "An error occurred");
         setOpLoading(false);
@@ -118,14 +118,19 @@ export const useMaterials = (shopId, resourceTypeId) => {
 
   const { modal, ModalElement } = useModal({
     title: "Create a New Material",
-    text: <CreateMaterialModalContent onSubmit={_createMaterial} />,
+    text: (
+      <CreateMaterialModalContent
+        onSubmit={_createMaterial}
+        resourceTypeId={resourceTypeId}
+      />
+    ),
   });
 
   const fetchMaterials = async () => {
     try {
       setLoading(true);
       const response = await authFetch(
-        `/api/shop/${shopId}/resources/${resourceTypeId}/material`
+        `/api/shop/${shopId}/resources/type/${resourceTypeId}/material`
       );
       const data = await response.json();
       if (data.materials) {

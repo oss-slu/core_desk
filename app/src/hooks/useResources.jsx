@@ -20,7 +20,6 @@ const CreateResourceModalContent = ({ onSubmit, _resourceTypeId }) => {
         onChange={setTitle}
         placeholder={"Bambu Lab X1C"}
       />
-      {resourceTypeId + "asdf"}
       <ResourceTypePicker value={resourceTypeId} onChange={setResourceTypeId} />
       <Util.Spacer size={2} />
       {title.length > 1 && resourceTypeId?.toString()?.length > 5 ? (
@@ -39,13 +38,13 @@ const CreateResourceModalContent = ({ onSubmit, _resourceTypeId }) => {
   );
 };
 
-export const useResources = (shopId) => {
+export const useResources = (shopId, resourceTypeId) => {
   const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resources, setResources] = useState([]);
 
-  const _createResource = async (title, resourceTypeId) => {
+  const _createResource = async (title) => {
     try {
       setOpLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/resources`, {
@@ -69,7 +68,12 @@ export const useResources = (shopId) => {
 
   const { modal, ModalElement } = useModal({
     title: "Create a new Resource",
-    text: <CreateResourceModalContent onSubmit={_createResource} />,
+    text: (
+      <CreateResourceModalContent
+        onSubmit={_createResource}
+        _resourceTypeId={resourceTypeId}
+      />
+    ),
   });
 
   const fetchResources = async () => {

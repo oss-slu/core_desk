@@ -59,6 +59,9 @@ model logs {
   material Material? @relation(fields: [materialId], references: [id], onDelete: Cascade)
   materialId String?
 
+  materialImage MaterialImage? @relation(fields: [materialImageId], references: [id], onDelete: Cascade)
+  materialImageId String?
+
   resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
   resourceTypeId String?
 
@@ -98,6 +101,11 @@ enum LogType {
   MATERIAL_CREATED
   MATERIAL_MODIFIED
   MATERIAL_DELETED
+  MATERIAL_MSDS_UPLOADED
+  MATERIAL_TDS_UPLOADED
+  MATERIAL_IMAGE_CREATED
+  MATERIAL_IMAGE_MODIFIED
+  MATERIAL_IMAGE_DELETED
 
 
   // LEGACY TYPES
@@ -217,6 +225,38 @@ model Material {
   resourceTypeId String
   resourceType ResourceType @relation(fields: [resourceTypeId], references: [id])
 
+  images MaterialImage[]
+
+  msdsFileKey String?
+  msdsFileUrl String?
+  msdsFileName String?
+  msdsFileType String?
+
+  tdsFileKey String?
+  tdsFileUrl String?
+  tdsFileName String?
+  tdsFileType String?
+
+  logs  logs[]
+}
+
+model MaterialImage {
+  id          String  @id @default(cuid())
+
+  fileKey String
+  fileUrl String
+  fileName String
+  fileType String
+
+  description String?
+
+  active Boolean @default(true)
+
+  material Material @relation(fields: [materialId], references: [id])
+  materialId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   logs  logs[]
 }
 
