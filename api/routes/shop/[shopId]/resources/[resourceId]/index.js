@@ -117,13 +117,18 @@ export const put = [
         },
       });
 
+      const updatedResourceWithoutImages = { ...updatedResource };
+      delete updatedResourceWithoutImages.images;
+      updatedResourceWithoutImages.imagesLength = updatedResource.images.length;
+      resource.imagesLength = resource.images.length;
+
       await prisma.logs.create({
         data: {
           userId,
           shopId,
           type: LogType.RESOURCE_MODIFIED,
           from: JSON.stringify(resource),
-          to: JSON.stringify(updatedResource),
+          to: JSON.stringify(updatedResourceWithoutImages),
           resourceId: updatedResource.id,
         },
       });

@@ -1,0 +1,9 @@
+.diffViewerReset pre {
+  background: unset;
+  padding: 0;
+  line-height: unset !important;
+}
+
+.diffViewerReset span {
+  padding: 0;
+}

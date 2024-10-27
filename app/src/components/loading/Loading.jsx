@@ -1,7 +1,7 @@
 import React from "react";
 import { Typography, Spinner } from "tabler-react-2";
 
-export const Loading = () => {
+export const Loading = ({ message }) => {
   return (
     <div
       style={{
@@ -13,7 +13,7 @@ export const Loading = () => {
         height: "70vh",
       }}
     >
-      <Typography.H3>Loading...</Typography.H3>
+      <Typography.H3>{message || "Loading..."}</Typography.H3>
       <Spinner />
     </div>
   );

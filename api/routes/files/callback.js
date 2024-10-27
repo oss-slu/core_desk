@@ -173,7 +173,7 @@ export const post = async (req, res) => {
       return res.status(404).json({ error: "Not found" });
     }
 
-    await prisma.materialImage.create({
+    const image = await prisma.materialImage.create({
       data: {
         materialId: material.id,
         fileKey: req.body.file.key,
@@ -188,6 +188,7 @@ export const post = async (req, res) => {
         userId: userId,
         shopId,
         materialId,
+        materialImageId: image.id,
         resourceTypeId: material.resourceTypeId,
         type: LogType.MATERIAL_IMAGE_CREATED,
       },

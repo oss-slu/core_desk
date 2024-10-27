@@ -18,6 +18,7 @@ import { Spinner } from "tabler-react-2/dist/spinner";
 import { Alert } from "tabler-react-2/dist/alert";
 import { useConfirm } from "tabler-react-2/dist/modal/confirm";
 import { NotFound } from "../../components/404/404";
+import { useUserLogs } from "../../hooks/useUserLogs";
 const { H1, H2, H3 } = Typography;
 
 const AddUserToShopForm = ({ user, onFinish }) => {
@@ -146,6 +147,7 @@ export const UserPage = () => {
     opLoading,
     changeUserRole,
   } = useShops();
+  const { logs, loading: logsLoading } = useUserLogs(userId);
 
   const { confirm, ConfirmModal } = useConfirm({
     title: "Are you sure you want to disconnect?",
@@ -385,7 +387,13 @@ export const UserPage = () => {
         </div>
         <div style={{ width: "50%" }}>
           <H2>Logs</H2>
-          <LogTimeline logs={user.logs} />
+          {logsLoading ? (
+            <Util.Col>
+              <Loading message={"Compiling and downloading logs..."} />
+            </Util.Col>
+          ) : (
+            <LogTimeline logs={logs} />
+          )}
         </div>
       </Util.Row>
     </Page>

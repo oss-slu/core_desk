@@ -44,8 +44,9 @@ export const post = [
 
       await prisma.logs.create({
         data: {
-          userId: req.user.id,
+          userId: req.params.userId,
           type: LogType.USER_PROMOTED_TO_ADMIN,
+          message: `User ${req.params.userId} was promoted to admin by ${req.user.id}`,
         },
       });
 
