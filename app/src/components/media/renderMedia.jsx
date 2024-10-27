@@ -4,7 +4,12 @@ import { StlViewer } from "react-stl-viewer";
 import classNames from "classnames";
 
 export const RenderMedia = ({ mediaUrl, fileType, big = false }) => {
-  if (fileType === "png") {
+  if (
+    fileType === "png" ||
+    fileType === "jpg" ||
+    fileType === "jpeg" ||
+    fileType === "webp"
+  ) {
     return (
       <img
         src={mediaUrl}

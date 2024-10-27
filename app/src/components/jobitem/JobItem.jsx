@@ -12,6 +12,7 @@ import styles from "./jobItem.module.css";
 import { use3dPrinterMaterials, use3dPrinterTypes } from "../../hooks";
 import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
+import Badge from "tabler-react-2/dist/badge";
 
 function downloadFile(url, filename) {
   fetch(url)
@@ -51,7 +52,7 @@ export const switchStatusToUI = (status) => {
   }
 };
 
-export const JobItem = ({ item: _item, refetchJobs }) => {
+export const JobItem = ({ item: _item, refetchJobs, admin }) => {
   const { shopId, jobId } = useParams();
 
   const { item, opLoading, updateJobItem, deleteJobItem } = useJobItem(
@@ -83,7 +84,7 @@ export const JobItem = ({ item: _item, refetchJobs }) => {
         <Util.Responsive gap={1} align="start" threshold={800}>
           <div style={{ minWidth: 300, maxWidth: 300.1 }}>
             <H3>{item.title}</H3>
-            <Util.Row gap={1}>
+            <Util.Row gap={1} align="center">
               <Button
                 onClick={modal}
                 style={{
@@ -103,39 +104,50 @@ export const JobItem = ({ item: _item, refetchJobs }) => {
               >
                 <Icon i="download" size={20} />
               </Button>
-              <Button
-                onClick={() => {
-                  deleteJobItem(refetchJobs);
-                }}
-                style={{
-                  padding: "0.4375rem",
-                }}
-                variant="danger"
-                outline
-              >
-                <Icon i="trash" size={20} />
-              </Button>
-              {opLoading ? (
-                <Spinner />
-              ) : (
-                <DropdownInput
-                  values={[
-                    { id: "IN_PROGRESS", label: "In Progress" },
-                    { id: "COMPLETED", label: "Completed" },
-                    { id: "NOT_STARTED", label: "Not Started" },
-                    { id: "CANCELLED", label: "Cancelled" },
-                    { id: "WONT_DO", label: "Won't Do" },
-                    { id: "WAITING", label: "Waiting" },
-                    { id: "WAITING_FOR_PICKUP", label: "Waiting for Pickup" },
-                    { id: "WAITING_FOR_PAYMENT", label: "Waiting for Payment" },
-                  ]}
-                  value={item.status}
-                  onChange={(value) => {
-                    updateJobItem({ status: value.id });
+              {admin && (
+                <Button
+                  onClick={() => {
+                    deleteJobItem(refetchJobs);
                   }}
-                  color={switchStatusToUI(item.status)[1]}
+                  style={{
+                    padding: "0.4375rem",
+                  }}
+                  variant="danger"
                   outline
-                />
+                >
+                  <Icon i="trash" size={20} />
+                </Button>
+              )}
+              {admin ? (
+                opLoading ? (
+                  <Spinner />
+                ) : (
+                  <DropdownInput
+                    values={[
+                      { id: "IN_PROGRESS", label: "In Progress" },
+                      { id: "COMPLETED", label: "Completed" },
+                      { id: "NOT_STARTED", label: "Not Started" },
+                      { id: "CANCELLED", label: "Cancelled" },
+                      { id: "WONT_DO", label: "Won't Do" },
+                      { id: "WAITING", label: "Waiting" },
+                      { id: "WAITING_FOR_PICKUP", label: "Waiting for Pickup" },
+                      {
+                        id: "WAITING_FOR_PAYMENT",
+                        label: "Waiting for Payment",
+                      },
+                    ]}
+                    value={item.status}
+                    onChange={(value) => {
+                      updateJobItem({ status: value.id });
+                    }}
+                    color={switchStatusToUI(item.status)[1]}
+                    outline
+                  />
+                )
+              ) : (
+                <Badge color={switchStatusToUI(item.status)[1]} soft>
+                  {switchStatusToUI(item.status)[0]}
+                </Badge>
               )}
             </Util.Row>
             <Util.Spacer size={1} />

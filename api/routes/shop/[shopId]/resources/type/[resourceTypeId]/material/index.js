@@ -72,7 +72,7 @@ export const post = [
       return res.status(400).json({ message: "Unauthorized" });
     }
 
-    if (!req.user.admin && !userShop.accountType === "ADMIN") {
+    if (!req.user.admin || !userShop.accountType === "ADMIN") {
       return res.status(400).json({ message: "Unauthorized" });
     }
 

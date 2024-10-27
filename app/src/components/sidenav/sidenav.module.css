@@ -7,7 +7,7 @@
   width: 200px;
   margin-top: -10px;
   padding-left: 0;
-  height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
 
   position: sticky;
   top: 60px;

@@ -91,6 +91,7 @@ export const ResourcesPage = () => {
           key={resourceType.id}
           resourceType={resourceType}
           shopId={shopId}
+          admin={user.admin || userShop.accountType === "ADMIN"}
         />
       ))}
 
@@ -105,7 +106,7 @@ export const ResourcesPage = () => {
   );
 };
 
-const ResourceType = ({ resourceType, shopId }) => {
+const ResourceType = ({ resourceType, shopId, admin }) => {
   const {
     materials,
     loading: materialsLoading,
@@ -122,14 +123,16 @@ const ResourceType = ({ resourceType, shopId }) => {
       <Util.Hr />
       <Util.Row justify="between">
         <H2 id={resourceType.id}>{resourceType.title}</H2>
-        <Util.Row gap={1}>
-          <Button onClick={createMaterial}>
-            <Icon i="sandbox" /> Add Material
-          </Button>
-          <Button onClick={createResource}>
-            <Icon i="tool" /> Add Resource
-          </Button>
-        </Util.Row>
+        {admin && (
+          <Util.Row gap={1}>
+            <Button onClick={createMaterial}>
+              <Icon i="sandbox" /> Add Material
+            </Button>
+            <Button onClick={createResource}>
+              <Icon i="tool" /> Add Resource
+            </Button>
+          </Util.Row>
+        )}
       </Util.Row>
       <Util.Spacer size={1} />
       <Util.Row gap={1} wrap>

@@ -16,6 +16,7 @@ import { PieProgressChart } from "../../../../components/piechart/PieProgressCha
 import { Icon } from "../../../../util/Icon";
 import { Avatar } from "tabler-react-2/dist/avatar";
 import { ShopUserPicker } from "../../../../components/shopUserPicker/ShopUserPicker";
+import { Modal } from "tabler-react-2/dist/modal";
 
 const switchStatusForBadge = (status) => {
   switch (status) {
@@ -94,8 +95,8 @@ export const Jobs = () => {
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
-    "NOT_STARTED",
-    "IN_PROGRESS",
+    // "NOT_STARTED",
+    // "IN_PROGRESS",
   ]);
   const [startDateFilter, setStartDateFilter] = useState(null);
   const [endDateFilter, setEndDateFilter] = useState(null);
@@ -146,6 +147,8 @@ export const Jobs = () => {
     );
   };
 
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
+
   if (jobsLoading) {
     return (
       <Page
@@ -170,18 +173,8 @@ export const Jobs = () => {
     // Filter by date range
     const dueDate = new Date(job.dueDate);
     const startDateMatches =
-      !startDateFilter || dueDate >= new Date(startDateFilter + "T00:00:00");
-    const endDateMatches =
-      !endDateFilter || dueDate <= new Date(endDateFilter + "T00:00:00");
-
-    // Filter by created date range
-    const createdAtDate = new Date(job.createdAt);
-    const createdAtDateStartMatches =
-      !createdAtDateStartFilter ||
-      createdAtDate >= new Date(createdAtDateStartFilter + "T00:00:00");
-    const createdAtDateEndMatches =
-      !createdAtDateEndFilter ||
-      createdAtDate <= new Date(createdAtDateEndFilter + "T00:00:00");
+      !startDateFilter || dueDate >= new Date(startDateFilter);
+    const endDateMatches = !endDateFilter || dueDate <= new Date(endDateFilter);
 
     // Filter by submitter
     const submitterId = job.user.id;
@@ -190,14 +183,76 @@ export const Jobs = () => {
 
     // Return true if all conditions are met
     return (
-      statusMatches &&
-      startDateMatches &&
-      endDateMatches &&
-      createdAtDateStartMatches &&
-      createdAtDateEndMatches &&
-      submitterMatches
+      statusMatches && startDateMatches && endDateMatches && submitterMatches
     );
   });
+
+  const Filters = () => (
+    <Util.Row gap={1}>
+      <Util.Col gap={0.5}>
+        <H4>Status</H4>
+        {/* Render status filter UI here, e.g., checkboxes for each status */}
+        {statusOptions.map(({ id, label, color }) => (
+          <Badge
+            key={id}
+            color={color}
+            soft={!statusFilter.includes(id)}
+            onClick={() => handleStatusToggle(id)}
+          >
+            <Util.Row justify="between" gap={0.5}>
+              {statusFilter.includes(id) ? (
+                <Icon i="square-check" />
+              ) : (
+                <Icon i="square" />
+              )}
+              {label}
+            </Util.Row>
+          </Badge>
+        ))}
+        {/* {JSON.stringify(statusFilter)} */}
+      </Util.Col>
+      <Util.Col gap={0}>
+        <H4>Due Date Range</H4>
+        <Input
+          type="date"
+          onChange={(e) => setStartDateFilter(e + "T00:00:00")}
+          value={startDateFilter?.split("T")[0]}
+          icon={startDateFilter && <Icon i="x" />}
+          iconPos="trailing"
+          separated={!!startDateFilter}
+          appendedLinkOnClick={() => setStartDateFilter(null)}
+        />
+        <Input
+          type="date"
+          onChange={(e) => setEndDateFilter(e + "T00:00:00")}
+          value={endDateFilter?.split("T")[0]}
+          icon={endDateFilter && <Icon i="x" />}
+          iconPos="trailing"
+          separated={!!endDateFilter}
+          appendedLinkOnClick={() => setEndDateFilter(null)}
+          style={{
+            marginTop: -12,
+          }}
+        />
+        {/* Render date pickers for start and end dates */}
+        {/* </Util.Col>
+        <Util.Col gap={0}> */}
+        {user.admin ||
+          userShop.accountType === "ADMIN" ||
+          (userShop.accountType === "OPERATOR" && (
+            <>
+              <H4>Submitter</H4>
+              <ShopUserPicker
+                value={submitterFilter}
+                onChange={setSubmitterFilter}
+                includeNone={true}
+              />
+            </>
+          ))}
+        {/* Render input for submitter name */}
+      </Util.Col>
+    </Util.Row>
+  );
 
   return (
     <Page
@@ -216,88 +271,8 @@ export const Jobs = () => {
       </Util.Row>
       <Util.Spacer size={1} />
 
-      {/* Filters Section */}
       <H3>Filters</H3>
-      <Util.Row gap={1}>
-        <Util.Col gap={0.5}>
-          <H4>Status</H4>
-          {/* Render status filter UI here, e.g., checkboxes for each status */}
-          {statusOptions.map(({ id, label, color }) => (
-            <Badge
-              key={id}
-              color={color}
-              soft={!statusFilter.includes(id)}
-              onClick={() => handleStatusToggle(id)}
-            >
-              <Util.Row justify="between" gap={0.5}>
-                {statusFilter.includes(id) ? (
-                  <Icon i="square-check" />
-                ) : (
-                  <Icon i="square" />
-                )}
-                {label}
-              </Util.Row>
-            </Badge>
-          ))}
-          {/* {JSON.stringify(statusFilter)} */}
-        </Util.Col>
-        <Util.Col gap={0}>
-          <H4>Due Date Range</H4>
-          <Input
-            type="date"
-            onChange={(e) => setStartDateFilter(e + "T00:00:00")}
-            value={startDateFilter?.split("T")[0]}
-            icon={startDateFilter && <Icon i="x" />}
-            iconPos="trailing"
-            separated={!!startDateFilter}
-            appendedLinkOnClick={() => setStartDateFilter(null)}
-          />
-          <Input
-            type="date"
-            onChange={(e) => setEndDateFilter(e + "T00:00:00")}
-            value={endDateFilter?.split("T")[0]}
-            icon={endDateFilter && <Icon i="x" />}
-            iconPos="trailing"
-            separated={!!endDateFilter}
-            appendedLinkOnClick={() => setEndDateFilter(null)}
-            style={{
-              marginTop: -12,
-            }}
-          />
-          {/* <H4>Created Date Range</H4>
-          <Input
-            type="date"
-            onChange={(e) => setCreatedAtDateStartFilter(e + "T00:00:00")}
-            value={createdAtDateStartFilter?.split("T")[0]}
-            icon={createdAtDateStartFilter && <Icon i="x" />}
-            iconPos="trailing"
-            separated={!!createdAtDateStartFilter}
-            appendedLinkOnClick={() => setCreatedAtDateStartFilter(null)}
-          />
-          <Input
-            type="date"
-            onChange={(e) => setCreatedAtDateEndFilter(e + "T00:00:00")}
-            value={createdAtDateEndFilter?.split("T")[0]}
-            icon={createdAtDateEndFilter && <Icon i="x" />}
-            iconPos="trailing"
-            separated={!!createdAtDateEndFilter}
-            appendedLinkOnClick={() => setCreatedAtDateEndFilter(null)}
-            style={{
-              marginTop: -12,
-            }}
-          /> */}
-          {/* Render date pickers for start and end dates */}
-          {/* </Util.Col>
-        <Util.Col gap={0}> */}
-          <H4>Submitter</H4>
-          <ShopUserPicker
-            value={submitterFilter}
-            onChange={setSubmitterFilter}
-            includeNone={true}
-          />
-          {/* Render input for submitter name */}
-        </Util.Col>
-      </Util.Row>
+      <Filters />
       <Util.Spacer size={2} />
 
       {/* Jobs Table */}

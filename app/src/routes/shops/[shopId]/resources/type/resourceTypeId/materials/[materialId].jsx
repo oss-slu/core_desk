@@ -60,27 +60,29 @@ export const MaterialPage = () => {
     <Page sidenavItems={shopSidenavItems("Resources", shopId, user, userShop)}>
       <Util.Row justify="between" align="center">
         <H1>{material.title}</H1>
-        {!editing && !editingGallery && (
-          <Util.Row gap={1}>
-            <Button onClick={() => setEditingGallery(true)}>
-              <Icon i="photo" />
-              Edit Gallery
-            </Button>
-            <Button onClick={() => setEditing(true)}>
-              <Icon i="edit" />
-              Edit
-            </Button>
-            <Button
-              onClick={deleteMaterial}
-              variant="danger"
-              outline
-              loading={opLoading}
-            >
-              <Icon i="trash" />
-              Delete
-            </Button>
-          </Util.Row>
-        )}
+        {(user.admin || userShop.accountType === "ADMIN") &&
+          !editing &&
+          !editingGallery && (
+            <Util.Row gap={1}>
+              <Button onClick={() => setEditingGallery(true)}>
+                <Icon i="photo" />
+                Edit Gallery
+              </Button>
+              <Button onClick={() => setEditing(true)}>
+                <Icon i="edit" />
+                Edit
+              </Button>
+              <Button
+                onClick={deleteMaterial}
+                variant="danger"
+                outline
+                loading={opLoading}
+              >
+                <Icon i="trash" />
+                Delete
+              </Button>
+            </Util.Row>
+          )}
       </Util.Row>
       <Util.Hr />
       <Util.Responsive threshold={800} gap={2}>

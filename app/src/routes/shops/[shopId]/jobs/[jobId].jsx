@@ -6,13 +6,17 @@ import { Typography, Util, Input } from "tabler-react-2";
 import { useJob } from "../../../../hooks/useJob";
 import { Loading } from "../../../../components/loading/Loading";
 import { UploadDropzone } from "../../../../components/upload/uploader";
-import { JobItem } from "../../../../components/jobitem/JobItem";
+import {
+  JobItem,
+  switchStatusToUI,
+} from "../../../../components/jobitem/JobItem";
 import { Button } from "tabler-react-2/dist/button";
 const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
 import { NotFound } from "../../../../components/404/404";
 import { LoadableDropdownInput } from "../../../../components/loadableDropdown/LoadableDropdown";
+import { useAuth, useShop } from "../../../../hooks";
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
@@ -23,6 +27,8 @@ export const JobPage = () => {
     opLoading,
     updateJob,
   } = useJob(shopId, jobId);
+  const { user, loading: userLoading } = useAuth();
+  const { userShop, loading: shopLoading } = useShop(shopId);
 
   const [editing, setEditing] = useState(false);
   const [job, setJob] = useState(uncontrolledJob);
@@ -31,7 +37,7 @@ export const JobPage = () => {
     setJob(uncontrolledJob);
   }, [uncontrolledJob]);
 
-  if (loading) return <Loading />;
+  if (loading || userLoading || shopLoading) return <Loading />;
 
   if (!job) return <NotFound />;
 
@@ -121,25 +127,33 @@ export const JobPage = () => {
                 )}
               </p>
               <H3>Status</H3>
-              <LoadableDropdownInput
-                loading={opLoading}
-                prompt={"Select a status"}
-                values={[
-                  { id: "IN_PROGRESS", label: "In Progress" },
-                  { id: "COMPLETED", label: "Completed" },
-                  { id: "NOT_STARTED", label: "Not Started" },
-                  { id: "CANCELLED", label: "Cancelled" },
-                  { id: "WONT_DO", label: "Won't Do" },
-                  { id: "WAITING", label: "Waiting" },
-                  { id: "WAITING_FOR_PICKUP", label: "Waiting for Pickup" },
-                  { id: "WAITING_FOR_PAYMENT", label: "Waiting for Payment" },
-                ]}
-                value={job.status}
-                onChange={(value) => {
-                  updateJob({ status: value.id });
-                }}
-                doTheColorThing={true}
-              />
+              {user.admin ||
+              userShop.accountType === "ADMIN" ||
+              userShop.accountType === "OPERATOR" ? (
+                <LoadableDropdownInput
+                  loading={opLoading}
+                  prompt={"Select a status"}
+                  values={[
+                    { id: "IN_PROGRESS", label: "In Progress" },
+                    { id: "COMPLETED", label: "Completed" },
+                    { id: "NOT_STARTED", label: "Not Started" },
+                    { id: "CANCELLED", label: "Cancelled" },
+                    { id: "WONT_DO", label: "Won't Do" },
+                    { id: "WAITING", label: "Waiting" },
+                    { id: "WAITING_FOR_PICKUP", label: "Waiting for Pickup" },
+                    { id: "WAITING_FOR_PAYMENT", label: "Waiting for Payment" },
+                  ]}
+                  value={job.status}
+                  onChange={(value) => {
+                    updateJob({ status: value.id });
+                  }}
+                  doTheColorThing={true}
+                />
+              ) : (
+                <Badge color={switchStatusToUI(job.status)[1]} soft>
+                  {switchStatusToUI(job.status)[0]}
+                </Badge>
+              )}
             </>
           )}
         </div>
@@ -163,7 +177,16 @@ export const JobPage = () => {
       ) : (
         <Util.Col gap={0.5}>
           {job.items?.map((item) => (
-            <JobItem key={item.id} item={item} refetchJobs={refetchJobs} />
+            <JobItem
+              key={item.id}
+              item={item}
+              refetchJobs={refetchJobs}
+              admin={
+                user.admin ||
+                userShop.accountType === "ADMIN" ||
+                userShop.accountType === "OPERATOR"
+              }
+            />
           ))}
         </Util.Col>
       )}
