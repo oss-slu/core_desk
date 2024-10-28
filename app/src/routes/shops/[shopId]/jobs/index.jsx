@@ -237,18 +237,18 @@ export const Jobs = () => {
         {/* Render date pickers for start and end dates */}
         {/* </Util.Col>
         <Util.Col gap={0}> */}
-        {user.admin ||
+        {(user.admin ||
           userShop.accountType === "ADMIN" ||
-          (userShop.accountType === "OPERATOR" && (
-            <>
-              <H4>Submitter</H4>
-              <ShopUserPicker
-                value={submitterFilter}
-                onChange={setSubmitterFilter}
-                includeNone={true}
-              />
-            </>
-          ))}
+          userShop.accountType === "OPERATOR") && (
+          <>
+            <H4>Submitter</H4>
+            <ShopUserPicker
+              value={submitterFilter}
+              onChange={setSubmitterFilter}
+              includeNone={true}
+            />
+          </>
+        )}
         {/* Render input for submitter name */}
       </Util.Col>
     </Util.Row>
