@@ -310,22 +310,7 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
       <Input
         label={
           <>
-            Fixed Cost <Help text={COSTING.fixedCost} />
-          </>
-        }
-        value={cr.fixedCost}
-        onChange={(e) => setCr({ ...cr, fixedCost: e })}
-        placeholder="What is the fixed cost of this resource?"
-        type="number"
-        onWheel={(e) => e.target.blur()}
-        icon={<Icon i="currency-dollar" />}
-        iconPos="leading"
-      />
-      <Input
-        label={
-          <>
-            Cost Per {cr.resourceType === "PRINTER_3D" ? "Build Plate" : "Unit"}{" "}
-            <Help text={COSTING.costPerUnit} />
+            Cost Per Unit <Help text={COSTING.costPerUnit} />
           </>
         }
         value={cr.costPerUnit}

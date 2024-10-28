@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Util, Typography, DropdownInput } from "tabler-react-2";
+import { Card, Util, Typography, DropdownInput, Input } from "tabler-react-2";
 import { RenderMedia } from "../media/renderMedia";
 import { Button } from "tabler-react-2/dist/button";
 import { Icon } from "../../util/Icon";
@@ -9,12 +9,14 @@ import { useParams } from "react-router-dom";
 import { Spinner } from "tabler-react-2/dist/spinner";
 const { H3, H4 } = Typography;
 import styles from "./jobItem.module.css";
-import { use3dPrinterMaterials, use3dPrinterTypes } from "../../hooks";
 import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 import Badge from "tabler-react-2/dist/badge";
 import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
+import { Price } from "../price/RenderPrice";
+import { Time } from "../time/RenderTime";
+import { EditCosting } from "./EditCosting";
 
 function downloadFile(url, filename) {
   fetch(url)
@@ -80,129 +82,144 @@ export const JobItem = ({ item: _item, refetchJobs, admin }) => {
 
   return (
     <Card>
-      <div className={styles.modal}>{ModalElement}</div>
-      <Util.Responsive gap={1} align="start" threshold={600}>
-        <RenderMedia mediaUrl={item.fileUrl} fileType={item.fileType} />
-        <Util.Responsive gap={2} align="start" threshold={800}>
-          <div style={{ maxWidth: 280 }}>
-            <H3>{item.title}</H3>
-            <Util.Row gap={1} align="center">
-              <Button
-                onClick={modal}
-                style={{
-                  padding: "0.4375rem",
-                }}
-              >
-                <Icon i="cube" size={20} />
-              </Button>
-              <Button
-                onClick={() => {
-                  downloadFile(item.fileUrl, item.title);
-                }}
-                style={{
-                  padding: "0.4375rem",
-                }}
-                download
-              >
-                <Icon i="download" size={20} />
-              </Button>
-              {admin && (
+      <Util.Responsive gap={1} align="start" threshold={1200}>
+        <div className={styles.modal}>{ModalElement}</div>
+        <Util.Responsive gap={1} align="start" threshold={800}>
+          <RenderMedia mediaUrl={item.fileUrl} fileType={item.fileType} />
+          <Util.Row gap={2} align="start" threshold={1100} style={{ flex: 1 }}>
+            <div style={{ maxWidth: 280 }}>
+              <H3>{item.title}</H3>
+              <Util.Row gap={1} align="center">
+                <Button
+                  onClick={modal}
+                  style={{
+                    padding: "0.4375rem",
+                  }}
+                >
+                  <Icon i="cube" size={20} />
+                </Button>
                 <Button
                   onClick={() => {
-                    deleteJobItem(refetchJobs);
+                    downloadFile(item.fileUrl, item.title);
                   }}
                   style={{
                     padding: "0.4375rem",
                   }}
-                  variant="danger"
-                  outline
+                  download
                 >
-                  <Icon i="trash" size={20} />
+                  <Icon i="download" size={20} />
                 </Button>
-              )}
-              {admin ? (
-                opLoading ? (
-                  <Spinner />
-                ) : (
-                  <DropdownInput
-                    values={[
-                      { id: "IN_PROGRESS", label: "In Progress" },
-                      { id: "COMPLETED", label: "Completed" },
-                      { id: "NOT_STARTED", label: "Not Started" },
-                      { id: "CANCELLED", label: "Cancelled" },
-                      { id: "WONT_DO", label: "Won't Do" },
-                      { id: "WAITING", label: "Waiting" },
-                      { id: "WAITING_FOR_PICKUP", label: "Waiting for Pickup" },
-                      {
-                        id: "WAITING_FOR_PAYMENT",
-                        label: "Waiting for Payment",
-                      },
-                    ]}
-                    value={item.status}
-                    onChange={(value) => {
-                      updateJobItem({ status: value.id });
+                {admin && (
+                  <Button
+                    onClick={() => {
+                      deleteJobItem(refetchJobs);
                     }}
-                    color={switchStatusToUI(item.status)[1]}
+                    style={{
+                      padding: "0.4375rem",
+                    }}
+                    variant="danger"
                     outline
-                  />
-                )
-              ) : (
-                <Badge color={switchStatusToUI(item.status)[1]} soft>
-                  {switchStatusToUI(item.status)[0]}
-                </Badge>
-              )}
-            </Util.Row>
-            <Util.Spacer size={1} />
+                  >
+                    <Icon i="trash" size={20} />
+                  </Button>
+                )}
+                {admin ? (
+                  opLoading ? (
+                    <Spinner />
+                  ) : (
+                    <DropdownInput
+                      values={[
+                        { id: "IN_PROGRESS", label: "In Progress" },
+                        { id: "COMPLETED", label: "Completed" },
+                        { id: "NOT_STARTED", label: "Not Started" },
+                        { id: "CANCELLED", label: "Cancelled" },
+                        { id: "WONT_DO", label: "Won't Do" },
+                        { id: "WAITING", label: "Waiting" },
+                        {
+                          id: "WAITING_FOR_PICKUP",
+                          label: "Waiting for Pickup",
+                        },
+                        {
+                          id: "WAITING_FOR_PAYMENT",
+                          label: "Waiting for Payment",
+                        },
+                      ]}
+                      value={item.status}
+                      onChange={(value) => {
+                        updateJobItem({ status: value.id });
+                      }}
+                      color={switchStatusToUI(item.status)[1]}
+                      outline
+                    />
+                  )
+                ) : (
+                  <Badge color={switchStatusToUI(item.status)[1]} soft>
+                    {switchStatusToUI(item.status)[0]}
+                  </Badge>
+                )}
+              </Util.Row>
+              <Util.Spacer size={1} />
 
-            <ResourceTypePicker
-              value={item.resourceTypeId}
-              loading={opLoading}
-              onChange={(value) => updateJobItem({ resourceTypeId: value })}
-              includeNone={true}
-            />
-          </div>
-
-          <Util.Responsive gap={2} align="start" threshold={1200}>
-            <div>
-              <H4>Resource Configuration</H4>
-              {item.resourceTypeId ? (
-                <Util.Responsive
-                  gap={1}
-                  align="start"
-                  threshold={1200}
-                  default="column"
-                >
-                  <MaterialPicker
-                    value={item.materialId}
-                    onChange={(value) => updateJobItem({ materialId: value })}
-                    resourceTypeId={item.resourceTypeId}
-                    opLoading={opLoading}
-                  />
-                  <ResourcePicker
-                    value={item.resourceId}
-                    onChange={(value) => updateJobItem({ resourceId: value })}
-                    resourceTypeId={item.resourceTypeId}
-                    opLoading={opLoading}
-                  />
-                </Util.Responsive>
-              ) : (
-                <i>Select a resource type to see more options</i>
-              )}
+              <ResourceTypePicker
+                value={item.resourceTypeId}
+                loading={opLoading}
+                onChange={(value) => updateJobItem({ resourceTypeId: value })}
+                includeNone={true}
+              />
             </div>
 
-            <div>
-              <H4>Item Costing</H4>
-              {item.materialId && item.resourceId ? (
-                <div></div>
-              ) : (
-                <Badge color="red" soft>
-                  <Icon i="coin-off" />
-                  Costing unavailable without material and resource
-                </Badge>
-              )}
-            </div>
-          </Util.Responsive>
+            <Util.Responsive
+              gap={2}
+              align="start"
+              threshold={1300}
+              style={{ flex: 1, width: "100%" }}
+            >
+              <div>
+                <H4>Resource Configuration</H4>
+                {item.resourceTypeId ? (
+                  <Util.Col
+                    gap={1}
+                    align="start"
+                    threshold={1200}
+                    default="column"
+                  >
+                    <MaterialPicker
+                      value={item.materialId}
+                      onChange={(value) => updateJobItem({ materialId: value })}
+                      resourceTypeId={item.resourceTypeId}
+                      opLoading={opLoading}
+                      includeNone={true}
+                    />
+                    <ResourcePicker
+                      value={item.resourceId}
+                      onChange={(value) => updateJobItem({ resourceId: value })}
+                      resourceTypeId={item.resourceTypeId}
+                      opLoading={opLoading}
+                      includeNone={true}
+                    />
+                  </Util.Col>
+                ) : (
+                  <i>Select a resource type to see more options</i>
+                )}
+              </div>
+            </Util.Responsive>
+          </Util.Row>
         </Util.Responsive>
+        <div style={{ width: "100%" }}>
+          <H4>Item Costing</H4>
+          {item.materialId && item.resourceId ? (
+            <EditCosting
+              item={item}
+              onChange={(value) => updateJobItem(value)}
+              loading={opLoading}
+            />
+          ) : (
+            <Badge color="red" soft>
+              <Icon i="coin-off" />
+              Costing unavailable without material and resource
+            </Badge>
+          )}
+        </div>
       </Util.Responsive>
     </Card>
   );

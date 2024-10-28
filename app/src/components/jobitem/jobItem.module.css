@@ -1,3 +1,11 @@
 .modal > .modal-dialog {
   max-width: 80%;
 }
+
+.bottomLine {
+  font-weight: 500;
+  border-top: 3px solid var(--tblr-border-color);
+  padding: 8px;
+  margin-top: 8px;
+  margin-right: -8px;
+}

@@ -9,25 +9,32 @@ export const ResourcePicker = ({
   onChange,
   resourceTypeId,
   opLoading,
+  includeNone,
 }) => {
   const { shopId } = useParams();
   const { resources, loading } = useResources(shopId, resourceTypeId);
 
   return (
     <Util.Col>
-      <label className="form-label" style={{ marginBottom: "0.25rem" }}>
-        Resource
-      </label>
       <LoadableDropdownInput
         loading={loading || opLoading}
         value={value}
         onChange={(v) => onChange(v.id)}
-        values={resources.map((m) => ({
-          id: m.id,
-          label: m.title,
-        }))}
+        values={[
+          ...resources.map((m) => ({
+            id: m.id,
+            label: m.title,
+          })),
+          includeNone
+            ? {
+                id: null,
+                label: "Select a resource",
+                dropdownText: "None",
+              }
+            : null,
+        ].filter((v) => v)}
         prompt="Select Resource"
-        showLabel={false}
+        label="Resource"
       />
     </Util.Col>
   );

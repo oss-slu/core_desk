@@ -47,8 +47,6 @@ export const patch = [
     const { shopId, jobId, jobItemId } = req.params;
     const userId = req.user.id;
 
-    console.log(req.body);
-
     const userShop = await prisma.userShop.findFirst({
       where: {
         userId,
@@ -91,12 +89,56 @@ export const patch = [
       return res.status(404).json({ error: "Not found" });
     }
 
+    if (
+      (req.body.data.resourceTypeId || req.body.data.resourceTypeId === null) &&
+      req.body.data.resourceTypeId !== jobItem.resourceTypeId
+    ) {
+      console.log("Resource type changed");
+      req.body.data.materialId = null;
+      req.body.data.resourceId = null;
+    }
+
+    delete req.body.data.resource;
+    delete req.body.data.material;
+
     const updatedItem = await prisma.jobItem.update({
       where: {
         id: jobItemId,
         active: true,
       },
       data: req.body.data,
+      include: {
+        resource: {
+          select: {
+            costingPublic: true,
+            costPerProcessingTime: true,
+            costPerTime: true,
+            costPerUnit: true,
+          },
+        },
+        material: {
+          select: {
+            costPerUnit: true,
+            unitDescriptor: true,
+          },
+        },
+      },
+    });
+
+    const updatedItemToLog = JSON.parse(JSON.stringify(updatedItem));
+    delete updatedItemToLog.resource;
+    delete updatedItemToLog.material;
+
+    await prisma.logs.create({
+      data: {
+        userId,
+        shopId,
+        jobId,
+        jobItemId,
+        type: LogType.JOB_ITEM_MODIFIED,
+        from: JSON.stringify(jobItem),
+        to: JSON.stringify(updatedItemToLog),
+      },
     });
 
     return res.json({ item: updatedItem });

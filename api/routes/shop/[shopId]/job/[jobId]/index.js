@@ -39,9 +39,33 @@ export const get = [
             where: {
               active: true,
             },
+            include: {
+              resource: {
+                select: {
+                  costingPublic: true,
+                  costPerProcessingTime: true,
+                  costPerTime: true,
+                  costPerUnit: true,
+                },
+              },
+              material: {
+                select: {
+                  costPerUnit: true,
+                  unitDescriptor: true,
+                },
+              },
+            },
+          },
+          resource: {
+            select: {
+              id: true,
+              title: true,
+            },
           },
         },
       });
+
+      // TODO: Respect costing public
 
       if (!job) {
         return res.status(404).json({ error: "Not found" });
@@ -108,6 +132,28 @@ export const put = [
           items: {
             where: {
               active: true,
+            },
+            include: {
+              resource: {
+                select: {
+                  costingPublic: true,
+                  costPerProcessingTime: true,
+                  costPerTime: true,
+                  costPerUnit: true,
+                },
+              },
+              material: {
+                select: {
+                  costPerUnit: true,
+                  unitDescriptor: true,
+                },
+              },
+            },
+          },
+          resource: {
+            select: {
+              id: true,
+              title: true,
             },
           },
         },

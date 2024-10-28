@@ -190,6 +190,7 @@ model Resource {
   userSuppliedMaterial SuppliedMaterialLevels @default(NEVER)
 
   jobItems JobItem[]
+  jobs Job[]
 
   logs  logs[]
 }
@@ -205,6 +206,7 @@ model Material {
   active Boolean @default(true)
 
   jobItems JobItem[]
+  jobs Job[]
 
   shopId String
   shop Shop @relation(fields: [shopId], references: [id])
@@ -295,6 +297,7 @@ model ResourceType {
 
   resources Resource[]
   jobItems JobItem[]
+  jobs Job[]
   materials Material[]
 
   logs  logs[]
@@ -333,6 +336,15 @@ model Job {
   user   user   @relation(fields: [userId], references: [id])
   userId String
 
+  material Material? @relation(fields: [materialId], references: [id])
+  materialId String?
+
+  resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id])
+  resourceTypeId String?
+
+  resource Resource? @relation(fields: [resourceId], references: [id])
+  resourceId String?
+
   dueDate DateTime?
 
   logs  logs[]
@@ -364,6 +376,11 @@ model JobItem {
   updatedAt DateTime @updatedAt
 
   active Boolean @default(true)
+
+  processingTimeQty Float?
+  timeQty Float?
+  unitQty Float?
+  materialQty Float?
 
   jobId String
   job Job @relation(fields: [jobId], references: [id])

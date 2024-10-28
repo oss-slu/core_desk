@@ -99,7 +99,7 @@ export const useResources = (shopId, resourceTypeId) => {
 
   useEffect(() => {
     fetchResources();
-  }, []);
+  }, [shopId, resourceTypeId]);
 
   return {
     resources,

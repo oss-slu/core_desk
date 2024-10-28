@@ -17,6 +17,9 @@ import Badge from "tabler-react-2/dist/badge";
 import { NotFound } from "../../../../components/404/404";
 import { LoadableDropdownInput } from "../../../../components/loadableDropdown/LoadableDropdown";
 import { useAuth, useShop } from "../../../../hooks";
+import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";
+import { MaterialPicker } from "../../../../components/materialPicker/MaterialPicker";
+import { ResourcePicker } from "../../../../components/resourcePicker/ResourcePicker";
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
@@ -36,6 +39,11 @@ export const JobPage = () => {
   useEffect(() => {
     setJob(uncontrolledJob);
   }, [uncontrolledJob]);
+
+  const userIsPrivileged =
+    user.admin ||
+    userShop.accountType === "ADMIN" ||
+    userShop.accountType === "OPERATOR";
 
   if (loading || userLoading || shopLoading) return <Loading />;
 
@@ -111,49 +119,112 @@ export const JobPage = () => {
           ) : (
             <>
               <p>{job.description}</p>
-              <H3>Upcoming Deadline</H3>
-              <p>
-                {moment(job.dueDate).format("MM/DD/YY")} (
-                {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
-                {new Date(job.dueDate) < new Date() &&
-                  !(
-                    new Date(job.dueDate).toDateString() ===
-                    new Date().toDateString()
-                  ) && <Badge color="red">Overdue</Badge>}
-                {/* Today warning */}{" "}
-                {new Date(job.dueDate).toDateString() ===
-                  new Date().toDateString() && (
-                  <Badge color="yellow">Due Today</Badge>
-                )}
-              </p>
-              <H3>Status</H3>
-              {user.admin ||
-              userShop.accountType === "ADMIN" ||
-              userShop.accountType === "OPERATOR" ? (
-                <LoadableDropdownInput
+              <Util.Row gap={2} align="start">
+                <div>
+                  <H3>Status</H3>
+                  {userIsPrivileged ? (
+                    <LoadableDropdownInput
+                      loading={opLoading}
+                      prompt={"Select a status"}
+                      values={[
+                        { id: "IN_PROGRESS", label: "In Progress" },
+                        { id: "COMPLETED", label: "Completed" },
+                        { id: "NOT_STARTED", label: "Not Started" },
+                        { id: "CANCELLED", label: "Cancelled" },
+                        { id: "WONT_DO", label: "Won't Do" },
+                        { id: "WAITING", label: "Waiting" },
+                        {
+                          id: "WAITING_FOR_PICKUP",
+                          label: "Waiting for Pickup",
+                        },
+                        {
+                          id: "WAITING_FOR_PAYMENT",
+                          label: "Waiting for Payment",
+                        },
+                      ]}
+                      value={job.status}
+                      onChange={(value) => {
+                        updateJob({ status: value.id });
+                      }}
+                      doTheColorThing={true}
+                    />
+                  ) : (
+                    <Badge color={switchStatusToUI(job.status)[1]} soft>
+                      {switchStatusToUI(job.status)[0]}
+                    </Badge>
+                  )}
+                </div>
+                <div>
+                  <H3>Upcoming Deadline</H3>
+                  <p>
+                    {moment(job.dueDate).format("MM/DD/YY")} (
+                    {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
+                    {new Date(job.dueDate) < new Date() &&
+                      !(
+                        new Date(job.dueDate).toDateString() ===
+                        new Date().toDateString()
+                      ) && <Badge color="red">Overdue</Badge>}
+                    {/* Today warning */}{" "}
+                    {new Date(job.dueDate).toDateString() ===
+                      new Date().toDateString() && (
+                      <Badge color="yellow">Due Today</Badge>
+                    )}
+                  </p>
+                </div>
+              </Util.Row>
+              <Util.Spacer size={2} />
+              <H3>Project Defaults</H3>
+              <Util.Row gap={1} wrap>
+                <ResourceTypePicker
                   loading={opLoading}
-                  prompt={"Select a status"}
-                  values={[
-                    { id: "IN_PROGRESS", label: "In Progress" },
-                    { id: "COMPLETED", label: "Completed" },
-                    { id: "NOT_STARTED", label: "Not Started" },
-                    { id: "CANCELLED", label: "Cancelled" },
-                    { id: "WONT_DO", label: "Won't Do" },
-                    { id: "WAITING", label: "Waiting" },
-                    { id: "WAITING_FOR_PICKUP", label: "Waiting for Pickup" },
-                    { id: "WAITING_FOR_PAYMENT", label: "Waiting for Payment" },
-                  ]}
-                  value={job.status}
+                  value={job.resourceTypeId}
                   onChange={(value) => {
-                    updateJob({ status: value.id });
+                    updateJob({ resourceTypeId: value });
                   }}
-                  doTheColorThing={true}
+                  shopId={shopId}
+                  opLoading={opLoading}
+                  includeNone={true}
                 />
-              ) : (
-                <Badge color={switchStatusToUI(job.status)[1]} soft>
-                  {switchStatusToUI(job.status)[0]}
-                </Badge>
-              )}
+                {job.resourceTypeId ? (
+                  <>
+                    <MaterialPicker
+                      value={job.materialId}
+                      onChange={(value) => {
+                        updateJob({ materialId: value });
+                      }}
+                      resourceTypeId={job.resourceTypeId}
+                      opLoading={opLoading}
+                      includeNone={true}
+                    />
+                    {userIsPrivileged ? (
+                      <ResourcePicker
+                        value={job.resourceId}
+                        onChange={(value) => {
+                          updateJob({ resourceId: value });
+                        }}
+                        resourceTypeId={job.resourceTypeId}
+                        opLoading={opLoading}
+                        includeNone={true}
+                      />
+                    ) : (
+                      <Util.Col>
+                        <label className="form-label">Resource</label>
+                        <Badge color="blue" soft>
+                          {job.resource?.title || "Not set"}
+                        </Badge>
+                      </Util.Col>
+                    )}
+                  </>
+                ) : (
+                  <i
+                    style={{
+                      alignSelf: "center",
+                    }}
+                  >
+                    Select a resource type to see more options
+                  </i>
+                )}
+              </Util.Row>
             </>
           )}
         </div>

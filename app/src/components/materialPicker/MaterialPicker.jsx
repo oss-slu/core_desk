@@ -9,25 +9,32 @@ export const MaterialPicker = ({
   onChange,
   resourceTypeId,
   opLoading,
+  includeNone,
 }) => {
   const { shopId } = useParams();
   const { materials, loading } = useMaterials(shopId, resourceTypeId);
 
   return (
     <Util.Col>
-      <label className="form-label" style={{ marginBottom: "0.25rem" }}>
-        Material
-      </label>
       <LoadableDropdownInput
         loading={loading || opLoading}
         value={value}
         onChange={(v) => onChange(v.id)}
-        values={materials.map((m) => ({
-          id: m.id,
-          label: m.title,
-        }))}
+        values={[
+          ...materials.map((m) => ({
+            id: m.id,
+            label: m.title,
+          })),
+          includeNone
+            ? {
+                id: null,
+                label: "Select a material",
+                dropdownText: "None",
+              }
+            : null,
+        ].filter((v) => v)}
         prompt="Select Material"
-        showLabel={false}
+        label={"Material"}
       />
     </Util.Col>
   );

@@ -152,7 +152,7 @@ export const useMaterials = (shopId, resourceTypeId) => {
 
   useEffect(() => {
     fetchMaterials();
-  }, []);
+  }, [resourceTypeId, shopId]);
 
   return {
     materials,
