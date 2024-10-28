@@ -21,15 +21,10 @@ export const get = [
       });
     }
 
-    const shouldLoadAll =
-      req.user.admin ||
-      userShop.accountType === "ADMIN" ||
-      userShop.accountType === "OPERATOR";
-
     const resourceTypes = await prisma.resourceType.findMany({
       where: {
         shopId: shopId,
-        active: shouldLoadAll ? undefined : true,
+        active: true,
       },
       include: {
         resources: {

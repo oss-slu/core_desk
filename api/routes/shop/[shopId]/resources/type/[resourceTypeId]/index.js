@@ -44,7 +44,7 @@ export const get = [
       where: {
         shopId: shopId,
         resourceTypeId: resourceTypeId,
-        active: shouldLoadAll ? undefined : true,
+        active: true,
       },
     });
 

@@ -7,12 +7,14 @@ import { useModal } from "tabler-react-2/dist/modal";
 import { useJobItem } from "../../hooks/useJobItem";
 import { useParams } from "react-router-dom";
 import { Spinner } from "tabler-react-2/dist/spinner";
-const { H3 } = Typography;
+const { H3, H4 } = Typography;
 import styles from "./jobItem.module.css";
 import { use3dPrinterMaterials, use3dPrinterTypes } from "../../hooks";
 import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 import Badge from "tabler-react-2/dist/badge";
+import { MaterialPicker } from "../materialPicker/MaterialPicker";
+import { ResourcePicker } from "../resourcePicker/ResourcePicker";
 
 function downloadFile(url, filename) {
   fetch(url)
@@ -81,8 +83,8 @@ export const JobItem = ({ item: _item, refetchJobs, admin }) => {
       <div className={styles.modal}>{ModalElement}</div>
       <Util.Responsive gap={1} align="start" threshold={600}>
         <RenderMedia mediaUrl={item.fileUrl} fileType={item.fileType} />
-        <Util.Responsive gap={1} align="start" threshold={800}>
-          <div style={{ minWidth: 300, maxWidth: 300.1 }}>
+        <Util.Responsive gap={2} align="start" threshold={800}>
+          <div style={{ maxWidth: 280 }}>
             <H3>{item.title}</H3>
             <Util.Row gap={1} align="center">
               <Button
@@ -159,114 +161,49 @@ export const JobItem = ({ item: _item, refetchJobs, admin }) => {
               includeNone={true}
             />
           </div>
-          {item.resourceType === "PRINTER_3D" ? (
+
+          <Util.Responsive gap={2} align="start" threshold={1200}>
             <div>
-              <PrinterTypePicker
-                value={item.printer3dTypeId}
-                opLoading={opLoading}
-                onChange={(value) =>
-                  updateJobItem({ printer3dTypeId: value.id })
-                }
-              />
-              <Util.Spacer size={1} />
-              <PrinterMaterialPicker
-                value={item.materialId}
-                printerTypeId={item.printer3dTypeId}
-                opLoading={opLoading}
-                onChange={(value) => updateJobItem({ materialId: value.id })}
-                disabled={
-                  item.printer3dTypeId === null || item.printer3dTypeId === ""
-                }
-                disabledText={"Select a printer type first"}
-              />
+              <H4>Resource Configuration</H4>
+              {item.resourceTypeId ? (
+                <Util.Responsive
+                  gap={1}
+                  align="start"
+                  threshold={1200}
+                  default="column"
+                >
+                  <MaterialPicker
+                    value={item.materialId}
+                    onChange={(value) => updateJobItem({ materialId: value })}
+                    resourceTypeId={item.resourceTypeId}
+                    opLoading={opLoading}
+                  />
+                  <ResourcePicker
+                    value={item.resourceId}
+                    onChange={(value) => updateJobItem({ resourceId: value })}
+                    resourceTypeId={item.resourceTypeId}
+                    opLoading={opLoading}
+                  />
+                </Util.Responsive>
+              ) : (
+                <i>Select a resource type to see more options</i>
+              )}
             </div>
-          ) : (
-            <i>Select a fulfillment type to see more options</i>
-          )}
+
+            <div>
+              <H4>Item Costing</H4>
+              {item.materialId && item.resourceId ? (
+                <div></div>
+              ) : (
+                <Badge color="red" soft>
+                  <Icon i="coin-off" />
+                  Costing unavailable without material and resource
+                </Badge>
+              )}
+            </div>
+          </Util.Responsive>
         </Util.Responsive>
       </Util.Responsive>
     </Card>
-  );
-};
-
-const PrinterTypePicker = ({ value, onChange, opLoading }) => {
-  const { shopId } = useParams();
-  const { printerTypes, loading } = use3dPrinterTypes(shopId);
-
-  const [selectedPrinterType, setSelectedPrinterType] = useState({
-    id: value,
-    label: "Select a printer type",
-  });
-
-  if (loading)
-    return (
-      <>
-        <label className="form-label">Printer Type</label>
-        <Button loading disabled>
-          Loading...
-        </Button>
-      </>
-    );
-
-  return (
-    <>
-      <label className="form-label">Printer Type</label>
-      {opLoading ? (
-        <Button disabled loading>
-          {selectedPrinterType.label}
-        </Button>
-      ) : (
-        <DropdownInput
-          values={[
-            ...printerTypes.map((printerType) => ({
-              id: printerType.id,
-              label: printerType.type,
-            })),
-            {
-              id: null,
-              label: "Select a printer type",
-              dropdownText: "None",
-            },
-          ]}
-          value={value}
-          onChange={(value) => {
-            setSelectedPrinterType(value);
-            onChange(value);
-          }}
-          prompt="Select a printer type"
-        />
-      )}
-    </>
-  );
-};
-
-const PrinterMaterialPicker = ({
-  value,
-  printerTypeId,
-  onChange,
-  opLoading,
-  disabled = false,
-  disabledText,
-}) => {
-  const { shopId } = useParams();
-  const { printerMaterials, loading } = use3dPrinterMaterials(
-    shopId,
-    printerTypeId
-  );
-
-  return (
-    <LoadableDropdownInput
-      loading={loading || opLoading}
-      prompt={"Select a material"}
-      label="Material"
-      values={printerMaterials?.map((material) => ({
-        id: material.id,
-        label: `${material.manufacturer} ${material.type}`,
-      }))}
-      value={value}
-      onChange={onChange}
-      disabled={disabled}
-      disabledText={disabledText}
-    />
   );
 };
