@@ -13,6 +13,12 @@
   top: 60px;
 }
 
+@media print {
+  .sidenav {
+    display: none !important;
+  }
+}
+
 .sidenav hr {
   margin: 8px 0;
   margin-right: -8px;

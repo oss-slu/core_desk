@@ -1,27 +1,51 @@
 import React, { useEffect, useState } from "react";
-import { Page } from "../../../../components/page/page";
-import { Icon } from "../../../../util/Icon";
+import { Page } from "../../../../../components/page/page";
+import { Icon } from "../../../../../util/Icon";
 import { useParams } from "react-router-dom";
 import { Typography, Util, Input, Card, Switch } from "tabler-react-2";
-import { useJob } from "../../../../hooks/useJob";
-import { Loading } from "../../../../components/loading/Loading";
-import { UploadDropzone } from "../../../../components/upload/uploader";
+import { useJob } from "../../../../../hooks/useJob";
+import { Loading } from "../../../../../components/loading/Loading";
+import { UploadDropzone } from "../../../../../components/upload/uploader";
 import {
   JobItem,
   switchStatusToUI,
-} from "../../../../components/jobitem/JobItem";
+} from "../../../../../components/jobitem/JobItem";
 import { Button } from "tabler-react-2/dist/button";
 const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
-import { NotFound } from "../../../../components/404/404";
-import { LoadableDropdownInput } from "../../../../components/loadableDropdown/LoadableDropdown";
-import { useAuth, useShop } from "../../../../hooks";
-import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";
-import { MaterialPicker } from "../../../../components/materialPicker/MaterialPicker";
-import { ResourcePicker } from "../../../../components/resourcePicker/ResourcePicker";
-import { EditCosting } from "../../../../components/jobitem/EditCosting";
-import { ProjectWideEditCosting } from "../../../../components/jobitem/ProjectWideEditCosting";
+import { NotFound } from "../../../../../components/404/404";
+import { LoadableDropdownInput } from "../../../../../components/loadableDropdown/LoadableDropdown";
+import { useAuth, useShop } from "../../../../../hooks";
+import { ResourceTypePicker } from "../../../../../components/resourceTypePicker/ResourceTypePicker";
+import { MaterialPicker } from "../../../../../components/materialPicker/MaterialPicker";
+import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
+import { EditCosting } from "../../../../../components/jobitem/EditCosting";
+import { ProjectWideEditCosting } from "../../../../../components/jobitem/ProjectWideEditCosting";
+
+export const sidenavItems = (activePage, shopId, jobId) => [
+  {
+    type: "item",
+    href: `/shops/${shopId}/jobs`,
+    text: `Back to jobs`,
+    active: false,
+    icon: <Icon i={"arrow-left"} size={18} />,
+  },
+  {
+    type: "item",
+    href: `/shops/${shopId}/jobs/${jobId}`,
+    text: `Home`,
+    active: activePage === "jobs",
+    icon: <Icon i={"robot"} size={18} />,
+  },
+  {
+    type: "item",
+    href: `/shops/${shopId}/jobs/${jobId}/costing`,
+    text: `Costing`,
+    active: activePage === "costing",
+    icon: <Icon i={"currency-dollar"} size={18} />,
+  },
+];
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
@@ -52,24 +76,7 @@ export const JobPage = () => {
   if (!job) return <NotFound />;
 
   return (
-    <Page
-      sidenavItems={[
-        {
-          type: "item",
-          href: `/shops/${shopId}/jobs`,
-          text: `Back to jobs`,
-          active: false,
-          icon: <Icon i={"arrow-left"} size={18} />,
-        },
-        {
-          type: "item",
-          href: `/shops/${shopId}/jobs/${jobId}`,
-          text: `Home`,
-          active: true,
-          icon: <Icon i={"robot"} size={18} />,
-        },
-      ]}
-    >
+    <Page sidenavItems={sidenavItems("jobs", shopId, jobId)}>
       <Util.Responsive gap={1} align="start" threshold={800}>
         <div style={{ flex: 1, width: "100%" }}>
           <Util.Row justify="between" align="center" gap={1} wrap>
@@ -231,50 +238,16 @@ export const JobPage = () => {
           )}
         </div>
         <div style={{ flex: 1, width: "100%" }}>
-          {userIsPrivileged ? (
-            <Card
-              tabs={[
-                {
-                  title: "Upload Files",
-                  content: (
-                    <UploadDropzone
-                      scope={"job.fileupload"}
-                      metadata={{
-                        jobId,
-                        shopId,
-                      }}
-                      onUploadComplete={() => {
-                        refetchJobs();
-                      }}
-                    />
-                  ),
-                },
-                {
-                  title: "Costing",
-                  content: (
-                    <>
-                      <ProjectWideEditCosting
-                        job={job}
-                        loading={opLoading}
-                        onChange={updateJob}
-                      />
-                    </>
-                  ),
-                },
-              ]}
-            />
-          ) : (
-            <UploadDropzone
-              scope={"job.fileupload"}
-              metadata={{
-                jobId,
-                shopId,
-              }}
-              onUploadComplete={() => {
-                refetchJobs();
-              }}
-            />
-          )}
+          <UploadDropzone
+            scope={"job.fileupload"}
+            metadata={{
+              jobId,
+              shopId,
+            }}
+            onUploadComplete={() => {
+              refetchJobs();
+            }}
+          />
         </div>
       </Util.Responsive>
       <Util.Spacer size={1} />

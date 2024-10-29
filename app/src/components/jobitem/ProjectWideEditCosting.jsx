@@ -51,7 +51,7 @@ export const ProjectWideEditCosting = ({ job: initialJob, loading }) => {
             : "You are adding to the project-wide cost"}
         </p>
         {lineItems?.length > 0 ? (
-          <div style={{ maxWidth: 600, overflowY: "auto" }}>
+          <div>
             {lineItems.map((additionalCost) => (
               <>
                 <CostCard
@@ -161,17 +161,6 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
             )}
           </Util.Col>
           <div style={{ flex: 1 }} />
-          {changed && (
-            <Button
-              color="primary"
-              outline
-              size="sm"
-              onClick={handleSave}
-              loading={opLoading}
-            >
-              <Icon i="device-floppy" />
-            </Button>
-          )}
           <Button
             color="danger"
             outline
@@ -180,6 +169,7 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
             loading={opLoading}
           >
             <Icon i="trash" />
+            Delete line item
           </Button>
         </Util.Row>
         <Util.Col gap={1}>
@@ -236,7 +226,22 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
                       setLocalLineItem({ ...localLineItem, materialQty: value })
                     }
                   />
-                  <Util.Row gap={1} align="center" justify="end">
+                  <Util.Row gap={1} align="center" justify="between">
+                    {changed ? (
+                      <Util.Row gap={1} align="center">
+                        <Button onClick={handleSave} loading={opLoading}>
+                          Save
+                        </Button>
+                        <Button onClick={() => setLocalLineItem(lineItem)}>
+                          Discard
+                        </Button>
+                        <Badge color="red" soft>
+                          You have unsaved changes!
+                        </Badge>
+                      </Util.Row>
+                    ) : (
+                      <div></div>
+                    )}
                     <span className={styles.bottomLine}>
                       <Util.Row gap={1}>
                         Total Cost:

@@ -10,12 +10,13 @@ import { UserPage } from "./routes/users/[userId]";
 import { ShopPage } from "./routes/shops/[shopId]/index";
 import { Shops } from "./routes/shops";
 import { Jobs } from "./routes/shops/[shopId]/jobs";
-import { JobPage } from "./routes/shops/[shopId]/jobs/[jobId]";
+import { JobPage } from "./routes/shops/[shopId]/jobs/[jobId]/index";
 import { Toaster } from "react-hot-toast";
 import { ResourcesPage } from "./routes/shops/[shopId]/resources";
 import { ResourcePage } from "./routes/shops/[shopId]/resources/[resourceId]";
 import { NotFound } from "./components/404/404";
 import { MaterialPage } from "./routes/shops/[shopId]/resources/type/resourceTypeId/materials/[materialId]";
+import { JobCostingPage } from "./routes/shops/[shopId]/jobs/[jobId]/costing";
 
 // eslint-disable-next-line
 export default () => {
@@ -51,6 +52,10 @@ export default () => {
                 <Route
                   path="/shops/:shopId/jobs/:jobId"
                   element={<JobPage />}
+                />
+                <Route
+                  path="/shops/:shopId/jobs/:jobId/costing"
+                  element={<JobCostingPage />}
                 />
                 <Route
                   path="/shops/:shopId/resources"

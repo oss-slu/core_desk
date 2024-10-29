@@ -49,6 +49,20 @@
       .card-tabs .nav-tabs {
         z-index: 500 !important;
       }
+      @media print {
+        button {
+          display: none !important;
+          opacity: 0;
+        }
+        .card {
+          border: 1px solid grey !important;
+        }
+        input {
+          border: none !important;
+          border-width: 0px !important;
+          border-bottom: 1px solid grey;
+        }
+      }
     </style>
   </head>
   <body>
