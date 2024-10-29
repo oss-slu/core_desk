@@ -17,3 +17,5 @@ export { useResourceType } from "./useResourceType";
 export { useMaterials } from "./useMaterials";
 export { useMaterial } from "./useMaterial";
 export { useUserLogs } from "./useUserLogs";
+export { useAdditionalLineItem } from "./useAdditionalLineItem";
+export { useAdditionalLineItems } from "./useAdditionalLineItems";

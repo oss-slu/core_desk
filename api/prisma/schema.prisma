@@ -193,6 +193,8 @@ model Resource {
   jobs Job[]
 
   logs  logs[]
+
+  additionalCostItems AdditionalCostLineItem[]
 }
 
 model Material {
@@ -231,6 +233,8 @@ model Material {
   tdsFileType String?
 
   logs  logs[]
+
+  additionalCostItems AdditionalCostLineItem[]
 }
 
 model MaterialImage {
@@ -301,6 +305,8 @@ model ResourceType {
   materials Material[]
 
   logs  logs[]
+
+  additionalCostItems AdditionalCostLineItem[]
 }
 
 enum SuppliedMaterialLevels {
@@ -347,10 +353,40 @@ model Job {
 
   dueDate DateTime?
 
+  additionalCostOverride Boolean @default(false) /// If true, the additional cost will be used _instead_ of the calculated cost. If false, it will be used in addition.
+
+  additionalCosts AdditionalCostLineItem[]
+
   logs  logs[]
   items JobItem[]
 
   status ProgressStatus @default(NOT_STARTED)
+}
+
+model AdditionalCostLineItem {
+  id          String  @id @default(cuid())
+
+  resourceTypeId String?
+  resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id])
+
+  resourceId String?
+  resource Resource? @relation(fields: [resourceId], references: [id])
+
+  materialId String?
+  material Material? @relation(fields: [materialId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  unitQty Float?
+  timeQty Float?
+  materialQty Float?
+  processingTimeQty Float?
+
+  active Boolean @default(true)
+
+  job Job @relation(fields: [jobId], references: [id])
+  jobId String
 }
 
 model JobItem {

@@ -62,6 +62,14 @@ export const get = [
               title: true,
             },
           },
+          additionalCosts: {
+            select: {
+              id: true,
+            },
+            where: {
+              active: true,
+            },
+          },
         },
       });
 
@@ -122,6 +130,8 @@ export const put = [
       delete req.body.createdAt;
       delete req.body.updatedAt;
       delete req.body.items;
+      delete req.body.resource;
+      // delete req.body.additionalCosts;
 
       const updatedJob = await prisma.job.update({
         where: {
@@ -154,6 +164,14 @@ export const put = [
             select: {
               id: true,
               title: true,
+            },
+          },
+          additionalCosts: {
+            select: {
+              id: true,
+            },
+            where: {
+              active: true,
             },
           },
         },

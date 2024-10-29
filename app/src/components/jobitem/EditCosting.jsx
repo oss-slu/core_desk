@@ -97,7 +97,7 @@ export const EditCosting = ({ item, onChange, loading }) => {
   );
 };
 
-const TimeInput = ({
+export const TimeInput = ({
   label,
   helpText,
   timeQty,
@@ -108,7 +108,7 @@ const TimeInput = ({
   <>
     <Util.Row gap={1} align="center">
       <label className="form-label" style={{ marginBottom: 0 }}>
-        {label} <Help text={helpText} modal={modal} />
+        {label} {helpText && <Help text={helpText} modal={modal} />}
       </label>
       <Input
         size="sm"
@@ -153,7 +153,7 @@ const TimeInput = ({
   </>
 );
 
-const QuantityInput = ({
+export const QuantityInput = ({
   label,
   helpText,
   quantity,
@@ -165,7 +165,7 @@ const QuantityInput = ({
   <>
     <Util.Row gap={1} align="center">
       <label className="form-label" style={{ marginBottom: 0 }}>
-        {label} <Help text={helpText} modal={modal} />
+        {label} {helpText && <Help text={helpText} modal={modal} />}
       </label>
       <Input
         size="sm"
@@ -198,7 +198,7 @@ const Help = ({ text, modal }) => (
   </a>
 );
 
-const HELP_TEXT = {
+export const HELP_TEXT = {
   resourceTime:
     "The time the resource will spend on this job item. This is a way to charge for machine time.",
   processingTime: "The time an operator will spend processing this job item.",

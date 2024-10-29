@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Page } from "../../../../components/page/page";
 import { Icon } from "../../../../util/Icon";
 import { useParams } from "react-router-dom";
-import { Typography, Util, Input } from "tabler-react-2";
+import { Typography, Util, Input, Card, Switch } from "tabler-react-2";
 import { useJob } from "../../../../hooks/useJob";
 import { Loading } from "../../../../components/loading/Loading";
 import { UploadDropzone } from "../../../../components/upload/uploader";
@@ -20,6 +20,8 @@ import { useAuth, useShop } from "../../../../hooks";
 import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";
 import { MaterialPicker } from "../../../../components/materialPicker/MaterialPicker";
 import { ResourcePicker } from "../../../../components/resourcePicker/ResourcePicker";
+import { EditCosting } from "../../../../components/jobitem/EditCosting";
+import { ProjectWideEditCosting } from "../../../../components/jobitem/ProjectWideEditCosting";
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
@@ -229,16 +231,50 @@ export const JobPage = () => {
           )}
         </div>
         <div style={{ flex: 1, width: "100%" }}>
-          <UploadDropzone
-            scope={"job.fileupload"}
-            metadata={{
-              jobId,
-              shopId,
-            }}
-            onUploadComplete={() => {
-              refetchJobs();
-            }}
-          />
+          {userIsPrivileged ? (
+            <Card
+              tabs={[
+                {
+                  title: "Upload Files",
+                  content: (
+                    <UploadDropzone
+                      scope={"job.fileupload"}
+                      metadata={{
+                        jobId,
+                        shopId,
+                      }}
+                      onUploadComplete={() => {
+                        refetchJobs();
+                      }}
+                    />
+                  ),
+                },
+                {
+                  title: "Costing",
+                  content: (
+                    <>
+                      <ProjectWideEditCosting
+                        job={job}
+                        loading={opLoading}
+                        onChange={updateJob}
+                      />
+                    </>
+                  ),
+                },
+              ]}
+            />
+          ) : (
+            <UploadDropzone
+              scope={"job.fileupload"}
+              metadata={{
+                jobId,
+                shopId,
+              }}
+              onUploadComplete={() => {
+                refetchJobs();
+              }}
+            />
+          )}
         </div>
       </Util.Responsive>
       <Util.Spacer size={1} />

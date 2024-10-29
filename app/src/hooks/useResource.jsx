@@ -28,7 +28,7 @@ export const useResource = (shopId, resourceId) => {
 
   useEffect(() => {
     fetchResource();
-  }, []);
+  }, [resourceId]);
 
   const updateResource = async (data) => {
     try {

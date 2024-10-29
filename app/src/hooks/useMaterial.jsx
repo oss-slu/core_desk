@@ -90,7 +90,7 @@ export const useMaterial = (shopId, resourceTypeId, materialId) => {
 
   useEffect(() => {
     fetchMaterial();
-  }, []);
+  }, [materialId, resourceTypeId]);
 
   return {
     material,
