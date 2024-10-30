@@ -19,7 +19,11 @@ import { Price } from "../price/RenderPrice";
 const { H2, H3 } = Typography;
 import styles from "./jobItem.module.css";
 
-export const ProjectWideEditCosting = ({ job: initialJob, loading }) => {
+export const ProjectWideEditCosting = ({
+  job: initialJob,
+  loading,
+  updateJob,
+}) => {
   const [job, setJob] = useState(initialJob);
   const {
     createLineItem,
@@ -41,7 +45,10 @@ export const ProjectWideEditCosting = ({ job: initialJob, loading }) => {
           label="Override or add to project-wide cost"
           value={job.additionalCostOverride}
           onChange={(value) => {
-            setJob({ ...job, additionalCostOverride: value });
+            // setJob({ ...job, additionalCostOverride: value });
+            updateJob({
+              additionalCostOverride: value,
+            });
           }}
           loading={loading}
         />

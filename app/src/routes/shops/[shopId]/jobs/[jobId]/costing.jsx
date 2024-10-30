@@ -11,6 +11,7 @@ const { H1, H2 } = Typography;
 import styles from "./costing.module.css";
 import { Price } from "../../../../../components/price/RenderPrice";
 import { calculateTotalCostOfJob } from "../../../../../util/totalCost";
+import { Spinner } from "tabler-react-2/dist/spinner";
 
 export const JobCostingPage = () => {
   const { shopId, jobId } = useParams();
@@ -18,6 +19,8 @@ export const JobCostingPage = () => {
     loading: jobLoading,
     job,
     refetch: refetchJob,
+    updateJob,
+    opLoading,
   } = useJob(shopId, jobId);
 
   if (jobLoading)
@@ -32,13 +35,21 @@ export const JobCostingPage = () => {
       <Util.Responsive threshold={500} gap={1}>
         <H1 style={{ flex: 1 }}>{job.title}</H1>
         <Card title="Total job cost" style={{ flex: 1 }}>
-          <Price value={calculateTotalCostOfJob(job)} icon />
+          {opLoading ? (
+            <Spinner />
+          ) : (
+            <Price value={calculateTotalCostOfJob(job)} icon />
+          )}
         </Card>
       </Util.Responsive>
       <Util.Spacer size={2} />
       <Util.Responsive threshold={1200} gap={1}>
         <div className={styles.section}>
-          <ProjectWideEditCosting job={job} loading={jobLoading} />
+          <ProjectWideEditCosting
+            job={job}
+            loading={jobLoading}
+            updateJob={updateJob}
+          />
         </div>
         <div className={styles.section}>
           <H2>Item-based costing</H2>

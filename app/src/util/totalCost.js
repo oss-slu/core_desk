@@ -14,7 +14,7 @@ export const calculateTotalCostOfJob = (data) => {
   });
 
   // if additionalCostOverride is true, return totalCost
-  if (data.additionalCostOverride) return;
+  if (data.additionalCostOverride) return totalCost;
 
   // Next, add up the item costs
   data.items.forEach((item) => {
