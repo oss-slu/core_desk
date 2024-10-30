@@ -18,7 +18,7 @@ import { Price } from "../price/RenderPrice";
 import { Time } from "../time/RenderTime";
 import { EditCosting } from "./EditCosting";
 
-function downloadFile(url, filename) {
+export function downloadFile(url, filename) {
   fetch(url)
     .then((response) => response.blob())
     .then((blob) => {

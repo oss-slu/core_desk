@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
+import { useConfirm } from "tabler-react-2";
 
 export const useJob = (shopId, jobId) => {
   const [loading, setLoading] = useState(true);
@@ -25,12 +26,25 @@ export const useJob = (shopId, jobId) => {
     }
   };
 
-  const updateJob = async (job) => {
+  const { confirm, ConfirmModal } = useConfirm({
+    title: "Already finalized",
+    text: "This job has already been finalized. You can still update it, but you cannot re-charge the customer.",
+    commitText: "Continue",
+    cancelText: "Cancel",
+  });
+
+  const updateJob = async (newJob) => {
+    if (job.finalized) {
+      const result = await confirm();
+      if (!result) {
+        return;
+      }
+    }
     try {
       setOpLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/job/${jobId}`, {
         method: "PUT",
-        body: JSON.stringify(job),
+        body: JSON.stringify(newJob),
       });
       const data = await r.json();
       if (data.job) {
@@ -50,5 +64,13 @@ export const useJob = (shopId, jobId) => {
     fetchJob();
   }, []);
 
-  return { job, loading, error, refetch: fetchJob, updateJob, opLoading };
+  return {
+    job,
+    loading,
+    error,
+    refetch: fetchJob,
+    updateJob,
+    opLoading,
+    ConfirmModal,
+  };
 };

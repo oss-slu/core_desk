@@ -23,6 +23,7 @@ import { ResourcePicker } from "../../../../../components/resourcePicker/Resourc
 import { EditCosting } from "../../../../../components/jobitem/EditCosting";
 import { ProjectWideEditCosting } from "../../../../../components/jobitem/ProjectWideEditCosting";
 import { Comments } from "../../../../../components/comments/Comments";
+import { Alert } from "tabler-react-2/dist/alert";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {
@@ -56,6 +57,7 @@ export const JobPage = () => {
     refetch: refetchJobs,
     opLoading,
     updateJob,
+    ConfirmModal,
   } = useJob(shopId, jobId);
   const { user, loading: userLoading } = useAuth();
   const { userShop, loading: shopLoading } = useShop(shopId);
@@ -74,10 +76,26 @@ export const JobPage = () => {
 
   if (loading || userLoading || shopLoading) return <Loading />;
 
-  if (!job) return <NotFound />;
+  if (!job)
+    return (
+      <Page sidenavItems={sidenavItems("jobs", shopId, jobId)}>
+        <NotFound />
+      </Page>
+    );
 
   return (
     <Page sidenavItems={sidenavItems("jobs", shopId, jobId)}>
+      {ConfirmModal}
+      {job.finalized && (
+        <Alert
+          variant="danger"
+          title="Job finalized"
+          icon={<Icon i="alert-triangle" />}
+        >
+          This job has already been finalized. You can still update it, but you
+          cannot re-charge the customer.
+        </Alert>
+      )}
       <Util.Responsive gap={1} align="start" threshold={800}>
         <div style={{ flex: 1, width: "100%" }}>
           <Util.Row justify="between" align="center" gap={1} wrap>

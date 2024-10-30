@@ -19,13 +19,14 @@ model user {
   firstName String
   lastName  String
 
-  logs  logs[]
-  shops UserShop[]
-  jobs  Job[]
+  logs     logs[]
+  shops    UserShop[]
+  jobs     Job[]
   comments JobComment[]
+  ledgerItems LedgerItem[]
 
-  admin  Boolean @default(false)
-  suspended Boolean @default(false)
+  admin            Boolean @default(false)
+  suspended        Boolean @default(false)
   suspensionReason String?
 
   createdAt DateTime @default(now())
@@ -36,8 +37,8 @@ model logs {
   id      String  @id @default(cuid())
   type    LogType
   message String?
-  from String? @db.MediumText
-  to String? @db.MediumText
+  from    String? @db.MediumText
+  to      String? @db.MediumText
 
   user   user?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
@@ -45,29 +46,32 @@ model logs {
   shop   Shop?   @relation(fields: [shopId], references: [id], onDelete: Cascade)
   shopId String?
 
-  job    Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job   Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   jobId String?
 
-  jobItem JobItem? @relation(fields: [jobItemId], references: [id], onDelete: Cascade)
+  jobItem   JobItem? @relation(fields: [jobItemId], references: [id], onDelete: Cascade)
   jobItemId String?
 
-  resource Resource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  resource   Resource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
   resourceId String?
 
-  resourceImage ResourceImage? @relation(fields: [resourceImageId], references: [id], onDelete: Cascade)
+  resourceImage   ResourceImage? @relation(fields: [resourceImageId], references: [id], onDelete: Cascade)
   resourceImageId String?
 
-  material Material? @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  material   Material? @relation(fields: [materialId], references: [id], onDelete: Cascade)
   materialId String?
 
-  materialImage MaterialImage? @relation(fields: [materialImageId], references: [id], onDelete: Cascade)
+  materialImage   MaterialImage? @relation(fields: [materialImageId], references: [id], onDelete: Cascade)
   materialImageId String?
 
-  resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
+  resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
   resourceTypeId String?
 
-  comment JobComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  comment   JobComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId String?
+
+  ledgerItem   LedgerItem? @relation(fields: [ledgerItemId], references: [id], onDelete: Cascade)
+  ledgerItemId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -93,6 +97,8 @@ enum LogType {
   JOB_ITEM_DELETED
   JOB_ITEM_MODIFIED
   JOB_ITEM_STATUS_CHANGED
+  JOB_FINALIZED
+  JOB_INVOICE_GENERATED
   RESOURCE_CREATED
   RESOURCE_MODIFIED
   RESOURCE_DELETED
@@ -111,6 +117,8 @@ enum LogType {
   MATERIAL_IMAGE_MODIFIED
   MATERIAL_IMAGE_DELETED
   COMMENT_CREATED
+  LEDGER_ITEM_CREATED
+
 }
 
 model UserShop {
@@ -120,7 +128,7 @@ model UserShop {
   shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
   shopId String
 
-  accountType AccountType @default(CUSTOMER)
+  accountType  AccountType @default(CUSTOMER)
   accountTitle String?
 
   active Boolean @default(true)
@@ -153,25 +161,26 @@ model Shop {
   jobs  Job[]
 
   resourceTypes ResourceType[]
-  resources Resource[]
-
+  resources     Resource[]
   materials Material[]
+
+  ledgerItems LedgerItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model Resource {
-  id          String  @id @default(cuid())
+  id          String          @id @default(cuid())
   title       String
-  description String? @db.MediumText
+  description String?         @db.MediumText
   images      ResourceImage[]
-  public      Boolean @default(false)
+  public      Boolean         @default(false)
 
-  primaryCategory String?
+  primaryCategory   String?
   secondaryCategory String?
 
-  resourceType ResourceType @relation(fields: [resourceTypeId], references: [id])
+  resourceType   ResourceType @relation(fields: [resourceTypeId], references: [id])
   resourceTypeId String
 
   shop   Shop   @relation(fields: [shopId], references: [id])
@@ -182,71 +191,71 @@ model Resource {
 
   active Boolean @default(true)
 
-  quantity Int?
+  quantity       Int?
   quantityPublic Boolean @default(true)
 
-  costPerUnit Float?
-  fixedCost Float?
-  costPerTime Float?
-  materialLabel String?
+  costPerUnit           Float?
+  fixedCost             Float?
+  costPerTime           Float?
+  materialLabel         String?
   costPerProcessingTime Float?
-  costingPublic Boolean @default(true)
+  costingPublic         Boolean @default(true)
 
   userSuppliedMaterial SuppliedMaterialLevels @default(NEVER)
 
   jobItems JobItem[]
-  jobs Job[]
+  jobs     Job[]
 
-  logs  logs[]
+  logs logs[]
 
   additionalCostItems AdditionalCostLineItem[]
 }
 
 model Material {
-  id          String  @id @default(cuid())
-  title       String
-  description String? @db.MediumText
+  id           String  @id @default(cuid())
+  title        String
+  description  String? @db.MediumText
   manufacturer String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  active Boolean @default(true)
+  active    Boolean  @default(true)
 
   jobItems JobItem[]
-  jobs Job[]
+  jobs     Job[]
 
   shopId String
-  shop Shop @relation(fields: [shopId], references: [id])
+  shop   Shop   @relation(fields: [shopId], references: [id])
 
-  costPerUnit Float?
+  costPerUnit    Float?
   unitDescriptor String?
-  costPublic Boolean @default(true)
+  costPublic     Boolean @default(true)
 
   resourceTypeId String
-  resourceType ResourceType @relation(fields: [resourceTypeId], references: [id])
+  resourceType   ResourceType @relation(fields: [resourceTypeId], references: [id])
 
   images MaterialImage[]
 
-  msdsFileKey String?
-  msdsFileUrl String?
+  msdsFileKey  String?
+  msdsFileUrl  String?
   msdsFileName String?
   msdsFileType String?
 
-  tdsFileKey String?
-  tdsFileUrl String?
+  tdsFileKey  String?
+  tdsFileUrl  String?
   tdsFileName String?
   tdsFileType String?
 
-  logs  logs[]
+  logs logs[]
 
   additionalCostItems AdditionalCostLineItem[]
 }
 
 model MaterialImage {
-  id          String  @id @default(cuid())
+  id String @id @default(cuid())
 
-  fileKey String
-  fileUrl String
+  fileKey  String
+  fileUrl  String
   fileName String
   fileType String
 
@@ -254,19 +263,19 @@ model MaterialImage {
 
   active Boolean @default(true)
 
-  material Material @relation(fields: [materialId], references: [id])
+  material   Material @relation(fields: [materialId], references: [id])
   materialId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  logs  logs[]
+  logs      logs[]
 }
 
 model ResourceImage {
-  id          String  @id @default(cuid())
+  id String @id @default(cuid())
 
-  fileKey String
-  fileUrl String
+  fileKey  String
+  fileUrl  String
   fileName String
   fileType String
 
@@ -274,12 +283,12 @@ model ResourceImage {
 
   active Boolean @default(true)
 
-  resource Resource @relation(fields: [resourceId], references: [id])
+  resource   Resource @relation(fields: [resourceId], references: [id])
   resourceId String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  logs  logs[]
+  logs      logs[]
 }
 
 // enum ResourceType {
@@ -299,17 +308,17 @@ model ResourceType {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  active Boolean @default(true)
+  active    Boolean  @default(true)
 
   shopId String
-  shop Shop @relation(fields: [shopId], references: [id])
+  shop   Shop   @relation(fields: [shopId], references: [id])
 
   resources Resource[]
-  jobItems JobItem[]
-  jobs Job[]
+  jobItems  JobItem[]
+  jobs      Job[]
   materials Material[]
 
-  logs  logs[]
+  logs logs[]
 
   additionalCostItems AdditionalCostLineItem[]
 }
@@ -347,20 +356,23 @@ model Job {
   user   user   @relation(fields: [userId], references: [id])
   userId String
 
-  material Material? @relation(fields: [materialId], references: [id])
+  material   Material? @relation(fields: [materialId], references: [id])
   materialId String?
 
-  resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id])
+  resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id])
   resourceTypeId String?
 
-  resource Resource? @relation(fields: [resourceId], references: [id])
+  resource   Resource? @relation(fields: [resourceId], references: [id])
   resourceId String?
 
   dueDate DateTime?
 
-  additionalCostOverride Boolean @default(false) /// If true, the additional cost will be used _instead_ of the calculated cost. If false, it will be used in addition.
+  finalized   Boolean     @default(false)
+  finalizedAt DateTime?
+  ledgerItems LedgerItem[]
 
-  additionalCosts AdditionalCostLineItem[]
+  additionalCostOverride Boolean                  @default(false) /// If true, the additional cost will be used _instead_ of the calculated cost. If false, it will be used in addition.
+  additionalCosts        AdditionalCostLineItem[]
 
   logs  logs[]
   items JobItem[]
@@ -370,64 +382,100 @@ model Job {
   status ProgressStatus @default(NOT_STARTED)
 }
 
+model LedgerItem {
+  id     String @id @default(cuid())
+
+  userId String
+  user   user   @relation(fields: [userId], references: [id])
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  jobId  String? @unique
+  job    Job?    @relation(fields: [jobId], references: [id])
+
+  type LedgerItemType
+
+  invoiceUrl String?
+  invoiceKey String?
+
+  value Float
+
+  logs logs[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum LedgerItemType {
+  INITIAL
+  JOB
+  AUTOMATED_TOPUP
+  AUTOMATED_DEPOSIT
+  MANUAL_TOPUP
+  MANUAL_DEPOSIT
+  FUNDS_PURCHASED
+  REFUND
+}
+
 model JobComment {
-  id          String  @id @default(cuid())
-  message     String @db.MediumText
+  id        String   @id @default(cuid())
+  message   String   @db.MediumText
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  job Job @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 
-  user user @relation(fields: [userId], references: [id])
+  user   user   @relation(fields: [userId], references: [id])
   userId String
 
   logs logs[]
 }
 
 model AdditionalCostLineItem {
-  id          String  @id @default(cuid())
+  id String @id @default(cuid())
 
   resourceTypeId String?
-  resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id])
+  resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id])
 
   resourceId String?
-  resource Resource? @relation(fields: [resourceId], references: [id])
+  resource   Resource? @relation(fields: [resourceId], references: [id])
 
   materialId String?
-  material Material? @relation(fields: [materialId], references: [id])
+  material   Material? @relation(fields: [materialId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  unitQty Float?
-  timeQty Float?
-  materialQty Float?
+  unitQty           Float?
+  timeQty           Float?
+  materialQty       Float?
   processingTimeQty Float?
 
   active Boolean @default(true)
 
-  job Job @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id])
   jobId String
 }
 
 model JobItem {
-  id          String  @id @default(cuid())
-  title       String
-  status     ProgressStatus @default(NOT_STARTED)
+  id     String         @id @default(cuid())
+  title  String
+  status ProgressStatus @default(NOT_STARTED)
 
-  fileKey String
-  fileUrl String
+  fileKey  String
+  fileUrl  String
   fileName String
   fileType String
 
-  resource Resource? @relation(fields: [resourceId], references: [id])
+  resource   Resource? @relation(fields: [resourceId], references: [id])
   resourceId String?
 
-  resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id])
+  resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id])
   resourceTypeId String?
 
-  material Material? @relation(fields: [materialId], references: [id])
+  material   Material? @relation(fields: [materialId], references: [id])
   materialId String?
 
   createdAt DateTime @default(now())
@@ -436,13 +484,13 @@ model JobItem {
   active Boolean @default(true)
 
   processingTimeQty Float?
-  timeQty Float?
-  unitQty Float?
-  materialQty Float?
+  timeQty           Float?
+  unitQty           Float?
+  materialQty       Float?
 
   jobId String
-  job Job @relation(fields: [jobId], references: [id])
-  logs logs[]
+  job   Job    @relation(fields: [jobId], references: [id])
+  logs  logs[]
 }
 
 enum ProgressStatus {

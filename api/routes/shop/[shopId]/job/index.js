@@ -1,6 +1,7 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "../../../../util/prisma.js";
 import { verifyAuth } from "../../../../util/verifyAuth.js";
+import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
 
 export const post = [
   verifyAuth,
@@ -96,8 +97,9 @@ export const get = [
             where: {
               active: true,
             },
-            select: {
-              status: true,
+            include: {
+              material: true,
+              resource: true,
             },
           },
           user: {
@@ -105,6 +107,12 @@ export const get = [
               firstName: true,
               lastName: true,
               id: true,
+            },
+          },
+          additionalCosts: {
+            include: {
+              material: true,
+              resource: true,
             },
           },
         },
@@ -134,6 +142,9 @@ export const get = [
           job.items.filter((item) => item.status === "WAITING").length +
           job.items.filter((item) => item.status === "WAITING_FOR_PAYMENT")
             .length;
+
+        job.totalCost = calculateTotalCostOfJob(job);
+        delete job.additionalCosts;
 
         job.user.name = `${job.user.firstName} ${job.user.lastName}`;
 

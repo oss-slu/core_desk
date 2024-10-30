@@ -1,6 +1,62 @@
-import { LogType } from "@prisma/client";
+import { LedgerItemType, LogType, Prisma } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
+import { generateInvoice } from "../../../../../util/docgen/invoice.js";
+
+/** @type {Prisma.JobInclude} */
+const JOB_INCLUDE = {
+  items: {
+    where: {
+      active: true,
+    },
+    include: {
+      resource: {
+        select: {
+          costingPublic: true,
+          costPerProcessingTime: true,
+          costPerTime: true,
+          costPerUnit: true,
+        },
+      },
+      material: {
+        select: {
+          costPerUnit: true,
+          unitDescriptor: true,
+        },
+      },
+    },
+  },
+  resource: {
+    select: {
+      id: true,
+      title: true,
+    },
+  },
+  additionalCosts: {
+    where: {
+      active: true,
+    },
+    include: {
+      resource: {
+        select: {
+          costPerProcessingTime: true,
+          costPerTime: true,
+          costPerUnit: true,
+        },
+      },
+      material: {
+        select: {
+          costPerUnit: true,
+        },
+      },
+    },
+  },
+  ledgerItems: {
+    where: {
+      type: LedgerItemType.JOB,
+    },
+  },
+};
 
 export const get = [
   verifyAuth,
@@ -34,54 +90,7 @@ export const get = [
           shopId,
           userId: shouldLoadAll ? undefined : userId,
         },
-        include: {
-          items: {
-            where: {
-              active: true,
-            },
-            include: {
-              resource: {
-                select: {
-                  costingPublic: true,
-                  costPerProcessingTime: true,
-                  costPerTime: true,
-                  costPerUnit: true,
-                },
-              },
-              material: {
-                select: {
-                  costPerUnit: true,
-                  unitDescriptor: true,
-                },
-              },
-            },
-          },
-          resource: {
-            select: {
-              id: true,
-              title: true,
-            },
-          },
-          additionalCosts: {
-            where: {
-              active: true,
-            },
-            include: {
-              resource: {
-                select: {
-                  costPerProcessingTime: true,
-                  costPerTime: true,
-                  costPerUnit: true,
-                },
-              },
-              material: {
-                select: {
-                  costPerUnit: true,
-                },
-              },
-            },
-          },
-        },
+        include: JOB_INCLUDE,
       });
 
       // TODO: Respect costing public
@@ -129,6 +138,20 @@ export const put = [
           id: jobId,
           userId: shouldLoadAll ? undefined : userId,
         },
+        include: {
+          additionalCosts: {
+            include: {
+              material: true,
+              resource: true,
+            },
+          },
+          items: {
+            include: {
+              material: true,
+              resource: true,
+            },
+          },
+        },
       });
 
       if (!job) {
@@ -142,73 +165,91 @@ export const put = [
       delete req.body.updatedAt;
       delete req.body.items;
       delete req.body.resource;
-      // delete req.body.additionalCosts;
 
-      const updatedJob = await prisma.job.update({
-        where: {
-          id: jobId,
-        },
-        data: req.body,
-        include: {
-          items: {
-            where: {
-              active: true,
-            },
-            include: {
-              resource: {
-                select: {
-                  costingPublic: true,
-                  costPerProcessingTime: true,
-                  costPerTime: true,
-                  costPerUnit: true,
-                },
-              },
-              material: {
-                select: {
-                  costPerUnit: true,
-                  unitDescriptor: true,
-                },
-              },
-            },
-          },
-          resource: {
-            select: {
-              id: true,
-              title: true,
-            },
-          },
-          additionalCosts: {
-            where: {
-              active: true,
-            },
-            include: {
-              resource: {
-                select: {
-                  costPerProcessingTime: true,
-                  costPerTime: true,
-                  costPerUnit: true,
-                },
-              },
-              material: {
-                select: {
-                  costPerUnit: true,
-                },
-              },
-            },
-          },
-        },
-      });
+      let updatedJob;
+      if (req.body.finalized && !job.finalized) {
+        if (
+          !(
+            userShop.accountType === "ADMIN" ||
+            userShop.accountType === "OPERATOR" ||
+            req.user.admin
+          )
+        ) {
+          return res.status(400).json({ error: "Forbidden" });
+        }
 
-      await prisma.logs.create({
-        data: {
-          type: LogType.JOB_MODIFIED,
-          userId,
-          shopId,
-          jobId,
-          from: JSON.stringify(job),
-          to: JSON.stringify(updatedJob),
-        },
-      });
+        const { url, key, value, log } = await generateInvoice(job, userId);
+        await prisma.job.update({
+          where: {
+            id: jobId,
+          },
+          data: {
+            finalized: true,
+            finalizedAt: new Date(),
+          },
+        });
+
+        const ledgerItem = await prisma.ledgerItem.create({
+          data: {
+            shopId,
+            jobId,
+            userId: job.userId,
+            invoiceUrl: url,
+            invoiceKey: key,
+            value: value,
+            type: LedgerItemType.JOB,
+          },
+        });
+
+        await prisma.logs.update({
+          where: {
+            id: log.id,
+          },
+          data: {
+            ledgerItemId: ledgerItem.id,
+          },
+        });
+
+        await prisma.logs.createMany({
+          data: [
+            {
+              userId: req.user.id,
+              shopId,
+              jobId,
+              type: LogType.JOB_FINALIZED,
+              ledgerItemId: ledgerItem.id,
+            },
+            {
+              userId: req.user.id,
+              shopId,
+              jobId,
+              type: LogType.LEDGER_ITEM_CREATED,
+              ledgerItemId: ledgerItem.id,
+            },
+          ],
+        });
+
+        // Finalize job
+      } else {
+        updatedJob = await prisma.job.update({
+          where: {
+            id: jobId,
+          },
+          data: req.body,
+          include: JOB_INCLUDE,
+        });
+
+        await prisma.logs.create({
+          data: {
+            type: LogType.JOB_MODIFIED,
+            userId,
+            shopId,
+            jobId,
+            from: JSON.stringify(job),
+            to: JSON.stringify(updatedJob),
+          },
+        });
+      }
 
       return res.json({ job: updatedJob });
     } catch (e) {

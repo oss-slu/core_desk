@@ -1,7 +1,13 @@
-const ejs = require("ejs");
-const fs = require("fs");
+import ejs from "ejs";
+import fs from "fs";
+import { utapi } from "../../config/uploadthing.js";
+import html_to_pdf from "html-pdf-node";
+import { prisma } from "#prisma";
+import { LogType } from "@prisma/client";
 
-const calculateTotalCostOfJob = (data) => {
+const options = { format: "Letter", printBackground: true };
+
+export const calculateTotalCostOfJob = (data) => {
   let totalCost = 0;
 
   // First, add up the additional line items
@@ -34,6 +40,7 @@ const calculateTotalCostOfJob = (data) => {
   return totalCost;
 };
 
+/*
 const data = {
   id: "cm2jl8hwj0001q4bxbfex38io",
   title: "Test Project",
@@ -195,12 +202,50 @@ const data = {
 };
 
 console.log(calculateTotalCostOfJob(data));
+*/
 
-ejs.renderFile(
-  "./invoice.ejs",
-  { ...data, data, calculateTotalCostOfJob },
-  (err, html) => {
-    if (err) throw err;
-    fs.writeFileSync("invoice.html", html);
-  }
-);
+export const generateInvoice = async (data, userId) => {
+  return new Promise((resolve, reject) => {
+    ejs.renderFile(
+      "./util/docgen/invoice.ejs",
+      { ...data, data, calculateTotalCostOfJob },
+      async (err, html) => {
+        if (err) reject(err);
+        html_to_pdf.generatePdf(
+          { content: html },
+          options,
+          async (err, res) => {
+            if (err) reject(err);
+            const ut = await utapi.uploadFiles([
+              new File([res], "invoice.pdf", { type: "application/pdf" }),
+            ]);
+            if (!ut || !ut[0] || !ut[0].data) {
+              console.error(ut);
+              reject("Upload failed");
+            }
+
+            const log = await prisma.logs.create({
+              data: {
+                type: LogType.JOB_INVOICE_GENERATED,
+                jobId: data.id,
+                userId,
+                to: JSON.stringify({
+                  url: ut[0].data.url,
+                  key: ut[0].data.key,
+                  value: calculateTotalCostOfJob(data),
+                }),
+              },
+            });
+
+            resolve({
+              url: ut[0].data.url,
+              key: ut[0].data.key,
+              value: calculateTotalCostOfJob(data),
+              log,
+            });
+          }
+        );
+      }
+    );
+  });
+};

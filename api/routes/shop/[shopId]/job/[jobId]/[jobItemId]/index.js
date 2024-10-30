@@ -47,8 +47,6 @@ export const patch = [
     const { shopId, jobId, jobItemId } = req.params;
     const userId = req.user.id;
 
-    console.log({ userId, shopId });
-
     const userShop = await prisma.userShop.findFirst({
       where: {
         userId,
@@ -99,7 +97,6 @@ export const patch = [
       (req.body.data.resourceTypeId || req.body.data.resourceTypeId === null) &&
       req.body.data.resourceTypeId !== jobItem.resourceTypeId
     ) {
-      console.log("Resource type changed");
       req.body.data.materialId = null;
       req.body.data.resourceId = null;
     }
