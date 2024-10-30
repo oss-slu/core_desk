@@ -1,11 +1,24 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
+import { useConfirm } from "tabler-react-2/dist/modal/confirm";
 
-export const useAdditionalLineItem = (shopId, jobId, lineItemId) => {
+export const useAdditionalLineItem = (
+  shopId,
+  jobId,
+  lineItemId,
+  jobFinalized
+) => {
   const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lineItem, setLineItem] = useState({});
+
+  const { confirm, ConfirmModal } = useConfirm({
+    title: "Already finalized",
+    text: "This job has already been finalized. You can still update it, but you cannot re-charge the customer.",
+    commitText: "Continue",
+    cancelText: "Cancel",
+  });
 
   const fetchLineItem = async (shouldSetLoading = true) => {
     try {
@@ -28,6 +41,12 @@ export const useAdditionalLineItem = (shopId, jobId, lineItemId) => {
   };
 
   const updateLineItem = async (data) => {
+    if (jobFinalized) {
+      const result = await confirm();
+      if (!result) {
+        return;
+      }
+    }
     try {
       setOpLoading(true);
       const r = await authFetch(
@@ -87,5 +106,6 @@ export const useAdditionalLineItem = (shopId, jobId, lineItemId) => {
     updateLineItem,
     opLoading,
     deleteLineItem,
+    ConfirmModal,
   };
 };

@@ -65,6 +65,7 @@ export const ProjectWideEditCosting = ({
                   lineItemId={additionalCost.id}
                   key={additionalCost.id}
                   refetchLineItems={fetchLineItems}
+                  jobFinalized={job.finalized}
                 />
                 <Util.Spacer size={1} />
               </>
@@ -86,10 +87,10 @@ export const ProjectWideEditCosting = ({
   );
 };
 
-const CostCard = ({ lineItemId, refetchLineItems }) => {
+const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
   const { shopId, jobId } = useParams();
-  const { lineItem, updateLineItem, deleteLineItem, opLoading } =
-    useAdditionalLineItem(shopId, jobId, lineItemId);
+  const { lineItem, updateLineItem, deleteLineItem, opLoading, ConfirmModal } =
+    useAdditionalLineItem(shopId, jobId, lineItemId, jobFinalized);
   const [localLineItem, setLocalLineItem] = useState(lineItem);
 
   const { loading: materialLoading, material } = useMaterial(
@@ -127,6 +128,7 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
 
   return (
     <Card key={localLineItem.id}>
+      {ConfirmModal}
       <Util.Col gap={1}>
         <Util.Row gap={1} align="start">
           <Util.Col gap={1}>

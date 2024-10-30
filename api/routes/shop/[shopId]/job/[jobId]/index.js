@@ -178,7 +178,11 @@ export const put = [
           return res.status(400).json({ error: "Forbidden" });
         }
 
-        const { url, key, value, log } = await generateInvoice(job, userId);
+        const { url, key, value, log } = await generateInvoice(
+          job,
+          userId,
+          shopId
+        );
         await prisma.job.update({
           where: {
             id: jobId,
