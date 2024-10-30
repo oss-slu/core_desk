@@ -22,6 +22,7 @@ model user {
   logs  logs[]
   shops UserShop[]
   jobs  Job[]
+  comments JobComment[]
 
   admin  Boolean @default(false)
   suspended Boolean @default(false)
@@ -65,6 +66,9 @@ model logs {
   resourceType ResourceType? @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
   resourceTypeId String?
 
+  comment JobComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -106,6 +110,7 @@ enum LogType {
   MATERIAL_IMAGE_CREATED
   MATERIAL_IMAGE_MODIFIED
   MATERIAL_IMAGE_DELETED
+  COMMENT_CREATED
 }
 
 model UserShop {
@@ -360,7 +365,24 @@ model Job {
   logs  logs[]
   items JobItem[]
 
+  comments JobComment[]
+
   status ProgressStatus @default(NOT_STARTED)
+}
+
+model JobComment {
+  id          String  @id @default(cuid())
+  message     String @db.MediumText
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id])
+  jobId String
+
+  user user @relation(fields: [userId], references: [id])
+  userId String
+
+  logs logs[]
 }
 
 model AdditionalCostLineItem {

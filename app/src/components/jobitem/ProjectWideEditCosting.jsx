@@ -180,7 +180,7 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
             <>
               {materialLoading || resourceLoading ? (
                 <Spinner />
-              ) : !resource?.costPerTime || !material?.costPerUnit ? (
+              ) : !resource || !material ? (
                 <span>
                   <Badge color="danger" soft>
                     <Icon i="coin-off" />
@@ -191,16 +191,16 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
                 <Util.Col gap={0}>
                   <TimeInput
                     label="Resource Time (hr:mm)"
-                    timeQty={localLineItem.timeQty}
-                    costPerTime={resource.costPerTime}
+                    timeQty={localLineItem.timeQty || 0}
+                    costPerTime={resource.costPerTime || 0}
                     onChange={(value) =>
                       setLocalLineItem({ ...localLineItem, timeQty: value })
                     }
                   />
                   <TimeInput
                     label="Processing Time (hr:mm)"
-                    timeQty={localLineItem.processingTimeQty}
-                    costPerTime={resource.costPerProcessingTime}
+                    timeQty={localLineItem.processingTimeQty || 0}
+                    costPerTime={resource.costPerProcessingTime || 0}
                     onChange={(value) =>
                       setLocalLineItem({
                         ...localLineItem,
@@ -210,8 +210,8 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
                   />
                   <QuantityInput
                     label="Unit runs"
-                    quantity={localLineItem.unitQty}
-                    costPerUnit={resource.costPerUnit}
+                    quantity={localLineItem.unitQty || 0}
+                    costPerUnit={resource.costPerUnit || 0}
                     icon={<Icon i="refresh" />}
                     onChange={(value) =>
                       setLocalLineItem({ ...localLineItem, unitQty: value })
@@ -219,29 +219,14 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
                   />
                   <QuantityInput
                     label={`Material quantity in ${material.unitDescriptor}s`}
-                    quantity={localLineItem.materialQty}
-                    costPerUnit={material.costPerUnit}
+                    quantity={localLineItem.materialQty || 0}
+                    costPerUnit={material.costPerUnit || 0}
                     icon={<Icon i="weight" />}
                     onChange={(value) =>
                       setLocalLineItem({ ...localLineItem, materialQty: value })
                     }
                   />
-                  <Util.Row gap={1} align="center" justify="between">
-                    {changed ? (
-                      <Util.Row gap={1} align="center">
-                        <Button onClick={handleSave} loading={opLoading}>
-                          Save
-                        </Button>
-                        <Button onClick={() => setLocalLineItem(lineItem)}>
-                          Discard
-                        </Button>
-                        <Badge color="red" soft>
-                          You have unsaved changes!
-                        </Badge>
-                      </Util.Row>
-                    ) : (
-                      <div></div>
-                    )}
+                  <Util.Row gap={1} align="center" justify="end">
                     <span className={styles.bottomLine}>
                       <Util.Row gap={1}>
                         Total Cost:
@@ -259,6 +244,21 @@ const CostCard = ({ lineItemId, refetchLineItems }) => {
                 Costing unavailable without material and resource
               </Badge>
             </span>
+          )}
+          {changed ? (
+            <Util.Row gap={1} align="center">
+              <Button onClick={handleSave} loading={opLoading}>
+                Save
+              </Button>
+              <Button onClick={() => setLocalLineItem(lineItem)}>
+                Discard
+              </Button>
+              <Badge color="red" soft>
+                You have unsaved changes!
+              </Badge>
+            </Util.Row>
+          ) : (
+            <div></div>
           )}
         </Util.Col>
       </Util.Col>

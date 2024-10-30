@@ -22,6 +22,7 @@ import { MaterialPicker } from "../../../../../components/materialPicker/Materia
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
 import { EditCosting } from "../../../../../components/jobitem/EditCosting";
 import { ProjectWideEditCosting } from "../../../../../components/jobitem/ProjectWideEditCosting";
+import { Comments } from "../../../../../components/comments/Comments";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {
@@ -238,15 +239,28 @@ export const JobPage = () => {
           )}
         </div>
         <div style={{ flex: 1, width: "100%" }}>
-          <UploadDropzone
-            scope={"job.fileupload"}
-            metadata={{
-              jobId,
-              shopId,
-            }}
-            onUploadComplete={() => {
-              refetchJobs();
-            }}
+          <Card
+            tabs={[
+              {
+                title: "Upload items",
+                content: (
+                  <UploadDropzone
+                    scope={"job.fileupload"}
+                    metadata={{
+                      jobId,
+                      shopId,
+                    }}
+                    onUploadComplete={() => {
+                      refetchJobs();
+                    }}
+                  />
+                ),
+              },
+              {
+                title: "Comments",
+                content: <Comments jobId={jobId} shopId={shopId} />,
+              },
+            ]}
           />
         </div>
       </Util.Responsive>

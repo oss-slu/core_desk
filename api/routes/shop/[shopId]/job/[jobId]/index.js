@@ -63,11 +63,22 @@ export const get = [
             },
           },
           additionalCosts: {
-            select: {
-              id: true,
-            },
             where: {
               active: true,
+            },
+            include: {
+              resource: {
+                select: {
+                  costPerProcessingTime: true,
+                  costPerTime: true,
+                  costPerUnit: true,
+                },
+              },
+              material: {
+                select: {
+                  costPerUnit: true,
+                },
+              },
             },
           },
         },
@@ -167,11 +178,22 @@ export const put = [
             },
           },
           additionalCosts: {
-            select: {
-              id: true,
-            },
             where: {
               active: true,
+            },
+            include: {
+              resource: {
+                select: {
+                  costPerProcessingTime: true,
+                  costPerTime: true,
+                  costPerUnit: true,
+                },
+              },
+              material: {
+                select: {
+                  costPerUnit: true,
+                },
+              },
             },
           },
         },

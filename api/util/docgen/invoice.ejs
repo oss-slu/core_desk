@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Invoice / Quote - <%= title %></title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+        padding: 0;
+        color: #333;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+      th,
+      td {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      th {
+        background-color: #f2f2f2;
+        text-align: left;
+      }
+      .total-row {
+        font-weight: bold;
+        background-color: #f9f9f9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p><strong>Description:</strong> <%= description %></p>
+    <p>
+      <strong>Due Date:</strong> <%= new Date(dueDate).toLocaleDateString() %>
+    </p>
+
+    <% if(!additionalCostOverride) { %>
+
+    <h2>Line Items</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Qty</th>
+          <th>Unit Cost</th>
+          <th>Subtotal</th>
+          <th>Item Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% items.forEach(item => { %> <% if (item.resource && item.material) {
+        %> <% const materialCost = (item.materialQty || 0) *
+        item.material.costPerUnit; %> <% const timeCost = (item.timeQty || 0) *
+        (item.resource.costPerTime || 0); %> <% const processingCost =
+        (item.processingTimeQty || 0) * (item.resource.costPerProcessingTime ||
+        0); %> <% const unitCost = (item.unitQty || 0) *
+        (item.resource.costPerUnit || 0); %> <% const totalItemCost = timeCost +
+        processingCost + unitCost + materialCost; %>
+
+        <tr>
+          <td rowspan="4"><%= item.title %></td>
+          <td><%= item.timeQty || '-' %> hours</td>
+          <td>$<%= item.resource.costPerTime || 0 %> / hour</td>
+          <td>$<%= timeCost.toFixed(2) %></td>
+          <td rowspan="4">$<%= totalItemCost.toFixed(2) %></td>
+        </tr>
+        <tr>
+          <td><%= item.processingTimeQty || '-' %> units</td>
+          <td>$<%= item.resource.costPerProcessingTime || 0 %></td>
+          <td>$<%= processingCost.toFixed(2) %></td>
+        </tr>
+        <tr>
+          <td><%= item.unitQty || '-' %> runs</td>
+          <td>$<%= item.resource.costPerUnit || 0 %> / unit</td>
+          <td>$<%= unitCost.toFixed(2) %></td>
+        </tr>
+        <tr>
+          <td>
+            <%= item.materialQty || '-' %> <%= item.material.unitDescriptor %>
+          </td>
+          <td>
+            $<%= item.material.costPerUnit %> / <%= item.material.unitDescriptor
+            %>
+          </td>
+          <td>$<%= materialCost.toFixed(2) %></td>
+        </tr>
+        <% } %> <% }) %>
+      </tbody>
+    </table>
+
+    <% } %>
+
+    <h2>Manually Entered Costs</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Qty</th>
+          <th>Unit Cost</th>
+          <th>Subtotal</th>
+          <th>Cost</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% additionalCosts.forEach(cost => { %> <% if (cost.resource &&
+        cost.material) { %> <% const materialCost = (cost.materialQty || 0) *
+        cost.material.costPerUnit; %> <% const timeCost = (cost.timeQty || 0) *
+        (cost.resource.costPerTime || 0); %> <% const processingCost =
+        (cost.processingTimeQty || 0) * (cost.resource.costPerProcessingTime ||
+        0); %> <% const unitCost = (cost.unitQty || 0) *
+        (cost.resource.costPerUnit || 0); %> <% const totalCost = timeCost +
+        processingCost + unitCost + materialCost; %>
+
+        <tr>
+          <td rowspan="4">Manually Entered Cost</td>
+          <td><%= cost.timeQty || '-' %> hours</td>
+          <td>$<%= cost.resource.costPerTime || 0 %> / hour</td>
+          <td>$<%= timeCost.toFixed(2) %></td>
+          <td rowspan="4">$<%= totalCost.toFixed(2) %></td>
+        </tr>
+        <tr>
+          <td><%= cost.processingTimeQty || '-' %> units</td>
+          <td>$<%= cost.resource.costPerProcessingTime || 0 %></td>
+          <td>$<%= processingCost.toFixed(2) %></td>
+        </tr>
+        <tr>
+          <td><%= cost.unitQty || '-' %> runs</td>
+          <td>$<%= cost.resource.costPerUnit || 0 %> / unit</td>
+          <td>$<%= unitCost.toFixed(2) %></td>
+        </tr>
+        <tr>
+          <td>
+            <%= cost.materialQty || '-' %> <%= cost.material.unitDescriptor %>
+          </td>
+          <td>
+            $<%= cost.material.costPerUnit %> / <%= cost.material.unitDescriptor
+            %>
+          </td>
+          <td>$<%= materialCost.toFixed(2) %></td>
+        </tr>
+        <% } %> <% }) %>
+      </tbody>
+    </table>
+
+    <h2>Total Cost</h2>
+    <p><strong>$<%= calculateTotalCostOfJob(data).toFixed(2) %></strong></p>
+  </body>
+</html>

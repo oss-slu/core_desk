@@ -83,6 +83,8 @@ export const put = [
     delete req.body.shopId;
     delete req.body.images;
 
+    req.body.costPerUnit = parseFloat(req.body.costPerUnit);
+
     const material = await prisma.material.update({
       where: {
         id: materialId,
