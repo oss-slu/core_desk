@@ -50,14 +50,28 @@ export const MaterialPage = () => {
   if (loading)
     return (
       <Page
-        sidenavItems={shopSidenavItems("Resources", shopId, user, userShop)}
+        sidenavItems={shopSidenavItems(
+          "Resources",
+          shopId,
+          user.admin,
+          userShop.accountType,
+          userShop.balance < 0
+        )}
       >
         <Loading />
       </Page>
     );
 
   return (
-    <Page sidenavItems={shopSidenavItems("Resources", shopId, user, userShop)}>
+    <Page
+      sidenavItems={shopSidenavItems(
+        "Resources",
+        shopId,
+        user.admin,
+        userShop.accountType,
+        userShop.balance < 0
+      )}
+    >
       <Util.Row justify="between" align="center">
         <H1>{material.title}</H1>
         {(user.admin || userShop.accountType === "ADMIN") &&

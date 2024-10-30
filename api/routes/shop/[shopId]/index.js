@@ -34,6 +34,18 @@ export const get = [
         },
       });
 
+      const userBalance = await prisma.ledgerItem.aggregate({
+        where: {
+          userId: req.user.id,
+          shopId: shop.id,
+        },
+        _sum: {
+          value: true,
+        },
+      });
+
+      userShop.balance = userBalance._sum.value || 0;
+
       res.json({ shop, userShop });
     } catch (error) {
       console.error(error);

@@ -17,6 +17,7 @@ import { ResourcePage } from "./routes/shops/[shopId]/resources/[resourceId]";
 import { NotFound } from "./components/404/404";
 import { MaterialPage } from "./routes/shops/[shopId]/resources/type/resourceTypeId/materials/[materialId]";
 import { JobCostingPage } from "./routes/shops/[shopId]/jobs/[jobId]/costing";
+import { Billing } from "./routes/shops/[shopId]/billing";
 
 // eslint-disable-next-line
 export default () => {
@@ -48,6 +49,7 @@ export default () => {
 
                 <Route path="/shops" element={<Shops />} />
                 <Route path="/shops/:shopId" element={<ShopPage />} />
+                <Route path="/shops/:shopId/billing" element={<Billing />} />
                 <Route path="/shops/:shopId/jobs" element={<Jobs />} />
                 <Route
                   path="/shops/:shopId/jobs/:jobId"

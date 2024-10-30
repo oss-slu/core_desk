@@ -16,7 +16,8 @@ export const shopSidenavItems = (
   activeText,
   shopId,
   isGlobalAdmin,
-  accountType
+  accountType,
+  isInDebt = true
 ) => {
   const items = [
     {
@@ -24,6 +25,16 @@ export const shopSidenavItems = (
       href: `/shops`,
       text: `Back to shops`,
       icon: <Icon i="arrow-left" size={18} />,
+    },
+    isInDebt && {
+      type: "divider",
+    },
+    isInDebt && {
+      type: "item",
+      text: <span className={"text-danger"}>Negative Balance</span>,
+      active: activeText === "In Debt",
+      href: `/shops/${shopId}/billing`,
+      icon: <Icon i="credit-card-off" size={18} color="#d63939" />,
     },
     {
       type: "divider",
@@ -56,21 +67,11 @@ export const shopSidenavItems = (
       href: `/shops/${shopId}/resources`,
       icon: <Icon i="brand-databricks" size={18} />,
     },
-  ];
+  ].filter(Boolean);
 
   if (accountType !== "CUSTOMER" || isGlobalAdmin) {
     items.push({
       type: "divider",
-    });
-  }
-
-  if (accountType === "ADMIN" || accountType === "OPERATOR" || isGlobalAdmin) {
-    items.push({
-      type: "item",
-      href: `/shops/${shopId}/tasks`,
-      text: "Tasks",
-      active: activeText === "Tasks",
-      icon: <Icon i="box" size={18} />,
     });
   }
 
@@ -111,7 +112,15 @@ export const ShopPage = () => {
 
   if (loading)
     return (
-      <Page sidenavItems={shopSidenavItems("Home", shopId, false)}>
+      <Page
+        sidenavItems={shopSidenavItems(
+          "Home",
+          shopId,
+          false,
+          userShop.accountType,
+          userShop.balance < 0
+        )}
+      >
         <Loading />
       </Page>
     );
@@ -124,7 +133,8 @@ export const ShopPage = () => {
         "Home",
         shopId,
         user.admin,
-        userShop.accountType
+        userShop.accountType,
+        userShop.balance < 0
       )}
     >
       <Util.Row style={{ justifyContent: "space-between" }}>

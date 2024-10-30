@@ -2,7 +2,7 @@ import React from "react";
 import { Page } from "../../../../../components/page/page";
 import { sidenavItems } from ".";
 import { Link, useParams } from "react-router-dom";
-import { useJob, useJobItem } from "../../../../../hooks";
+import { useAuth, useJob, useJobItem, useShop } from "../../../../../hooks";
 import { Loading } from "../../../../../components/loading/Loading";
 import { Card, Typography, Util } from "tabler-react-2";
 import { ProjectWideEditCosting } from "../../../../../components/jobitem/ProjectWideEditCosting";
@@ -28,6 +28,7 @@ export const JobCostingPage = () => {
     opLoading,
     ConfirmModal,
   } = useJob(shopId, jobId);
+  const { userShop } = useShop(shopId);
 
   const { confirm, ConfirmModal: ConfirmFinalizeModal } = useConfirm({
     title: "Finalize job",
@@ -63,7 +64,9 @@ export const JobCostingPage = () => {
             {opLoading ? (
               <Spinner />
             ) : (
-              <Price value={calculateTotalCostOfJob(job)} icon />
+              <>
+                <Price value={calculateTotalCostOfJob(job)} icon />
+              </>
             )}
             {!job.finalized && (
               <Button
@@ -72,12 +75,13 @@ export const JobCostingPage = () => {
                   const result = await confirm();
                   if (result) updateJob({ finalized: true });
                 }}
+                loading={opLoading}
               >
                 Finalize job
               </Button>
             )}
           </Util.Row>
-          {job.finalized && (
+          {job.finalized ? (
             <>
               <Link
                 onClick={() =>
@@ -90,6 +94,18 @@ export const JobCostingPage = () => {
                 <Icon i="download" /> Download invoice
               </Link>
             </>
+          ) : (
+            calculateTotalCostOfJob(job) > userShop?.balance && (
+              <>
+                <Util.Spacer size={1} />
+                <span className="text-danger">
+                  <Icon i="alert-triangle" /> Insufficient balance: This job
+                  will put the customer's account into a negative balance. You
+                  can still finalize the job, but the customer will need to
+                  refill their account before they can place another order.
+                </span>
+              </>
+            )
           )}
         </Card>
       </Util.Responsive>

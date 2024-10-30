@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import styles from "./Header.module.css";
-import logo from "../../assets/slucam-logo-color.png";
+import logo from "../../assets/sluop-logo.png";
 import { Dropdown } from "tabler-react-2/dist/dropdown";
 import { Icon } from "../../util/Icon";
 import { useShop } from "../../hooks/index";

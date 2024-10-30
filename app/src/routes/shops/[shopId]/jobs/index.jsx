@@ -160,6 +160,7 @@ export const Jobs = () => {
     "Submitter",
     "Description",
     "Total Cost",
+    "Affordability",
     "Items",
     "Progress",
     "Status",
@@ -190,7 +191,8 @@ export const Jobs = () => {
           "Jobs",
           shopId,
           user.admin,
-          userShop.accountType
+          userShop.accountType,
+          userShop.balance < 0
         )}
       >
         <Loading />
@@ -349,7 +351,8 @@ export const Jobs = () => {
         "Jobs",
         shopId,
         user.admin,
-        userShop.accountType
+        userShop.accountType,
+        userShop.balance < 0
       )}
     >
       <Util.Row justify="between" align="center">
@@ -417,6 +420,20 @@ export const Jobs = () => {
                   </Util.Row>
                 ),
                 sortable: true,
+              },
+              {
+                label: "Affordability",
+                accessor: "totalCost",
+                render: (d) =>
+                  d > userShop.balance ? (
+                    <Badge color="red" soft>
+                      Insufficient Funds
+                    </Badge>
+                  ) : (
+                    <Badge color="green" soft>
+                      Sufficient Funds
+                    </Badge>
+                  ),
               },
               {
                 label: "Items",

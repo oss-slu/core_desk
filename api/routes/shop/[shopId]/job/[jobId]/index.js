@@ -196,7 +196,7 @@ export const put = [
             userId: job.userId,
             invoiceUrl: url,
             invoiceKey: key,
-            value: value,
+            value: value * -1,
             type: LedgerItemType.JOB,
           },
         });
