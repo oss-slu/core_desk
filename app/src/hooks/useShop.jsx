@@ -1,21 +1,33 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 
-export const useShop = (shopId) => {
+export const useShop = (shopId, options) => {
+  const includeUsers = options?.includeUsers || false;
   const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [shop, setShop] = useState({});
   const [userShop, setUserShop] = useState({});
+  const [users, setUsers] = useState([]);
 
   const fetchShop = async () => {
     try {
       setLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}`);
+      const r = await authFetch(
+        `/api/shop/${shopId}${includeUsers ? "?includeUsers=true" : ""}`
+      );
       const data = await r.json();
-      setShop(data.shop);
-      setUserShop(data.userShop);
-      setLoading(false);
+      if (data.shop) {
+        setShop(data.shop);
+        setUserShop(data.userShop);
+        if (data.users) {
+          setUsers(data.users);
+        }
+        setLoading(false);
+      } else {
+        setError(data);
+        setLoading(false);
+      }
     } catch (error) {
       setError(error);
       setLoading(false);
@@ -49,6 +61,7 @@ export const useShop = (shopId) => {
 
   return {
     shop,
+    users,
     userShop,
     loading,
     error,

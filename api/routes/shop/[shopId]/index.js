@@ -34,19 +34,100 @@ export const get = [
         },
       });
 
-      const userBalance = await prisma.ledgerItem.aggregate({
-        where: {
-          userId: req.user.id,
-          shopId: shop.id,
-        },
-        _sum: {
-          value: true,
-        },
-      });
+      if (userShop) {
+        const userBalance = await prisma.ledgerItem.aggregate({
+          where: {
+            userId: req.user.id,
+            shopId: shop.id,
+          },
+          _sum: {
+            value: true,
+          },
+        });
 
-      userShop.balance = userBalance._sum.value || 0;
+        userShop.balance = userBalance._sum.value || 0;
+      }
 
-      res.json({ shop, userShop });
+      let users;
+      if (req.query.includeUsers && req.query.includeUsers === "true") {
+        if (
+          !(
+            userShop.accountType === "ADMIN" ||
+            userShop.accountType === "OPERATOR" ||
+            req.user.admin
+          )
+        ) {
+          return res.status(400).json({ error: "Forbidden" });
+        }
+
+        users = await prisma.userShop.findMany({
+          where: {
+            shopId: shop.id,
+          },
+          include: {
+            user: {
+              include: {
+                ledgerItems: {
+                  select: {
+                    value: true,
+                  },
+                },
+                jobs: {
+                  select: {
+                    status: true,
+                  },
+                },
+              },
+            },
+          },
+        });
+
+        users = users.map((userShop) => {
+          const jobCounts = userShop.user.jobs.reduce(
+            (acc, job) => {
+              switch (job.status) {
+                case "COMPLETED":
+                  acc.completedCount += 1;
+                  break;
+                case "IN_PROGRESS":
+                  acc.inProgressCount += 1;
+                  break;
+                case "NOT_STARTED":
+                  acc.notStartedCount += 1;
+                  break;
+                default:
+                  acc.excludedCount += 1;
+                  break;
+              }
+              return acc;
+            },
+            {
+              completedCount: 0,
+              inProgressCount: 0,
+              notStartedCount: 0,
+              excludedCount: 0,
+            }
+          );
+
+          return {
+            ...userShop,
+            user: {
+              ...userShop.user,
+              name: `${userShop.user.firstName} ${userShop.user.lastName}`,
+              balance: userShop.user.ledgerItems.reduce(
+                (acc, item) => acc + item.value,
+                0
+              ),
+              jobCounts,
+              totalJobs: userShop.user.jobs.length,
+              ledgerItems: undefined,
+              jobs: undefined,
+            },
+          };
+        });
+      }
+
+      res.json({ shop, userShop, users });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Something went wrong" });
