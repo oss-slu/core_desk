@@ -154,6 +154,10 @@ model Shop {
   description String? @db.MediumText
   imageUrl    String?
 
+  logoUrl String?
+  logoKey String?
+  logoName String?
+
   color Color?
 
   logs  logs[]

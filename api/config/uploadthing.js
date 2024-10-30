@@ -149,6 +149,29 @@ export const uploadRouter = {
           return { ...metadata, userId: user.id, scope };
         }
       }
+
+      if (scope === "shop.logo") {
+        const { shopId } = metadata;
+
+        if (user.admin) {
+          return { ...metadata, userId: user.id, scope };
+        }
+
+        const userShop = await prisma.userShop.findFirst({
+          where: {
+            userId: user.id,
+            shopId,
+          },
+        });
+
+        if (!userShop) {
+          throw new UploadThingError("You do not have access to this shop");
+        }
+
+        if (userShop.accountType === "ADMIN") {
+          return { ...metadata, userId: user.id, scope };
+        }
+      }
     })
     .onUploadComplete((data) => {
       data;

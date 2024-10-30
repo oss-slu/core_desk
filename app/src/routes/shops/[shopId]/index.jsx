@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Page } from "../../../components/page/page";
 import { useAuth } from "../../../hooks/useAuth";
 import { Loading } from "../../../components/loading/Loading";
-import { Typography, Util } from "tabler-react-2";
+import { Typography, Util, Input } from "tabler-react-2";
 import { Icon } from "../../../util/Icon";
 import { useParams } from "react-router-dom";
-const { H1, H2 } = Typography;
+const { H1, H2, H3 } = Typography;
 import { useShop } from "../../../hooks/useShop";
 import { Button } from "tabler-react-2/dist/button";
 import { MarkdownRender } from "../../../components/markdown/MarkdownRender";
 import { MarkdownEditor } from "../../../components/markdown/MarkdownEditor";
 import { NotFound } from "../../../components/404/404";
+import { UploadDropzone } from "../../../components/upload/uploader";
 
 export const shopSidenavItems = (
   activeText,
@@ -106,9 +107,18 @@ export const shopSidenavItems = (
 export const ShopPage = () => {
   const { user, loading } = useAuth();
   const { shopId } = useParams();
-  const { shop, userShop, updateShop, opLoading } = useShop(shopId);
+  const {
+    shop,
+    userShop,
+    updateShop,
+    opLoading,
+    refetch: refetchShop,
+  } = useShop(shopId);
   const [editing, setEditing] = useState(false);
-  const [newDescription, setNewDescription] = useState(shop?.description);
+  const [newShop, setNewShop] = useState(shop);
+  useEffect(() => {
+    setNewShop(shop);
+  }, [shop]);
 
   if (loading)
     return (
@@ -137,7 +147,7 @@ export const ShopPage = () => {
         userShop.balance < 0
       )}
     >
-      <Util.Row style={{ justifyContent: "space-between" }}>
+      <Util.Row justify="between" align="center">
         <H1>{shop.name}</H1>
         {user.admin || userShop.accountType === "ADMIN"
           ? !editing && (
@@ -151,11 +161,10 @@ export const ShopPage = () => {
       {editing ? (
         <>
           <Util.Row style={{ justifyContent: "space-between" }}>
-            <H2>Editing shop description</H2>
+            <H2>Editing</H2>
             <Button
               onClick={async () => {
-                console.log(newDescription);
-                await updateShop({ description: newDescription });
+                await updateShop(newShop);
                 setEditing(false);
               }}
               loading={opLoading}
@@ -163,13 +172,33 @@ export const ShopPage = () => {
               Save
             </Button>
           </Util.Row>
-          <Util.Spacer size={1} />
-          <MarkdownEditor
-            value={shop.description || ""}
-            onChange={(description) => {
-              setNewDescription(description);
-            }}
-          />
+          <Util.Col gap={1}>
+            <div>
+              <label className="form-label">Logo</label>
+              <UploadDropzone
+                scope="shop.logo"
+                metadata={{
+                  shopId: shopId,
+                }}
+                onUploadComplete={() => document.location.reload()}
+              />
+            </div>
+            <Input
+              value={newShop.name}
+              onChange={(e) => setNewShop({ ...newShop, name: e })}
+              placeholder="Your Shop's Name"
+              label="Shop Name"
+            />
+            <div>
+              <label className="form-label">Description</label>
+              <MarkdownEditor
+                value={newShop.description || ""}
+                onChange={(description) => {
+                  setNewShop({ ...newShop, description });
+                }}
+              />
+            </div>
+          </Util.Col>
         </>
       ) : (
         <>

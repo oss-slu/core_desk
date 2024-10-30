@@ -147,11 +147,13 @@ export const Billing = () => {
             label: "Date",
             accessor: "createdAt",
             render: (date) => moment(date).format("MM/DD/YY h:mm a"),
+            sortable: true,
           },
           {
             label: "Amount",
             accessor: "value",
             render: (amount) => <Price value={amount} icon />,
+            sortable: true,
           },
           {
             label: "Job",
@@ -188,6 +190,7 @@ export const Billing = () => {
             label: "Type",
             accessor: "type",
             render: (type) => <>{switchTypeForBadge(type)}</>,
+            sortable: true,
           },
         ]}
         data={ledger}

@@ -27,7 +27,15 @@ export const Header = () => {
       <div className={styles.headerGroup}>
         <img src={logo} className={styles.headerLogo} alt="SLUCAM Logo" />
         <h1 className={classNames(styles.headerTitle, "hos-600")}>
-          {shop?.name}
+          {shop?.logoUrl ? (
+            <img
+              src={shop?.logoUrl}
+              className={styles.headerLogo}
+              alt={shop?.name}
+            />
+          ) : (
+            shop?.name
+          )}
         </h1>
       </div>
       <Dropdown

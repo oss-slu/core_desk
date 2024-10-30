@@ -7,4 +7,5 @@ export const SHOP_SELECT = {
   description: true,
   imageUrl: true,
   color: true,
+  logoUrl: true,
 };

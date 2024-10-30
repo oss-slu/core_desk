@@ -1,5 +1,6 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "../../util/prisma.js";
+import { utapi } from "../../config/uploadthing.js";
 
 export const post = async (req, res) => {
   const { jobId, shopId, userId, scope, resourceId, materialId } =
@@ -195,6 +196,35 @@ export const post = async (req, res) => {
     });
 
     return res.json({ material });
+  }
+
+  if (scope === "shop.logo") {
+    const shop = await prisma.shop.findFirst({
+      where: {
+        id: shopId,
+      },
+    });
+
+    if (!shop) {
+      return res.status(404).json({
+        error: "Not found",
+      });
+    }
+
+    if (shop.logoKey) {
+      await utapi.deleteFiles([shop.logoKey]);
+    }
+
+    await prisma.shop.update({
+      where: {
+        id: shopId,
+      },
+      data: {
+        logoKey: req.body.file.key,
+        logoName: req.body.file.name,
+        logoUrl: req.body.file.url,
+      },
+    });
   }
 
   return res.status(404).json({ error: "Not found" });

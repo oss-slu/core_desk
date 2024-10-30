@@ -122,7 +122,7 @@ app.use(
     router: uploadRouter,
     config: {
       token: process.env.UPLOADTHING_TOKEN,
-      callbackUrl: process.env.TUNNEL_URL + "/api/files/callback",
+      callbackUrl: process.env.SERVER_URL + "/api/files/callback",
     },
   })
 );
