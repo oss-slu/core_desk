@@ -1309,20 +1309,13 @@
     react-devtools-inline "4.4.0"
     react-is "^17.0.2"
 
-"@effect/platform@0.63.2":
-  version "0.63.2"
-  resolved "https://registry.npmjs.org/@effect/platform/-/platform-0.63.2.tgz"
-  integrity sha512-b39pVFw0NGo/tXjGShW7Yg0M+kG7bRrFR6+dQ3aIu99ePTkTp6bGb/kDB7n+dXsFFdIqHsQGYESeYcOQngxdFQ==
+"@effect/platform@0.69.8":
+  version "0.69.8"
+  resolved "https://registry.yarnpkg.com/@effect/platform/-/platform-0.69.8.tgz#9f14bfdac392d16206cd507a2b814718e2bb8b06"
+  integrity sha512-zhBhg0c1MHMMo+grOc/6wC2/3UETLroruwrYNZ89uDtXl6EOcP5alFP+vW3NToKDA2o0hRh22KNqq4aixA7xXg==
   dependencies:
     find-my-way-ts "^0.1.5"
     multipasta "^0.2.5"
-
-"@effect/schema@0.72.2":
-  version "0.72.2"
-  resolved "https://registry.npmjs.org/@effect/schema/-/schema-0.72.2.tgz"
-  integrity sha512-/x1BIA2pqcUidNrOMmwYe6Z58KtSgHSc5iJu7bNwIxi2LHMVuUao1BvpI5x6i7T/zkoi4dd1S6qasZzJIYDjdw==
-  dependencies:
-    fast-check "^3.21.0"
 
 "@esbuild/aix-ppc64@0.21.5":
   version "0.21.5"
@@ -2608,6 +2601,11 @@
   resolved "https://registry.npmjs.org/@uploadthing/mime-types/-/mime-types-0.3.0.tgz"
   integrity sha512-jN/XFvpKTzcd3MXT/9D9oxx05scnYiSYxAXF/e6hyg377zFducRxivU/kHyYTkpUZPTmOL5q9EQbOkUsXMlSMg==
 
+"@uploadthing/mime-types@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@uploadthing/mime-types/-/mime-types-0.3.1.tgz#b158cb87570c890b24df2bfd620c2f1981feceac"
+  integrity sha512-CaEadjn33CzPSLRaU8uL8IRv8MpW9xU5Rg/R45T5In8608dzovDDk0uQ9jzmmLYU5hHt+4v2qugcG/jirm/KEA==
+
 "@uploadthing/react@^7.0.3":
   version "7.0.3"
   resolved "https://registry.npmjs.org/@uploadthing/react/-/react-7.0.3.tgz"
@@ -2623,6 +2621,15 @@
   dependencies:
     "@uploadthing/mime-types" "0.3.0"
     effect "3.7.2"
+    sqids "^0.3.0"
+
+"@uploadthing/shared@7.1.0":
+  version "7.1.0"
+  resolved "https://registry.yarnpkg.com/@uploadthing/shared/-/shared-7.1.0.tgz#11f8e93f3a140fe46c85055e3d3ff8d1e2348fd0"
+  integrity sha512-6cdS2hq9jUJFU/tqRKHs5XsDIwc6HdaVI4ka0vRy+IwjPnQBR0iXHwqyCtNNssCCAq4zQxrZr3iNEDPNqc0dqw==
+  dependencies:
+    "@uploadthing/mime-types" "0.3.1"
+    effect "3.10.3"
     sqids "^0.3.0"
 
 "@vitejs/plugin-react@^4.3.2":
@@ -3204,6 +3211,13 @@ draco3d@^1.4.1:
   version "1.5.7"
   resolved "https://registry.npmjs.org/draco3d/-/draco3d-1.5.7.tgz"
   integrity sha512-m6WCKt/erDXcw+70IJXnG7M3awwQPAsZvJGX5zY7beBqpELw6RDGkYVU0W43AFxye4pDZ5i2Lbyc/NNGqwjUVQ==
+
+effect@3.10.3:
+  version "3.10.3"
+  resolved "https://registry.yarnpkg.com/effect/-/effect-3.10.3.tgz#cebf04d736ccc588a96dcf9e9cb31320e0ca2f9e"
+  integrity sha512-+Z5bUhzTeqYlfoPsfXMZG1pYadqLBKARD3xwMIoEAESsOhKFOrUsHHNCy2ZZW3/6oa4wokgT01k1zavA4BAQ4w==
+  dependencies:
+    fast-check "^3.21.0"
 
 effect@3.7.2:
   version "3.7.2"
@@ -6059,16 +6073,15 @@ update-browserslist-db@^1.1.0:
     escalade "^3.2.0"
     picocolors "^1.1.0"
 
-uploadthing@^7.1.0:
-  version "7.1.0"
-  resolved "https://registry.npmjs.org/uploadthing/-/uploadthing-7.1.0.tgz"
-  integrity sha512-l1bRHs+q/YLx3XwBav98t4Bl1wLWaskhPEwopxtYgiRrxX5nW3uUuSP0RJ9eKwx0+6ZhHWxHDvShf7ZLledqmQ==
+uploadthing@^7.2.0:
+  version "7.2.0"
+  resolved "https://registry.yarnpkg.com/uploadthing/-/uploadthing-7.2.0.tgz#762dd334bf4a1dbb664aecaee5c29c4f55579c50"
+  integrity sha512-x7UAumRF/o+zAkHDP8Re7Qzi3pQF44BZkpsDdubjOE5lNcLw5RQD8WzUPwXKR0hsWEZcR4uoB8LNEDIHT7lAHw==
   dependencies:
-    "@effect/platform" "0.63.2"
-    "@effect/schema" "0.72.2"
-    "@uploadthing/mime-types" "0.3.0"
-    "@uploadthing/shared" "7.0.3"
-    effect "3.7.2"
+    "@effect/platform" "0.69.8"
+    "@uploadthing/mime-types" "0.3.1"
+    "@uploadthing/shared" "7.1.0"
+    effect "3.10.3"
 
 uri-js@^4.2.2:
   version "4.4.1"

@@ -2358,7 +2358,7 @@ unpipe@1.0.0, unpipe@~1.0.0:
   resolved "https://registry.yarnpkg.com/unpipe/-/unpipe-1.0.0.tgz#b2bf4ee8514aae6165b4817829d21b2ef49904ec"
   integrity sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==
 
-uploadthing@^7.1.0:
+uploadthing@^7.2.0:
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/uploadthing/-/uploadthing-7.2.0.tgz#762dd334bf4a1dbb664aecaee5c29c4f55579c50"
   integrity sha512-x7UAumRF/o+zAkHDP8Re7Qzi3pQF44BZkpsDdubjOE5lNcLw5RQD8WzUPwXKR0hsWEZcR4uoB8LNEDIHT7lAHw==
