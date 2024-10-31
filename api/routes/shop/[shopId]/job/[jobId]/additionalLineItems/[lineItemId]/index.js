@@ -160,6 +160,9 @@ export const put = [
       delete req.body.shopId;
       delete req.body.createdAt;
       delete req.body.active;
+      delete req.body.resourceType;
+      delete req.body.resource;
+      delete req.body.material;
 
       const updatedLineItem = await prisma.additionalCostLineItem.update({
         where: {
