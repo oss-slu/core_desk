@@ -116,6 +116,8 @@ app.post(
 
 app.use(express.json());
 
+console.log("CALLBACK URL", process.env.SERVER_URL + "/api/files/callback");
+
 app.use(
   "/api/files/upload",
   createRouteHandler({
