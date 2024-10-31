@@ -62,7 +62,7 @@ export const useJob = (shopId, jobId) => {
 
   useEffect(() => {
     fetchJob();
-  }, []);
+  }, [shopId, jobId]);
 
   return {
     job,

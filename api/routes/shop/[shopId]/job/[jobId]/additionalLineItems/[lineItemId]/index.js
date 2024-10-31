@@ -45,6 +45,26 @@ export const get = [
           id: req.params.lineItemId,
           active: true,
         },
+        include: {
+          resourceType: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          resource: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          material: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+        },
       });
 
       return res.json({ lineItem });
@@ -93,11 +113,41 @@ export const put = [
         return res.status(400).json({ error: "Job not found" });
       }
 
+      if (
+        !(
+          req.user.admin ||
+          userShop.accountType === "ADMIN" ||
+          userShop.accountType === "OPERATOR"
+        )
+      ) {
+        return res.status(400).json({ error: "Unauthorized" });
+      }
+
       const lineItem = await prisma.additionalCostLineItem.findFirst({
         where: {
           jobId: job.id,
           id: req.params.lineItemId,
           active: true,
+        },
+        include: {
+          resourceType: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          resource: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          material: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
         },
       });
 

@@ -8,8 +8,10 @@ import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import {
   useAdditionalLineItem,
   useAdditionalLineItems,
+  useAuth,
   useMaterial,
   useResource,
+  useShop,
 } from "../../hooks";
 import { useParams } from "react-router-dom";
 import { Spinner } from "tabler-react-2/dist/spinner";
@@ -23,6 +25,7 @@ export const ProjectWideEditCosting = ({
   job: initialJob,
   loading,
   updateJob,
+  refetchJob,
 }) => {
   const [job, setJob] = useState(initialJob);
   const {
@@ -34,6 +37,13 @@ export const ProjectWideEditCosting = ({
   useEffect(() => {
     setJob(initialJob);
   }, [initialJob]);
+  const { user } = useAuth();
+  const { userShop } = useShop();
+
+  const userIsPrivileged =
+    user?.admin ||
+    userShop?.accountType === "ADMIN" ||
+    userShop?.accountType === "OPERATOR";
 
   return (
     <>
@@ -41,45 +51,62 @@ export const ProjectWideEditCosting = ({
         <Util.Row align="center" justify="between">
           <H2>Project-wide costing</H2>
         </Util.Row>
-        <Switch
-          label="Override or add to project-wide cost"
-          value={job.additionalCostOverride}
-          onChange={(value) => {
-            // setJob({ ...job, additionalCostOverride: value });
-            updateJob({
-              additionalCostOverride: value,
-            });
-          }}
-          loading={loading}
-        />
-        <p>
-          {job.additionalCostOverride
-            ? "You are overriding the project-wide cost"
-            : "You are adding to the project-wide cost"}
-        </p>
+
+        {userIsPrivileged && (
+          <Switch
+            label="Override or add to project-wide cost"
+            value={job.additionalCostOverride}
+            onChange={(value) => {
+              // setJob({ ...job, additionalCostOverride: value });
+              updateJob({
+                additionalCostOverride: value,
+              });
+            }}
+            loading={loading}
+          />
+        )}
+        {userIsPrivileged ? (
+          <p>
+            {job.additionalCostOverride
+              ? "You are overriding the item-based cost"
+              : "You are adding to the item-based cost"}
+          </p>
+        ) : (
+          <p>
+            {job.additionalCostOverride
+              ? "Additional costs override the item-based cost"
+              : "Additional costs are in addition to the item-based cost"}
+          </p>
+        )}
         {lineItems?.length > 0 ? (
           <div>
             {lineItems.map((additionalCost) => (
               <>
                 <CostCard
+                  refetchJob={refetchJob}
                   lineItemId={additionalCost.id}
                   key={additionalCost.id}
                   refetchLineItems={fetchLineItems}
                   jobFinalized={job.finalized}
+                  userIsPrivileged={userIsPrivileged}
                 />
                 <Util.Spacer size={1} />
               </>
             ))}
-            <Button onClick={createLineItem} loading={createOpLoading}>
-              Add another additional cost
-            </Button>
+            {userIsPrivileged && (
+              <Button onClick={createLineItem} loading={createOpLoading}>
+                Add another additional cost
+              </Button>
+            )}
           </div>
         ) : (
           <Card>
-            <p>There are no additional costs for this job</p>
-            <Button onClick={createLineItem} loading={createOpLoading}>
-              Add additional cost
-            </Button>
+            <p>There are no additional costs for this job.</p>
+            {userIsPrivileged && (
+              <Button onClick={createLineItem} loading={createOpLoading}>
+                Add additional cost
+              </Button>
+            )}
           </Card>
         )}
       </Util.Col>
@@ -87,7 +114,13 @@ export const ProjectWideEditCosting = ({
   );
 };
 
-const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
+const CostCard = ({
+  lineItemId,
+  refetchLineItems,
+  jobFinalized,
+  userIsPrivileged,
+  refetchJob,
+}) => {
   const { shopId, jobId } = useParams();
   const { lineItem, updateLineItem, deleteLineItem, opLoading, ConfirmModal } =
     useAdditionalLineItem(shopId, jobId, lineItemId, jobFinalized);
@@ -121,9 +154,9 @@ const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
     );
   };
 
-  const handleSave = () => {
-    updateLineItem(localLineItem);
-    // console.log(localLineItem);
+  const handleSave = async () => {
+    await updateLineItem(localLineItem);
+    refetchJob(false);
   };
 
   return (
@@ -132,36 +165,63 @@ const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
       <Util.Col gap={1}>
         <Util.Row gap={1} align="start">
           <Util.Col gap={1}>
-            <ResourceTypePicker
-              value={localLineItem.resourceTypeId}
-              onChange={(value) =>
-                setLocalLineItem({
-                  ...localLineItem,
-                  resourceTypeId: value,
-                  resourceId: null,
-                  materialId: null,
-                })
-              }
-              loading={opLoading}
-            />
+            {userIsPrivileged ? (
+              <ResourceTypePicker
+                value={localLineItem.resourceTypeId}
+                onChange={(value) =>
+                  setLocalLineItem({
+                    ...localLineItem,
+                    resourceTypeId: value,
+                    resourceId: null,
+                    materialId: null,
+                  })
+                }
+                loading={opLoading}
+              />
+            ) : (
+              <>
+                <span className="form-label mb-0">Resource Type</span>
+                <span>
+                  <Badge soft>{localLineItem.resourceType?.title}</Badge>
+                </span>
+              </>
+            )}
             {localLineItem.resourceTypeId ? (
               <Util.Row gap={1}>
-                <ResourcePicker
-                  value={localLineItem.resourceId}
-                  resourceTypeId={localLineItem.resourceTypeId}
-                  onChange={(value) =>
-                    setLocalLineItem({ ...localLineItem, resourceId: value })
-                  }
-                  loading={opLoading}
-                />
-                <MaterialPicker
-                  value={localLineItem.materialId}
-                  resourceTypeId={localLineItem.resourceTypeId}
-                  onChange={(value) =>
-                    setLocalLineItem({ ...localLineItem, materialId: value })
-                  }
-                  loading={opLoading}
-                />
+                {userIsPrivileged ? (
+                  <ResourcePicker
+                    value={localLineItem.resourceId}
+                    resourceTypeId={localLineItem.resourceTypeId}
+                    onChange={(value) =>
+                      setLocalLineItem({ ...localLineItem, resourceId: value })
+                    }
+                    loading={opLoading}
+                  />
+                ) : (
+                  <Util.Col gap={1}>
+                    <span className="form-label mb-0">Resource</span>
+                    <span>
+                      <Badge soft>{localLineItem.resource?.title}</Badge>
+                    </span>
+                  </Util.Col>
+                )}
+                {userIsPrivileged ? (
+                  <MaterialPicker
+                    value={localLineItem.materialId}
+                    resourceTypeId={localLineItem.resourceTypeId}
+                    onChange={(value) =>
+                      setLocalLineItem({ ...localLineItem, materialId: value })
+                    }
+                    loading={opLoading}
+                  />
+                ) : (
+                  <Util.Col gap={1}>
+                    <span className="form-label mb-0">Material</span>
+                    <span>
+                      <Badge soft>{localLineItem.material?.title}</Badge>
+                    </span>
+                  </Util.Col>
+                )}
               </Util.Row>
             ) : (
               <i style={{ alignSelf: "center" }}>
@@ -170,16 +230,18 @@ const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
             )}
           </Util.Col>
           <div style={{ flex: 1 }} />
-          <Button
-            color="danger"
-            outline
-            size="sm"
-            onClick={() => deleteLineItem(refetchLineItems)}
-            loading={opLoading}
-          >
-            <Icon i="trash" />
-            Delete line item
-          </Button>
+          {userIsPrivileged && (
+            <Button
+              color="danger"
+              outline
+              size="sm"
+              onClick={() => deleteLineItem(refetchLineItems)}
+              loading={opLoading}
+            >
+              <Icon i="trash" />
+              Delete line item
+            </Button>
+          )}
         </Util.Row>
         <Util.Col gap={1}>
           <H3>Line Item Quantities</H3>
@@ -205,6 +267,7 @@ const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
                     onChange={(value) =>
                       setLocalLineItem({ ...localLineItem, timeQty: value })
                     }
+                    showInput={userIsPrivileged}
                   />
                   <TimeInput
                     label="Processing Time (hr:mm)"
@@ -216,6 +279,7 @@ const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
                         processingTimeQty: value,
                       })
                     }
+                    showInput={userIsPrivileged}
                   />
                   <QuantityInput
                     label="Unit runs"
@@ -225,6 +289,7 @@ const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
                     onChange={(value) =>
                       setLocalLineItem({ ...localLineItem, unitQty: value })
                     }
+                    showInput={userIsPrivileged}
                   />
                   <QuantityInput
                     label={`Material quantity in ${material.unitDescriptor}s`}
@@ -234,6 +299,7 @@ const CostCard = ({ lineItemId, refetchLineItems, jobFinalized }) => {
                     onChange={(value) =>
                       setLocalLineItem({ ...localLineItem, materialQty: value })
                     }
+                    showInput={userIsPrivileged}
                   />
                   <Util.Row gap={1} align="center" justify="end">
                     <span className={styles.bottomLine}>

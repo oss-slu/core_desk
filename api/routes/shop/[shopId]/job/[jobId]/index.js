@@ -16,12 +16,14 @@ const JOB_INCLUDE = {
           costPerProcessingTime: true,
           costPerTime: true,
           costPerUnit: true,
+          title: true,
         },
       },
       material: {
         select: {
           costPerUnit: true,
           unitDescriptor: true,
+          title: true,
         },
       },
     },

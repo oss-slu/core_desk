@@ -60,13 +60,18 @@ export const useAdditionalLineItem = (
       if (updatedlineItem.lineItem) {
         setLineItem(updatedlineItem.lineItem);
         setOpLoading(false);
+        return true;
       } else {
         setError(updatedlineItem);
         setOpLoading(false);
+        fetchLineItem(false);
+        return false;
       }
     } catch (error) {
       setError(error);
       setOpLoading(false);
+      fetchLineItem(false);
+      return false;
     }
   };
 

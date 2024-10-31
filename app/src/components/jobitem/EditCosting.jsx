@@ -8,7 +8,12 @@ import { Time } from "../time/RenderTime";
 import { Button } from "tabler-react-2/dist/button";
 import Badge from "tabler-react-2/dist/badge";
 
-export const EditCosting = ({ item, onChange, loading }) => {
+export const EditCosting = ({
+  item,
+  onChange,
+  loading,
+  userIsPrivileged = false,
+}) => {
   const [newItem, setNewItem] = useState(item);
   const { modal, ModalElement } = useModal({ title: "Help", text: "" });
 
@@ -43,6 +48,7 @@ export const EditCosting = ({ item, onChange, loading }) => {
         costPerTime={newItem.resource.costPerTime}
         onChange={(value) => setNewItem({ ...newItem, timeQty: value })}
         modal={modal}
+        showInput={userIsPrivileged}
       />
       <TimeInput
         label="Processing Time (hr:mm)"
@@ -53,6 +59,7 @@ export const EditCosting = ({ item, onChange, loading }) => {
           setNewItem({ ...newItem, processingTimeQty: value })
         }
         modal={modal}
+        showInput={userIsPrivileged}
       />
       <QuantityInput
         label="Unit runs"
@@ -62,6 +69,7 @@ export const EditCosting = ({ item, onChange, loading }) => {
         icon={<Icon i="refresh" />}
         onChange={(value) => setNewItem({ ...newItem, unitQty: value })}
         modal={modal}
+        showInput={userIsPrivileged}
       />
       <QuantityInput
         label={`Material quantity in ${newItem.material.unitDescriptor}s`}
@@ -71,6 +79,7 @@ export const EditCosting = ({ item, onChange, loading }) => {
         icon={<Icon i="weight" />}
         onChange={(value) => setNewItem({ ...newItem, materialQty: value })}
         modal={modal}
+        showInput={userIsPrivileged}
       />
       <Util.Row gap={1} align="center" justify="between">
         {JSON.stringify(newItem) !== JSON.stringify(item) ? (
@@ -104,44 +113,49 @@ export const TimeInput = ({
   costPerTime,
   onChange,
   modal,
+  showInput = true,
 }) => (
   <>
     <Util.Row gap={1} align="center">
       <label className="form-label" style={{ marginBottom: 0 }}>
         {label} {helpText && <Help text={helpText} modal={modal} />}
       </label>
-      <Input
-        size="sm"
-        noMargin
-        placeholder="Hr"
-        style={{ minWidth: 40, maxWidth: 41 }}
-        value={Math.floor(timeQty || 0)}
-        onChange={(e) => {
-          const decimalPart = timeQty % 1 || 0;
-          let newTime = parseInt(e) + decimalPart;
-          if (newTime < 0 || isNaN(newTime)) newTime = 0;
-          onChange(newTime);
-        }}
-        type="number"
-        min={0}
-      />
-      :
-      <Input
-        size="sm"
-        noMargin
-        placeholder="Min"
-        style={{ minWidth: 40, maxWidth: 41 }}
-        value={Math.round((timeQty % 1 || 0) * 60)}
-        onChange={(e) => {
-          const hours = Math.floor(timeQty || 0);
-          const minutes = parseInt(e) / 60;
-          let newTime = hours + minutes;
-          if (newTime < 0 || isNaN(newTime)) newTime = 0;
-          onChange(newTime);
-        }}
-        type="number"
-        min={0}
-      />
+      {showInput && (
+        <>
+          <Input
+            size="sm"
+            noMargin
+            placeholder="Hr"
+            style={{ minWidth: 40, maxWidth: 41 }}
+            value={Math.floor(timeQty || 0)}
+            onChange={(e) => {
+              const decimalPart = timeQty % 1 || 0;
+              let newTime = parseInt(e) + decimalPart;
+              if (newTime < 0 || isNaN(newTime)) newTime = 0;
+              onChange(newTime);
+            }}
+            type="number"
+            min={0}
+          />
+          :
+          <Input
+            size="sm"
+            noMargin
+            placeholder="Min"
+            style={{ minWidth: 40, maxWidth: 41 }}
+            value={Math.round((timeQty % 1 || 0) * 60)}
+            onChange={(e) => {
+              const hours = Math.floor(timeQty || 0);
+              const minutes = parseInt(e) / 60;
+              let newTime = hours + minutes;
+              if (newTime < 0 || isNaN(newTime)) newTime = 0;
+              onChange(newTime);
+            }}
+            type="number"
+            min={0}
+          />
+        </>
+      )}
       <div style={{ flex: 1 }} />
       <Time value={timeQty} icon />
       <Icon i="x" />
@@ -161,25 +175,28 @@ export const QuantityInput = ({
   icon,
   onChange,
   modal,
+  showInput = true,
 }) => (
   <>
     <Util.Row gap={1} align="center">
       <label className="form-label" style={{ marginBottom: 0 }}>
         {label} {helpText && <Help text={helpText} modal={modal} />}
       </label>
-      <Input
-        size="sm"
-        noMargin
-        value={quantity || 0}
-        onChange={(e) => {
-          let val = parseFloat(e);
-          if (isNaN(val) || val < 0) val = 0;
-          onChange(val);
-        }}
-        type="number"
-        min={0}
-        style={{ minWidth: 100, maxWidth: 101 }}
-      />
+      {showInput && (
+        <Input
+          size="sm"
+          noMargin
+          value={quantity || 0}
+          onChange={(e) => {
+            let val = parseFloat(e);
+            if (isNaN(val) || val < 0) val = 0;
+            onChange(val);
+          }}
+          type="number"
+          min={0}
+          style={{ minWidth: 100, maxWidth: 101 }}
+        />
+      )}
       <div style={{ flex: 1 }} />
       {icon}
       <span>{quantity || 0}</span>

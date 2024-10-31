@@ -6,6 +6,7 @@ import { Button } from "tabler-react-2/dist/button";
 import { Avatar } from "tabler-react-2/dist/avatar";
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
+import { useAuth } from "../../hooks";
 const { H4 } = Typography;
 
 export const Comments = ({ jobId, shopId }) => {
@@ -50,6 +51,7 @@ String.prototype.capitalize = function () {
 };
 
 const Comment = ({ comment }) => {
+  const { user } = useAuth();
   return (
     <Card
       title={
@@ -69,6 +71,11 @@ const Comment = ({ comment }) => {
                 {comment.user.shops?.[0]?.accountType
                   .toLowerCase()
                   .capitalize()}
+              </Badge>
+            )}
+            {comment.userId === user.id && (
+              <Badge color="green" soft>
+                You
               </Badge>
             )}
           </Util.Row>

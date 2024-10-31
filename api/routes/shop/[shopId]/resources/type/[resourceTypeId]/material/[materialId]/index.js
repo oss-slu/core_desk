@@ -5,50 +5,55 @@ import { LogType } from "@prisma/client";
 export const get = [
   verifyAuth,
   async (req, res) => {
-    const { shopId } = req.params;
-    const userId = req.user.id;
-    const { materialId } = req.params;
+    try {
+      const { shopId } = req.params;
+      const userId = req.user.id;
+      const { materialId } = req.params;
 
-    const userShop = await prisma.userShop.findFirst({
-      where: {
-        shopId,
-        userId,
-        active: true,
-      },
-    });
+      const userShop = await prisma.userShop.findFirst({
+        where: {
+          shopId,
+          userId,
+          active: true,
+        },
+      });
 
-    if (!userShop) {
-      return res.status(400).json({ message: "Unauthorized" });
-    }
+      if (!userShop) {
+        return res.status(400).json({ message: "Unauthorized" });
+      }
 
-    const material = await prisma.material.findFirst({
-      where: {
-        id: materialId,
-        shopId,
-        active: true,
-      },
-      include: {
-        resourceType: true,
-        images: {
-          where: {
-            active: true,
+      const material = await prisma.material.findFirst({
+        where: {
+          id: materialId,
+          shopId,
+          active: true,
+        },
+        include: {
+          resourceType: true,
+          images: {
+            where: {
+              active: true,
+            },
           },
         },
-      },
-    });
+      });
 
-    if (
-      !req.user.admin &&
-      userShop.accountType !== "ADMIN" &&
-      userShop.accountType !== "OPERATOR"
-    ) {
-      if (!material.costPublic) {
-        delete material.costPerUnit;
-        delete material.unitDescriptor;
+      if (
+        !req.user.admin &&
+        userShop.accountType !== "ADMIN" &&
+        userShop.accountType !== "OPERATOR"
+      ) {
+        if (!material.costPublic) {
+          delete material.costPerUnit;
+          delete material.unitDescriptor;
+        }
       }
-    }
 
-    res.json({ material });
+      res.json({ material });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal server error" });
+    }
   },
 ];
 

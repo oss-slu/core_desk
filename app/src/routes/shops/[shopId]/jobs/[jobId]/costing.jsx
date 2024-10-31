@@ -28,7 +28,13 @@ export const JobCostingPage = () => {
     opLoading,
     ConfirmModal,
   } = useJob(shopId, jobId);
+  const { user } = useAuth();
   const { userShop } = useShop(shopId);
+
+  const userIsPrivileged =
+    user?.admin ||
+    userShop?.accountType === "ADMIN" ||
+    userShop?.accountType === "OPERATOR";
 
   const { confirm, ConfirmModal: ConfirmFinalizeModal } = useConfirm({
     title: "Finalize job",
@@ -68,7 +74,7 @@ export const JobCostingPage = () => {
                 <Price value={calculateTotalCostOfJob(job)} icon />
               </>
             )}
-            {!job.finalized && (
+            {!job.finalized && userIsPrivileged && (
               <Button
                 color="primary"
                 onClick={async () => {
@@ -95,7 +101,8 @@ export const JobCostingPage = () => {
               </Link>
             </>
           ) : (
-            calculateTotalCostOfJob(job) > userShop?.balance && (
+            calculateTotalCostOfJob(job) > userShop?.balance &&
+            userIsPrivileged && (
               <>
                 <Util.Spacer size={1} />
                 <span className="text-danger">
@@ -116,6 +123,7 @@ export const JobCostingPage = () => {
             job={job}
             loading={jobLoading}
             updateJob={updateJob}
+            refetchJob={refetchJob}
           />
         </div>
         <div className={styles.section}>

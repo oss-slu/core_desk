@@ -56,7 +56,7 @@ export const switchStatusToUI = (status) => {
   }
 };
 
-export const JobItem = ({ item: _item, refetchJobs, admin }) => {
+export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
   const { shopId, jobId } = useParams();
 
   const { item, opLoading, updateJobItem, deleteJobItem } = useJobItem(
@@ -109,7 +109,7 @@ export const JobItem = ({ item: _item, refetchJobs, admin }) => {
                 >
                   <Icon i="download" size={20} />
                 </Button>
-                {admin && (
+                {userIsPrivileged && (
                   <Button
                     onClick={() => {
                       deleteJobItem(refetchJobs);
@@ -123,7 +123,7 @@ export const JobItem = ({ item: _item, refetchJobs, admin }) => {
                     <Icon i="trash" size={20} />
                   </Button>
                 )}
-                {admin ? (
+                {userIsPrivileged ? (
                   opLoading ? (
                     <Spinner />
                   ) : (
@@ -190,13 +190,24 @@ export const JobItem = ({ item: _item, refetchJobs, admin }) => {
                       opLoading={opLoading}
                       includeNone={true}
                     />
-                    <ResourcePicker
-                      value={item.resourceId}
-                      onChange={(value) => updateJobItem({ resourceId: value })}
-                      resourceTypeId={item.resourceTypeId}
-                      opLoading={opLoading}
-                      includeNone={true}
-                    />
+                    {userIsPrivileged ? (
+                      <ResourcePicker
+                        value={item.resourceId}
+                        onChange={(value) =>
+                          updateJobItem({ resourceId: value })
+                        }
+                        resourceTypeId={item.resourceTypeId}
+                        opLoading={opLoading}
+                        includeNone={true}
+                      />
+                    ) : (
+                      <Util.Col gap={1}>
+                        <label className="form-label mb-0">Resource</label>
+                        <Badge color="blue" soft>
+                          {item.resource?.title}
+                        </Badge>
+                      </Util.Col>
+                    )}
                   </Util.Col>
                 ) : (
                   <i>Select a resource type to see more options</i>
