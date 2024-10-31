@@ -1,5 +1,5 @@
 # Base image for frontend and backend
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Accept build-time arguments
 ARG DATABASE_URL
