@@ -6,6 +6,8 @@ export const post = async (req, res) => {
   const { jobId, shopId, userId, scope, resourceId, materialId } =
     req.body.metadata;
 
+  console.log(req.body.metadata);
+
   if (scope === "job.fileupload") {
     console.log("job.fileupload");
     const job = await prisma.job.findFirst({
