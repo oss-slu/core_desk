@@ -10,7 +10,6 @@ export const useShops = () => {
 
   const fetchShops = async (shouldSetLoading = true) => {
     try {
-      console.log(shouldSetLoading);
       shouldSetLoading && setLoading(true);
       const r = await authFetch("/api/shop");
       const data = await r.json();

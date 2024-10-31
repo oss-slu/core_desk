@@ -23,12 +23,6 @@ export const get = [
         req.user.id === userId
       )
     ) {
-      console.log(
-        !req.user.admin,
-        userShop.accountType !== "ADMIN",
-        userShop.accountType !== "OPERATOR",
-        req.user.id !== userId
-      );
       return res.status(400).json({ error: "Unauthorized" });
     }
 

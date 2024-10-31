@@ -89,7 +89,7 @@ export const post = [
       return res.status(400).json({ message: "Message is required" });
     }
 
-    const comment = await prisma.jobComment.create({
+    await prisma.jobComment.create({
       data: {
         message: message,
         userId: req.user.id,

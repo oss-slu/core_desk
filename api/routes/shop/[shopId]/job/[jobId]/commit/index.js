@@ -26,7 +26,6 @@ export const post = [
         req.user.admin
       )
     ) {
-      console.log(userShop.accountType);
       return res.status(400).json({ error: "Forbidden" });
     }
 

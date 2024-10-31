@@ -18,7 +18,7 @@ export const authFetch = async (url, options) => {
   });
   if (res.status === 401) {
     localStorage.removeItem("token");
-    window.fetchUser();
+    window.logout && window.logout();
     emitter.emit("logout");
   }
   return res;

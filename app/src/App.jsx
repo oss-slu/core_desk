@@ -23,9 +23,21 @@ import { ShopUserPage } from "./routes/shops/[shopId]/users/[userId]";
 
 // eslint-disable-next-line
 export default () => {
-  const { loggedIn, loading, login } = useAuth();
+  const { loggedIn, loading, login, user } = useAuth();
 
   if (loading) return null;
+
+  if (user && user.suspended) {
+    return (
+      <div>
+        <Header />
+        <div style={{ padding: "20px" }}>
+          <h1>Your account has been suspended</h1>
+          <p>{user.suspensionReason}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

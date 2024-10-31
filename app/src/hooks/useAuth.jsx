@@ -67,6 +67,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    window.logout = logout;
     emitter.on("logout", () => {
       logout();
     });

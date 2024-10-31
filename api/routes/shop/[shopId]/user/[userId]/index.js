@@ -138,8 +138,6 @@ export const post = [
         },
       });
 
-      console.log(req.user.admin, shopAdmin);
-
       if (!req.user.admin && !shopAdmin) {
         return res.status(403).json({ error: "Unauthorized" });
       }

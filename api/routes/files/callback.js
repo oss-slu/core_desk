@@ -6,8 +6,6 @@ export const post = async (req, res) => {
   const { jobId, shopId, userId, scope, resourceId, materialId } =
     req.body.metadata;
 
-  console.log(`[UPTNG] ${scope} upload completed`, req.body);
-
   if (scope === "job.fileupload") {
     const job = await prisma.job.findFirst({
       where: {
@@ -17,14 +15,8 @@ export const post = async (req, res) => {
     });
 
     if (!job) {
-      console.log("No Job");
-      console.log(jobId, shopId, userId);
       return res.status(404).json({ error: "Not found" });
     }
-
-    console.log(
-      `Job ${job.id} (${job.title}) uploaded file ${req.body.file.name}`
-    );
 
     const jobItem = await prisma.jobItem.create({
       data: {
@@ -61,7 +53,6 @@ export const post = async (req, res) => {
     });
 
     if (!resource) {
-      console.log("No Resource");
       return res.status(404).json({ error: "Not found" });
     }
 

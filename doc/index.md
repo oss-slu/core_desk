@@ -2,7 +2,7 @@
 
 ## Codebase Organization
 
-The React frontend lives in the `app/` directory, everything else is based in the root. `index.js` is the entrypoint for the API, and uses file-based routing to route requests to the appropriate file living in the `/routes` directory. The API is built using Express.js. The file-based router is implemented on the `/api/*` path, so all API requests going to the router folder should be prefixed with `/api/`.
+The React frontend lives in the `app/` directory, everything else is based in the root. `index.js` is the entrypoint for the API, and uses file-based routing to route requests to the appropriate file living in the `/routes` directory. The API is built using Express.js. The file-based router is implemented on the `/api/*` path, so all API requests going to the router folder should be prefixed with `/api/`. The API is pretty self-documenting based on the file structure.
 
 Data fetching is done primarily with the `authFetch` method from `/app/src/util/url.js`. This method is a wrapper around the `fetch` API that automatically attaches the JWT token to the request headers. It is otherwise called the same way as `fetch`. It returns the fetch promise. All data fetching should happen in hooks living in the `/app/src/hooks` directory. Hooks should all export `{ loading, error, refetch, data }` where data is the high-level data object. It should be named using the singular noun resource it fetches, e.g. `user`, `shop`, `project` etc. All hooks should be named `use{Resource}` where the resource is the same as data object's name, and the hook file should be named `use{Resource}.js`.
 
@@ -86,7 +86,9 @@ const { user } = useAuth();
 
 Shops are centers that host printers or other equipment. They are the highest level of "campus" in the application.
 
-### GET `/api/shop`
+### `/api/shop`
+
+#### GET
 
 This endpoint returns a JSON object with a `shops` key that contains an array of shop objects. This endpoint requires a valid JWT in the `Authorization` header.
 
@@ -113,7 +115,7 @@ This endpoint returns a JSON object with a `shops` key that contains an array of
 
 }
 
-### POST `/api/shop`
+#### POST
 
 This endpoint creates a new shop. It requires a valid JWT in the `Authorization` header, and a JSON object in the request body with the following keys:
 
@@ -127,7 +129,7 @@ This endpoint creates a new shop. It requires a valid JWT in the `Authorization`
 
 The API will respond with a JSON object containing the content of a traditional GET request to the shop endpoint with the new shop included, the standard meta object, and a `newShop` key that contains the new shop object.
 
-#### Request body:
+##### Request body:
 
 ```json
 {
@@ -141,7 +143,7 @@ The API will respond with a JSON object containing the content of a traditional 
 }
 ```
 
-#### Response:
+##### Response:
 
 ```json
 {

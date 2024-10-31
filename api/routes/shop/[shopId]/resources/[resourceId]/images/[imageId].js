@@ -10,8 +10,6 @@ export const del = [
       const userId = req.user.id;
       const { resourceId, shopId, imageId } = req.params;
 
-      console.log("Deleting image", imageId);
-
       const userShop = await prisma.userShop.findFirst({
         where: {
           shopId,

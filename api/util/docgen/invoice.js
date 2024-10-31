@@ -1,5 +1,4 @@
 import ejs from "ejs";
-import fs from "fs";
 import { utapi } from "../../config/uploadthing.js";
 import html_to_pdf from "html-pdf-node";
 import { prisma } from "#prisma";

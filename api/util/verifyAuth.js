@@ -9,7 +9,7 @@ export const verifyAuth = async (req, res, next) => {
 
     jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
       if (err) {
-        return res.sendStatus(403); // Forbidden
+        return res.sendStatus(401); // Forbidden
       }
       // req.user = user; // Attach the user object to the request
 

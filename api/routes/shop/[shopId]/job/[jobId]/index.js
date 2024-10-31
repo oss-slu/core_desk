@@ -1,4 +1,4 @@
-import { LedgerItemType, LogType, Prisma } from "@prisma/client";
+import { LedgerItemType, LogType } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";

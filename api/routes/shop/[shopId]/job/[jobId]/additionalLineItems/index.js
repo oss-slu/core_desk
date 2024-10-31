@@ -16,8 +16,6 @@ export const get = [
         },
       });
 
-      console.log(userId, shopId, userShop);
-
       if (!userShop) {
         return res
           .status(400)

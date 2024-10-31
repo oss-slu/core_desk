@@ -36,7 +36,7 @@ const regnerateInvoice = async () => {
 
   await utapi.deleteFiles(originalLedgerItem.invoiceKey);
 
-  const { url, key, value, log } = await generateInvoice(data, userId, shopId);
+  const { url, key } = await generateInvoice(data, userId, shopId);
   await prisma.job.update({
     where: {
       id: jobId,
