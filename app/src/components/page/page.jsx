@@ -19,30 +19,30 @@ export const sidenavItems = (activeText, userIsAdmin) => {
       active: activeText === "Shops",
       icon: <Icon i="building-store" size={18} />,
     },
-    {
-      type: "item",
-      href: `/jobs`,
-      text: `Jobs`,
-      active: activeText === "Jobs",
-      icon: <Icon i="list-details" size={18} />,
-    },
-    {
-      type: "divider",
-    },
-    {
-      type: "item",
-      href: `/notifications`,
-      text: `Notifications`,
-      active: activeText === "Notifications",
-      icon: <Icon i="bell" size={18} />,
-    },
-    {
-      type: "item",
-      href: "/logs",
-      text: "Logs",
-      active: activeText === "Logs",
-      icon: <Icon i="logs" size={18} />,
-    },
+    // {
+    //   type: "item",
+    //   href: `/jobs`,
+    //   text: `Jobs`,
+    //   active: activeText === "Jobs",
+    //   icon: <Icon i="list-details" size={18} />,
+    // },
+    // {
+    //   type: "divider",
+    // },
+    // {
+    //   type: "item",
+    //   href: `/notifications`,
+    //   text: `Notifications`,
+    //   active: activeText === "Notifications",
+    //   icon: <Icon i="bell" size={18} />,
+    // },
+    // {
+    //   type: "item",
+    //   href: "/logs",
+    //   text: "Logs",
+    //   active: activeText === "Logs",
+    //   icon: <Icon i="logs" size={18} />,
+    // },
   ];
 
   if (userIsAdmin) {

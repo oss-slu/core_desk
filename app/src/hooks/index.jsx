@@ -19,3 +19,4 @@ export { useMaterial } from "./useMaterial";
 export { useUserLogs } from "./useUserLogs";
 export { useAdditionalLineItem } from "./useAdditionalLineItem";
 export { useAdditionalLineItems } from "./useAdditionalLineItems";
+export { useUserShop } from "./useUserShop";

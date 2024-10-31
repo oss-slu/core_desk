@@ -1,6 +1,121 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
+import { calculateTotalCostOfJobByJobId } from "../../../../../util/docgen/invoice.js";
+
+export const get = [
+  verifyAuth,
+  async (req, res) => {
+    try {
+      const { userId, shopId } = req.params;
+
+      const authUserShop = await prisma.userShop.findFirst({
+        where: {
+          userId: req.user.id,
+          shopId: shopId,
+          active: true,
+        },
+      });
+
+      if (!authUserShop) {
+        return res.status(400).json({ error: "Unauthorized" });
+      }
+
+      if (
+        !(
+          req.user.admin ||
+          authUserShop.accountType === "ADMIN" ||
+          authUserShop.accountType === "OPERATOR"
+        )
+      ) {
+        return res.status(400).json({ error: "Unauthorized" });
+      }
+
+      const user = await prisma.userShop.findFirst({
+        where: {
+          userId: userId,
+          shopId: shopId,
+          active: true,
+        },
+        include: {
+          user: {
+            include: {
+              ledgerItems: {
+                select: {
+                  value: true,
+                },
+              },
+              jobs: {
+                select: {
+                  status: true,
+                  id: true,
+                  title: true,
+                  dueDate: true,
+                  createdAt: true,
+                  finalized: true,
+                  finalizedAt: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const jobCounts = user.user.jobs.reduce(
+        (acc, job) => {
+          switch (job.status) {
+            case "COMPLETED":
+              acc.completedCount += 1;
+              break;
+            case "IN_PROGRESS":
+              acc.inProgressCount += 1;
+              break;
+            case "NOT_STARTED":
+              acc.notStartedCount += 1;
+              break;
+            default:
+              acc.excludedCount += 1;
+              break;
+          }
+          return acc;
+        },
+        {
+          completedCount: 0,
+          inProgressCount: 0,
+          notStartedCount: 0,
+          excludedCount: 0,
+        }
+      );
+
+      user.user.jobCounts = jobCounts;
+      user.user.balance = user.user.ledgerItems.reduce(
+        (acc, item) => acc + item.value,
+        0
+      );
+      delete user.user.ledgerItems;
+
+      user.user.isMe = user.userId === req.user.id;
+
+      const updatedJobs = await Promise.all(
+        user.user.jobs.map(async (job) => {
+          const totalCost = await calculateTotalCostOfJobByJobId(job.id);
+          return { ...job, totalCost };
+        })
+      );
+
+      user.user.jobs = updatedJobs;
+
+      if (!user) {
+        return res.status(400).json({ error: "User is not connected to shop" });
+      }
+
+      res.json({ userShop: user });
+    } catch (e) {
+      console.error(e);
+      res.status(500).json({ error: "An error occurred" });
+    }
+  },
+];
 
 export const post = [
   verifyAuth,

@@ -172,7 +172,7 @@ export const UserPage = () => {
       {SuspendConfirmModal}
       {UnSuspendConfirmModal}
       {ConfirmModal}
-      <Util.Row gap={2}>
+      <Util.Row gap={2} align="center">
         <Avatar size="xl" dicebear initials={user.id} />
         <Util.Col>
           <H1>

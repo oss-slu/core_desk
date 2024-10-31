@@ -1,7 +1,7 @@
 import React from "react";
 import { Page } from "../../../../components/page/page";
 import { shopSidenavItems } from "..";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAuth } from "../../../../hooks/useAuth";
 import { useShop } from "../../../../hooks";
 import { Loading } from "../../../../components/loading/Loading";
@@ -86,7 +86,9 @@ export const ShopUsersPage = () => {
               <Util.Row gap={0.5} align="center">
                 <Avatar size="sm" dicebear initials={context.user.id} />
                 <Util.Col align="start">
-                  {name}
+                  <Link to={`/shops/${shopId}/users/${context.user.id}`}>
+                    {name}
+                  </Link>
                   {context.user.id === user.id && (
                     <Badge color="green" soft>
                       You

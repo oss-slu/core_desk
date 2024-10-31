@@ -7,6 +7,30 @@ import { LogType } from "@prisma/client";
 
 const options = { format: "Letter", printBackground: true };
 
+export const calculateTotalCostOfJobByJobId = async (jobId) => {
+  const data = await prisma.job.findFirst({
+    where: {
+      id: jobId,
+    },
+    include: {
+      items: {
+        include: {
+          resource: true,
+          material: true,
+        },
+      },
+      additionalCosts: {
+        include: {
+          resource: true,
+          material: true,
+        },
+      },
+    },
+  });
+
+  return calculateTotalCostOfJob(data);
+};
+
 export const calculateTotalCostOfJob = (data) => {
   let totalCost = 0;
 

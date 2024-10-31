@@ -165,7 +165,9 @@ export const Jobs = () => {
     "Progress",
     "Status",
     "Finalized",
+    "Finalized At",
     "Due Date",
+    "Created At",
   ];
   const [columnsToShow, setColumnsToShow] = useState([
     "Title",
@@ -529,16 +531,23 @@ export const Jobs = () => {
                 sortable: true,
               },
               {
+                label: "Finalized At",
+                accessor: "finalizedAt",
+                render: (d) => <>{d ? moment(d).format("MM/DD/YY") : "N/A"}</>,
+                sortable: true,
+              },
+              {
                 label: "Due Date",
                 accessor: "dueDate",
-                render: (d) => (
+                render: (d, context) => (
                   <>
                     {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()}){" "}
                     {/* Overdue warning */}
                     {new Date(d) < new Date() &&
                       !(
                         new Date(d).toDateString() === new Date().toDateString()
-                      ) && <Badge color="red">Overdue</Badge>}
+                      ) &&
+                      !context.finalized && <Badge color="red">Overdue</Badge>}
                     {/* Today warning */}{" "}
                     {new Date(d).toDateString() ===
                       new Date().toDateString() && (
@@ -547,6 +556,15 @@ export const Jobs = () => {
                   </>
                 ),
                 sortable: true,
+              },
+              {
+                label: "Created At",
+                accessor: "createdAt",
+                render: (d) => (
+                  <>
+                    {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()})
+                  </>
+                ),
               },
             ].filter((c) => columnsToShow.includes(c.label))}
             data={filteredJobs}
