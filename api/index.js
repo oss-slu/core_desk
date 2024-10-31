@@ -29,6 +29,18 @@ app.use(
   })
 );
 
+//RESPONSE BODY LOGGER
+// app.use((req, res, next) => {
+//   const originalSend = res.send;
+
+//   res.send = function (body) {
+//     console.log("Response Body:", body); // Log the response body
+//     originalSend.call(this, body);
+//   };
+
+//   next();
+// });
+
 // Initialize passport
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -125,6 +137,8 @@ app.use(
     config: {
       token: process.env.UPLOADTHING_TOKEN,
       callbackUrl: process.env.SERVER_URL + "/api/files/callback",
+      logLevel: "debug",
+      logFormat: "pretty",
     },
   })
 );

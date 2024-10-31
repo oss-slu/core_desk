@@ -2,14 +2,16 @@ import { LogType } from "@prisma/client";
 import { prisma } from "../../util/prisma.js";
 import { utapi } from "../../config/uploadthing.js";
 
+const logging = false;
+
 export const post = async (req, res) => {
   const { jobId, shopId, userId, scope, resourceId, materialId } =
     req.body.metadata;
 
-  console.log(req.body.metadata);
+  logging && console.log(req.body.metadata);
 
   if (scope === "job.fileupload") {
-    console.log("job.fileupload");
+    logging && console.log("job.fileupload");
     const job = await prisma.job.findFirst({
       where: {
         id: jobId,
@@ -45,11 +47,12 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.json({ jobItem });
+    logging && console.log("jobItem", jobItem);
+    return res.sendStatus(200);
   }
 
   if (scope === "shop.resource.image") {
-    console.log("shop.resource.image");
+    logging && console.log("shop.resource.image");
     const resource = await prisma.resource.findFirst({
       where: {
         id: resourceId,
@@ -82,11 +85,11 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.json({ image });
+    return res.sendStatus(200);
   }
 
   if (scope === "material.msds") {
-    console.log("material.msds");
+    logging && console.log("material.msds");
     const material = await prisma.material.findFirst({
       where: {
         id: materialId,
@@ -121,11 +124,11 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.json({ material });
+    return res.sendStatus(200);
   }
 
   if (scope === "material.tds") {
-    console.log("material.tds");
+    logging && console.log("material.tds");
     const material = await prisma.material.findFirst({
       where: {
         id: materialId,
@@ -160,11 +163,11 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.json({ material });
+    return res.sendStatus(200);
   }
 
   if (scope === "material.image") {
-    console.log("material.image");
+    logging && console.log("material.image");
     const material = await prisma.material.findFirst({
       where: {
         id: materialId,
@@ -198,11 +201,11 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.json({ material });
+    return res.sendStatus(200);
   }
 
   if (scope === "shop.logo") {
-    console.log("shop.logo");
+    logging && console.log("shop.logo");
     const shop = await prisma.shop.findFirst({
       where: {
         id: shopId,
