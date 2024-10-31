@@ -8,7 +8,14 @@ export const utapi = new UTApi({
   token: process.env.UPLOADTHING_TOKEN,
 });
 
-const f = createUploadthing();
+const f = createUploadthing({
+  errorFormatter: (err) => {
+    console.log(err);
+    return {
+      message: err.message,
+    };
+  },
+});
 
 export const uploadRouter = {
   files: f({
