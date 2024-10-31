@@ -7,6 +7,7 @@ export const post = async (req, res) => {
     req.body.metadata;
 
   if (scope === "job.fileupload") {
+    console.log("job.fileupload");
     const job = await prisma.job.findFirst({
       where: {
         id: jobId,
@@ -15,6 +16,7 @@ export const post = async (req, res) => {
     });
 
     if (!job) {
+      console.error("job not found");
       return res.status(404).json({ error: "Not found" });
     }
 
@@ -45,6 +47,7 @@ export const post = async (req, res) => {
   }
 
   if (scope === "shop.resource.image") {
+    console.log("shop.resource.image");
     const resource = await prisma.resource.findFirst({
       where: {
         id: resourceId,
@@ -53,6 +56,7 @@ export const post = async (req, res) => {
     });
 
     if (!resource) {
+      console.error("resource not found");
       return res.status(404).json({ error: "Not found" });
     }
 
@@ -80,6 +84,7 @@ export const post = async (req, res) => {
   }
 
   if (scope === "material.msds") {
+    console.log("material.msds");
     const material = await prisma.material.findFirst({
       where: {
         id: materialId,
@@ -88,6 +93,7 @@ export const post = async (req, res) => {
     });
 
     if (!material) {
+      console.error("material not found");
       return res.status(404).json({ error: "Not found" });
     }
 
@@ -117,6 +123,7 @@ export const post = async (req, res) => {
   }
 
   if (scope === "material.tds") {
+    console.log("material.tds");
     const material = await prisma.material.findFirst({
       where: {
         id: materialId,
@@ -125,6 +132,7 @@ export const post = async (req, res) => {
     });
 
     if (!material) {
+      console.error("material not found");
       return res.status(404).json({ error: "Not found" });
     }
 
@@ -154,6 +162,7 @@ export const post = async (req, res) => {
   }
 
   if (scope === "material.image") {
+    console.log("material.image");
     const material = await prisma.material.findFirst({
       where: {
         id: materialId,
@@ -162,6 +171,7 @@ export const post = async (req, res) => {
     });
 
     if (!material) {
+      console.error("material not found");
       return res.status(404).json({ error: "Not found" });
     }
 
@@ -190,6 +200,7 @@ export const post = async (req, res) => {
   }
 
   if (scope === "shop.logo") {
+    console.log("shop.logo");
     const shop = await prisma.shop.findFirst({
       where: {
         id: shopId,
@@ -197,6 +208,7 @@ export const post = async (req, res) => {
     });
 
     if (!shop) {
+      console.error("shop not found");
       return res.status(404).json({
         error: "Not found",
       });
