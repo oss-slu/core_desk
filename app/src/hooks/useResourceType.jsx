@@ -1,33 +1,33 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { authFetch } from "../util/url";
 
+const fetcher = (url) => authFetch(url).then((res) => res.json());
+
 export const useResourceType = (shopId, resourceTypeId) => {
-  const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [resourceType, setResourceType] = useState({});
   const [resources, setResources] = useState([]);
 
-  const fetchResourceType = async (shouldSetLoading = true) => {
-    try {
-      shouldSetLoading && setLoading(true);
-      const r = await authFetch(
-        `/api/shop/${shopId}/resources/type/${resourceTypeId}`
-      );
-      const data = await r.json();
+  const {
+    data,
+    error: fetchError,
+    isLoading,
+    mutate,
+  } = useSWR(`/api/shop/${shopId}/resources/type/${resourceTypeId}`, fetcher, {
+    onSuccess: (data) => {
       if (data.resourceType && data.resources) {
         setResourceType(data.resourceType);
         setResources(data.resources);
-        setLoading(false);
       } else {
         setError(data);
-        setLoading(false);
       }
-    } catch (error) {
-      setError(error);
-      setLoading(false);
-    }
-  };
+    },
+    onError: (err) => {
+      setError(err);
+    },
+  });
 
   const updateResourceType = async (updatedData) => {
     try {
@@ -39,32 +39,28 @@ export const useResourceType = (shopId, resourceTypeId) => {
           body: JSON.stringify(updatedData),
         }
       );
-      const data = await r.json();
-      if (data.resourceType && data.resources) {
-        setResourceType(data.resourceType);
-        setResources(data.resources);
-        setLoading(false);
+      const updatedDataResponse = await r.json();
+      if (updatedDataResponse.resourceType && updatedDataResponse.resources) {
+        setResourceType(updatedDataResponse.resourceType);
+        setResources(updatedDataResponse.resources);
+        mutate(); // Re-fetch data after the update
       } else {
-        setError(data);
-        setLoading(false);
+        setError(updatedDataResponse);
       }
-    } catch (error) {
-      setError(error);
+    } catch (err) {
+      setError(err);
+    } finally {
       setOpLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchResourceType();
-  }, []);
-
   return {
     resourceType,
     resources,
-    loading,
+    loading: isLoading,
     opLoading,
-    error,
-    refetch: fetchResourceType,
+    error: fetchError || error,
+    refetch: mutate,
     updateResourceType,
   };
 };

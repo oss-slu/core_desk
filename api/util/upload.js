@@ -1,14 +1,14 @@
 import { LogType } from "@prisma/client";
-import { prisma } from "../../util/prisma.js";
-import { utapi } from "../../config/uploadthing.js";
+import { prisma } from "#prisma";
+import { utapi } from "../config/uploadthing.js";
 
 const logging = false;
 
-export const post = async (req, res) => {
+export const handleUpload = async (data) => {
   const { jobId, shopId, userId, scope, resourceId, materialId } =
-    req.body.metadata;
+    data.metadata;
 
-  logging && console.log(req.body.metadata);
+  console.log("FILE UPLOADED", data.file.name);
 
   if (scope === "job.fileupload") {
     logging && console.log("job.fileupload");
@@ -21,19 +21,19 @@ export const post = async (req, res) => {
 
     if (!job) {
       console.error("job not found");
-      return res.status(404).json({ error: "Not found" });
+      // return res.status(404).json({ error: "Not found" });
     }
 
     const jobItem = await prisma.jobItem.create({
       data: {
         jobId: job.id,
 
-        fileKey: req.body.file.key,
-        fileName: req.body.file.name,
-        fileType: req.body.file.name.split(".").pop(),
-        fileUrl: req.body.file.url,
+        fileKey: data.file.key,
+        fileName: data.file.name,
+        fileType: data.file.name.split(".").pop(),
+        fileUrl: data.file.url,
 
-        title: req.body.file.name,
+        title: data.file.name,
       },
     });
 
@@ -48,7 +48,7 @@ export const post = async (req, res) => {
     });
 
     logging && console.log("jobItem", jobItem);
-    return res.sendStatus(200);
+    // return res.sendStatus(200);
   }
 
   if (scope === "shop.resource.image") {
@@ -62,16 +62,16 @@ export const post = async (req, res) => {
 
     if (!resource) {
       console.error("resource not found");
-      return res.status(404).json({ error: "Not found" });
+      // return res.status(404).json({ error: "Not found" });
     }
 
     const image = await prisma.resourceImage.create({
       data: {
         resourceId: resource.id,
-        fileKey: req.body.file.key,
-        fileName: req.body.file.name,
-        fileType: req.body.file.name.split(".").pop(),
-        fileUrl: req.body.file.url,
+        fileKey: data.file.key,
+        fileName: data.file.name,
+        fileType: data.file.name.split(".").pop(),
+        fileUrl: data.file.url,
       },
     });
 
@@ -85,7 +85,7 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.sendStatus(200);
+    // return res.sendStatus(200);
   }
 
   if (scope === "material.msds") {
@@ -99,7 +99,7 @@ export const post = async (req, res) => {
 
     if (!material) {
       console.error("material not found");
-      return res.status(404).json({ error: "Not found" });
+      // return res.status(404).json({ error: "Not found" });
     }
 
     await prisma.material.update({
@@ -107,10 +107,10 @@ export const post = async (req, res) => {
         id: material.id,
       },
       data: {
-        msdsFileKey: req.body.file.key,
-        msdsFileName: req.body.file.name,
-        msdsFileType: req.body.file.name.split(".").pop(),
-        msdsFileUrl: req.body.file.url,
+        msdsFileKey: data.file.key,
+        msdsFileName: data.file.name,
+        msdsFileType: data.file.name.split(".").pop(),
+        msdsFileUrl: data.file.url,
       },
     });
 
@@ -124,7 +124,7 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.sendStatus(200);
+    // return res.sendStatus(200);
   }
 
   if (scope === "material.tds") {
@@ -138,7 +138,7 @@ export const post = async (req, res) => {
 
     if (!material) {
       console.error("material not found");
-      return res.status(404).json({ error: "Not found" });
+      // return res.status(404).json({ error: "Not found" });
     }
 
     await prisma.material.update({
@@ -146,10 +146,10 @@ export const post = async (req, res) => {
         id: material.id,
       },
       data: {
-        tdsFileKey: req.body.file.key,
-        tdsFileName: req.body.file.name,
-        tdsFileType: req.body.file.name.split(".").pop(),
-        tdsFileUrl: req.body.file.url,
+        tdsFileKey: data.file.key,
+        tdsFileName: data.file.name,
+        tdsFileType: data.file.name.split(".").pop(),
+        tdsFileUrl: data.file.url,
       },
     });
 
@@ -163,7 +163,7 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.sendStatus(200);
+    // return res.sendStatus(200);
   }
 
   if (scope === "material.image") {
@@ -177,16 +177,16 @@ export const post = async (req, res) => {
 
     if (!material) {
       console.error("material not found");
-      return res.status(404).json({ error: "Not found" });
+      // return res.status(404).json({ error: "Not found" });
     }
 
     const image = await prisma.materialImage.create({
       data: {
         materialId: material.id,
-        fileKey: req.body.file.key,
-        fileName: req.body.file.name,
-        fileType: req.body.file.name.split(".").pop(),
-        fileUrl: req.body.file.url,
+        fileKey: data.file.key,
+        fileName: data.file.name,
+        fileType: data.file.name.split(".").pop(),
+        fileUrl: data.file.url,
       },
     });
 
@@ -201,7 +201,7 @@ export const post = async (req, res) => {
       },
     });
 
-    return res.sendStatus(200);
+    // return res.sendStatus(200);
   }
 
   if (scope === "shop.logo") {
@@ -214,9 +214,9 @@ export const post = async (req, res) => {
 
     if (!shop) {
       console.error("shop not found");
-      return res.status(404).json({
-        error: "Not found",
-      });
+      // return res.status(404).json({
+      //   error: "Not found",
+      // });
     }
 
     if (shop.logoKey) {
@@ -228,12 +228,12 @@ export const post = async (req, res) => {
         id: shopId,
       },
       data: {
-        logoKey: req.body.file.key,
-        logoName: req.body.file.name,
-        logoUrl: req.body.file.url,
+        logoKey: data.file.key,
+        logoName: data.file.name,
+        logoUrl: data.file.url,
       },
     });
   }
 
-  return res.status(404).json({ error: "Not found" });
+  // return res.status(404).json({ error: "Not found" });
 };

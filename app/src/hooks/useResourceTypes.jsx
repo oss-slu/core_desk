@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import useSWR from "swr";
+import React, { useState } from "react";
 import { authFetch } from "../util/url";
 import { Input, Button } from "tabler-react-2";
 import { useModal } from "tabler-react-2/dist/modal";
@@ -30,11 +31,16 @@ const CreateResourceModalContent = ({ onSubmit }) => {
   );
 };
 
+const fetcher = (url) => authFetch(url).then((res) => res.json());
+
 export const useResourceTypes = (shopId) => {
-  const [loading, setLoading] = useState(true);
+  const { data, error, mutate } = useSWR(
+    `/api/shop/${shopId}/resources/type`,
+    fetcher,
+    { suspense: true } // optional, for suspense mode
+  );
+
   const [opLoading, setOpLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [resourceTypes, setResourceTypes] = useState([]);
 
   const _createResourceType = async (title) => {
     try {
@@ -45,57 +51,38 @@ export const useResourceTypes = (shopId) => {
       });
       const data = await r.json();
       if (data.resourceType) {
-        setResourceTypes([...resourceTypes, data.resourceType]);
+        // Optimistically update the data
+        mutate();
         setOpLoading(false);
         document.location.hash = "#" + data.resourceType.id;
         document.location.reload();
       } else {
-        setError(data.error);
-        setOpLoading(false);
+        throw data.error;
       }
     } catch (error) {
-      setError(error);
       setOpLoading(false);
+      throw error;
     }
   };
 
   const { modal, ModalElement } = useModal({
     title: "Create a new Resource Type",
-    text: <CreateResourceModalContent onSubmit={_createResourceType} />,
+    text: (
+      <CreateResourceModalContent
+        onSubmit={async (title) => {
+          await _createResourceType(title);
+          modal.hide();
+        }}
+      />
+    ),
   });
 
-  const fetchResourceTypes = async () => {
-    try {
-      setLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/resources/type`);
-      const data = await r.json();
-      if (data.resourceTypes) {
-        setResourceTypes(data.resourceTypes);
-        setLoading(false);
-      } else {
-        setError(data.error);
-        setLoading(false);
-      }
-    } catch (error) {
-      setError(error);
-      setLoading(false);
-    }
-  };
-
-  const createResourceType = () => {
-    modal();
-  };
-
-  useEffect(() => {
-    fetchResourceTypes();
-  }, []);
-
   return {
-    resourceTypes,
-    loading,
+    resourceTypes: data ? data.resourceTypes : [],
+    loading: !data && !error,
     error,
-    refetch: fetchResourceTypes,
-    createResourceType,
+    refetch: mutate,
+    createResourceType: modal.show,
     opLoading,
     ModalElement,
   };

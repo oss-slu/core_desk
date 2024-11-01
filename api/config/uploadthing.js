@@ -3,6 +3,7 @@ import { verifyAuthAlone } from "../util/verifyAuth.js";
 import { prisma } from "../util/prisma.js";
 import { UploadThingError } from "uploadthing/server";
 import { UTApi } from "uploadthing/server";
+import { handleUpload } from "../util/upload.js";
 
 export const utapi = new UTApi({
   token: process.env.UPLOADTHING_TOKEN,
@@ -10,7 +11,7 @@ export const utapi = new UTApi({
 
 const f = createUploadthing({
   errorFormatter: (err) => {
-    console.log(err);
+    console.error(err);
     return {
       message: err.message,
     };
@@ -181,7 +182,6 @@ export const uploadRouter = {
       }
     })
     .onUploadComplete((data) => {
-      data;
-      // console.log("upload completed!", data);
+      handleUpload(data);
     }),
 };

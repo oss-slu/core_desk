@@ -135,8 +135,7 @@ app.use(
     config: {
       token: process.env.UPLOADTHING_TOKEN,
       callbackUrl: process.env.SERVER_URL + "/api/files/upload",
-      logLevel: "debug",
-      logFormat: "pretty",
+      logLevel: "Error",
     },
   })
 );
