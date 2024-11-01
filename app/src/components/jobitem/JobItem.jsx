@@ -85,7 +85,11 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
       <Util.Responsive gap={1} align="start" threshold={1200}>
         <div className={styles.modal}>{ModalElement}</div>
         <Util.Responsive gap={1} align="start" threshold={800}>
-          <RenderMedia mediaUrl={item.fileUrl} fileType={item.fileType} />
+          <RenderMedia
+            mediaUrl={item.fileUrl}
+            fileType={item.fileType}
+            thumbnailUrl={item.fileThumbnailUrl}
+          />
           <Util.Row gap={2} align="start" threshold={1100} style={{ flex: 1 }}>
             <div style={{ maxWidth: 280 }}>
               <H3>{item.title}</H3>
@@ -111,8 +115,8 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
                 </Button>
                 {userIsPrivileged && (
                   <Button
-                    onClick={() => {
-                      deleteJobItem(refetchJobs);
+                    onClick={(e) => {
+                      deleteJobItem(refetchJobs, e);
                     }}
                     style={{
                       padding: "0.4375rem",

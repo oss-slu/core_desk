@@ -65,8 +65,10 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
     }
   };
 
-  const deleteJobItem = async (refetchJobs) => {
+  const deleteJobItem = async (refetchJobs, e) => {
+    const skipConfirm = e && e.shiftKey;
     if (
+      !skipConfirm &&
       !window.confirm(
         "Are you sure you want to delete this item? You cannot undo this action."
       )

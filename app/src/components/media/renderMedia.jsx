@@ -1,9 +1,33 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styles from "./renderMedia.module.css";
 import { StlViewer } from "react-stl-viewer";
 import classNames from "classnames";
 
-export const RenderMedia = ({ mediaUrl, fileType, big = false }) => {
+export const RenderMedia = ({
+  mediaUrl,
+  thumbnailUrl,
+  fileType,
+  big = false,
+}) => {
+  const [preview, setPreview] = useState(true);
+  const timeoutRef = useRef(null);
+
+  const handleMouseOut = () => {
+    timeoutRef.current = setTimeout(() => {
+      setPreview(true);
+    }, 5 * 1000); // 10 seconds
+  };
+
+  const handleMouseEnter = () => {
+    clearTimeout(timeoutRef.current);
+    setPreview(false);
+  };
+
+  useEffect(() => {
+    // Cleanup timeout on unmount
+    return () => clearTimeout(timeoutRef.current);
+  }, []);
+
   if (
     fileType === "png" ||
     fileType === "jpg" ||
@@ -20,12 +44,25 @@ export const RenderMedia = ({ mediaUrl, fileType, big = false }) => {
   }
 
   if (fileType === "stl") {
+    if (preview && thumbnailUrl && !big) {
+      return (
+        <img
+          src={thumbnailUrl}
+          className={classNames(styles.image, big ? styles.big : "")}
+          alt="media"
+          onClick={() => setPreview(false)}
+        />
+      );
+    }
+
     return (
       <StlViewer
         className={classNames(styles.image, big ? styles.big : "")}
         orbitControls
         shadows
         url={mediaUrl}
+        onMouseOut={handleMouseOut}
+        onMouseEnter={handleMouseEnter}
         modelProps={{
           color: "rgb(83, 195, 238)",
         }}

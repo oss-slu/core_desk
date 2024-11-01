@@ -186,7 +186,9 @@ export const del = [
       },
     });
 
-    await utapi.deleteFiles(jobItem.fileKey);
+    await utapi.deleteFiles(
+      [jobItem.fileKey, jobItem.fileThumbnailKey].filter(Boolean)
+    );
 
     await prisma.logs.create({
       data: {

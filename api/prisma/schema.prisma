@@ -476,6 +476,10 @@ model JobItem {
   fileName String
   fileType String
 
+  fileThumbnailKey  String?
+  fileThumbnailUrl  String?
+  fileThumbnailName String?
+
   resource   Resource? @relation(fields: [resourceId], references: [id])
   resourceId String?
 

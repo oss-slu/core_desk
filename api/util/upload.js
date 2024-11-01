@@ -1,6 +1,8 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "#prisma";
 import { utapi } from "../config/uploadthing.js";
+import { renderStl } from "./renderStl.js";
+import { writeFileSync } from "fs";
 
 const logging = false;
 
@@ -36,6 +38,27 @@ export const handleUpload = async (data) => {
         title: data.file.name,
       },
     });
+
+    const fileType = data.file.name.split(".").pop();
+    if (fileType === "stl") {
+      // Render stl
+      const pngData = await renderStl(data.file.url);
+      const upload = await utapi.uploadFiles([
+        new File([pngData], `${data.file.name}.preview.png`, {
+          type: "image/png",
+        }),
+      ]);
+      await prisma.jobItem.update({
+        where: {
+          id: jobItem.id,
+        },
+        data: {
+          fileThumbnailKey: upload[0].data.key,
+          fileThumbnailName: upload[0].data.name,
+          fileThumbnailUrl: upload[0].data.url,
+        },
+      });
+    }
 
     await prisma.logs.create({
       data: {
