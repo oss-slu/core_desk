@@ -269,7 +269,7 @@ export const JobPage = () => {
                       shopId,
                     }}
                     onUploadComplete={() => {
-                      refetchJobs();
+                      refetchJobs(false);
                     }}
                   />
                 ),

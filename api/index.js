@@ -128,15 +128,13 @@ app.post(
 
 app.use(express.json());
 
-console.log("CALLBACK URL", process.env.SERVER_URL + "/api/files/callback");
-
 app.use(
   "/api/files/upload",
   createRouteHandler({
     router: uploadRouter,
     config: {
       token: process.env.UPLOADTHING_TOKEN,
-      callbackUrl: process.env.SERVER_URL + "/api/files/callback",
+      callbackUrl: process.env.SERVER_URL + "/api/files/upload",
       logLevel: "debug",
       logFormat: "pretty",
     },
