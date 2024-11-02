@@ -24,6 +24,7 @@ model user {
   jobs     Job[]
   comments JobComment[]
   ledgerItems LedgerItem[]
+  billingGroups UserBillingGroup[]
 
   admin            Boolean @default(false)
   suspended        Boolean @default(false)
@@ -73,6 +74,18 @@ model logs {
   ledgerItem   LedgerItem? @relation(fields: [ledgerItemId], references: [id], onDelete: Cascade)
   ledgerItemId String?
 
+  billingGroup   BillingGroup? @relation(fields: [billingGroupId], references: [id], onDelete: Cascade)
+  billingGroupId String?
+
+  userBillingGroup   UserBillingGroup? @relation(fields: [userBillingGroupId], references: [id], onDelete: Cascade)
+  userBillingGroupId String?
+
+  billingGroupProject   BillingGroupProject? @relation(fields: [billingGroupProjectId], references: [id], onDelete: Cascade)
+  billingGroupProjectId String?
+
+  billingGroupProjectFile   BillingGroupProjectFile? @relation(fields: [billingGroupProjectFileId], references: [id], onDelete: Cascade)
+  billingGroupProjectFileId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -119,6 +132,16 @@ enum LogType {
   COMMENT_CREATED
   LEDGER_ITEM_CREATED
   LEDGER_ITEM_CREATED_MANUALLY
+  BILLING_GROUP_CREATED
+  BILLING_GROUP_MODIFIED
+  BILLING_GROUP_DELETED
+  USER_ADDED_TO_BILLING_GROUP
+  USER_REMOVED_FROM_BILLING_GROUP
+  USER_BILLING_GROUP_ROLE_CHANGED
+  BILLING_GROUP_PROJECT_CREATED
+  BILLING_GROUP_PROJECT_MODIFIED
+  BILLING_GROUP_PROJECT_DELETED
+  BILLING_GROUP_PROJECT_FILE_UPLOADED
 }
 
 model UserShop {
@@ -165,6 +188,7 @@ model Shop {
   logs  logs[]
   users UserShop[]
   jobs  Job[]
+  billingGroups BillingGroup[]
 
   resourceTypes ResourceType[]
   resources     Resource[]
@@ -296,16 +320,6 @@ model ResourceImage {
   updatedAt DateTime @updatedAt
   logs      logs[]
 }
-
-// enum ResourceType {
-//   OTHER
-//   INSTRUMENT
-//   TOOL
-//   PRINTER
-//   PRINTER_3D
-//   LASER_CUTTER
-//   CNC
-// }
 
 model ResourceType {
   id          String  @id @default(cuid())
@@ -519,4 +533,72 @@ enum ProgressStatus {
   CANCELLED
   WONT_DO
   WAITING
+}
+
+model BillingGroup {
+  id          String  @id @default(cuid())
+  title       String
+  description String? @db.MediumText
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id])
+
+  users UserBillingGroup[]
+  logs logs[]
+  projects BillingGroupProject[]
+}
+
+model UserBillingGroup {
+  id     String @id @default(cuid())
+
+  userId String
+  user   user   @relation(fields: [userId], references: [id])
+
+  billingGroupId String
+  billingGroup   BillingGroup @relation(fields: [billingGroupId], references: [id])
+
+  role UserBillingGroupRole @default(MEMBER)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  logs logs[]
+}
+
+enum UserBillingGroupRole {
+  ADMIN
+  MEMBER
+}
+
+model BillingGroupProject {
+  id String @id @default(cuid())
+
+  billingGroupId String
+  billingGroup   BillingGroup @relation(fields: [billingGroupId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  logs logs[]
+  images BillingGroupProjectFile[]
+}
+
+model BillingGroupProjectFile {
+  id String @id @default(cuid())
+
+  fileKey  String
+  fileUrl  String
+  fileName String
+  fileType String
+
+  BillingGroupProjectId String
+  project   BillingGroupProject @relation(fields: [BillingGroupProjectId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  logs logs[]
 }
