@@ -4,8 +4,6 @@ import html_to_pdf from "html-pdf-node";
 import { prisma } from "#prisma";
 import { LogType } from "@prisma/client";
 
-const options = { format: "Letter", printBackground: true };
-
 export const calculateTotalCostOfJobByJobId = async (jobId) => {
   const data = await prisma.job.findFirst({
     where: {
@@ -85,7 +83,11 @@ export const generateInvoice = async (data, userId, shopId) => {
 
         html_to_pdf.generatePdf(
           { content: html },
-          options,
+          {
+            format: "Letter",
+            printBackground: true,
+            args: ["--no-sandbox", "--disable-setuid-sandbox"],
+          },
           async (err, res) => {
             if (err) reject(err);
             const ut = await utapi.uploadFiles([

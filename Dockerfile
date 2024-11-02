@@ -9,6 +9,9 @@ RUN apk add --no-cache \
     ca-certificates \
     ttf-freefont
 
+ENV PUPPETEER_SKIP_DOWNLOAD true
+ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
+
 # Accept build-time arguments
 ARG DATABASE_URL
 
