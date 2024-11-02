@@ -1,3 +1,4 @@
+import { LogType } from "@prisma/client";
 import { prisma } from "../../util/prisma.js";
 import { verifyAuth } from "../../util/verifyAuth.js";
 
@@ -21,6 +22,16 @@ export const get = [
               jobs: true,
             },
           },
+          // Most recent login
+          logs: {
+            where: {
+              type: LogType.USER_LOGIN,
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+            take: 1,
+          },
         },
         take: req.query.limit ? parseInt(req.query.limit) : 20,
         skip: req.query.offset ? parseInt(req.query.offset) : 0,
@@ -33,6 +44,8 @@ export const get = [
         shopCount: user._count.shops,
         jobCount: user._count.jobs,
         _count: undefined,
+        lastLogin: user.logs[0]?.createdAt,
+        logs: undefined,
       }));
 
       // Remove undefined values

@@ -62,6 +62,12 @@ export const UsersPage = () => {
               sortable: true,
             },
             { label: "Email", accessor: "email", sortable: true },
+            {
+              label: "Last login",
+              accessor: "lastLogin",
+              sortable: true,
+              render: (v) => (v ? moment(v).format("MM/DD/YY, h:mm a") : "-"),
+            },
             { label: "Shops", accessor: "shopCount" },
             { label: "Jobs", accessor: "jobCount" },
             {
