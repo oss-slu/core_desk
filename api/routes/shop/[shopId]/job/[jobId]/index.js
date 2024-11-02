@@ -1,4 +1,5 @@
-import { LedgerItemType, LogType } from "@prisma/client";
+// eslint-disable-next-line no-unused-vars
+import { LedgerItemType, LogType, Prisma } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";
@@ -180,11 +181,13 @@ export const put = [
           return res.status(400).json({ error: "Forbidden" });
         }
 
+        console.log("Generating Invoice");
         const { url, key, value, log } = await generateInvoice(
           job,
           userId,
           shopId
         );
+        console.log("Generated Invoice", url);
         await prisma.job.update({
           where: {
             id: jobId,

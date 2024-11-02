@@ -72,6 +72,7 @@ export const generateInvoice = async (data, userId, shopId) => {
       id: userId,
     },
   });
+  console.log("Data loaded");
 
   return new Promise((resolve, reject) => {
     ejs.renderFile(
@@ -80,6 +81,7 @@ export const generateInvoice = async (data, userId, shopId) => {
       async (err, html) => {
         if (err) console.error(err);
         if (err) reject(err);
+        console.log("Rendered HTML");
 
         html_to_pdf.generatePdf(
           { content: html },
@@ -89,6 +91,7 @@ export const generateInvoice = async (data, userId, shopId) => {
             args: ["--no-sandbox", "--disable-setuid-sandbox"],
           },
           async (err, res) => {
+            console.log("Generated PDF");
             if (err) reject(err);
             const ut = await utapi.uploadFiles([
               new File([res], "invoice.pdf", { type: "application/pdf" }),
@@ -110,6 +113,8 @@ export const generateInvoice = async (data, userId, shopId) => {
                 }),
               },
             });
+
+            console.log("Generated Invoice", ut[0].data.url);
 
             resolve({
               url: ut[0].data.url,
