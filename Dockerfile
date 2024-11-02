@@ -1,16 +1,13 @@
 # Base image for frontend and backend
 FROM node:20-alpine AS base
 
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache \
     chromium \
-    libnss3 \
-    libxss1 \
-    libasound2 \
-    fonts-liberation \
-    libappindicator3-1 \
-    libatk-bridge2.0-0 \
-    libxkbcommon0 \
-    xdg-utils
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont
 
 # Accept build-time arguments
 ARG DATABASE_URL
