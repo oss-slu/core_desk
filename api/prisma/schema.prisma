@@ -480,6 +480,12 @@ model JobItem {
   fileThumbnailUrl  String?
   fileThumbnailName String?
 
+  stlVolume Float?
+  stlBoundingBoxX Float?
+  stlBoundingBoxY Float?
+  stlBoundingBoxZ Float?
+  stlIsWatertight Boolean?
+
   resource   Resource? @relation(fields: [resourceId], references: [id])
   resourceId String?
 

@@ -2,7 +2,7 @@ import { LogType } from "@prisma/client";
 import { prisma } from "#prisma";
 import { utapi } from "../config/uploadthing.js";
 import { renderStl } from "./renderStl.js";
-import { writeFileSync } from "fs";
+import NodeStl from "node-stl";
 
 const logging = false;
 
@@ -41,14 +41,20 @@ export const handleUpload = async (data) => {
 
     const fileType = data.file.name.split(".").pop();
     if (fileType === "stl") {
+      console.log("STL");
       // Render stl
-      const pngData = await renderStl(data.file.url);
+      const [pngData, stlData] = await renderStl(data.file.url);
+
       const upload = await utapi.uploadFiles([
         new File([pngData], `${data.file.name}.preview.png`, {
           type: "image/png",
         }),
       ]);
-      await prisma.jobItem.update({
+
+      const stlStats = new NodeStl(Buffer.from(stlData));
+      console.log(stlStats);
+
+      const newJobItem = await prisma.jobItem.update({
         where: {
           id: jobItem.id,
         },
@@ -56,8 +62,14 @@ export const handleUpload = async (data) => {
           fileThumbnailKey: upload[0].data.key,
           fileThumbnailName: upload[0].data.name,
           fileThumbnailUrl: upload[0].data.url,
+          stlVolume: stlStats.volume,
+          stlIsWatertight: stlStats.isWatertight,
+          stlBoundingBoxX: stlStats.boundingBox[0] / 10,
+          stlBoundingBoxY: stlStats.boundingBox[1] / 10,
+          stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
         },
       });
+      console.log(newJobItem);
     }
 
     await prisma.logs.create({

@@ -17,5 +17,5 @@ export const renderStl = async (stlUrl, size = 200) => {
     edgeMaterials: [edgemat],
   });
 
-  return pngData;
+  return [pngData, stlData];
 };

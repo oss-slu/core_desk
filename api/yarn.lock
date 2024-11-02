@@ -1762,6 +1762,11 @@ node-fetch@2.6.1:
   resolved "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.1.tgz"
   integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
+node-stl@^0.7.3:
+  version "0.7.3"
+  resolved "https://registry.npmjs.org/node-stl/-/node-stl-0.7.3.tgz"
+  integrity sha512-ZdqkD7vE7VskSOVgj6p9z9G5pYEXIAq53Vw276kCPdZyimintgxqwpbdwPAxspgJIvsrno3q8jB8g7UDwNREGg==
+
 nodemon@^3.1.7:
   version "3.1.7"
   resolved "https://registry.npmjs.org/nodemon/-/nodemon-3.1.7.tgz"

@@ -92,7 +92,35 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
           />
           <Util.Row gap={2} align="start" threshold={1100} style={{ flex: 1 }}>
             <div style={{ maxWidth: 280 }}>
-              <H3>{item.title}</H3>
+              <H3 className="mb-0">{item.title}</H3>
+              {item.stlBoundingBoxX ? (
+                <>
+                  <Util.Row gap={1}>
+                    <span>
+                      <Icon i="cube-3d-sphere" />
+                      {item.stlBoundingBoxX.toFixed(2)} x{" "}
+                      {item.stlBoundingBoxY.toFixed(2)} x{" "}
+                      {item.stlBoundingBoxZ.toFixed(2)} cm
+                    </span>
+                    <span>
+                      {item.stlIsWatertight ? (
+                        <>
+                          <Icon i="droplet" color="green" />
+                          Watertight
+                        </>
+                      ) : (
+                        <>
+                          <Icon i="droplet-off" color="red" />
+                          Not Watertight
+                        </>
+                      )}
+                    </span>
+                  </Util.Row>
+                  <Util.Spacer size={0.5} />
+                </>
+              ) : (
+                <Util.Spacer size={1} />
+              )}
               <Util.Row gap={1} align="center">
                 <Button
                   onClick={modal}
