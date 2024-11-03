@@ -47,12 +47,18 @@ export const useJob = (shopId, jobId) => {
         body: JSON.stringify(newJob),
       });
       const data = await r.json();
-      if (data.job) {
-        setJob(data.job);
+      console.log(job, data);
+      if (newJob.finalized) {
+        fetchJob(false);
         setOpLoading(false);
       } else {
-        setError("Internal server error");
-        setOpLoading(false);
+        if (data.job) {
+          setJob(data.job);
+          setOpLoading(false);
+        } else {
+          setError("Internal server error");
+          setOpLoading(false);
+        }
       }
     } catch (error) {
       setError(error);

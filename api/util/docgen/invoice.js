@@ -1,8 +1,8 @@
 import ejs from "ejs";
 import { utapi } from "../../config/uploadthing.js";
-import html_to_pdf from "html-pdf-node";
 import { prisma } from "#prisma";
 import { LogType } from "@prisma/client";
+import { htmlToPdf } from "../htmlToPdf.js";
 
 export const calculateTotalCostOfJobByJobId = async (jobId) => {
   const data = await prisma.job.findFirst({
@@ -83,47 +83,38 @@ export const generateInvoice = async (data, userId, shopId) => {
         if (err) reject(err);
         console.log("Rendered HTML");
 
-        html_to_pdf.generatePdf(
-          { content: html },
-          {
-            format: "Letter",
-            printBackground: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
-          },
-          async (err, res) => {
-            console.log("Generated PDF");
-            if (err) reject(err);
-            const ut = await utapi.uploadFiles([
-              new File([res], "invoice.pdf", { type: "application/pdf" }),
-            ]);
-            if (!ut || !ut[0] || !ut[0].data) {
-              console.error(ut);
-              reject("Upload failed");
-            }
+        const pdf = await htmlToPdf(html);
 
-            const log = await prisma.logs.create({
-              data: {
-                type: LogType.JOB_INVOICE_GENERATED,
-                jobId: data.id,
-                userId,
-                to: JSON.stringify({
-                  url: ut[0].data.url,
-                  key: ut[0].data.key,
-                  value: calculateTotalCostOfJob(data),
-                }),
-              },
-            });
+        console.log("Generated PDF");
+        const ut = await utapi.uploadFiles([
+          new File([pdf], "invoice.pdf", { type: "application/pdf" }),
+        ]);
+        if (!ut || !ut[0] || !ut[0].data) {
+          console.error(ut);
+          reject("Upload failed");
+        }
 
-            console.log("Generated Invoice", ut[0].data.url);
-
-            resolve({
+        const log = await prisma.logs.create({
+          data: {
+            type: LogType.JOB_INVOICE_GENERATED,
+            jobId: data.id,
+            userId,
+            to: JSON.stringify({
               url: ut[0].data.url,
               key: ut[0].data.key,
               value: calculateTotalCostOfJob(data),
-              log,
-            });
-          }
-        );
+            }),
+          },
+        });
+
+        console.log("Generated Invoice", ut[0].data.url);
+
+        resolve({
+          url: ut[0].data.url,
+          key: ut[0].data.key,
+          value: calculateTotalCostOfJob(data),
+          log,
+        });
       }
     );
   });

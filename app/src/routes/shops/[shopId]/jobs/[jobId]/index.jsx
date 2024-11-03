@@ -293,11 +293,7 @@ export const JobPage = () => {
               key={item.id}
               item={item}
               refetchJobs={refetchJobs}
-              userIsPrivileged={
-                user.admin ||
-                userShop.accountType === "ADMIN" ||
-                userShop.accountType === "OPERATOR"
-              }
+              userIsPrivileged={userIsPrivileged}
             />
           ))}
         </Util.Col>

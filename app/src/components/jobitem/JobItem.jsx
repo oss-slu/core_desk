@@ -255,6 +255,7 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
               item={item}
               onChange={(value) => updateJobItem(value)}
               loading={opLoading}
+              userIsPrivileged={userIsPrivileged}
             />
           ) : (
             <Badge color="red" soft>
