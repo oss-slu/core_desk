@@ -8,10 +8,10 @@ const browser = await puppeteer.launch({
 });
 console.log("Launched Puppeteer");
 
-const page = await browser.newPage();
-console.log("Created Page");
-
 export const htmlToPdf = async (html) => {
+  const page = await browser.newPage();
+  console.log("Created Page");
+
   await page.setContent(html, { waitUntil: "domcontentloaded" });
 
   const pdf = await page.pdf({ format: "letter" });
