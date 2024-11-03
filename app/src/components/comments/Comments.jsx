@@ -38,6 +38,7 @@ export const Comments = ({ jobId, shopId }) => {
             Post Comment
           </Button>
         </div>
+        <Util.Spacer size={2} />
         {comments.map((comment) => (
           <Comment key={comment.id} comment={comment} />
         ))}

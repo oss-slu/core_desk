@@ -96,8 +96,11 @@ export const Jobs = () => {
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
-    // "NOT_STARTED",
-    // "IN_PROGRESS",
+    "NOT_STARTED",
+    "IN_PROGRESS",
+    "WAITING",
+    "WAITING_FOR_PICKUP",
+    "WAITING_FOR_PAYMENT",
   ]);
   const [startDateFilter, setStartDateFilter] = useState(null);
   const [endDateFilter, setEndDateFilter] = useState(null);

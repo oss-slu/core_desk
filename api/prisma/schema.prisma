@@ -412,7 +412,7 @@ model LedgerItem {
   shop   Shop   @relation(fields: [shopId], references: [id])
 
   jobId  String? @unique
-  job    Job?    @relation(fields: [jobId], references: [id])
+  job    Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   type LedgerItemType
 
@@ -445,7 +445,7 @@ model JobComment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  job   Job    @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   jobId String
 
   user   user   @relation(fields: [userId], references: [id])
@@ -476,7 +476,7 @@ model AdditionalCostLineItem {
 
   active Boolean @default(true)
 
-  job   Job    @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   jobId String
 }
 
@@ -520,7 +520,7 @@ model JobItem {
   materialQty       Float?
 
   jobId String
-  job   Job    @relation(fields: [jobId], references: [id])
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
   logs  logs[]
 }
 
