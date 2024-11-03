@@ -6,7 +6,10 @@ const browser = await puppeteer.launch({
   //   : undefined,
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
 });
+console.log("Launched Puppeteer");
+
 const page = await browser.newPage();
+console.log("Created Page");
 
 export const htmlToPdf = async (html) => {
   await page.setContent(html, { waitUntil: "domcontentloaded" });
