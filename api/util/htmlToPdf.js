@@ -1,13 +1,17 @@
 import puppeteer from "puppeteer";
 
 const browser = await puppeteer.launch({
-  executablePath: "/usr/bin/chromium-browser",
+  executablePath: process.env.NODE_ENV
+    ? "/usr/bin/chromium-browser"
+    : undefined,
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
 });
 const page = await browser.newPage();
 
 export const htmlToPdf = async (html) => {
-  await page.setContent(html);
+  await page.setContent(html, { waitUntil: "domcontentloaded" });
+
   const pdf = await page.pdf({ format: "letter" });
+
   return pdf;
 };
