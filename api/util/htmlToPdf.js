@@ -1,9 +1,9 @@
 import puppeteer from "puppeteer";
 
 const browser = await puppeteer.launch({
-  // executablePath: process.env.NODE_ENV
-  //   ? "/usr/bin/chromium-browser"
-  //   : undefined,
+  executablePath:
+    process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
+
   args: ["--no-sandbox", "--disable-setuid-sandbox"],
 });
 console.log("Launched Puppeteer");
