@@ -37,7 +37,7 @@ export const useResourceTypes = (shopId) => {
   const { data, error, mutate } = useSWR(
     `/api/shop/${shopId}/resources/type`,
     fetcher,
-    { suspense: true } // optional, for suspense mode
+    { suspense: false }
   );
 
   const [opLoading, setOpLoading] = useState(false);
