@@ -180,8 +180,8 @@ export const post = [
                 ? "n operator"
                 : req.body.role === "ADMIN"
                 ? "n admin"
-                : req.body.role === "INSTRUCTOR"
-                ? "n instructor"
+                : req.body.role === "GROUP_ADMIN"
+                ? "n group admin"
                 : ""
             }`,
             type: LogType.USER_CONNECTED_TO_SHOP,
@@ -363,8 +363,8 @@ export const put = [
               ? "n operator"
               : req.body.role === "ADMIN"
               ? "n admin"
-              : req.body.role === "INSTRUCTOR"
-              ? "n instructor"
+              : req.body.role === "GROUP_ADMIN"
+              ? "n group admin"
               : ""
           }`,
           type: LogType.USER_SHOP_ROLE_CHANGED,

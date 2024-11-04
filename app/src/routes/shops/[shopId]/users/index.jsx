@@ -29,10 +29,10 @@ const switchAccountTypeForBadge = (type) => {
           Operator
         </Badge>
       );
-    case "INSTRUCTOR":
+    case "GROUP_ADMIN":
       return (
         <Badge color="pink" soft>
-          Instructor
+          Group Admin
         </Badge>
       );
     default:

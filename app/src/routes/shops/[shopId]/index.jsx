@@ -79,7 +79,7 @@ export const shopSidenavItems = (
   if (
     accountType === "ADMIN" ||
     accountType === "OPERATOR" ||
-    accountType === "INSTRUCTOR" ||
+    accountType === "GROUP_ADMIN" ||
     isGlobalAdmin
   ) {
     items.push({

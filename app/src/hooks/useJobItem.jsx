@@ -44,7 +44,7 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
       const res = await authFetch(
         `/api/shop/${shopId}/job/${jobId}/${jobItemId}`,
         {
-          method: "PATCH",
+          method: "PUT",
           headers: {
             "Content-Type": "application/json",
           },

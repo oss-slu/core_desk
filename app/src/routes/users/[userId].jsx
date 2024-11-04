@@ -63,7 +63,7 @@ const AddUserToShopForm = ({ user, onFinish }) => {
             { id: "CUSTOMER", label: "Customer" },
             { id: "OPERATOR", label: "Operator" },
             { id: "ADMIN", label: "Admin" },
-            { id: "INSTRUCTOR", label: "Instructor" },
+            { id: "GROUP_ADMIN", label: "Group Admin" },
           ]}
           value={selectedRole}
           onChange={setSelectedRole}
@@ -341,7 +341,7 @@ export const UserPage = () => {
                           { id: "CUSTOMER", label: "Customer" },
                           { id: "OPERATOR", label: "Operator" },
                           { id: "ADMIN", label: "Admin" },
-                          { id: "INSTRUCTOR", label: "Instructor" },
+                          { id: "GROUP_ADMIN", label: "Group Admin" },
                         ]}
                         onChange={async (value) => {
                           await changeUserRole(

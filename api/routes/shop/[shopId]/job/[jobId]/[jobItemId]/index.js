@@ -41,7 +41,7 @@ export const get = [
   },
 ];
 
-export const patch = [
+export const put = [
   verifyAuth,
   async (req, res) => {
     const { shopId, jobId, jobItemId } = req.params;

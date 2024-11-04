@@ -13,6 +13,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator docs {
+  provider = "node node_modules/prisma-docs-generator"
+}
+
 model user {
   id        String @id @default(cuid())
   email     String @unique
@@ -166,7 +170,7 @@ enum AccountType {
   CUSTOMER
   OPERATOR
   ADMIN
-  INSTRUCTOR
+  GROUP_ADMIN
 }
 
 model Shop {
@@ -542,6 +546,7 @@ model BillingGroup {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  active    Boolean  @default(true)
 
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id])
@@ -564,6 +569,7 @@ model UserBillingGroup {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  active    Boolean  @default(true)
 
   logs logs[]
 }
