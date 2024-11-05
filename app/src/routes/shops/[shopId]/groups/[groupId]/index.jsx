@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAuth,
   useBillingGroup,
@@ -17,12 +17,14 @@ import { Table } from "tabler-react-2/dist/table";
 import moment from "moment";
 import { MOMENT_FORMAT } from "../../../../../util/constants";
 import Badge from "tabler-react-2/dist/badge";
+import { EditBillingGroup } from "../../../../../components/billingGroup/EditBillingGroup";
 
 export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
   const { user } = useAuth();
   const { userShop, shop } = useShop(shopId);
-  const { billingGroup, loading } = useBillingGroup(shopId, groupId);
+  const { billingGroup, loading, opLoading, updateBillingGroup } =
+    useBillingGroup(shopId, groupId);
   const {
     billingGroupInvitations,
     loading: loadingInvitations,
@@ -38,6 +40,8 @@ export const BillingGroupPage = () => {
       />
     ),
   });
+
+  const [editing, setEditing] = useState(false);
 
   const userIsPrivileged =
     user.admin ||
@@ -71,14 +75,42 @@ export const BillingGroupPage = () => {
       )}
     >
       {ModalElement}
-      <h1>{billingGroup.title}</h1>
-      <p>
-        <b>Admin</b>: {billingGroup.adminUsers[0].name}
-        <br />
-        {billingGroup.userCount} user{billingGroup.userCount > 1 ? "s" : ""}
-      </p>
+      <Util.Row justify="between" align="center">
+        <h1>{billingGroup.title}</h1>
+        {userIsPrivileged && (
+          <>
+            {editing ? (
+              <Button
+                variant="primary"
+                onClick={() => {
+                  setEditing(false);
+                }}
+              >
+                Save
+              </Button>
+            ) : (
+              <Button onClick={() => setEditing(true)}>Edit</Button>
+            )}
+          </>
+        )}
+      </Util.Row>
+      {editing ? (
+        <>
+          <EditBillingGroup
+            billingGroup={billingGroup}
+            opLoading={opLoading}
+            updateBillingGroup={updateBillingGroup}
+          />
+        </>
+      ) : (
+        <p>
+          <b>Admin</b>: {billingGroup.adminUsers[0].name}
+          <br />
+          {billingGroup.userCount} user{billingGroup.userCount > 1 ? "s" : ""}
+        </p>
+      )}
       <Util.Spacer size={1} />
-      {userIsPrivileged && (
+      {userIsPrivileged && !editing && (
         <>
           <Util.Row justify="between" align="center">
             <h2>Invitations</h2>

@@ -84,12 +84,6 @@ model logs {
   userBillingGroup   UserBillingGroup? @relation(fields: [userBillingGroupId], references: [id], onDelete: Cascade)
   userBillingGroupId String?
 
-  billingGroupProject   BillingGroupProject? @relation(fields: [billingGroupProjectId], references: [id], onDelete: Cascade)
-  billingGroupProjectId String?
-
-  billingGroupProjectFile   BillingGroupProjectFile? @relation(fields: [billingGroupProjectFileId], references: [id], onDelete: Cascade)
-  billingGroupProjectFileId String?
-
   billingGroupInvitationLink   BillingGroupInvitationLink? @relation(fields: [billingGroupInvitationLinkId], references: [id], onDelete: Cascade)
   billingGroupInvitationLinkId String?
 
@@ -395,6 +389,9 @@ model Job {
   resource   Resource? @relation(fields: [resourceId], references: [id])
   resourceId String?
 
+  group   BillingGroup? @relation(fields: [groupId], references: [id])
+  groupId String?
+
   dueDate DateTime?
 
   finalized   Boolean     @default(false)
@@ -557,9 +554,11 @@ model BillingGroup {
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id])
 
+  membersCanCreateProjects Boolean @default(false)
+
   users UserBillingGroup[]
   logs logs[]
-  projects BillingGroupProject[]
+  jobs Job[]
   invitationLinks BillingGroupInvitationLink[]
 }
 
@@ -598,34 +597,4 @@ model UserBillingGroup {
 enum UserBillingGroupRole {
   ADMIN
   MEMBER
-}
-
-model BillingGroupProject {
-  id String @id @default(cuid())
-
-  billingGroupId String
-  billingGroup   BillingGroup @relation(fields: [billingGroupId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  logs logs[]
-  images BillingGroupProjectFile[]
-}
-
-model BillingGroupProjectFile {
-  id String @id @default(cuid())
-
-  fileKey  String
-  fileUrl  String
-  fileName String
-  fileType String
-
-  BillingGroupProjectId String
-  project   BillingGroupProject @relation(fields: [BillingGroupProjectId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  logs logs[]
 }
