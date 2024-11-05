@@ -7,3 +7,5 @@ export const RESOURCE_TYPES = [
   { id: "TOOL", label: "Tool" },
   { id: "OTHER", label: "Other" },
 ];
+
+export const MOMENT_FORMAT = "MM/DD/YY, h:mm a";

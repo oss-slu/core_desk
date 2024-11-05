@@ -1,0 +1,163 @@
+import React from "react";
+import {
+  useAuth,
+  useBillingGroup,
+  useBillingGroupInvitations,
+  useShop,
+} from "../../../../../hooks";
+import { Link, useParams } from "react-router-dom";
+import { shopSidenavItems } from "../..";
+import { Page } from "../../../../../components/page/page";
+import { Loading } from "../../../../../components/loading/Loading";
+import { Button } from "tabler-react-2/dist/button";
+import { Util } from "tabler-react-2";
+import { useModal } from "tabler-react-2/dist/modal";
+import { CreateBillingGroupInvitation } from "../../../../../components/billingGroup/CreateBillingGroupInvitation";
+import { Table } from "tabler-react-2/dist/table";
+import moment from "moment";
+import { MOMENT_FORMAT } from "../../../../../util/constants";
+import Badge from "tabler-react-2/dist/badge";
+
+export const BillingGroupPage = () => {
+  const { shopId, groupId } = useParams();
+  const { user } = useAuth();
+  const { userShop, shop } = useShop(shopId);
+  const { billingGroup, loading } = useBillingGroup(shopId, groupId);
+  const {
+    billingGroupInvitations,
+    loading: loadingInvitations,
+    createBillingGroupInvitation,
+    opLoading: opLoadingInvitations,
+  } = useBillingGroupInvitations(shopId, groupId);
+  const { modal, ModalElement } = useModal({
+    title: "Create a new invitation link",
+    text: (
+      <CreateBillingGroupInvitation
+        createBillingGroupInvitation={createBillingGroupInvitation}
+        opLoading={opLoadingInvitations}
+      />
+    ),
+  });
+
+  const userIsPrivileged =
+    user.admin ||
+    userShop.accountType === "ADMIN" ||
+    userShop.accountType === "OPERATOR" ||
+    billingGroup.userRole === "ADMIN";
+
+  if (loading || loadingInvitations)
+    return (
+      <Page
+        sidenavItems={shopSidenavItems(
+          "Billing Groups",
+          shopId,
+          user.admin,
+          userShop.accountType,
+          userShop.balance < 0
+        )}
+      >
+        <Loading />
+      </Page>
+    );
+
+  return (
+    <Page
+      sidenavItems={shopSidenavItems(
+        "Billing Groups",
+        shopId,
+        user.admin,
+        userShop.accountType,
+        userShop.balance < 0
+      )}
+    >
+      {ModalElement}
+      <h1>{billingGroup.title}</h1>
+      <p>
+        <b>Admin</b>: {billingGroup.adminUsers[0].name}
+        <br />
+        {billingGroup.userCount} user{billingGroup.userCount > 1 ? "s" : ""}
+      </p>
+      <Util.Spacer size={1} />
+      {userIsPrivileged && (
+        <>
+          <Util.Row justify="between" align="center">
+            <h2>Invitations</h2>
+            <Button onClick={modal}>Create a new invitation link</Button>
+          </Util.Row>
+          <Util.Spacer size={1} />
+          <Table
+            columns={[
+              {
+                label: "Link",
+                accessor: "id",
+                render: (id) => (
+                  <Link
+                    to={`/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`}
+                  >
+                    Link
+                  </Link>
+                ),
+              },
+              {
+                label: "Expires",
+                accessor: "expires",
+                sortable: true,
+                render: (e) => moment(e).format(MOMENT_FORMAT) || "Never",
+              },
+              {
+                label: "Active",
+                accessor: "active",
+                render: (a) =>
+                  a ? (
+                    <Badge color="green" soft>
+                      Yes
+                    </Badge>
+                  ) : (
+                    <Badge color="red" soft>
+                      No
+                    </Badge>
+                  ),
+                sortable: true,
+              },
+            ]}
+            data={billingGroupInvitations}
+          />
+          <Util.Spacer size={2} />
+          <h2>Users</h2>
+          <p>
+            {billingGroup.userCount} user{billingGroup.userCount > 1 ? "s" : ""}
+          </p>
+          <Table
+            columns={[
+              {
+                label: "Name",
+                accessor: "user",
+                render: (user) => user.firstName + " " + user.lastName,
+              },
+              {
+                label: "Email",
+                accessor: "user.email",
+                render: (email) => <Link to={`mailto:${email}`}>{email}</Link>,
+              },
+              {
+                label: "Joined at",
+                accessor: "createdAt",
+                render: (c) => moment(c).format(MOMENT_FORMAT),
+              },
+              {
+                label: "Role",
+                accessor: "role",
+                render: (role) => (
+                  <Badge color="blue" soft>
+                    {role.charAt(0) + role.slice(1).toLowerCase()}
+                  </Badge>
+                ),
+              },
+            ]}
+            data={billingGroup.users}
+          />
+        </>
+      )}
+    </Page>
+  );
+};

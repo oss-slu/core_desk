@@ -1,5 +1,5 @@
 import { prisma } from "#prisma";
-import { verifyAuth } from "#verifyAuth";
+import { verifyAuth, verifyAuthAlone } from "#verifyAuth";
 import { LogType } from "@prisma/client";
 
 export const put = [
@@ -71,10 +71,9 @@ export const put = [
 ];
 
 export const get = [
-  verifyAuth,
   async (req, res) => {
     try {
-      const userId = req.user.id;
+      const user = await verifyAuthAlone(req.headers.authorization);
       const { shopId, groupId } = req.params;
 
       if (!shopId) {
@@ -85,48 +84,96 @@ export const get = [
         return res.status(400).send({ error: "Group ID is required" });
       }
 
-      const userShop = await prisma.userShop.findFirst({
+      let userIsPrivileged = false;
+      if (user) {
+        const userShop = await prisma.userShop.findFirst({
+          where: {
+            userId: user.id,
+            shopId,
+            active: true,
+          },
+        });
+
+        if (userShop) {
+          userIsPrivileged =
+            user.admin ||
+            userShop.accountType === "ADMIN" ||
+            userShop.accountType === "OPERATOR" ||
+            userShop.accountType === "GROUP_ADMIN";
+        }
+      }
+
+      const group = await prisma.billingGroup.findFirst({
         where: {
-          userId,
+          id: groupId,
           shopId,
-          active: true,
+          users: userIsPrivileged
+            ? undefined
+            : {
+                some: {
+                  user: user.id,
+                },
+              },
+        },
+        include: {
+          users: {
+            where: {
+              role: userIsPrivileged ? undefined : "ADMIN",
+              active: true,
+            },
+            orderBy: {
+              createdAt: "asc",
+            },
+            select: {
+              role: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  email: true,
+                  id: true,
+                  createdAt: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              users: {
+                where: {
+                  active: true,
+                },
+              },
+            },
+          },
         },
       });
 
-      if (!userShop) {
-        return res.status(400).send({ error: "Forbidden" });
-      }
+      const adminUsers = group.users.filter((user) => user.role === "ADMIN");
+      group.userCount = group._count.users;
+      group.adminUsers = adminUsers.map((user) => ({
+        name: user.user.firstName + " " + user.user.lastName,
+        id: user.user.id,
+      }));
 
-      const userIsPrivileged =
-        req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR";
+      group._count = undefined;
 
-      if (!userIsPrivileged) {
-        const userGroup = await prisma.userBillingGroup.findFirst({
+      group.userIsMember = false;
+      group.userRole = null;
+      if (user) {
+        const userBillingGroup = await prisma.userBillingGroup.findFirst({
           where: {
-            userId,
+            userId: user.id,
             billingGroupId: groupId,
             active: true,
           },
         });
 
-        if (!userGroup) {
-          return res.status(400).send({ error: "Forbidden" });
+        if (userBillingGroup) {
+          group.userIsMember = true;
+          group.userRole = userBillingGroup.role;
         }
       }
-
-      const userIsPrivilegedOrGroupAdmin =
-        userIsPrivileged || userShop.accountType === "GROUP_ADMIN";
-
-      const group = await prisma.billingGroup.findFirst({
-        where: {
-          id: groupId,
-        },
-        include: {
-          users: userIsPrivilegedOrGroupAdmin ? true : false,
-        },
-      });
 
       res.json({ group });
     } catch (error) {

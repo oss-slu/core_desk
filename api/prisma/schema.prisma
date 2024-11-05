@@ -90,6 +90,9 @@ model logs {
   billingGroupProjectFile   BillingGroupProjectFile? @relation(fields: [billingGroupProjectFileId], references: [id], onDelete: Cascade)
   billingGroupProjectFileId String?
 
+  billingGroupInvitationLink   BillingGroupInvitationLink? @relation(fields: [billingGroupInvitationLinkId], references: [id], onDelete: Cascade)
+  billingGroupInvitationLinkId String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -146,6 +149,9 @@ enum LogType {
   BILLING_GROUP_PROJECT_MODIFIED
   BILLING_GROUP_PROJECT_DELETED
   BILLING_GROUP_PROJECT_FILE_UPLOADED
+  BILLING_GROUP_INVITATION_LINK_CREATED
+  BILLING_GROUP_INVITATION_LINK_DELETED
+  BILLING_GROUP_INVITATION_LINK_MODIFIED
 }
 
 model UserShop {
@@ -554,6 +560,21 @@ model BillingGroup {
   users UserBillingGroup[]
   logs logs[]
   projects BillingGroupProject[]
+  invitationLinks BillingGroupInvitationLink[]
+}
+
+model BillingGroupInvitationLink {
+  id     String @id @default(cuid())
+  active Boolean @default(true)
+  expires DateTime?
+
+  billingGroupId String
+  billingGroup   BillingGroup @relation(fields: [billingGroupId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  logs logs[]
 }
 
 model UserBillingGroup {

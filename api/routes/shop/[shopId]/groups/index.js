@@ -33,9 +33,32 @@ export const post = [
         userShop.accountType === "ADMIN" ||
         userShop.accountType === "OPERATOR" ||
         userShop.accountType === "GROUP_ADMIN";
+      const userIsStaff =
+        req.user.admin ||
+        userShop.accountType === "ADMIN" ||
+        userShop.accountType === "OPERATOR";
 
       if (!userIsPrivileged) {
         return res.status(400).send({ error: "Forbidden" });
+      }
+
+      let userToConnect = null;
+      if (req.body.assignAdminToSelf) {
+        userToConnect = {
+          userId,
+          role: "ADMIN",
+        };
+      } else {
+        if (!userIsStaff) {
+          return res.status(400).send({ error: "Forbidden" });
+        }
+        if (!req.body.adminUserId) {
+          return res.status(400).send({ error: "Admin user ID is required" });
+        }
+        userToConnect = {
+          userId: req.body.adminUserId,
+          role: "ADMIN",
+        };
       }
 
       const group = await prisma.billingGroup.create({
@@ -43,10 +66,7 @@ export const post = [
           shopId,
           title,
           users: {
-            connect: {
-              userId,
-              role: "ADMIN",
-            },
+            create: userToConnect,
           },
         },
       });
@@ -61,7 +81,7 @@ export const post = [
             to: JSON.stringify({ group }),
           },
           {
-            userId,
+            userId: userToConnect.userId,
             shopId,
             billingGroupId: group.id,
             type: LogType.USER_ADDED_TO_BILLING_GROUP,
@@ -69,6 +89,65 @@ export const post = [
           },
         ],
       });
+
+      const groups = await prisma.billingGroup.findMany({
+        where: {
+          shopId,
+          users: userIsPrivileged
+            ? undefined
+            : {
+                some: {
+                  userId,
+                },
+              },
+        },
+        include: {
+          users: {
+            where: {
+              role: "ADMIN",
+            },
+            orderBy: {
+              createdAt: "asc",
+            },
+            select: {
+              role: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  id: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              users: {
+                where: {
+                  active: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      // Process each group to find the admin user and rename _count.users to userCount
+      const groupsWithUserCountAndAdmin = groups.map((group) => {
+        const adminUsers = group.users.filter((user) => user.role === "ADMIN");
+        return {
+          ...group,
+          userCount: group._count.users,
+          adminUsers: adminUsers.map((user) => ({
+            name: user.user.firstName + " " + user.user.lastName,
+            id: user.user.id,
+          })),
+          users: undefined,
+          _count: undefined,
+        };
+      });
+
+      res.send({ groups: groupsWithUserCountAndAdmin });
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: "Internal server error" });
@@ -99,18 +178,69 @@ export const get = [
         return res.status(400).send({ error: "Forbidden" });
       }
 
+      const userIsPrivileged =
+        req.user.admin ||
+        userShop.accountType === "ADMIN" ||
+        userShop.accountType === "OPERATOR";
+
       const groups = await prisma.billingGroup.findMany({
         where: {
           shopId,
+          users: userIsPrivileged
+            ? undefined
+            : {
+                some: {
+                  userId,
+                },
+              },
+        },
+        include: {
           users: {
-            some: {
-              userId,
+            where: {
+              role: "ADMIN",
+            },
+            orderBy: {
+              createdAt: "asc",
+            },
+            select: {
+              role: true,
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  id: true,
+                },
+              },
+            },
+          },
+          _count: {
+            select: {
+              users: {
+                where: {
+                  active: true,
+                },
+              },
             },
           },
         },
       });
 
-      res.send({ groups });
+      // Process each group to find the admin user and rename _count.users to userCount
+      const groupsWithUserCountAndAdmin = groups.map((group) => {
+        const adminUsers = group.users.filter((user) => user.role === "ADMIN");
+        return {
+          ...group,
+          userCount: group._count.users,
+          adminUsers: adminUsers.map((user) => ({
+            name: user.user.firstName + " " + user.user.lastName,
+            id: user.user.id,
+          })),
+          users: undefined,
+          _count: undefined,
+        };
+      });
+
+      res.send({ groups: groupsWithUserCountAndAdmin });
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: "Internal server error" });

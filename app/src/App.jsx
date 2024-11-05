@@ -20,6 +20,9 @@ import { JobCostingPage } from "./routes/shops/[shopId]/jobs/[jobId]/costing";
 import { Billing } from "./routes/shops/[shopId]/billing";
 import { ShopUsersPage } from "./routes/shops/[shopId]/users";
 import { ShopUserPage } from "./routes/shops/[shopId]/users/[userId]";
+import { BillingGroupsPage } from "./routes/shops/[shopId]/groups";
+import { BillingGroupPage } from "./routes/shops/[shopId]/groups/[groupId]";
+import { BillingGroupInvitationPage } from "./routes/shops/[shopId]/groups/[groupId]/[inviteId]";
 
 // eslint-disable-next-line
 export default () => {
@@ -54,6 +57,10 @@ export default () => {
       >
         <Router>
           <Routes>
+            <Route
+              path="/shops/:shopId/billing-groups/:groupId/invitations/:inviteId"
+              element={<BillingGroupInvitationPage />}
+            />
             {loggedIn ? (
               <>
                 <Route path="/" element={<Home />} />
@@ -92,6 +99,14 @@ export default () => {
                 <Route
                   path="/shops/:shopId/resources/type/:resourceTypeId/materials/:materialId"
                   element={<MaterialPage />}
+                />
+                <Route
+                  path="/shops/:shopId/billing-groups"
+                  element={<BillingGroupsPage />}
+                />
+                <Route
+                  path="/shops/:shopId/billing-groups/:groupId"
+                  element={<BillingGroupPage />}
                 />
 
                 <Route path="*" element={<NotFound />} />

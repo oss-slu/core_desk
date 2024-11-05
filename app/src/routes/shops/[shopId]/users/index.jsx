@@ -55,7 +55,7 @@ export const ShopUsersPage = () => {
     return (
       <Page
         sidenavItems={shopSidenavItems(
-          "Billing",
+          "Users",
           shopId,
           user.admin,
           userShop.accountType,
