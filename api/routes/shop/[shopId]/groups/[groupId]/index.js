@@ -128,6 +128,7 @@ export const get = [
             select: {
               role: true,
               createdAt: true,
+              id: true,
               user: {
                 select: {
                   firstName: true,

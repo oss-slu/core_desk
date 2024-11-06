@@ -49,6 +49,29 @@ export const useBillingGroup = (shopId, billingGroupId) => {
     }
   };
 
+  const removeUserFromGroup = async (userId) => {
+    try {
+      setOpLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/groups/${billingGroupId}/users/${userId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const res = await r.json();
+      if (res.success) {
+        setOpLoading(false);
+        fetchBillingGroup(false);
+      } else {
+        setError(res);
+        setOpLoading(false);
+      }
+    } catch (error) {
+      setError(error);
+      setOpLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchBillingGroup();
   }, []);
@@ -59,6 +82,7 @@ export const useBillingGroup = (shopId, billingGroupId) => {
     error,
     refetch: fetchBillingGroup,
     updateBillingGroup,
+    removeUserFromGroup,
     opLoading,
   };
 };

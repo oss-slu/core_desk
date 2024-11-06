@@ -33,6 +33,7 @@ export const BillingGroupPage = () => {
     opLoading,
     updateBillingGroup,
     refetch: refetchBillingGroup,
+    removeUserFromGroup,
   } = useBillingGroup(shopId, groupId);
   const {
     billingGroupInvitations,
@@ -162,7 +163,16 @@ export const BillingGroupPage = () => {
                   label: "Expires",
                   accessor: "expires",
                   sortable: true,
-                  render: (e) => moment(e).format(MOMENT_FORMAT) || "Never",
+                  render: (e) => (
+                    <span>
+                      {moment(e).format(MOMENT_FORMAT) || "Never"}{" "}
+                      {e && moment(e).isBefore(moment()) && (
+                        <Badge color="red" soft>
+                          Expired
+                        </Badge>
+                      )}
+                    </span>
+                  ),
                 },
                 {
                   label: "Active",
@@ -203,7 +213,16 @@ export const BillingGroupPage = () => {
               {
                 label: "Name",
                 accessor: "user",
-                render: (user) => user.firstName + " " + user.lastName,
+                render: (u) => (
+                  <span>
+                    {u.firstName + " " + u.lastName}{" "}
+                    {u.id === user.id && (
+                      <Badge color="green" soft>
+                        You{" "}
+                      </Badge>
+                    )}
+                  </span>
+                ),
               },
               {
                 label: "Email",
@@ -223,6 +242,24 @@ export const BillingGroupPage = () => {
                     {role.charAt(0) + role.slice(1).toLowerCase()}
                   </Badge>
                 ),
+              },
+              {
+                label: "Remove",
+                accessor: "user.id",
+                render: (id) =>
+                  id === user.id ? (
+                    <></>
+                  ) : (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      outline
+                      onClick={() => removeUserFromGroup(id)}
+                      loading={opLoading}
+                    >
+                      <Icon i="plug-connected-x" /> Remove
+                    </Button>
+                  ),
               },
             ]}
             data={billingGroup.users}

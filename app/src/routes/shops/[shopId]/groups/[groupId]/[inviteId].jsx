@@ -37,7 +37,8 @@ export const BillingGroupInvitationPage = () => {
               Go to billing group
             </Button>
           </>
-        ) : (
+        ) : billingGroupInvitation.active &&
+          new Date(billingGroupInvitation.expires) >= new Date() ? (
           <>
             <p>
               You have been invited to join the billing group{" "}
@@ -64,6 +65,10 @@ export const BillingGroupInvitationPage = () => {
                 Log in to join billing group
               </Button>
             )}
+          </>
+        ) : (
+          <>
+            <p>This invitation has been deactivated or has expired.</p>
           </>
         )}
       </Card>
