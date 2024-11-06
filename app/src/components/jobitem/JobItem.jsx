@@ -93,6 +93,7 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
           <Util.Row gap={2} align="start" threshold={1100} style={{ flex: 1 }}>
             <div style={{ maxWidth: 280 }}>
               <H3 className="mb-0">{item.title}</H3>
+              <span>{item.userId || "Anonymous"}</span>
               {item.stlBoundingBoxX ? (
                 <>
                   <Util.Row gap={1}>

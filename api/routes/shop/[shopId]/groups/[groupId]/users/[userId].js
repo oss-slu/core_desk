@@ -38,7 +38,7 @@ export const del = [
       },
     });
 
-    await prisma.userBillingGroup.update({
+    const newBGUser = await prisma.userBillingGroup.update({
       where: {
         id: userBillingGroup.id,
       },
@@ -58,5 +58,7 @@ export const del = [
     });
 
     res.send({ success: true });
+
+    console.log(newBGUser);
   },
 ];

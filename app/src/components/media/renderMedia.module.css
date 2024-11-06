@@ -29,3 +29,10 @@
   max-width: unset;
   height: 300px;
 }
+
+.small {
+  width: 100px;
+  min-width: unset;
+  max-width: unset;
+  height: 100px;
+}

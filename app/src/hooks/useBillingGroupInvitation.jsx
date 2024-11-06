@@ -64,16 +64,16 @@ export const useBillingGroupInvitation = (
     try {
       setOpLoading(true);
       const r = await authFetch(
-        `/api/shop/${shopId}/groups/${groupId}/invite/${billingGroupInvitationId}`,
+        `/api/shop/${shopId}/billing-groups/${groupId}/invite/${billingGroupInvitationId}`,
         {
           method: "POST",
         }
       );
-      console.log(r);
-      const updatedBillingGroupInvitation = await r.json();
+      const updatedBillingGroupInvitation = (await r.json()).group;
+      console.log(updatedBillingGroupInvitation);
       if (updatedBillingGroupInvitation.id) {
         // setBillingGroupInvitation(updatedBillingGroupInvitation.invite);
-        navigate(`/shops/${shopId}/groups/${groupId}/portal`);
+        navigate(`/shops/${shopId}/billing-groups/${groupId}/portal`);
         setOpLoading(false);
       } else {
         setError(updatedBillingGroupInvitation);

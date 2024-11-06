@@ -8,6 +8,7 @@ export const RenderMedia = ({
   thumbnailUrl,
   fileType,
   big = false,
+  small = false,
 }) => {
   const [preview, setPreview] = useState(true);
   const timeoutRef = useRef(null);
@@ -37,7 +38,11 @@ export const RenderMedia = ({
     return (
       <img
         src={mediaUrl}
-        className={classNames(styles.image, big ? styles.big : "")}
+        className={classNames(
+          styles.image,
+          big ? styles.big : "",
+          small ? styles.small : ""
+        )}
         alt="media"
       />
     );
@@ -48,7 +53,11 @@ export const RenderMedia = ({
       return (
         <img
           src={thumbnailUrl}
-          className={classNames(styles.image, big ? styles.big : "")}
+          className={classNames(
+            styles.image,
+            big ? styles.big : "",
+            small ? styles.small : ""
+          )}
           alt="media"
           onClick={() => setPreview(false)}
         />
@@ -57,7 +66,11 @@ export const RenderMedia = ({
 
     return (
       <StlViewer
-        className={classNames(styles.image, big ? styles.big : "")}
+        className={classNames(
+          styles.image,
+          big ? styles.big : "",
+          small ? styles.small : ""
+        )}
         orbitControls
         shadows
         url={mediaUrl}
@@ -79,14 +92,24 @@ export const RenderMedia = ({
     return (
       <iframe
         src={mediaUrl}
-        className={classNames(styles.image, big ? styles.big : "")}
+        className={classNames(
+          styles.image,
+          big ? styles.big : "",
+          small ? styles.small : ""
+        )}
         title="PDF"
       />
     );
   }
 
   return (
-    <div className={classNames(styles.unsupported, big ? styles.big : "")}>
+    <div
+      className={classNames(
+        styles.unsupported,
+        big ? styles.big : "",
+        small ? styles.small : ""
+      )}
+    >
       {fileType}
       <i>Rendering is not supported for this file type</i>
     </div>

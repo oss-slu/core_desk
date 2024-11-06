@@ -20,7 +20,7 @@ export const BillingGroupInvitationPage = () => {
     useBillingGroup(shopId, groupId);
   const { loggedIn, login } = useAuth();
 
-  if (loading) return <Loading />;
+  if (loading || billingGroupLoading) return <Loading />;
 
   return (
     <div style={{ maxWidth: 400, margin: "auto" }}>
@@ -31,7 +31,7 @@ export const BillingGroupInvitationPage = () => {
             <Button
               color="primary"
               onClick={() => {
-                window.location.href = `/shops/${shopId}/billing-groups/${groupId}`;
+                window.location.href = `/shops/${shopId}/billing-groups/${groupId}/portal`;
               }}
             >
               Go to billing group

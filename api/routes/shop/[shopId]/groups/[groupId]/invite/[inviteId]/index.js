@@ -80,14 +80,33 @@ export const post = [
       });
 
       if (!userShop) {
-        userShop = await prisma.userShop.create({
-          data: {
+        const inactiveUserShop = await prisma.userShop.findFirst({
+          where: {
             userId,
             shopId,
-            active: true,
-            accountType: "CUSTOMER",
+            active: false,
           },
         });
+
+        if (inactiveUserShop) {
+          userShop = await prisma.userShop.update({
+            where: {
+              id: inactiveUserShop.id,
+            },
+            data: {
+              active: true,
+            },
+          });
+        } else {
+          userShop = await prisma.userShop.create({
+            data: {
+              userId,
+              shopId,
+              active: true,
+              accountType: "CUSTOMER",
+            },
+          });
+        }
 
         await prisma.logs.create({
           data: {
@@ -98,13 +117,31 @@ export const post = [
         });
       }
 
-      await prisma.userBillingGroup.create({
-        data: {
+      const userBillingGroup = await prisma.userBillingGroup.findFirst({
+        where: {
           userId,
           billingGroupId: invite.billingGroupId,
-          role: "MEMBER",
         },
       });
+
+      if (userBillingGroup) {
+        await prisma.userBillingGroup.update({
+          where: {
+            id: userBillingGroup.id,
+          },
+          data: {
+            active: true,
+          },
+        });
+      } else {
+        await prisma.userBillingGroup.create({
+          data: {
+            userId,
+            billingGroupId: invite.billingGroupId,
+            role: "MEMBER",
+          },
+        });
+      }
 
       await prisma.logs.create({
         data: {

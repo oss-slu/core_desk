@@ -61,6 +61,22 @@ const JOB_INCLUDE = {
   },
 };
 
+/** @type {Prisma.JobInclude} */
+const generateGroupInclude = (userId, userIsPrivileged) => {
+  /** @type {Prisma.JobInclude} */
+  const JOB_GROUP_INCLUDE = JSON.parse(JSON.stringify(JOB_INCLUDE));
+  JOB_GROUP_INCLUDE.items.where = {
+    active: true,
+    userId,
+  };
+  if (!userIsPrivileged) {
+    JOB_GROUP_INCLUDE.additionalCosts = undefined;
+    JOB_GROUP_INCLUDE.ledgerItems = undefined;
+    JOB_GROUP_INCLUDE.resource = undefined;
+  }
+  return JOB_GROUP_INCLUDE;
+};
+
 export const get = [
   verifyAuth,
   async (req, res) => {
@@ -87,14 +103,51 @@ export const get = [
         userShop.accountType === "ADMIN" ||
         userShop.accountType === "OPERATOR";
 
-      const job = await prisma.job.findFirst({
+      const initialJob = await prisma.job.findFirst({
         where: {
           id: jobId,
           shopId,
-          userId: shouldLoadAll ? undefined : userId,
         },
-        include: JOB_INCLUDE,
       });
+
+      let job;
+      if (initialJob.groupId && !shouldLoadAll) {
+        const INCLUDE = generateGroupInclude(userId);
+
+        // The job is part of a group, so we need to handle different users accessing it.
+
+        // Make sure the user is in the group
+        const userGroup = await prisma.userBillingGroup.findFirst({
+          where: {
+            userId,
+            billingGroupId: initialJob.groupId,
+            active: true,
+          },
+        });
+
+        if (!userGroup) {
+          return res
+            .status(400)
+            .json({ error: "You are not a member of this group" });
+        }
+
+        job = await prisma.job.findFirst({
+          where: {
+            id: jobId,
+            shopId,
+          },
+          include: INCLUDE,
+        });
+      } else {
+        job = await prisma.job.findFirst({
+          where: {
+            id: jobId,
+            shopId,
+            userId: shouldLoadAll ? undefined : userId,
+          },
+          include: JOB_INCLUDE,
+        });
+      }
 
       // TODO: Respect costing public
 
