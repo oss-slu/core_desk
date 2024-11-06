@@ -19,7 +19,7 @@ import { ShopUserPicker } from "../../../../components/shopUserPicker/ShopUserPi
 import { Modal } from "tabler-react-2/dist/modal";
 import { Price } from "../../../../components/price/RenderPrice";
 
-const switchStatusForBadge = (status) => {
+export const switchStatusForBadge = (status) => {
   switch (status) {
     case "IN_PROGRESS":
       return (

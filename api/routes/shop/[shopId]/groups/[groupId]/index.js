@@ -48,6 +48,7 @@ export const put = [
         data: {
           title: req.body.title,
           description: req.body.description,
+          membersCanCreateJobs: req.body.membersCanCreateJobs,
         },
       });
 
@@ -111,7 +112,7 @@ export const get = [
             ? undefined
             : {
                 some: {
-                  user: user.id,
+                  user: { id: user.id },
                 },
               },
         },
@@ -146,6 +147,7 @@ export const get = [
               },
             },
           },
+          jobs: true,
         },
       });
 

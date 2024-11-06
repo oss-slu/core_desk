@@ -40,7 +40,7 @@ export const get = [
   },
 ];
 
-export const subscribe = [
+export const post = [
   verifyAuth,
   async (req, res) => {
     try {

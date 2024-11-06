@@ -54,6 +54,7 @@ export const useJobs = (shopId) => {
   const [jobs, setJobs] = useState([]);
   const [meta, setMeta] = useState(null);
   const [opLoading, setOpLoading] = useState(false);
+  const [microLoading, setMicroLoading] = useState(false);
 
   const _createJob = async (title, description, dueDate) => {
     try {
@@ -77,22 +78,57 @@ export const useJobs = (shopId) => {
     text: <CreateJobModalContent onSubmit={_createJob} />,
   });
 
-  const fetchJobs = async () => {
+  const fetchJobs = async (shouldSetLoading = true) => {
     try {
-      setLoading(true);
+      shouldSetLoading ? setLoading(true) : setMicroLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/job`);
       const data = await r.json();
       setJobs(data.jobs);
       setMeta(data.meta);
       setLoading(false);
+      setMicroLoading(false);
     } catch (error) {
       setError(error);
       setLoading(false);
+      setMicroLoading(false);
     }
   };
 
   const createJob = async () => {
     modal();
+  };
+
+  const updateJob = async (jobId, newJob) => {
+    const job = jobs.find((j) => j.id === jobId);
+    if (job.finalized) {
+      const result = await confirm();
+      if (!result) {
+        return;
+      }
+    }
+    try {
+      setOpLoading(true);
+      const r = await authFetch(`/api/shop/${shopId}/job/${jobId}`, {
+        method: "PUT",
+        body: JSON.stringify(newJob),
+      });
+      const data = await r.json();
+      if (newJob.finalized) {
+        fetchJobs(false);
+        setOpLoading(false);
+      } else {
+        if (data.job) {
+          fetchJobs(false);
+          setOpLoading(false);
+        } else {
+          setError("Internal server error");
+          setOpLoading(false);
+        }
+      }
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -102,11 +138,13 @@ export const useJobs = (shopId) => {
   return {
     jobs,
     loading,
+    microLoading,
     error,
     meta,
     refetch: fetchJobs,
     ModalElement,
     createJob,
     opLoading,
+    updateJob,
   };
 };

@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
+import { useAuth } from "./useAuth";
+import { useNavigate } from "react-router-dom";
 
 export const useBillingGroupInvitation = (
   shopId,
@@ -10,6 +12,8 @@ export const useBillingGroupInvitation = (
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [billingGroupInvitation, setBillingGroupInvitation] = useState({});
+
+  const navigate = useNavigate();
 
   const fetchBillingGroupInvitation = async (shouldSetLoading = true) => {
     try {
@@ -35,7 +39,7 @@ export const useBillingGroupInvitation = (
     try {
       setOpLoading(true);
       const r = await authFetch(
-        `/api/shop/${shopId}/groups/${billingGroupInvitationId}`,
+        `/api/shop/${shopId}/groups/${groupId}/invite/${billingGroupInvitationId}`,
         {
           method: "PUT",
           body: JSON.stringify(data),
@@ -44,6 +48,32 @@ export const useBillingGroupInvitation = (
       const updatedBillingGroupInvitation = await r.json();
       if (updatedBillingGroupInvitation.invite) {
         setBillingGroupInvitation(updatedBillingGroupInvitation.invite);
+        setOpLoading(false);
+      } else {
+        setError(updatedBillingGroupInvitation);
+        setOpLoading(false);
+      }
+    } catch (error) {
+      setError(error);
+      setOpLoading(false);
+    }
+  };
+
+  const acceptBillingGroupInvitation = async () => {
+    console.log("acceptBillingGroupInvitation");
+    try {
+      setOpLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/groups/${groupId}/invite/${billingGroupInvitationId}`,
+        {
+          method: "POST",
+        }
+      );
+      console.log(r);
+      const updatedBillingGroupInvitation = await r.json();
+      if (updatedBillingGroupInvitation.id) {
+        // setBillingGroupInvitation(updatedBillingGroupInvitation.invite);
+        navigate(`/shops/${shopId}/groups/${groupId}/portal`);
         setOpLoading(false);
       } else {
         setError(updatedBillingGroupInvitation);
@@ -65,6 +95,7 @@ export const useBillingGroupInvitation = (
     error,
     refetch: fetchBillingGroupInvitation,
     updateBillingGroupInvitation,
+    acceptBillingGroupInvitation,
     opLoading,
   };
 };

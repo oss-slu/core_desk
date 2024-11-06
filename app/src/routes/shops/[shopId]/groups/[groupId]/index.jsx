@@ -18,13 +18,19 @@ import moment from "moment";
 import { MOMENT_FORMAT } from "../../../../../util/constants";
 import Badge from "tabler-react-2/dist/badge";
 import { EditBillingGroup } from "../../../../../components/billingGroup/EditBillingGroup";
+import { switchStatusForBadge } from "../../jobs";
 
 export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
   const { user } = useAuth();
   const { userShop, shop } = useShop(shopId);
-  const { billingGroup, loading, opLoading, updateBillingGroup } =
-    useBillingGroup(shopId, groupId);
+  const {
+    billingGroup,
+    loading,
+    opLoading,
+    updateBillingGroup,
+    refetch: refetchBillingGroup,
+  } = useBillingGroup(shopId, groupId);
   const {
     billingGroupInvitations,
     loading: loadingInvitations,
@@ -79,18 +85,7 @@ export const BillingGroupPage = () => {
         <h1>{billingGroup.title}</h1>
         {userIsPrivileged && (
           <>
-            {editing ? (
-              <Button
-                variant="primary"
-                onClick={() => {
-                  setEditing(false);
-                }}
-              >
-                Save
-              </Button>
-            ) : (
-              <Button onClick={() => setEditing(true)}>Edit</Button>
-            )}
+            {!editing && <Button onClick={() => setEditing(true)}>Edit</Button>}
           </>
         )}
       </Util.Row>
@@ -100,6 +95,11 @@ export const BillingGroupPage = () => {
             billingGroup={billingGroup}
             opLoading={opLoading}
             updateBillingGroup={updateBillingGroup}
+            onFinish={async () => {
+              await refetchBillingGroup(false);
+              setEditing(false);
+            }}
+            // updateBillingGroup={console.log}
           />
         </>
       ) : (
@@ -117,43 +117,50 @@ export const BillingGroupPage = () => {
             <Button onClick={modal}>Create a new invitation link</Button>
           </Util.Row>
           <Util.Spacer size={1} />
-          <Table
-            columns={[
-              {
-                label: "Link",
-                accessor: "id",
-                render: (id) => (
-                  <Link
-                    to={`/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`}
-                  >
-                    Link
-                  </Link>
-                ),
-              },
-              {
-                label: "Expires",
-                accessor: "expires",
-                sortable: true,
-                render: (e) => moment(e).format(MOMENT_FORMAT) || "Never",
-              },
-              {
-                label: "Active",
-                accessor: "active",
-                render: (a) =>
-                  a ? (
-                    <Badge color="green" soft>
-                      Yes
-                    </Badge>
-                  ) : (
-                    <Badge color="red" soft>
-                      No
-                    </Badge>
+          {billingGroupInvitations.length === 0 ? (
+            <i>
+              You do not have any invitation links.{" "}
+              <Link onClick={modal}>You can create one here.</Link>
+            </i>
+          ) : (
+            <Table
+              columns={[
+                {
+                  label: "Link",
+                  accessor: "id",
+                  render: (id) => (
+                    <Link
+                      to={`/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`}
+                    >
+                      Link
+                    </Link>
                   ),
-                sortable: true,
-              },
-            ]}
-            data={billingGroupInvitations}
-          />
+                },
+                {
+                  label: "Expires",
+                  accessor: "expires",
+                  sortable: true,
+                  render: (e) => moment(e).format(MOMENT_FORMAT) || "Never",
+                },
+                {
+                  label: "Active",
+                  accessor: "active",
+                  render: (a) =>
+                    a ? (
+                      <Badge color="green" soft>
+                        Yes
+                      </Badge>
+                    ) : (
+                      <Badge color="red" soft>
+                        No
+                      </Badge>
+                    ),
+                  sortable: true,
+                },
+              ]}
+              data={billingGroupInvitations}
+            />
+          )}
           <Util.Spacer size={2} />
           <h2>Users</h2>
           <p>
@@ -188,6 +195,45 @@ export const BillingGroupPage = () => {
             ]}
             data={billingGroup.users}
           />
+          <Util.Spacer size={2} />
+          <h2>Jobs</h2>
+          {billingGroup.jobs.length === 0 ? (
+            <i>
+              There are no jobs in this billing group. You can add jobs by
+              clicking the "Edit" button above and turning on job connections.
+            </i>
+          ) : (
+            <Table
+              columns={[
+                {
+                  label: "Title",
+                  accessor: "title",
+                },
+                {
+                  label: "Status",
+                  accessor: "status",
+                  render: (status) => switchStatusForBadge(status),
+                },
+                {
+                  label: "Created At",
+                  accessor: "createdAt",
+                  render: (createdAt) =>
+                    moment(createdAt).format(MOMENT_FORMAT),
+                },
+                {
+                  label: "Due Date",
+                  accessor: "dueDate",
+                  render: (dueDate) => (
+                    <>
+                      {moment(dueDate).format("MM/DD/YY")} (
+                      {moment(dueDate).fromNow()})
+                    </>
+                  ),
+                },
+              ]}
+              data={billingGroup.jobs}
+            />
+          )}
         </>
       )}
     </Page>

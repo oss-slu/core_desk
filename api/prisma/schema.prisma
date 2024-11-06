@@ -554,7 +554,7 @@ model BillingGroup {
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id])
 
-  membersCanCreateProjects Boolean @default(false)
+  membersCanCreateJobs Boolean @default(false)
 
   users UserBillingGroup[]
   logs logs[]

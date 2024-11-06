@@ -9,11 +9,12 @@ import { MOMENT_FORMAT } from "../../../../../util/constants";
 
 export const BillingGroupInvitationPage = () => {
   const { shopId, groupId, inviteId } = useParams();
-  const { billingGroupInvitation, loading } = useBillingGroupInvitation(
-    shopId,
-    groupId,
-    inviteId
-  );
+  const {
+    billingGroupInvitation,
+    loading,
+    acceptBillingGroupInvitation,
+    opLoading,
+  } = useBillingGroupInvitation(shopId, groupId, inviteId);
   const billingGroup = billingGroupInvitation.billingGroup;
   const { billingGroup: _billingGroup, loading: billingGroupLoading } =
     useBillingGroup(shopId, groupId);
@@ -51,7 +52,11 @@ export const BillingGroupInvitationPage = () => {
               </p>
             )}
             {loggedIn ? (
-              <Button color="primary" onClick={() => {}}>
+              <Button
+                color="primary"
+                onClick={acceptBillingGroupInvitation}
+                loading={opLoading}
+              >
                 Join billing group
               </Button>
             ) : (
