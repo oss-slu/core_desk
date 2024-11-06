@@ -87,6 +87,39 @@ export const uploadRouter = {
         return { ...metadata, userId: user.id, scope };
       }
 
+      if (scope === "group.fileUpload") {
+        const { shopId, groupId, jobId } = metadata;
+
+        if (user.admin) {
+          return { ...metadata, userId: user.id, scope };
+        }
+
+        const userGroup = await prisma.userBillingGroup.findFirst({
+          where: {
+            userId: user.id,
+            billingGroupId: groupId,
+            active: true,
+          },
+        });
+
+        if (!userGroup) {
+          throw new UploadThingError("You do not have access to this group");
+        }
+
+        const job = await prisma.job.findFirst({
+          where: {
+            id: jobId,
+            groupId,
+          },
+        });
+
+        if (!job) {
+          throw new UploadThingError("Job not found");
+        }
+
+        return { ...metadata, userId: user.id, scope };
+      }
+
       if (scope === "shop.resource.image") {
         const { shopId, resourceId } = metadata;
 

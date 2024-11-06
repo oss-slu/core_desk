@@ -22,6 +22,7 @@ import { switchStatusForBadge } from "../../jobs";
 import { EditBillingGroupInvitation } from "../../../../../components/editBillingGroupInvitation/EditBillingGroupInvitation";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { Icon } from "../../../../../util/Icon";
+import { MarkdownRender } from "../../../../../components/markdown/MarkdownRender";
 
 export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
@@ -89,11 +90,21 @@ export const BillingGroupPage = () => {
       {ModalElement}
       <Util.Row justify="between" align="center">
         <h1>{billingGroup.title}</h1>
-        {userIsPrivileged && (
-          <>
-            {!editing && <Button onClick={() => setEditing(true)}>Edit</Button>}
-          </>
-        )}
+        <Util.Row gap={1}>
+          <Button
+            variant="primary"
+            href={`/shops/${shopId}/billing-groups/${groupId}/portal`}
+          >
+            Portal
+          </Button>
+          {userIsPrivileged && (
+            <>
+              {!editing && (
+                <Button onClick={() => setEditing(true)}>Edit</Button>
+              )}
+            </>
+          )}
+        </Util.Row>
       </Util.Row>
       {editing ? (
         <>
@@ -277,6 +288,11 @@ export const BillingGroupPage = () => {
                 {
                   label: "Title",
                   accessor: "title",
+                  render: (title, context) => (
+                    <Link to={`/shops/${shopId}/jobs/${context.id}`}>
+                      {title}
+                    </Link>
+                  ),
                 },
                 {
                   label: "Status",
@@ -303,6 +319,9 @@ export const BillingGroupPage = () => {
               data={billingGroup.jobs}
             />
           )}
+          <Util.Spacer size={2} />
+          <h2>Description</h2>
+          <MarkdownRender markdown={billingGroup.description} />
         </>
       )}
     </Page>

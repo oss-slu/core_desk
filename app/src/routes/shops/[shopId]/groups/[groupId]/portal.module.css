@@ -1,0 +1,16 @@
+.box {
+  flex: 1;
+}
+
+@media screen and (min-width: 800px) {
+  .box {
+    position: sticky;
+    top: 70px;
+    max-height: 87vh;
+  }
+}
+
+.card {
+  max-height: 100%;
+  overflow-y: auto;
+}

@@ -23,6 +23,7 @@ import { ShopUserPage } from "./routes/shops/[shopId]/users/[userId]";
 import { BillingGroupsPage } from "./routes/shops/[shopId]/groups";
 import { BillingGroupPage } from "./routes/shops/[shopId]/groups/[groupId]";
 import { BillingGroupInvitationPage } from "./routes/shops/[shopId]/groups/[groupId]/[inviteId]";
+import { BillingGroupPortal } from "./routes/shops/[shopId]/groups/[groupId]/portal";
 
 // eslint-disable-next-line
 export default () => {
@@ -107,6 +108,10 @@ export default () => {
                 <Route
                   path="/shops/:shopId/billing-groups/:groupId"
                   element={<BillingGroupPage />}
+                />
+                <Route
+                  path="/shops/:shopId/billing-groups/:groupId/portal"
+                  element={<BillingGroupPortal />}
                 />
 
                 <Route path="*" element={<NotFound />} />

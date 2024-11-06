@@ -7,7 +7,7 @@ import NodeStl from "node-stl";
 const logging = false;
 
 export const handleUpload = async (data) => {
-  const { jobId, shopId, userId, scope, resourceId, materialId } =
+  const { jobId, shopId, userId, scope, resourceId, materialId, groupId } =
     data.metadata;
 
   console.log("FILE UPLOADED", data.file.name);
@@ -83,6 +83,82 @@ export const handleUpload = async (data) => {
     });
 
     logging && console.log("jobItem", jobItem);
+    // return res.sendStatus(200);
+  }
+
+  if (scope === "group.fileUpload") {
+    logging && console.log("group.fileUpload");
+    const group = await prisma.billingGroup.findFirst({
+      where: {
+        id: groupId,
+        shopId,
+      },
+    });
+
+    if (!group) {
+      console.error("group not found");
+      // return res.status(404).json({ error: "Not found" });
+    }
+
+    const jobItem = await prisma.jobItem.create({
+      data: {
+        jobId,
+
+        fileKey: data.file.key,
+        fileName: data.file.name,
+        fileType: data.file.name.split(".").pop(),
+        fileUrl: data.file.url,
+
+        title: data.file.name,
+
+        userId,
+      },
+    });
+
+    const fileType = data.file.name.split(".").pop();
+    if (fileType === "stl") {
+      console.log("STL");
+      // Render stl
+      const [pngData, stlData] = await renderStl(data.file.url);
+
+      const upload = await utapi.uploadFiles([
+        new File([pngData], `${data.file.name}.preview.png`, {
+          type: "image/png",
+        }),
+      ]);
+
+      const stlStats = new NodeStl(Buffer.from(stlData));
+      console.log(stlStats);
+
+      const newJobItem = await prisma.jobItem.update({
+        where: {
+          id: jobItem.id,
+        },
+        data: {
+          fileThumbnailKey: upload[0].data.key,
+          fileThumbnailName: upload[0].data.name,
+          fileThumbnailUrl: upload[0].data.url,
+          stlVolume: stlStats.volume,
+          stlIsWatertight: stlStats.isWatertight,
+          stlBoundingBoxX: stlStats.boundingBox[0] / 10,
+          stlBoundingBoxY: stlStats.boundingBox[1] / 10,
+          stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
+        },
+      });
+      console.log(newJobItem);
+    }
+
+    await prisma.logs.create({
+      data: {
+        userId,
+        shopId,
+        jobId,
+        jobItemId: jobItem.id,
+        billingGroupId: group.id,
+        type: LogType.JOB_ITEM_CREATED,
+      },
+    });
+
     // return res.sendStatus(200);
   }
 
