@@ -12,6 +12,7 @@
   "dependencies": {
     "@mdxeditor/editor": "^3.14.0",
     "@tabler/icons-webfont": "^3.19.0",
+    "@uidotdev/usehooks": "^2.4.1",
     "@uploadthing/react": "^7.0.3",
     "@vitejs/plugin-react": "^4.3.2",
     "mitt": "^3.0.1",

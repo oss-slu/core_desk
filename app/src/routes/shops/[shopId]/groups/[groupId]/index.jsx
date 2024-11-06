@@ -19,6 +19,9 @@ import { MOMENT_FORMAT } from "../../../../../util/constants";
 import Badge from "tabler-react-2/dist/badge";
 import { EditBillingGroup } from "../../../../../components/billingGroup/EditBillingGroup";
 import { switchStatusForBadge } from "../../jobs";
+import { EditBillingGroupInvitation } from "../../../../../components/editBillingGroupInvitation/EditBillingGroupInvitation";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
+import { Icon } from "../../../../../util/Icon";
 
 export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
@@ -48,6 +51,8 @@ export const BillingGroupPage = () => {
   });
 
   const [editing, setEditing] = useState(false);
+
+  const [copiedText, copyToClipboard] = useCopyToClipboard();
 
   const userIsPrivileged =
     user.admin ||
@@ -129,11 +134,28 @@ export const BillingGroupPage = () => {
                   label: "Link",
                   accessor: "id",
                   render: (id) => (
-                    <Link
-                      to={`/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`}
-                    >
-                      Link
-                    </Link>
+                    <Util.Row align="center" gap={1}>
+                      <Link
+                        to={`/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`}
+                      >
+                        Link
+                      </Link>
+                      <Button
+                        size="sm"
+                        onClick={() =>
+                          copyToClipboard(
+                            `${document.location.origin}/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`
+                          )
+                        }
+                      >
+                        {copiedText ===
+                        `${document.location.origin}/shops/${shopId}/billing-groups/${groupId}/invitations/${id}` ? (
+                          <Icon i="check" />
+                        ) : (
+                          <Icon i="copy" />
+                        )}
+                      </Button>
+                    </Util.Row>
                   ),
                 },
                 {
@@ -156,6 +178,16 @@ export const BillingGroupPage = () => {
                       </Badge>
                     ),
                   sortable: true,
+                },
+                {
+                  label: "Edit",
+                  accessor: "id",
+                  render: (id) => (
+                    <EditBillingGroupInvitation
+                      invitationId={id}
+                      refetch={() => document.location.reload()}
+                    />
+                  ),
                 },
               ]}
               data={billingGroupInvitations}

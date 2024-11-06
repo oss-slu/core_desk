@@ -151,24 +151,38 @@ export const put = [
       return res.status(400).send({ error: "Forbidden" });
     }
 
-    const { expires, title, description } = req.body;
+    const { expires, title, description, active } = req.body;
+
+    const originalInvite = await prisma.billingGroupInvitationLink.findFirst({
+      where: {
+        id: inviteId,
+      },
+    });
 
     const invite = await prisma.billingGroupInvitationLink.update({
       where: {
         id: inviteId,
       },
       data: {
-        expires,
+        expires: expires ? new Date(expires) : undefined,
         title,
         description,
+        active,
       },
     });
 
     await prisma.logs.create({
-      type: LogType.BILLING_GROUP_INVITATION_LINK_MODIFIED,
+      data: {
+        type: LogType.BILLING_GROUP_INVITATION_LINK_MODIFIED,
+        from: JSON.stringify(originalInvite),
+        to: JSON.stringify(invite),
+        userId,
+        shopId,
+        billingGroupId: invite.billingGroupId,
+        billingGroupInvitationLinkId: invite.id,
+      },
     });
 
     res.json({ invite });
-    ``;
   },
 ];
