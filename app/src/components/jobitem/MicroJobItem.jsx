@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import { RenderMedia } from "../media/renderMedia";
-import { Card, Typography, Util } from "tabler-react-2";
+import { Card, Typography, Util, Input } from "tabler-react-2";
 import { downloadFile, switchStatusToUI } from "./JobItem";
 import Badge from "tabler-react-2/dist/badge";
 import { Icon } from "../../util/Icon";
@@ -8,12 +8,18 @@ import { Button } from "tabler-react-2/dist/button";
 import { useJobItem } from "../../hooks";
 import { useParams } from "react-router-dom";
 
-export const MicroJobItem = ({ item }) => {
+export const MicroJobItem = ({ item: _item }) => {
   const { shopId } = useParams();
-  const { deleteJobItem, opLoading } = useJobItem(shopId, item.jobId, item.id, {
-    initialValue: item,
-    shouldFetchJobItem: false,
-  });
+  const { deleteJobItem, opLoading, updateJobItem, item } = useJobItem(
+    shopId,
+    _item.jobId,
+    _item.id,
+    {
+      initialValue: _item,
+      shouldFetchJobItem: false,
+    }
+  );
+  const [localQty, setLocalQty] = useState(_item.qty);
 
   return (
     <Card>
@@ -28,6 +34,26 @@ export const MicroJobItem = ({ item }) => {
           <Typography.H4 style={{ marginBottom: 0 }}>
             {item.title}
           </Typography.H4>
+          <Util.Row gap={0.5} align="center" style={{ width: 200 }}>
+            <b>Quantity</b>
+            <Input
+              size="sm"
+              placeholder="0"
+              value={localQty}
+              noMargin
+              style={{ float: 1 }}
+              onChange={(e) => setLocalQty(e)}
+            />
+            {item.qty !== parseFloat(localQty) && !isNaN(localQty) && (
+              <Button
+                size="sm"
+                onClick={() => updateJobItem({ qty: parseFloat(localQty) })}
+                loading={opLoading}
+              >
+                Save
+              </Button>
+            )}
+          </Util.Row>
           <span>
             <b>Fulfillment Status</b>{" "}
             <Badge color={switchStatusToUI(item.status)[1]} soft>

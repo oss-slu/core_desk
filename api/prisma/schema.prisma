@@ -493,6 +493,8 @@ model JobItem {
   title  String
   status ProgressStatus @default(NOT_STARTED)
 
+  qty Float?
+
   fileKey  String
   fileUrl  String
   fileName String

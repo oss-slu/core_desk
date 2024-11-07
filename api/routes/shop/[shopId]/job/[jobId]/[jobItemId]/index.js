@@ -59,8 +59,19 @@ export const put = [
       return res.status(400).json({ error: "User shop not found" });
     }
 
+    let firstJob = await prisma.job.findFirst({
+      where: {
+        id: jobId,
+        shopId,
+      },
+    });
+
     let job;
-    if (userShop.accountType === "CUSTOMER" && !req.user.admin) {
+    if (
+      userShop.accountType === "CUSTOMER" &&
+      !req.user.admin &&
+      !firstJob.groupId
+    ) {
       job = await prisma.job.findFirst({
         where: {
           id: jobId,
@@ -75,6 +86,20 @@ export const put = [
           shopId,
         },
       });
+    }
+
+    if (job.groupId) {
+      const userGroup = await prisma.userBillingGroup.findFirst({
+        where: {
+          userId,
+          billingGroupId: job.groupId,
+          active: true,
+        },
+      });
+
+      if (!userGroup) {
+        return res.status(400).json({ error: "User group not found" });
+      }
     }
 
     if (!job) {

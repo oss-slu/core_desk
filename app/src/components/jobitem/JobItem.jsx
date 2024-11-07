@@ -87,6 +87,7 @@ export const JobItem = ({
   const { user } = useAuth();
   const { billingGroupUser, loading: billingGroupUserLoading } =
     useBillingGroupUser(shopId, group.id, user.id);
+  const [localQty, setLocalQty] = useState(item?.qty);
 
   if (!item) return null;
 
@@ -102,7 +103,31 @@ export const JobItem = ({
           />
           <Util.Row gap={2} align="start" threshold={1100} style={{ flex: 1 }}>
             <div style={{ maxWidth: 280 }}>
-              <H3 className="mb-0">{item.title}</H3>
+              <Util.Row gap={1}>
+                <H3 className="mb-0">{item.title}</H3>
+                <Util.Row gap={0.5} align="center" style={{ width: 100 }}>
+                  Qty
+                  <Input
+                    size="sm"
+                    placeholder="0"
+                    value={localQty}
+                    noMargin
+                    style={{ float: 1 }}
+                    onChange={(e) => setLocalQty(e)}
+                  />
+                  {item.qty !== parseFloat(localQty) && !isNaN(localQty) && (
+                    <Button
+                      size="sm"
+                      onClick={() =>
+                        updateJobItem({ qty: parseFloat(localQty) })
+                      }
+                      loading={opLoading}
+                    >
+                      Save
+                    </Button>
+                  )}
+                </Util.Row>
+              </Util.Row>
               {item.user?.id && (
                 <span>
                   <Icon i="user" />
@@ -224,7 +249,10 @@ export const JobItem = ({
                         updateJobItem({ approved: value.id })
                       }
                       values={[
-                        { id: true, label: "Approved" },
+                        {
+                          id: true,
+                          label: "Approved",
+                        },
                         { id: false, label: "Not Approved" },
                         { id: null, label: "Pending" },
                       ]}
