@@ -201,6 +201,8 @@ model Shop {
 
   ledgerItems LedgerItem[]
 
+  startingDeposit Float?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

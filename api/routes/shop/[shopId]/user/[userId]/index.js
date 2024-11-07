@@ -1,4 +1,4 @@
-import { LogType } from "@prisma/client";
+import { LedgerItemType, LogType } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 import { calculateTotalCostOfJobByJobId } from "../../../../../util/docgen/invoice.js";
@@ -208,6 +208,27 @@ export const post = [
 
       if (!connection) {
         return res.status(400).json({ error: "Failed to add user to shop" });
+      }
+
+      if (connection.startingDeposit) {
+        // Post a credit to the user's balance
+        const ledgerItem = await prisma.ledgerItem.create({
+          data: {
+            userId,
+            shopId,
+            value: connection.startingDeposit,
+            type: LedgerItemType.INITIAL,
+          },
+        });
+
+        await prisma.logs.create({
+          data: {
+            userId,
+            shopId,
+            ledgerItemId: ledgerItem.id,
+            type: LogType.LEDGER_ITEM_CREATED,
+          },
+        });
       }
 
       await prisma.logs.create({

@@ -8,4 +8,5 @@ export const SHOP_SELECT = {
   imageUrl: true,
   color: true,
   logoUrl: true,
+  startingDeposit: true,
 };

@@ -214,6 +214,7 @@ export const get = [
   },
 ];
 
+/*
 export const merge = [
   verifyAuth,
   async (req, res) => {
@@ -396,3 +397,4 @@ export const purge = [
     }
   },
 ];
+*/

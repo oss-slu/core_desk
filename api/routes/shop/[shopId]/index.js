@@ -170,6 +170,8 @@ export const put = [
         return res.status(403).json({ error: "User is not an admin" });
       }
 
+      req.body.startingDeposit = parseFloat(req.body.startingDeposit);
+
       const updatedShop = await prisma.shop.update({
         where: {
           id: shop.id,

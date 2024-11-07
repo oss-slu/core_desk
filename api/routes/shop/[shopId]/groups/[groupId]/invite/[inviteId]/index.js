@@ -1,6 +1,6 @@
 import { prisma } from "#prisma";
 import { verifyAuth, verifyAuthAlone } from "#verifyAuth";
-import { LogType } from "@prisma/client";
+import { LedgerItemType, LogType } from "@prisma/client";
 
 export const get = [
   async (req, res) => {
@@ -106,6 +106,33 @@ export const post = [
               accountType: "CUSTOMER",
             },
           });
+
+          const shop = await prisma.shop.findFirst({
+            where: {
+              id: shopId,
+            },
+          });
+          if (shop.startingDeposit) {
+            // Post a credit to the user's balance
+
+            const ledgerItem = await prisma.ledgerItem.create({
+              data: {
+                userId,
+                shopId,
+                value: shop.startingDeposit,
+                type: LedgerItemType.INITIAL,
+              },
+            });
+
+            await prisma.logs.create({
+              data: {
+                userId,
+                shopId,
+                ledgerItemId: ledgerItem.id,
+                type: LogType.LEDGER_ITEM_CREATED,
+              },
+            });
+          }
         }
 
         await prisma.logs.create({

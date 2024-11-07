@@ -189,6 +189,20 @@ export const ShopPage = () => {
               placeholder="Your Shop's Name"
               label="Shop Name"
             />
+            <Input
+              value={newShop.startingDeposit}
+              prependedText="$"
+              onChange={(e) => setNewShop({ ...newShop, startingDeposit: e })}
+              placeholder="Starting Deposit"
+              label="Starting Deposit"
+              noMargin
+            />
+            <i>
+              The starting deposit will be deposited to new shop members when
+              they are added to the shop. If a user leaves or is removed from a
+              shop then returns, they will not receive the starting deposit
+              again.
+            </i>
             <div>
               <label className="form-label">Description</label>
               <MarkdownEditor
