@@ -28,6 +28,7 @@ export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
   const { user } = useAuth();
   const { userShop, shop } = useShop(shopId);
+
   const {
     billingGroup,
     loading,
@@ -36,12 +37,14 @@ export const BillingGroupPage = () => {
     refetch: refetchBillingGroup,
     removeUserFromGroup,
   } = useBillingGroup(shopId, groupId);
+
   const {
     billingGroupInvitations,
     loading: loadingInvitations,
     createBillingGroupInvitation,
     opLoading: opLoadingInvitations,
   } = useBillingGroupInvitations(shopId, groupId);
+
   const { modal, ModalElement } = useModal({
     title: "Create a new invitation link",
     text: (
@@ -294,6 +297,26 @@ export const BillingGroupPage = () => {
                     </Link>
                   ),
                 },
+                {
+                  label: "Items",
+                  accessor: "id",
+                  render: (id, context) => (
+                    <span>
+                      <span className="text-red">
+                        {context.unapprovedItems} Needs Approval
+                      </span>
+                      <br />
+                      <span className="text-green">
+                        {context.approvedItems} Approved
+                      </span>
+                      <br />
+                      <span className="text-orange">
+                        {context.rejectedItems} Rejected
+                      </span>
+                    </span>
+                  ),
+                },
+
                 {
                   label: "Status",
                   accessor: "status",

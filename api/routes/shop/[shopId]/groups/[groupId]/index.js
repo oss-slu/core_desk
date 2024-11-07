@@ -149,8 +149,35 @@ export const get = [
               },
             },
           },
-          jobs: true,
+          jobs: {
+            // Count all items that have `approved` at null in each job
+            include: {
+              items: {
+                select: {
+                  approved: true,
+                },
+                where: {
+                  active: true,
+                },
+              },
+            },
+          },
         },
+      });
+
+      group.jobs = group.jobs.map((job) => {
+        job.unapprovedItems = job.items.filter(
+          (item) => item.approved === null
+        ).length;
+        job.totalItems = job.items.length;
+        job.approvedItems = job.items.filter(
+          (item) => item.approved === true
+        ).length;
+        job.rejectedItems = job.items.filter(
+          (item) => item.approved === false
+        ).length;
+        delete job.items;
+        return job;
       });
 
       const adminUsers = group.users.filter((user) => user.role === "ADMIN");
