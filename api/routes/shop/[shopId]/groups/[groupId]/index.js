@@ -165,20 +165,22 @@ export const get = [
         },
       });
 
-      group.jobs = group.jobs.map((job) => {
-        job.unapprovedItems = job.items.filter(
-          (item) => item.approved === null
-        ).length;
-        job.totalItems = job.items.length;
-        job.approvedItems = job.items.filter(
-          (item) => item.approved === true
-        ).length;
-        job.rejectedItems = job.items.filter(
-          (item) => item.approved === false
-        ).length;
-        delete job.items;
-        return job;
-      });
+      if (group.jobs) {
+        group.jobs = group.jobs.map((job) => {
+          job.unapprovedItems = job.items.filter(
+            (item) => item.approved === null
+          ).length;
+          job.totalItems = job.items.length;
+          job.approvedItems = job.items.filter(
+            (item) => item.approved === true
+          ).length;
+          job.rejectedItems = job.items.filter(
+            (item) => item.approved === false
+          ).length;
+          delete job.items;
+          return job;
+        });
+      }
 
       const adminUsers = group.users.filter((user) => user.role === "ADMIN");
       group.userCount = group._count.users;
