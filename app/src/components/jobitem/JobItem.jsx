@@ -86,7 +86,7 @@ export const JobItem = ({
 
   const { user } = useAuth();
   const { billingGroupUser, loading: billingGroupUserLoading } =
-    useBillingGroupUser(shopId, group.id, user.id);
+    useBillingGroupUser(shopId, group?.id, user?.id);
   const [localQty, setLocalQty] = useState(item?.qty);
 
   if (!item) return null;
@@ -265,7 +265,7 @@ export const JobItem = ({
                       }
                     />
                   </div>
-                ) : (
+                ) : billingGroupUser?.id ? (
                   <>
                     <label className="form-label">Approval status</label>
                     <Badge
@@ -285,6 +285,8 @@ export const JobItem = ({
                         : "Not Approved"}
                     </Badge>
                   </>
+                ) : (
+                  <></>
                 )}
 
                 <ResourceTypePicker
