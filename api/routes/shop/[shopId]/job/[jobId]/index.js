@@ -27,6 +27,13 @@ const JOB_INCLUDE = {
           title: true,
         },
       },
+      user: {
+        select: {
+          firstName: true,
+          lastName: true,
+          id: true,
+        },
+      },
     },
   },
   resource: {
@@ -57,6 +64,28 @@ const JOB_INCLUDE = {
   ledgerItems: {
     where: {
       type: LedgerItemType.JOB,
+    },
+  },
+  group: {
+    select: {
+      id: true,
+      title: true,
+      active: true,
+      users: {
+        where: {
+          active: true,
+          role: "ADMIN",
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+            },
+          },
+        },
+      },
     },
   },
 };

@@ -13,6 +13,7 @@ export const LoadableDropdownInput = ({
   doTheColorThing = false,
   disabled = false,
   disabledText,
+  color,
 }) => {
   if (loading)
     return (
@@ -40,10 +41,12 @@ export const LoadableDropdownInput = ({
         value={value}
         onChange={onChange}
         prompt={prompt}
-        color={doTheColorThing ? switchStatusToUI(value)[1] : null}
+        color={color || (doTheColorThing ? switchStatusToUI(value)[1] : null)}
         data-value={value}
-        data-color={doTheColorThing ? switchStatusToUI(value)[1] : null}
-        outline={doTheColorThing}
+        data-color={
+          color || (doTheColorThing ? switchStatusToUI(value)[1] : null)
+        }
+        outline={color || doTheColorThing}
       />
     </Util.Col>
   );

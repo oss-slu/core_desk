@@ -5,7 +5,7 @@ import { Button } from "tabler-react-2/dist/button";
 import { Icon } from "../../util/Icon";
 import { useModal } from "tabler-react-2/dist/modal";
 import { useJobItem } from "../../hooks/useJobItem";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Spinner } from "tabler-react-2/dist/spinner";
 const { H3, H4 } = Typography;
 import styles from "./jobItem.module.css";
@@ -17,6 +17,7 @@ import { ResourcePicker } from "../resourcePicker/ResourcePicker";
 import { Price } from "../price/RenderPrice";
 import { Time } from "../time/RenderTime";
 import { EditCosting } from "./EditCosting";
+import { useAuth, useBillingGroupUser } from "../../hooks";
 
 export function downloadFile(url, filename) {
   fetch(url)
@@ -56,7 +57,12 @@ export const switchStatusToUI = (status) => {
   }
 };
 
-export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
+export const JobItem = ({
+  item: _item,
+  refetchJobs,
+  userIsPrivileged,
+  group,
+}) => {
   const { shopId, jobId } = useParams();
 
   const { item, opLoading, updateJobItem, deleteJobItem } = useJobItem(
@@ -78,6 +84,10 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
     ),
   });
 
+  const { user } = useAuth();
+  const { billingGroupUser, loading: billingGroupUserLoading } =
+    useBillingGroupUser(shopId, group.id, user.id);
+
   if (!item) return null;
 
   return (
@@ -93,7 +103,14 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
           <Util.Row gap={2} align="start" threshold={1100} style={{ flex: 1 }}>
             <div style={{ maxWidth: 280 }}>
               <H3 className="mb-0">{item.title}</H3>
-              <span>{item.userId || "Anonymous"}</span>
+              {item.user?.id && (
+                <span>
+                  <Icon i="user" />
+                  <Link to={`/shops/${shopId}/users/${item.user.id}`}>
+                    {item.user.firstName} {item.user.lastName}
+                  </Link>
+                </span>
+              )}
               {item.stlBoundingBoxX ? (
                 <>
                   <Util.Row gap={1}>
@@ -123,39 +140,41 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
                 <Util.Spacer size={1} />
               )}
               <Util.Row gap={1} align="center">
-                <Button
-                  onClick={modal}
-                  style={{
-                    padding: "0.4375rem",
-                  }}
-                >
-                  <Icon i="cube" size={20} />
-                </Button>
-                <Button
-                  onClick={() => {
-                    downloadFile(item.fileUrl, item.title);
-                  }}
-                  style={{
-                    padding: "0.4375rem",
-                  }}
-                  download
-                >
-                  <Icon i="download" size={20} />
-                </Button>
-                {userIsPrivileged && (
+                <>
                   <Button
-                    onClick={(e) => {
-                      deleteJobItem(refetchJobs, e);
+                    onClick={modal}
+                    style={{
+                      padding: "0.4375rem",
+                    }}
+                  >
+                    <Icon i="cube" size={16} />
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      downloadFile(item.fileUrl, item.title);
                     }}
                     style={{
                       padding: "0.4375rem",
                     }}
-                    variant="danger"
-                    outline
+                    download
                   >
-                    <Icon i="trash" size={20} />
+                    <Icon i="download" size={16} />
                   </Button>
-                )}
+                  {userIsPrivileged && (
+                    <Button
+                      onClick={(e) => {
+                        deleteJobItem(refetchJobs, e);
+                      }}
+                      style={{
+                        padding: "0.4375rem",
+                      }}
+                      variant="danger"
+                      outline
+                    >
+                      <Icon i="trash" size={16} />
+                    </Button>
+                  )}
+                </>
                 {userIsPrivileged ? (
                   opLoading ? (
                     <Spinner />
@@ -193,12 +212,60 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
               </Util.Row>
               <Util.Spacer size={1} />
 
-              <ResourceTypePicker
-                value={item.resourceTypeId}
-                loading={opLoading}
-                onChange={(value) => updateJobItem({ resourceTypeId: value })}
-                includeNone={true}
-              />
+              <Util.Row gap={1}>
+                {!billingGroupUserLoading &&
+                billingGroupUser.role === "ADMIN" ? (
+                  <div className={item.approved === null && styles.callout}>
+                    <LoadableDropdownInput
+                      label={"Approval"}
+                      loading={opLoading}
+                      value={item.approved}
+                      onChange={(value) =>
+                        updateJobItem({ approved: value.id })
+                      }
+                      values={[
+                        { id: true, label: "Approved" },
+                        { id: false, label: "Not Approved" },
+                        { id: null, label: "Pending" },
+                      ]}
+                      color={
+                        item.approved
+                          ? "green"
+                          : item.approved === false
+                          ? "orange"
+                          : "red"
+                      }
+                    />
+                  </div>
+                ) : (
+                  <>
+                    <label className="form-label">Approval status</label>
+                    <Badge
+                      color={
+                        item.approved
+                          ? "green"
+                          : item.approved === false
+                          ? "orange"
+                          : "red"
+                      }
+                      soft
+                    >
+                      {item.approved === null
+                        ? "Pending"
+                        : item.approved
+                        ? "Approved"
+                        : "Not Approved"}
+                    </Badge>
+                  </>
+                )}
+
+                <ResourceTypePicker
+                  value={item.resourceTypeId}
+                  loading={opLoading}
+                  onChange={(value) => updateJobItem({ resourceTypeId: value })}
+                  includeNone={true}
+                />
+              </Util.Row>
             </div>
 
             <Util.Responsive
@@ -249,7 +316,7 @@ export const JobItem = ({ item: _item, refetchJobs, userIsPrivileged }) => {
             </Util.Responsive>
           </Util.Row>
         </Util.Responsive>
-        <div style={{ width: "100%" }}>
+        <div style={{}}>
           <H4>Item Costing</H4>
           {item.materialId && item.resourceId ? (
             <EditCosting

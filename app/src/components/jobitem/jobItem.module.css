@@ -9,3 +9,23 @@
   margin-top: 8px;
   margin-right: -8px;
 }
+
+.callout {
+  outline-width: 4px;
+  outline-style: solid;
+  outline-offset: 4px;
+  animation: pulse 2s infinite;
+}
+
+/* An animation that slowly pulses through 0.05 to 0.25 of 	rgb(214,57,57) */
+@keyframes pulse {
+  0% {
+    outline-color: rgba(214, 57, 57, 0.2);
+  }
+  50% {
+    outline-color: rgba(214, 57, 57, 1);
+  }
+  100% {
+    outline-color: rgba(214, 57, 57, 0.2);
+  }
+}

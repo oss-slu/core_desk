@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Page } from "../../../../../components/page/page";
 import { Icon } from "../../../../../util/Icon";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Typography, Util, Input, Card, Switch } from "tabler-react-2";
 import { useJob } from "../../../../../hooks/useJob";
 import { Loading } from "../../../../../components/loading/Loading";
@@ -253,6 +253,23 @@ export const JobPage = () => {
                   </i>
                 )}
               </Util.Row>
+              {job.group && (
+                <>
+                  <Util.Spacer size={2} />
+                  <H3>Group</H3>
+                  <p>
+                    <b>Group Title</b>{" "}
+                    <Link
+                      to={`/shops/${shopId}/billing-groups/${job.group.id}`}
+                    >
+                      {job.group.title}
+                    </Link>
+                    <br />
+                    <b>Group Admin</b> {job.group.users[0].user.firstName}{" "}
+                    {job.group.users[0].user.lastName}
+                  </p>
+                </>
+              )}
             </>
           )}
         </div>
@@ -294,6 +311,7 @@ export const JobPage = () => {
               item={item}
               refetchJobs={refetchJobs}
               userIsPrivileged={userIsPrivileged}
+              group={job.group}
             />
           ))}
         </Util.Col>

@@ -26,7 +26,7 @@ export const ResourceTypePicker = ({
           label: resourceType.title,
         })),
         includeNone
-          ? { id: null, label: "Select a resource type", dropdownText: "None" }
+          ? { id: null, label: "Select a type", dropdownText: "None" }
           : null,
       ].filter((v) => v)}
     />
