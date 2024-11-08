@@ -12,6 +12,7 @@
   "dependencies": {
     "@mdxeditor/editor": "^3.14.0",
     "@sentry/react": "^8.37.1",
+    "@sentry/vite-plugin": "^2.22.6",
     "@tabler/icons-webfont": "^3.19.0",
     "@uidotdev/usehooks": "^2.4.1",
     "@uploadthing/react": "^7.0.3",
