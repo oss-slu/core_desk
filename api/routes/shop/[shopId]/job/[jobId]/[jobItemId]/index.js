@@ -127,7 +127,10 @@ export const put = [
     }
 
     delete req.body.data.resource;
+    delete req.body.data.resourceType;
     delete req.body.data.material;
+
+    console.log(req.body.data);
 
     const updatedItem = await prisma.jobItem.update({
       where: {

@@ -21,7 +21,7 @@ export const EditCosting = ({
     setNewItem(item);
   }, [item]);
 
-  const calculateTotalCost = () => {
+  const calculateTotalCost = (includeQty = true) => {
     const {
       timeQty,
       processingTimeQty,
@@ -29,14 +29,87 @@ export const EditCosting = ({
       materialQty,
       resource,
       material,
+      qty,
     } = newItem;
     return (
-      (timeQty * resource.costPerTime || 0) +
-      (processingTimeQty * resource.costPerProcessingTime || 0) +
-      (unitQty * resource.costPerUnit || 0) +
-      (materialQty * material.costPerUnit || 0)
+      ((timeQty * resource.costPerTime || 0) +
+        (processingTimeQty * resource.costPerProcessingTime || 0) +
+        (unitQty * resource.costPerUnit || 0) +
+        (materialQty * material.costPerUnit || 0)) *
+      (includeQty ? qty : 1)
     );
   };
+
+  if (!userIsPrivileged)
+    return (
+      <div style={{ width: "100%" }}>
+        <Util.Row gap={1} align="center" justify="between">
+          <label className="form-label">Resource Time</label>
+          <div
+            style={{
+              flex: 1,
+              height: 2,
+              backgroundColor: "var(--tblr-border-color)",
+            }}
+          />
+          <Time value={newItem.timeQty} icon />
+        </Util.Row>
+        <Util.Row gap={1} align="center" justify="between">
+          <label className="form-label">Processing Time</label>
+          <div
+            style={{
+              flex: 1,
+              height: 2,
+              backgroundColor: "var(--tblr-border-color)",
+            }}
+          />
+          <Time value={newItem.processingTimeQty} icon />
+        </Util.Row>
+        <Util.Row gap={1} align="center" justify="between">
+          <label className="form-label">Unit runs</label>
+          <div
+            style={{
+              flex: 1,
+              height: 2,
+              backgroundColor: "var(--tblr-border-color)",
+            }}
+          />
+          <Icon i="refresh" />
+          <span>{newItem.unitQty || 0}</span>
+        </Util.Row>
+        <Util.Row gap={1} align="center" justify="between">
+          <label className="form-label">Material quantity</label>
+          <div
+            style={{
+              flex: 1,
+              height: 2,
+              backgroundColor: "var(--tblr-border-color)",
+            }}
+          />
+          <Icon i="weight" />
+          <span>{newItem.materialQty || 0}</span>
+        </Util.Row>
+        <Util.Row gap={1} align="center" justify="between">
+          <div />
+          <span className={styles.bottomLine}>
+            <Util.Row gap={1} justify="end">
+              Subtotal
+              <Price value={calculateTotalCost(false)} icon />{" "}
+              {item.qty > 1 && (
+                <>
+                  <Icon i="x" />
+                  {item.qty}
+                </>
+              )}
+            </Util.Row>
+            <Util.Row gap={1} justify="end">
+              Total Cost:
+              <Price value={calculateTotalCost()} icon />
+            </Util.Row>
+          </span>
+        </Util.Row>
+      </div>
+    );
 
   return (
     <div style={{ width: "100%" }}>
@@ -83,8 +156,18 @@ export const EditCosting = ({
       />
       <Util.Row gap={1} align="center" justify="between">
         {JSON.stringify(newItem) !== JSON.stringify(item) ? (
-          <Util.Row gap={1} align="center">
-            <Button onClick={() => onChange(newItem)} loading={loading}>
+          <Util.Row gap={1} align="center" wrap>
+            <Button
+              onClick={() =>
+                onChange({
+                  timeQty: newItem.timeQty,
+                  processingTimeQty: newItem.processingTimeQty,
+                  unitQty: newItem.unitQty,
+                  materialQty: newItem.materialQty,
+                })
+              }
+              loading={loading}
+            >
               Save
             </Button>
             <Button onClick={() => setNewItem(item)}>Discard</Button>
@@ -96,7 +179,17 @@ export const EditCosting = ({
           <div></div>
         )}
         <span className={styles.bottomLine}>
-          <Util.Row gap={1}>
+          <Util.Row gap={1} justify="end">
+            Subtotal
+            <Price value={calculateTotalCost(false)} icon />{" "}
+            {item.qty > 1 && (
+              <>
+                <Icon i="x" />
+                {item.qty}
+              </>
+            )}
+          </Util.Row>
+          <Util.Row gap={1} justify="end">
             Total Cost:
             <Price value={calculateTotalCost()} icon />
           </Util.Row>
@@ -116,53 +209,61 @@ export const TimeInput = ({
   showInput = true,
 }) => (
   <>
-    <Util.Row gap={1} align="center">
+    <Util.Col gap={0.5} align="start">
       <label className="form-label" style={{ marginBottom: 0 }}>
         {label} {helpText && <Help text={helpText} modal={modal} />}
       </label>
-      {showInput && (
-        <>
-          <Input
-            size="sm"
-            noMargin
-            placeholder="Hr"
-            style={{ minWidth: 40, maxWidth: 41 }}
-            value={Math.floor(timeQty || 0)}
-            onChange={(e) => {
-              const decimalPart = timeQty % 1 || 0;
-              let newTime = parseInt(e) + decimalPart;
-              if (newTime < 0 || isNaN(newTime)) newTime = 0;
-              onChange(newTime);
-            }}
-            type="number"
-            min={0}
-          />
-          :
-          <Input
-            size="sm"
-            noMargin
-            placeholder="Min"
-            style={{ minWidth: 40, maxWidth: 41 }}
-            value={Math.round((timeQty % 1 || 0) * 60)}
-            onChange={(e) => {
-              const hours = Math.floor(timeQty || 0);
-              const minutes = parseInt(e) / 60;
-              let newTime = hours + minutes;
-              if (newTime < 0 || isNaN(newTime)) newTime = 0;
-              onChange(newTime);
-            }}
-            type="number"
-            min={0}
-          />
-        </>
-      )}
-      <div style={{ flex: 1 }} />
-      <Time value={timeQty} icon />
-      <Icon i="x" />
-      <Price value={costPerTime} icon />
-      <Icon i="equal" />
-      <Price value={timeQty * costPerTime} icon />
-    </Util.Row>
+      <Util.Row gap={1} align="center" style={{ width: "100%" }}>
+        {showInput && (
+          <>
+            <Input
+              size="sm"
+              noMargin
+              placeholder="Hr"
+              style={{ minWidth: 40, maxWidth: 41 }}
+              value={Math.floor(timeQty || 0)}
+              onChange={(e) => {
+                const decimalPart = timeQty % 1 || 0;
+                let newTime = parseInt(e) + decimalPart;
+                if (newTime < 0 || isNaN(newTime)) newTime = 0;
+                onChange(newTime);
+              }}
+              type="number"
+              min={0}
+            />
+            :
+            <Input
+              size="sm"
+              noMargin
+              placeholder="Min"
+              style={{ minWidth: 40, maxWidth: 41 }}
+              value={Math.round((timeQty % 1 || 0) * 60)}
+              onChange={(e) => {
+                const hours = Math.floor(timeQty || 0);
+                const minutes = parseInt(e) / 60;
+                let newTime = hours + minutes;
+                if (newTime < 0 || isNaN(newTime)) newTime = 0;
+                onChange(newTime);
+              }}
+              type="number"
+              min={0}
+            />
+          </>
+        )}
+        <div
+          style={{
+            flex: 1,
+            height: 2,
+            backgroundColor: "var(--tblr-border-color)",
+          }}
+        />
+        <Time value={timeQty} icon />
+        <Icon i="x" />
+        <Price value={costPerTime} icon />
+        <Icon i="equal" />
+        <Price value={timeQty * costPerTime} icon />
+      </Util.Row>
+    </Util.Col>
     <Util.Spacer size={1} />
   </>
 );
@@ -178,33 +279,41 @@ export const QuantityInput = ({
   showInput = true,
 }) => (
   <>
-    <Util.Row gap={1} align="center">
+    <Util.Col gap={0.5} align="start">
       <label className="form-label" style={{ marginBottom: 0 }}>
         {label} {helpText && <Help text={helpText} modal={modal} />}
       </label>
-      {showInput && (
-        <Input
-          size="sm"
-          noMargin
-          value={quantity || 0}
-          onChange={(e) => {
-            let val = parseFloat(e);
-            if (isNaN(val) || val < 0) val = 0;
-            onChange(val);
+      <Util.Row gap={1} align="center" style={{ width: "100%" }}>
+        {showInput && (
+          <Input
+            size="sm"
+            noMargin
+            value={quantity || 0}
+            onChange={(e) => {
+              let val = parseFloat(e);
+              if (isNaN(val) || val < 0) val = 0;
+              onChange(val);
+            }}
+            type="number"
+            min={0}
+            style={{ minWidth: 100, maxWidth: 101 }}
+          />
+        )}
+        <div
+          style={{
+            flex: 1,
+            height: 2,
+            backgroundColor: "var(--tblr-border-color)",
           }}
-          type="number"
-          min={0}
-          style={{ minWidth: 100, maxWidth: 101 }}
         />
-      )}
-      <div style={{ flex: 1 }} />
-      {icon}
-      <span>{quantity || 0}</span>
-      <Icon i="x" />
-      <Price value={costPerUnit} icon />
-      <Icon i="equal" />
-      <Price value={quantity * costPerUnit} icon />
-    </Util.Row>
+        {icon}
+        <span>{quantity || 0}</span>
+        <Icon i="x" />
+        <Price value={costPerUnit} icon />
+        <Icon i="equal" />
+        <Price value={quantity * costPerUnit} icon />
+      </Util.Row>
+    </Util.Col>
     <Util.Spacer size={1} />
   </>
 );

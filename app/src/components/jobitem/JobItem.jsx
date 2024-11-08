@@ -93,40 +93,25 @@ export const JobItem = ({
 
   return (
     <Card>
-      <Util.Responsive gap={1} align="start" threshold={1200}>
+      <Util.Responsive gap={1} align="start" threshold={1100}>
         <div className={styles.modal}>{ModalElement}</div>
-        <Util.Responsive gap={1} align="start" threshold={800}>
+        <Util.Responsive
+          gap={1}
+          align="start"
+          threshold={800}
+          style={{ flex: 1 }}
+        >
           <RenderMedia
             mediaUrl={item.fileUrl}
             fileType={item.fileType}
             thumbnailUrl={item.fileThumbnailUrl}
           />
-          <Util.Row gap={2} align="start" threshold={1100} style={{ flex: 1 }}>
+          <Util.Row gap={2} align="start" threshold={1200} style={{ flex: 1 }}>
             <div style={{ maxWidth: 280 }}>
               <Util.Row gap={1}>
-                <H3 className="mb-0">{item.title}</H3>
-                <Util.Row gap={0.5} align="center" style={{ width: 100 }}>
-                  Qty
-                  <Input
-                    size="sm"
-                    placeholder="0"
-                    value={localQty}
-                    noMargin
-                    style={{ float: 1 }}
-                    onChange={(e) => setLocalQty(e)}
-                  />
-                  {item.qty !== parseFloat(localQty) && !isNaN(localQty) && (
-                    <Button
-                      size="sm"
-                      onClick={() =>
-                        updateJobItem({ qty: parseFloat(localQty) })
-                      }
-                      loading={opLoading}
-                    >
-                      Save
-                    </Button>
-                  )}
-                </Util.Row>
+                <H3 className="mb-0" style={{ wordBreak: "break-all" }}>
+                  {item.title}
+                </H3>
               </Util.Row>
               {item.user?.id && (
                 <span>
@@ -236,7 +221,28 @@ export const JobItem = ({
                 )}
               </Util.Row>
               <Util.Spacer size={1} />
-
+              <Util.Row gap={0.5} align="center" style={{ width: 200 }}>
+                <Input
+                  placeholder="0"
+                  value={localQty}
+                  noMargin
+                  style={{ float: 1, marginBottom: 0 }}
+                  onChange={(e) => setLocalQty(e)}
+                  prependedText="Qty"
+                  type="number"
+                />
+                {parseFloat(item.qty) !== parseFloat(localQty) &&
+                  !isNaN(localQty) && (
+                    <Button
+                      onClick={() =>
+                        updateJobItem({ qty: parseFloat(localQty) })
+                      }
+                      loading={opLoading}
+                    >
+                      Save
+                    </Button>
+                  )}
+              </Util.Row>
               <Util.Row gap={1}>
                 {!billingGroupUserLoading &&
                 billingGroupUser.role === "ADMIN" ? (
@@ -288,80 +294,85 @@ export const JobItem = ({
                 ) : (
                   <></>
                 )}
-
-                <ResourceTypePicker
-                  value={item.resourceTypeId}
-                  loading={opLoading}
-                  onChange={(value) => updateJobItem({ resourceTypeId: value })}
-                  includeNone={true}
-                />
               </Util.Row>
             </div>
+          </Util.Row>
+        </Util.Responsive>
 
-            <Util.Responsive
-              gap={2}
-              align="start"
-              threshold={1300}
-              style={{ flex: 1, width: "100%" }}
-            >
-              <div>
-                <H4>Resource Configuration</H4>
-                {item.resourceTypeId ? (
-                  <Util.Col
-                    gap={1}
-                    align="start"
-                    threshold={1200}
-                    default="column"
-                  >
-                    <MaterialPicker
-                      value={item.materialId}
-                      onChange={(value) => updateJobItem({ materialId: value })}
-                      resourceTypeId={item.resourceTypeId}
-                      opLoading={opLoading}
-                      includeNone={true}
-                    />
-                    {userIsPrivileged ? (
-                      <ResourcePicker
-                        value={item.resourceId}
+        <Card
+          className={styles.tabcard}
+          tabs={[
+            {
+              title: "Resource Configuration",
+              content: (
+                <div>
+                  <H4>Resource Configuration</H4>
+                  {item.resourceTypeId ? (
+                    <Util.Row gap={1} align="start" wrap>
+                      <ResourceTypePicker
+                        value={item.resourceTypeId}
+                        loading={opLoading}
                         onChange={(value) =>
-                          updateJobItem({ resourceId: value })
+                          updateJobItem({ resourceTypeId: value })
+                        }
+                        includeNone={true}
+                      />
+                      <MaterialPicker
+                        value={item.materialId}
+                        onChange={(value) =>
+                          updateJobItem({ materialId: value })
                         }
                         resourceTypeId={item.resourceTypeId}
                         opLoading={opLoading}
                         includeNone={true}
                       />
-                    ) : (
-                      <Util.Col gap={1}>
-                        <label className="form-label mb-0">Resource</label>
-                        <Badge color="blue" soft>
-                          {item.resource?.title}
-                        </Badge>
-                      </Util.Col>
-                    )}
-                  </Util.Col>
-                ) : (
-                  <i>Select a resource type to see more options</i>
-                )}
-              </div>
-            </Util.Responsive>
-          </Util.Row>
-        </Util.Responsive>
-        <div style={{}}>
-          <H4>Item Costing</H4>
-          {item.materialId && item.resourceId ? (
-            <EditCosting
-              item={item}
-              onChange={(value) => updateJobItem(value)}
-              loading={opLoading}
-              userIsPrivileged={userIsPrivileged}
-            />
-          ) : (
-            <Badge color="red" soft>
-              <Icon i="coin-off" />
-              Costing unavailable without material and resource
-            </Badge>
-          )}
-        </div>
+                      {userIsPrivileged ? (
+                        <ResourcePicker
+                          value={item.resourceId}
+                          onChange={(value) =>
+                            updateJobItem({ resourceId: value })
+                          }
+                          resourceTypeId={item.resourceTypeId}
+                          opLoading={opLoading}
+                          includeNone={true}
+                        />
+                      ) : (
+                        <Util.Col gap={1}>
+                          <label className="form-label mb-0">Resource</label>
+                          <Badge color="blue" soft>
+                            {item.resource?.title || "None"}
+                          </Badge>
+                        </Util.Col>
+                      )}
+                    </Util.Row>
+                  ) : (
+                    <i>Select a resource type to see more options</i>
+                  )}
+                </div>
+              ),
+            },
+            {
+              title: "Costing",
+              content: (
+                <>
+                  {item.materialId && item.resourceId ? (
+                    <EditCosting
+                      item={item}
+                      onChange={(value) => updateJobItem(value)}
+                      loading={opLoading}
+                      userIsPrivileged={userIsPrivileged}
+                    />
+                  ) : (
+                    <Badge color="red" soft>
+                      <Icon i="coin-off" />
+                      Costing unavailable without material and resource
+                    </Badge>
+                  )}
+                </>
+              ),
+            },
+          ]}
+        />
       </Util.Responsive>
     </Card>
   );

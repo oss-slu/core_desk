@@ -8,6 +8,7 @@
   padding: 8px;
   margin-top: 8px;
   margin-right: -8px;
+  text-align: right;
 }
 
 .callout {
@@ -27,5 +28,18 @@
   }
   100% {
     outline-color: rgba(214, 57, 57, 0.2);
+  }
+}
+
+.tabcard {
+  min-width: 500px;
+  max-width: 500px;
+}
+
+@media screen and (max-width: 1200px) {
+  .tabcard {
+    width: 100%;
+    max-width: unset;
+    min-width: unset;
   }
 }
