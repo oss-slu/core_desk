@@ -28,3 +28,4 @@ jobs:
           tags: jackcranee/sluopenproject:0.0.1
           build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
+            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}

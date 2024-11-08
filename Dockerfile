@@ -14,6 +14,7 @@ ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
 
 # Accept build-time arguments
 ARG DATABASE_URL
+ARG SENTRY_AUTH_TOKEN
 
 # Set the working directory to /app for the frontend
 WORKDIR /app
