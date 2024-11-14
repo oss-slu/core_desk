@@ -304,7 +304,7 @@ const CostCard = ({
                   <Util.Row gap={1} align="center" justify="end">
                     <span className={styles.bottomLine}>
                       <Util.Row gap={1}>
-                        Total Cost:
+                        Total:
                         <Price value={calculateTotalCost()} icon />
                       </Util.Row>
                     </span>

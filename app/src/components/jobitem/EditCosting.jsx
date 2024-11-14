@@ -103,7 +103,7 @@ export const EditCosting = ({
               )}
             </Util.Row>
             <Util.Row gap={1} justify="end">
-              Total Cost:
+              Total:
               <Price value={calculateTotalCost()} icon />
             </Util.Row>
           </span>
@@ -190,7 +190,7 @@ export const EditCosting = ({
             )}
           </Util.Row>
           <Util.Row gap={1} justify="end">
-            Total Cost:
+            Total:
             <Price value={calculateTotalCost()} icon />
           </Util.Row>
         </span>
