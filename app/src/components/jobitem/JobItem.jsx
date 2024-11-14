@@ -14,8 +14,7 @@ import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 import Badge from "tabler-react-2/dist/badge";
 import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
-import { Price } from "../price/RenderPrice";
-import { Time } from "../time/RenderTime";
+
 import { EditCosting } from "./EditCosting";
 import { useAuth, useBillingGroupUser } from "../../hooks";
 
@@ -307,47 +306,49 @@ export const JobItem = ({
               content: (
                 <div>
                   <H4>Resource Configuration</H4>
-                  {item.resourceTypeId ? (
-                    <Util.Row gap={1} align="start" wrap>
-                      <ResourceTypePicker
-                        value={item.resourceTypeId}
-                        loading={opLoading}
-                        onChange={(value) =>
-                          updateJobItem({ resourceTypeId: value })
-                        }
-                        includeNone={true}
-                      />
-                      <MaterialPicker
-                        value={item.materialId}
-                        onChange={(value) =>
-                          updateJobItem({ materialId: value })
-                        }
-                        resourceTypeId={item.resourceTypeId}
-                        opLoading={opLoading}
-                        includeNone={true}
-                      />
-                      {userIsPrivileged ? (
-                        <ResourcePicker
-                          value={item.resourceId}
+                  <Util.Row gap={1} align="start" wrap>
+                    <ResourceTypePicker
+                      value={item.resourceTypeId}
+                      loading={opLoading}
+                      onChange={(value) =>
+                        updateJobItem({ resourceTypeId: value })
+                      }
+                      includeNone={true}
+                    />
+                    {item.resourceTypeId ? (
+                      <>
+                        <MaterialPicker
+                          value={item.materialId}
                           onChange={(value) =>
-                            updateJobItem({ resourceId: value })
+                            updateJobItem({ materialId: value })
                           }
                           resourceTypeId={item.resourceTypeId}
                           opLoading={opLoading}
                           includeNone={true}
                         />
-                      ) : (
-                        <Util.Col gap={1}>
-                          <label className="form-label mb-0">Resource</label>
-                          <Badge color="blue" soft>
-                            {item.resource?.title || "None"}
-                          </Badge>
-                        </Util.Col>
-                      )}
-                    </Util.Row>
-                  ) : (
-                    <i>Select a resource type to see more options</i>
-                  )}
+                        {userIsPrivileged ? (
+                          <ResourcePicker
+                            value={item.resourceId}
+                            onChange={(value) =>
+                              updateJobItem({ resourceId: value })
+                            }
+                            resourceTypeId={item.resourceTypeId}
+                            opLoading={opLoading}
+                            includeNone={true}
+                          />
+                        ) : (
+                          <Util.Col gap={1}>
+                            <label className="form-label mb-0">Resource</label>
+                            <Badge color="blue" soft>
+                              {item.resource?.title || "None"}
+                            </Badge>
+                          </Util.Col>
+                        )}
+                      </>
+                    ) : (
+                      <i>Select a resource type to see more options</i>
+                    )}
+                  </Util.Row>
                 </div>
               ),
             },
