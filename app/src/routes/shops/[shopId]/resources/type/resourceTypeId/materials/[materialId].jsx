@@ -31,6 +31,7 @@ export const MaterialPage = () => {
     opLoading,
     deleteMaterialImage,
     deleteMaterial,
+    refetch,
   } = useMaterial(shopId, resourceTypeId, materialId);
 
   const [nm, setNm] = useState(material);
@@ -159,6 +160,7 @@ export const MaterialPage = () => {
               <UploadDropzone
                 scope="material.image"
                 metadata={{ shopId, materialId }}
+                onUploadComplete={refetch}
                 dropzoneAppearance={{
                   container: {
                     height: 200,
@@ -271,6 +273,11 @@ export const MaterialPage = () => {
             <UploadDropzone
               scope="material.msds"
               metadata={{ shopId, materialId }}
+              onUploadComplete={() => {
+                setTimeout(() => {
+                  refetch();
+                }, 750);
+              }}
               dropzoneAppearance={{
                 container: {
                   height: !material.msdsFileUrl ? 200 : null,
@@ -316,6 +323,7 @@ export const MaterialPage = () => {
             <UploadDropzone
               scope="material.tds"
               metadata={{ shopId, materialId }}
+              onUploadComplete={refetch}
               dropzoneAppearance={{
                 container: {
                   height: !material.tdsFileUrl ? 200 : null,
@@ -425,6 +433,7 @@ export const MaterialPage = () => {
                 backgroundColor: "var(--tblr-primary)",
               },
             }}
+            onUploadComplete={refetch}
           />
         </div>
       ) : (

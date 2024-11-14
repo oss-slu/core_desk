@@ -120,7 +120,7 @@ export const put = [
       const updatedResourceWithoutImages = { ...updatedResource };
       delete updatedResourceWithoutImages.images;
       updatedResourceWithoutImages.imagesLength = updatedResource.images.length;
-      resource.imagesLength = resource.images.length;
+      resource.imagesLength = resource?.images?.length;
 
       await prisma.logs.create({
         data: {

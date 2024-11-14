@@ -58,7 +58,7 @@ export const ResourcePage = () => {
     );
   }
 
-  const HereUploadDropzone = (height = "100%", onComplete = refetch) => (
+  const HereUploadDropzone = ({ height = "100%", onComplete = refetch }) => (
     <UploadDropzone
       scope="shop.resource.image"
       metadata={{
@@ -163,7 +163,7 @@ export const ResourcePage = () => {
                 <Gallery images={resource.images} height={200} />
               </div>
             ) : user.admin || userShop.accountType === "ADMIN" ? (
-              <HereUploadDropzone />
+              <HereUploadDropzone onComplete={refetch} />
             ) : (
               <i>No images found</i>
             )}
@@ -178,6 +178,7 @@ export const ResourcePage = () => {
           opLoading={opLoading}
           updateResource={updateResource}
           setIsEditing={setIsEditing}
+          refetch={refetch}
         />
       ) : isEditingImages ? (
         <EditGallery
