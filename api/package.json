@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest",
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
@@ -38,10 +38,13 @@
   "devDependencies": {
     "eslint": "^9.13.0",
     "eslint-plugin-prisma": "^0.0.1",
-    "prisma": "5.21.0"
+    "prisma": "5.21.0",
+    "vitest": "^2.1.5",
+    "vitest-mock-extended": "^2.0.2"
   },
   "imports": {
     "#prisma": "./util/prisma.js",
-    "#verifyAuth": "./util/verifyAuth.js"
+    "#verifyAuth": "./util/verifyAuth.js",
+    "#mock-prisma": "./util/__mocks__/prisma.ts"
   }
 }
