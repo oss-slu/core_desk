@@ -7,7 +7,7 @@ export const get = [
   async (req, res) => {
     try {
       if (!req.user.admin) {
-        return res.status(403).json({});
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       let users = await prisma.user.findMany({

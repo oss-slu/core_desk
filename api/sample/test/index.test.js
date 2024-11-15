@@ -1,6 +1,5 @@
 import { expect, test, vi } from "vitest";
 import { prisma } from "#mock-prisma";
-
 vi.mock("#prisma");
 
 const users = async () => {
