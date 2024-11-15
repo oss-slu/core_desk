@@ -47,6 +47,6 @@
   "imports": {
     "#prisma": "./util/prisma.js",
     "#verifyAuth": "./util/verifyAuth.js",
-    "#mock-prisma": "./util/__mocks__/prisma.ts"
+    "#mock-prisma": "./util/__mocks__/prisma.js"
   }
 }

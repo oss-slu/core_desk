@@ -1,6 +1,7 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "../../util/prisma.js";
 import { verifyAuth } from "../../util/verifyAuth.js";
+import fs from "fs";
 
 export const get = [
   verifyAuth,
@@ -37,6 +38,8 @@ export const get = [
         skip: req.query.offset ? parseInt(req.query.offset) : 0,
       });
 
+      fs.writeFileSync("users.json", JSON.stringify(users));
+
       users = users.map((user) => ({
         ...user,
         name: `${user.firstName} ${user.lastName}`,
@@ -47,6 +50,7 @@ export const get = [
         lastLogin: user.logs[0]?.createdAt,
         logs: undefined,
       }));
+      fs.writeFileSync("mapped-users.json", JSON.stringify(users));
 
       // Remove undefined values
       users = users.map((user) =>
@@ -54,8 +58,19 @@ export const get = [
           Object.entries(user).filter(([, v]) => v !== undefined)
         )
       );
+      fs.writeFileSync("filtered-users.json", JSON.stringify(users));
 
       const count = await prisma.user.count();
+
+      const response = {
+        users,
+        meta: {
+          total: count,
+          count: users.length,
+          offset: req.query.offset ? parseInt(req.query.offset) : 0,
+        },
+      };
+      fs.writeFileSync("response.json", JSON.stringify(response));
 
       return res.json({
         users,
