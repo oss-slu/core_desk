@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE `Shop` ADD COLUMN `logoKey` VARCHAR(191) NULL,
+    ADD COLUMN `logoName` VARCHAR(191) NULL,
+    ADD COLUMN `logoUrl` VARCHAR(191) NULL;

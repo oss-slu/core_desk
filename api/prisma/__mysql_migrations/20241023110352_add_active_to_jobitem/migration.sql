@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `JobItem` ADD COLUMN `active` BOOLEAN NOT NULL DEFAULT true;

@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `ResourceImage` ADD COLUMN `resourceType` ENUM('OTHER', 'INSTRUMENT', 'TOOL', 'PRINTER', 'PRINTER_3D') NOT NULL DEFAULT 'OTHER';

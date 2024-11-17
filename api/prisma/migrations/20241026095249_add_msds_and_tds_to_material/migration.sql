@@ -1,9 +1,0 @@
--- AlterTable
-ALTER TABLE `Material` ADD COLUMN `msdsFileKey` VARCHAR(191) NULL,
-    ADD COLUMN `msdsFileName` VARCHAR(191) NULL,
-    ADD COLUMN `msdsFileType` VARCHAR(191) NULL,
-    ADD COLUMN `msdsFileUrl` VARCHAR(191) NULL,
-    ADD COLUMN `tdsFileKey` VARCHAR(191) NULL,
-    ADD COLUMN `tdsFileName` VARCHAR(191) NULL,
-    ADD COLUMN `tdsFileType` VARCHAR(191) NULL,
-    ADD COLUMN `tdsFileUrl` VARCHAR(191) NULL;

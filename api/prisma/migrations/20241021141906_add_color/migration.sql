@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE `Shop` ADD COLUMN `color` ENUM('RED', 'BLUE', 'GREEN', 'YELLOW', 'ORANGE', 'PURPLE', 'PINK') NULL;
