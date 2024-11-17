@@ -5,7 +5,7 @@ export default defineConfig({
   test: {
     include: ["routes/**/*.test.js"],
     threads: false,
-    setupFiles: ["src/tests/helpers/setup.ts"],
+    setupFiles: ["util/tests/setup.js"],
   },
   resolve: {
     alias: {
