@@ -1,1 +1,5 @@
 api/coverage
+api/filtered-users.json
+api/mapped-users.json
+api/response.json
+api/users.json
