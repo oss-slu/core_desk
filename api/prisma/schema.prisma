@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -43,8 +43,8 @@ model logs {
   id      String  @id @default(cuid())
   type    LogType
   message String?
-  from    String? @db.MediumText
-  to      String? @db.MediumText
+  from    String? @db.Text
+  to      String? @db.Text
 
   user   user?   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String?
@@ -181,7 +181,7 @@ model Shop {
   phone       String?
   email       String?
   website     String?
-  description String? @db.MediumText
+  description String? @db.Text
   imageUrl    String?
 
   logoUrl String?
@@ -210,7 +210,7 @@ model Shop {
 model Resource {
   id          String          @id @default(cuid())
   title       String
-  description String?         @db.MediumText
+  description String?         @db.Text
   images      ResourceImage[]
   public      Boolean         @default(false)
 
@@ -251,7 +251,7 @@ model Resource {
 model Material {
   id           String  @id @default(cuid())
   title        String
-  description  String? @db.MediumText
+  description  String? @db.Text
   manufacturer String?
 
   createdAt DateTime @default(now())
@@ -331,7 +331,7 @@ model ResourceImage {
 model ResourceType {
   id          String  @id @default(cuid())
   title       String
-  description String? @db.MediumText
+  description String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -371,7 +371,7 @@ enum Color {
 model Job {
   id          String  @id @default(cuid())
   title       String
-  description String? @db.MediumText
+  description String? @db.Text
   imageUrl    String?
 
   createdAt DateTime @default(now())
@@ -451,7 +451,7 @@ enum LedgerItemType {
 
 model JobComment {
   id        String   @id @default(cuid())
-  message   String   @db.MediumText
+  message   String   @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -555,7 +555,7 @@ enum ProgressStatus {
 model BillingGroup {
   id          String  @id @default(cuid())
   title       String
-  description String? @db.MediumText
+  description String? @db.Text
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
