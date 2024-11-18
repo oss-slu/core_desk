@@ -10,6 +10,9 @@ echo $DATABASE_URL
 echo '🟡 - Waiting for database to be ready...'
 $DIR/wait-for-it.sh localhost:5432 -t 45
 
+echo '🟢 - Database is ready!'
+sleep 10
+
 npx prisma migrate dev --name init
 
 echo '⚡ Running integration tests...'
