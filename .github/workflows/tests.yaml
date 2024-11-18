@@ -32,6 +32,6 @@ jobs:
         working-directory: ./api
         env:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/sluop-test
-          API_URL: ${{ secrets.API_URL }}
-          SECRET_KEY: ${{ secrets.SECRET_KEY }}
+          JWT_SECRET: TEST_JWT_SECRET
+          BASE_URL: "http://localhost:5173"
         run: yarn test

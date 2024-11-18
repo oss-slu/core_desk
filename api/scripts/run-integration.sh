@@ -12,7 +12,7 @@ $DIR/wait-for-it.sh localhost:5432 -t 0
 
 npx prisma migrate dev --name init
 
-echo '⚡Running integration tests...'
+echo '⚡ Running integration tests...'
 
 # Collect arguments for vitest
 VITEST_ARGS=""
