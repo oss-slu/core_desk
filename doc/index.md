@@ -82,104 +82,76 @@ const { user } = useAuth();
 */
 ```
 
-## Shops
+## Testing
 
-Shops are centers that host printers or other equipment. They are the highest level of "campus" in the application.
+Vitest is used for testing the API. To run the tests, run `yarn test` from the api directory. Codecov is collected with `yarn coverage` but is not accurate. Tests are colocated with their respective routes in the `routes` directory in `tests` folders. To prevent the router from attempting to load test files, test file names must be prepended with an underscore. Tests should be called `_{route}.test.js` where `{route}` is the name of the route file being tested.
 
-### `/api/shop`
+Here is an example test file:
 
-#### GET
+```javascript
+import { describe, expect, it } from "vitest";
+import request from "supertest";
+import { app } from "#index";
+import { gt } from "#gt";
+import { prisma as mockPrisma } from "#mock-prisma";
+import { prisma } from "#prisma";
 
-This endpoint returns a JSON object with a `shops` key that contains an array of shop objects. This endpoint requires a valid JWT in the `Authorization` header.
+describe("/users", () => {
+  describe("GET", () => {
+    it("Should return 403 if user is not a global admin", async () => {
+      const res = await request(app)
+        .get("/api/users")
+        .set(...(await gt()))
+        .send();
 
-```json
-{
-  "shops": [
-    {
-      "id": "cm2dz5xdz0002665mvd5j491p",
-      "name": "SLU Center for Additive Manufacturing",
-      "address": null,
-      "phone": null,
-      "email": "slu.cam@slu.edu",
-      "description": null,
-      "imageUrl": null
-    }
-  ],
-  "meta": {
-    "total": 1,
-    "count": 1,
-    "offset": 0
-  }
-}
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual({ error: "Unauthorized" });
+      expect(mockPrisma.user.findMany).not.toHaveBeenCalled();
+    });
+
+    it("Should return a list of users if the user is a global admin", async () => {
+      await prisma.user.update({
+        where: {
+          email: "test@email.com",
+        },
+        data: {
+          admin: true,
+        },
+      });
+
+      const res = await request(app)
+        .get("/api/users")
+        .set(...(await gt()))
+        .send();
+
+      expect(res.status).toBe(200);
+      expect(res.body.users).toHaveLength(1);
+
+      expect(res.body).toMatchSnapshot({
+        users: [
+          {
+            id: expect.any(String),
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          },
+        ],
+      });
+    });
+  })
+});
 ```
 
-}
+The integration test environment has Prisma mocked for spying on database calls, and has a local instance of Prisma and Postgres running in a Docker container allowing you to pollute the test db without affecting the development or production db. Running prisma operations as normal in test files will affect the test db. The test db is reset before each test is run and a default user with an email of `test@email.com` is created. The default user has no permissions.
 
-#### POST
+### Imports
 
-This endpoint creates a new shop. It requires a valid JWT in the `Authorization` header, and a JSON object in the request body with the following keys:
-
-- `name` (string): The name of the shop
-- `address` (string?): The address of the shop
-- `phone` (string?): The phone number of the shop
-- `email` (string?): The email of the shop
-- `website` (string?): The website of the shop
-- `description` (string?): A description of the shop
-- `imageUrl` (string?): A URL to an image of the shop
-
-The API will respond with a JSON object containing the content of a traditional GET request to the shop endpoint with the new shop included, the standard meta object, and a `newShop` key that contains the new shop object.
-
-##### Request body:
-
-```json
-{
-  "name": "Academic Tech Commons at Pius III Memorial Library",
-  "email": "atc@slu.edu",
-  "phone": "555-555-5555",
-  "address": "3650 Lindell Blvd, St. Louis, Missouri",
-  "description": "3d printers and more advanced printers in the ATC in the library's first floor",
-  "website": "https://www.slu.edu/library/services/academic-technology-commons/index.php",
-  "imageUrl": "https://www.slu.edu/library/services/academic-technology-commons/-img/academic-technology-commons-01.jpg"
-}
-```
-
-##### Response:
-
-```json
-{
-  "newShop": {
-    "id": "cm2exf9h60000lrscxidsipw0",
-    "name": "Academic Tech Commons at Pius III Memorial Library",
-    "address": "3650 Lindell Blvd, St. Louis, Missouri",
-    "phone": "555-555-5555",
-    "email": "atc@slu.edu",
-    "description": "3d printers and more advanced printers in the ATC in the library's first floor",
-    "imageUrl": "https://www.slu.edu/library/services/academic-technology-commons/-img/academic-technology-commons-01.jpg"
-  },
-  "shops": [
-    {
-      "id": "cm2dz5xdz0002665mvd5j491p",
-      "name": "SLU Center for Additive Manufacturing",
-      "address": null,
-      "phone": null,
-      "email": "slu.cam@slu.edu",
-      "description": null,
-      "imageUrl": null
-    },
-    {
-      "id": "cm2exf9h60000lrscxidsipw0",
-      "name": "Academic Tech Commons at Pius III Memorial Library",
-      "address": "3650 Lindell Blvd, St. Louis, Missouri",
-      "phone": "555-555-5555",
-      "email": "atc@slu.edu",
-      "description": "3d printers and more advanced printers in the ATC in the library's first floor",
-      "imageUrl": "https://www.slu.edu/library/services/academic-technology-commons/-img/academic-technology-commons-01.jpg"
-    }
-  ],
-  "meta": {
-    "total": 2,
-    "count": 2,
-    "offset": 0
-  }
-}
-```
+| Import | Description |
+| --- | --- |
+| `describe` | A function that creates a test suite. |
+| `expect` | A function that creates an expectation. |
+| `it` | A function that creates a test. |
+| `request` | A function that creates a supertest request. It is a wrapper around the express app imported from `#index`. Calling request(app).{method}({endpoint}).send() will send a request to the express app as if it were a real request. |
+| `app` | The express app. |
+| `gt` | A function that generates and returns an array of auth headers for the test user. Looks like `['Authorization': 'Bearer {jwt}']` |
+| `prisma` from `#mock-prisma` | The mocked prisma client to be used for function spying |
+| `prisma` from `#prisma` | The real prisma client to be used for database operations |

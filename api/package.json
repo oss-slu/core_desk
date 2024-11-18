@@ -53,6 +53,7 @@
     "#prisma": "./util/prisma.js",
     "#verifyAuth": "./util/verifyAuth.js",
     "#mock-prisma": "./util/__mocks__/prisma.js",
-    "#gt": "./util/tests/generateToken.js"
+    "#gt": "./util/tests/generateToken.js",
+    "#index": "./index.js"
   }
 }
