@@ -152,6 +152,12 @@ The integration test environment has Prisma mocked for spying on database calls,
 | `it` | A function that creates a test. |
 | `request` | A function that creates a supertest request. It is a wrapper around the express app imported from `#index`. Calling request(app).{method}({endpoint}).send() will send a request to the express app as if it were a real request. |
 | `app` | The express app. |
-| `gt` | A function that generates and returns an array of auth headers for the test user. Looks like `['Authorization': 'Bearer {jwt}']` |
+| `gt` | A function that generates and returns an array of auth headers for the test user. Looks like `['Authorization': 'Bearer {jwt}']`. Accepts options to set up the user at [gt() options](#gt-options). |
 | `prisma` from `#mock-prisma` | The mocked prisma client to be used for function spying |
 | `prisma` from `#prisma` | The real prisma client to be used for database operations |
+
+#### gt() options
+
+| Option | Description | Default |
+| --- | --- | --- |
+| `ga` | Global Admin | `false` |

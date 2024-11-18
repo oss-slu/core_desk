@@ -11,7 +11,7 @@ echo '🟡 - Waiting for database to be ready...'
 $DIR/wait-for-it.sh localhost:5432 -t 45
 
 echo '🟢 - Database is ready!'
-sleep 10
+sleep 5
 
 npx prisma migrate dev --name init
 
@@ -29,4 +29,4 @@ if [[ "$@" == *"--coverage"* ]]; then
 fi
 
 # Run vitest with collected arguments
-vitest -c ./vitest.config.integration.js $VITEST_ARGS
+vitest run -c ./vitest.config.integration.js $VITEST_ARGS

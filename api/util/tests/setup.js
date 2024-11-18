@@ -1,12 +1,7 @@
 import prisma from "#prisma";
-import { beforeEach } from "vitest";
+import { afterAll, beforeEach } from "vitest";
 
 beforeEach(async () => {
-  // Reset the database before each test.
-  // First, make sure the database is NOT production
-  // if (process.env.NODE_ENV === "production") {
-  //   throw new Error("Cannot reset the database in production.");
-  // }
   if (process.env.NODE_ENV === "test") {
     if (
       !process.env.DATABASE_URL.includes(

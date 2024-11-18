@@ -5,13 +5,13 @@ export default defineConfig({
   test: {
     include: ["routes/**/*.test.js"],
     threads: false,
+    isolate: true,
     setupFiles: ["util/tests/setup.js"],
-  },
-  resolve: {
-    alias: {
-      auth: "/src/auth",
-      quotes: "/src/quotes",
-      lib: "/src/lib",
+    fileParallelism: false,
+    sequence: {
+      shuffle: false, // Ensure deterministic order
+      concurrent: false, // Run tests sequentially
+      maxConcurrency: 1, // Only run one test at a time
     },
   },
 });

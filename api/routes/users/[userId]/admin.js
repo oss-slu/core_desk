@@ -2,13 +2,14 @@ import { LogType } from "@prisma/client";
 import { prisma } from "../../../util/prisma.js";
 import { verifyAuth } from "../../../util/verifyAuth.js";
 
+// Promote a user to global admin
 export const post = [
   verifyAuth,
   async (req, res) => {
     try {
       if (!req.user.admin) {
-        res.status(403).json({
-          message: "You are not authorized to perform this action",
+        res.status(400).json({
+          error: "Unauthorized",
         });
         return;
       }
@@ -66,8 +67,8 @@ export const del = [
   verifyAuth,
   async (req, res) => {
     if (!req.user.admin) {
-      res.status(403).json({
-        message: "You are not authorized to perform this action",
+      res.status(400).json({
+        error: "Unauthorized",
       });
       return;
     }
@@ -103,7 +104,7 @@ export const del = [
 
     await prisma.logs.create({
       data: {
-        userId: req.user.id,
+        userId: req.params.userId,
         type: LogType.USER_DEMOTED_FROM_ADMIN,
       },
     });

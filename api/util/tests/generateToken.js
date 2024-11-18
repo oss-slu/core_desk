@@ -1,12 +1,25 @@
 import { prisma } from "#prisma";
 import jwt from "jsonwebtoken";
 
-export const gt = async () => {
-  const user = await prisma.user.findFirst({
-    where: {
-      email: "test@email.com",
-    },
-  });
+export const gt = async (options) => {
+  const ga = options?.ga || false;
+  let user;
+  if (ga) {
+    user = await prisma.user.update({
+      where: {
+        email: "test@email.com",
+      },
+      data: {
+        admin: true,
+      },
+    });
+  } else {
+    user = await prisma.user.findFirst({
+      where: {
+        email: "test@email.com",
+      },
+    });
+  }
 
   if (!user) {
     throw new Error(
