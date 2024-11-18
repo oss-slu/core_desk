@@ -8,7 +8,6 @@ beforeEach(async () => {
   //   throw new Error("Cannot reset the database in production.");
   // }
   if (process.env.NODE_ENV === "test") {
-    console.log("Resetting the database...");
     if (
       !process.env.DATABASE_URL.includes(
         "postgres://postgres:postgres@localhost"
@@ -37,5 +36,14 @@ beforeEach(async () => {
       prisma.billingGroupInvitationLink.deleteMany(),
       prisma.userBillingGroup.deleteMany(),
     ]);
+
+    // Create an initial user
+    await prisma.user.create({
+      data: {
+        firstName: "TestFirstName",
+        lastName: "TestLastName",
+        email: "test@email.com",
+      },
+    });
   }
 });

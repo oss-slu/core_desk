@@ -1,15 +1,86 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { get } from "../index.js";
+import { describe, expect, it } from "vitest";
 import request from "supertest";
 import { app } from "../../../index.js";
+import { gt } from "#gt";
+import { prisma } from "#mock-prisma";
+import { prisma as realPrisma } from "#prisma";
 
 describe("/users", () => {
   describe("GET", () => {
-    it("Should return a list of users", async () => {
-      const res = await request(app).get("/api/users").send();
+    it("Should return 403 if user is not a global admin", async () => {
+      const res = await request(app)
+        .get("/api/users")
+        .set(...(await gt()))
+        .send();
 
-      console.log(res.status);
-      console.log(res.body);
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual({ error: "Unauthorized" });
+      expect(prisma.user.findMany).not.toHaveBeenCalled();
+    });
+
+    it("Should return a list of users if the user is a global admin", async () => {
+      // Make the user a global admin
+      await realPrisma.user.update({
+        where: {
+          email: "test@email.com",
+        },
+        data: {
+          admin: true,
+        },
+      });
+
+      const res = await request(app)
+        .get("/api/users")
+        .set(...(await gt()))
+        .send();
+
+      expect(res.status).toBe(200);
+      expect(res.body.users).toHaveLength(1);
+
+      expect(res.body.users[0]).toMatchObject({
+        admin: expect.any(Boolean),
+        createdAt: expect.any(String),
+        email: expect.any(String),
+        firstName: expect.any(String),
+        id: expect.any(String),
+        isMe: expect.any(Boolean),
+        jobCount: expect.any(Number),
+        lastName: expect.any(String),
+        name: expect.any(String),
+        shopCount: expect.any(Number),
+        suspended: expect.any(Boolean),
+        updatedAt: expect.any(String),
+      });
+
+      // Ensure no extra keys
+      const expectedKeys = [
+        "admin",
+        "createdAt",
+        "email",
+        "firstName",
+        "id",
+        "isMe",
+        "jobCount",
+        "lastName",
+        "name",
+        "shopCount",
+        "suspended",
+        "suspensionReason",
+        "updatedAt",
+      ];
+      expect(Object.keys(res.body.users[0]).sort()).toEqual(
+        expectedKeys.sort()
+      );
+
+      expect(res.body).toMatchSnapshot({
+        users: [
+          {
+            id: expect.any(String),
+            createdAt: expect.any(String),
+            updatedAt: expect.any(String),
+          },
+        ],
+      });
     });
   });
 });
