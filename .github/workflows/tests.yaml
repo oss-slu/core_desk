@@ -20,11 +20,13 @@ jobs:
           node-version: "lts/*"
 
       - name: Install Dependencies
+        working-directory: ./api
         run: yarn install
 
       - name: Run Tests
+        working-directory: ./api
         env:
           NODE_ENV: test
-          JWT_SECRET: "MOCK_JWT_SECRET"
-          BASE_URL: "http://localhost:5173"
+          API_URL: ${{ secrets.API_URL }}
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: yarn test
