@@ -5,9 +5,10 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "./scripts/run-integration.sh",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "coverage": "vitest run --coverage"
   },
   "keywords": [],
   "author": "",
@@ -15,6 +16,8 @@
   "dependencies": {
     "@prisma/client": "5.21.0",
     "@scalenc/stl-to-png": "^1.2.0",
+    "@vitest/coverage-c8": "^0.33.0",
+    "@vitest/coverage-istanbul": "^2.1.5",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
@@ -36,12 +39,20 @@
     "url": "^0.11.4"
   },
   "devDependencies": {
+    "@types/supertest": "^6.0.2",
+    "@vitest/coverage-v8": "2.1.5",
+    "@vitest/ui": "2.1.5",
     "eslint": "^9.13.0",
     "eslint-plugin-prisma": "^0.0.1",
-    "prisma": "5.21.0"
+    "prisma": "5.21.0",
+    "supertest": "^7.0.0",
+    "vitest": "^2.1.5",
+    "vitest-mock-extended": "^2.0.2"
   },
   "imports": {
     "#prisma": "./util/prisma.js",
-    "#verifyAuth": "./util/verifyAuth.js"
+    "#verifyAuth": "./util/verifyAuth.js",
+    "#mock-prisma": "./util/__mocks__/prisma.js",
+    "#gt": "./util/tests/generateToken.js"
   }
 }
