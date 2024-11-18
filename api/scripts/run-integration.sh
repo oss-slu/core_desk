@@ -8,7 +8,7 @@ export DATABASE_URL="postgres://postgres:postgres@localhost:5432/sluop-test"
 echo $DATABASE_URL
 
 echo '🟡 - Waiting for database to be ready...'
-$DIR/wait-for-it.sh localhost:5432 -t 0
+$DIR/wait-for-it.sh localhost:5432 -t 45
 
 npx prisma migrate dev --name init
 
