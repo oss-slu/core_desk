@@ -1,4 +1,4 @@
-name: Run Tests
+name: Run Integration Tests
 
 on:
   push:
@@ -19,14 +19,19 @@ jobs:
         with:
           node-version: "lts/*"
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Install Dependencies
         working-directory: ./api
         run: yarn install
 
-      - name: Run Tests
+      - name: Run Integration Tests
         working-directory: ./api
         env:
-          NODE_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/sluop-test
           API_URL: ${{ secrets.API_URL }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: yarn test
