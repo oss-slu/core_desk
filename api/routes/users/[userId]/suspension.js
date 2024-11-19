@@ -7,7 +7,7 @@ export const post = [
   async (req, res) => {
     if (!req.user.admin) {
       res.status(403).json({
-        message: "You are not authorized to perform this action",
+        error: "Unauthorized",
       });
       return;
     }
@@ -20,7 +20,7 @@ export const post = [
 
     if (!user) {
       res.status(404).json({
-        message: "User not found",
+        error: "User not found",
       });
       return;
     }
@@ -56,7 +56,7 @@ export const del = [
   async (req, res) => {
     if (!req.user.admin) {
       res.status(403).json({
-        message: "You are not authorized to perform this action",
+        error: "Unauthorized",
       });
       return;
     }
@@ -69,7 +69,7 @@ export const del = [
 
     if (!user) {
       res.status(404).json({
-        message: "User not found",
+        error: "User not found",
       });
       return;
     }
@@ -107,7 +107,7 @@ export const put = [
       // Change suspension reason
       if (!req.user.admin) {
         res.status(403).json({
-          message: "You are not authorized to perform this action",
+          error: "Unauthorized",
         });
         return;
       }
@@ -120,14 +120,14 @@ export const put = [
 
       if (!user) {
         res.status(404).json({
-          message: "User not found",
+          error: "User not found",
         });
         return;
       }
 
       if (!user.suspended) {
         res.status(400).json({
-          message: "User is not suspended",
+          error: "User is not suspended",
         });
         return;
       }

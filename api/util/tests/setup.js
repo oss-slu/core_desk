@@ -1,4 +1,5 @@
 import prisma from "#prisma";
+import { AccountType } from "@prisma/client";
 import { afterAll, beforeEach } from "vitest";
 
 beforeEach(async () => {
@@ -33,11 +34,23 @@ beforeEach(async () => {
     ]);
 
     // Create an initial user
-    await prisma.user.create({
+    const globalUser = await prisma.user.create({
       data: {
         firstName: "TestFirstName",
         lastName: "TestLastName",
         email: "test@email.com",
+      },
+    });
+
+    await prisma.shop.create({
+      data: {
+        name: "TestShop",
+        users: {
+          create: {
+            accountType: AccountType.CUSTOMER,
+            userId: globalUser.id,
+          },
+        },
       },
     });
   }

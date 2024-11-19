@@ -18,7 +18,7 @@ exports[`/users > GET > Should return a list of users if the user is a global ad
       "jobCount": 0,
       "lastName": "TestLastName",
       "name": "TestFirstName TestLastName",
-      "shopCount": 0,
+      "shopCount": 1,
       "suspended": false,
       "suspensionReason": null,
       "updatedAt": Any<String>,

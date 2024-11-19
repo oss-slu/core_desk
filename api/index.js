@@ -130,6 +130,48 @@ app.post(
 
 app.use(express.json());
 
+app.use((req, res, next) => {
+  // Hook into the response lifecycle
+  const originalSend = res.send;
+
+  res.send = async function (body) {
+    if (res.statusCode === 403) {
+      await prisma.logs.create({
+        data: {
+          type: LogType.FORBIDDEN_ACTION,
+          userId: req.user.id,
+          message: JSON.stringify({
+            message: res.body?.message,
+            error: res.body?.error,
+            method: req.method,
+            url: req.originalUrl,
+            body: req.body,
+            query: req.query,
+            ip: req.ip,
+          }),
+          shopId: req.params?.shopId,
+          jobId: req.params?.jobId,
+          jobItemId: req.params?.jobItemId,
+          resourceId: req.params?.resourceId,
+          resourceTypeId: req.params?.resourceTypeId,
+          materialId: req.params?.materialId,
+          commentId: req.params?.commentId,
+          ledgerItemId: req.params?.ledgerItemId,
+          billingGroupId: req.params?.billingGroupId,
+          userBillingGroupId: req.params?.userBillingGroupId,
+          billingGroupInvitationLinkId:
+            req.params?.billingGroupInvitationLinkId,
+        },
+      });
+    }
+
+    // Call the original send method
+    return originalSend.call(this, body);
+  };
+
+  next();
+});
+
 app.use(
   "/api/files/upload",
   createRouteHandler({
@@ -148,15 +190,6 @@ app.use(express.static("../app/dist"));
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../app/dist", "index.html"));
-});
-
-app.all("/log", (req, res) => {
-  console.log(req.body, req.headers);
-  res.send("ok");
-});
-
-app.get("/", (req, res) => {
-  res.send("Hello World");
 });
 
 // Error Route

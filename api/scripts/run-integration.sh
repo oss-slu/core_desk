@@ -17,16 +17,7 @@ npx prisma migrate dev --name init
 
 echo '⚡ Running integration tests...'
 
-# Collect arguments for vitest
-VITEST_ARGS=""
-
-if [[ "$@" == *"--ui"* ]]; then
-  VITEST_ARGS+=" --ui"
-fi
-
-if [[ "$@" == *"--coverage"* ]]; then
-  VITEST_ARGS+=" --coverage"
-fi
+echo $@
 
 # Run vitest with collected arguments
-vitest run -c ./vitest.config.integration.js $VITEST_ARGS
+vitest run -c ./vitest.config.integration.js $@

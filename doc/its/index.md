@@ -1,10 +1,17 @@
 # SLU Open Project
 
 - [SLU Open Project](#slu-open-project)
+  - [Changelog](#changelog)
   - [Project Overview](#project-overview)
   - [System Architecture](#system-architecture)
   - [Deployment Architecture](#deployment-architecture)
   - [Security](#security)
+  - [Code Quality and Testing](#code-quality-and-testing)
+
+## Changelog
+
+- **2024-11-15**: Initial draft
+- **2024-11-18**: Added code quality and testing section
 
 ## Project Overview
 SLU Open Project is a tool built by a collaboration between the Saint Louis University Center for Additive Manufacturing and SLU Open Source. It is a platform for managing and tracking jobs to be submitted to shops across the SLU community. It is designed to be a simple one-stop-shop for shops to manage their workloads and to serve as a hub for users to submit jobs to these shops. Shops can recieve jobs from single users, or from billing groups of users that allow users to submit jobs to a shop, but to have their billing handled by a separate entity, like a department or lab.
@@ -61,3 +68,7 @@ The application is deployed using a Docker container. It currently runs off of a
   - **SWR**: SWR is used for data fetching in the frontend. SWR is a first-party library by Vercel and is used for caching and fetching data from the backend. We use it sparingly for its caching capabilities and its ability to handle stale data. It is only used on non-critical and non-sensitive data.
   - **Three**: Three is used for rendering 3D models in the frontend. Three is a first-party library by the Three.js team and is used for rendering 3D models in the browser. Three is given access to the canvas element and file URLs.
   - **Moment**: Moment is used for date formatting in the frontend. Moment is a well-tested library and is given access to only the date and time fields of the application.
+
+## Code Quality and Testing
+
+Integration testing is used to ensure consistent and expected behavior across the entire codebase including keeping track of database state. When tests are run, a database instance is spun up and seeded with minimal test data. Tests are run against this database and the database is torn down after the tests are complete. This ensures that tests are isolated and that the database is in a known state before each test run.
