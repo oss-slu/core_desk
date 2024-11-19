@@ -8,7 +8,7 @@ import { LogType } from "@prisma/client";
 
 describe("/[userId]", () => {
   describe("User/global admin promotion", async () => {
-    it("should return 400 if requesting user is not a global admin", async () => {
+    it("should return 403 if requesting user is not a global admin", async () => {
       const createdUser = await prisma.user.create({
         data: {
           email: "toBePromoted@test.com",
@@ -22,7 +22,7 @@ describe("/[userId]", () => {
         .set(...(await gt()))
         .send();
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(403);
       expect(res.body).toEqual({ error: "Unauthorized" });
 
       const updatedUser = await prisma.user.findUnique({
@@ -30,6 +30,20 @@ describe("/[userId]", () => {
       });
 
       expect(updatedUser.admin).toBe(false);
+
+      const requestingUser = await prisma.user.findUnique({
+        where: { email: "test@email.com" },
+        include: {
+          logs: {
+            where: {
+              type: LogType.FORBIDDEN_ACTION,
+            },
+          },
+        },
+      });
+
+      expect(requestingUser.logs).toHaveLength(1);
+      expect(requestingUser.logs[0].type).toBe(LogType.FORBIDDEN_ACTION);
     });
     it("should return 404 if user is not found", async () => {
       const res = await request(app)
@@ -102,7 +116,7 @@ describe("/[userId]", () => {
   });
 
   describe("User/global admin demotion", async () => {
-    it("should return 400 if requesting user is not a global admin", async () => {
+    it("should return 403 if requesting user is not a global admin", async () => {
       const createdUser = await prisma.user.create({
         data: {
           email: "toBePromoted@test.com",
@@ -117,7 +131,7 @@ describe("/[userId]", () => {
         .set(...(await gt()))
         .send();
 
-      expect(res.status).toBe(400);
+      expect(res.status).toBe(403);
       expect(res.body).toEqual({ error: "Unauthorized" });
 
       const updatedUser = await prisma.user.findUnique({
@@ -134,8 +148,19 @@ describe("/[userId]", () => {
       expect(updatedUser.admin).toBe(true);
       expect(updatedUser.logs).toHaveLength(0);
 
-      expect(mockPrisma.logs.create).not.toHaveBeenCalled();
-      expect(mockPrisma.user.update).not.toHaveBeenCalled();
+      const requestingUser = await prisma.user.findUnique({
+        where: { email: "test@email.com" },
+        include: {
+          logs: {
+            where: {
+              type: LogType.FORBIDDEN_ACTION,
+            },
+          },
+        },
+      });
+
+      expect(requestingUser.logs).toHaveLength(1);
+      expect(requestingUser.logs[0].type).toBe(LogType.FORBIDDEN_ACTION);
     });
     it("should return 404 if user is not found", async () => {
       const res = await request(app)

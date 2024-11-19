@@ -8,7 +8,7 @@ export const post = [
   async (req, res) => {
     try {
       if (!req.user.admin) {
-        res.status(400).json({
+        res.status(403).json({
           error: "Unauthorized",
         });
         return;
@@ -67,7 +67,7 @@ export const del = [
   verifyAuth,
   async (req, res) => {
     if (!req.user.admin) {
-      res.status(400).json({
+      res.status(403).json({
         error: "Unauthorized",
       });
       return;

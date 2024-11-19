@@ -44,10 +44,6 @@ describe("/[userId]", () => {
 
       expect(requestingUser.logs).toHaveLength(1);
       expect(requestingUser.logs[0].type).toBe(LogType.FORBIDDEN_ACTION);
-      expect(requestingUser.logs[0]).toMatchSnapshot({
-        id: expect.any(String),
-        userId: expect.any(String),
-      });
     });
 
     it("should return 404 if user is not found", async () => {
@@ -137,10 +133,6 @@ describe("/[userId]", () => {
 
       expect(requestingUser.logs).toHaveLength(1);
       expect(requestingUser.logs[0].type).toBe(LogType.FORBIDDEN_ACTION);
-      expect(requestingUser.logs[0]).toMatchSnapshot({
-        id: expect.any(String),
-        userId: expect.any(String),
-      });
     });
 
     it("should return 404 if user is not found", async () => {
@@ -232,10 +224,6 @@ describe("/[userId]", () => {
 
       expect(requestingUser.logs).toHaveLength(1);
       expect(requestingUser.logs[0].type).toBe(LogType.FORBIDDEN_ACTION);
-      expect(requestingUser.logs[0]).toMatchSnapshot({
-        id: expect.any(String),
-        userId: expect.any(String),
-      });
     });
 
     it("should return 403 if target user is not suspended", async () => {

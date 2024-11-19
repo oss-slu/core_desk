@@ -4,6 +4,7 @@ import { app } from "../../../index.js";
 import { gt } from "#gt";
 import { prisma } from "#mock-prisma";
 import { prisma as realPrisma } from "#prisma";
+import { LogType } from "@prisma/client";
 
 describe("/users", () => {
   describe("GET", () => {
@@ -16,6 +17,20 @@ describe("/users", () => {
       expect(res.status).toBe(403);
       expect(res.body).toEqual({ error: "Unauthorized" });
       expect(prisma.user.findMany).not.toHaveBeenCalled();
+
+      const requestingUser = await realPrisma.user.findUnique({
+        where: { email: "test@email.com" },
+        include: {
+          logs: {
+            where: {
+              type: LogType.FORBIDDEN_ACTION,
+            },
+          },
+        },
+      });
+
+      expect(requestingUser.logs).toHaveLength(1);
+      expect(requestingUser.logs[0].type).toBe(LogType.FORBIDDEN_ACTION);
     });
 
     it("Should return a list of users if the user is a global admin", async () => {
