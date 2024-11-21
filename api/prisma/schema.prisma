@@ -23,12 +23,12 @@ model user {
   firstName String
   lastName  String
 
-  logs     logs[]
-  shops    UserShop[]
-  jobs     Job[]
-  jobItems JobItem[]
-  comments JobComment[]
-  ledgerItems LedgerItem[]
+  logs          logs[]
+  shops         UserShop[]
+  jobs          Job[]
+  jobItems      JobItem[]
+  comments      JobComment[]
+  ledgerItems   LedgerItem[]
   billingGroups UserBillingGroup[]
 
   admin            Boolean @default(false)
@@ -185,20 +185,20 @@ model Shop {
   description String? @db.Text
   imageUrl    String?
 
-  logoUrl String?
-  logoKey String?
+  logoUrl  String?
+  logoKey  String?
   logoName String?
 
   color Color?
 
-  logs  logs[]
-  users UserShop[]
-  jobs  Job[]
+  logs          logs[]
+  users         UserShop[]
+  jobs          Job[]
   billingGroups BillingGroup[]
 
   resourceTypes ResourceType[]
   resources     Resource[]
-  materials Material[]
+  materials     Material[]
 
   ledgerItems LedgerItem[]
 
@@ -259,8 +259,9 @@ model Material {
   updatedAt DateTime @updatedAt
   active    Boolean  @default(true)
 
-  jobItems JobItem[]
-  jobs     Job[]
+  jobItems      JobItem[]
+  jobs          Job[]     @relation("Job::primaryMaterial")
+  jobsSecondary Job[]     @relation("Job::secondaryMaterial")
 
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id])
@@ -384,8 +385,11 @@ model Job {
   user   user   @relation(fields: [userId], references: [id])
   userId String
 
-  material   Material? @relation(fields: [materialId], references: [id])
+  material   Material? @relation("Job::primaryMaterial", fields: [materialId], references: [id])
   materialId String?
+
+  secondaryMaterial   Material? @relation("Job::secondaryMaterial", fields: [secondaryMaterialId], references: [id])
+  secondaryMaterialId String?
 
   resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id])
   resourceTypeId String?
@@ -398,7 +402,7 @@ model Job {
 
   dueDate DateTime?
 
-  finalized   Boolean     @default(false)
+  finalized   Boolean      @default(false)
   finalizedAt DateTime?
   ledgerItems LedgerItem[]
 
@@ -414,7 +418,7 @@ model Job {
 }
 
 model LedgerItem {
-  id     String @id @default(cuid())
+  id String @id @default(cuid())
 
   userId String
   user   user   @relation(fields: [userId], references: [id])
@@ -422,8 +426,8 @@ model LedgerItem {
   shopId String
   shop   Shop   @relation(fields: [shopId], references: [id])
 
-  jobId  String? @unique
-  job    Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId String? @unique
+  job   Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   type LedgerItemType
 
@@ -507,7 +511,7 @@ model JobItem {
   fileThumbnailUrl  String?
   fileThumbnailName String?
 
-  stlVolume Float?
+  stlVolume       Float?
   stlBoundingBoxX Float?
   stlBoundingBoxY Float?
   stlBoundingBoxZ Float?
@@ -522,7 +526,7 @@ model JobItem {
   material   Material? @relation(fields: [materialId], references: [id])
   materialId String?
 
-  user  user?   @relation(fields: [userId], references: [id])
+  user   user?   @relation(fields: [userId], references: [id])
   userId String?
 
   approved Boolean?
@@ -567,15 +571,15 @@ model BillingGroup {
 
   membersCanCreateJobs Boolean @default(false)
 
-  users UserBillingGroup[]
-  logs logs[]
-  jobs Job[]
+  users           UserBillingGroup[]
+  logs            logs[]
+  jobs            Job[]
   invitationLinks BillingGroupInvitationLink[]
 }
 
 model BillingGroupInvitationLink {
-  id     String @id @default(cuid())
-  active Boolean @default(true)
+  id      String    @id @default(cuid())
+  active  Boolean   @default(true)
   expires DateTime?
 
   billingGroupId String
@@ -588,7 +592,7 @@ model BillingGroupInvitationLink {
 }
 
 model UserBillingGroup {
-  id     String @id @default(cuid())
+  id String @id @default(cuid())
 
   userId String
   user   user   @relation(fields: [userId], references: [id])
