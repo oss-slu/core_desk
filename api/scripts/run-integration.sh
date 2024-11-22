@@ -17,7 +17,5 @@ npx prisma migrate dev --name init
 
 echo '⚡ Running integration tests...'
 
-echo $@
-
 # Run vitest with collected arguments
-vitest run -c ./vitest.config.integration.js $@
+vitest -c ./vitest.config.integration.js $@
