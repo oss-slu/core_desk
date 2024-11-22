@@ -24,4 +24,5 @@ jobs:
         run: yarn install
 
       - name: Run Lint
+        working-directory: ./api
         run: yarn lint
