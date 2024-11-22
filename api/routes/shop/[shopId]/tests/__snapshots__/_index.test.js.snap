@@ -1,0 +1,152 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/shop/[shopId] > GET > returns a shop and a user's membership in said shop 1`] = `
+{
+  "address": null,
+  "color": null,
+  "description": null,
+  "email": null,
+  "id": Any<String>,
+  "imageUrl": null,
+  "logoUrl": null,
+  "name": "TestShop",
+  "phone": null,
+  "startingDeposit": null,
+}
+`;
+
+exports[`/shop/[shopId] > GET > returns a shop and a user's membership in said shop 2`] = `
+{
+  "accountTitle": null,
+  "accountType": "CUSTOMER",
+  "balance": 0,
+}
+`;
+
+exports[`/shop/[shopId] > GET > returns a shop and a user's membership in said shop with users when the user is a global admin 1`] = `
+{
+  "accountTitle": null,
+  "accountType": "CUSTOMER",
+  "active": true,
+  "blacklisted": false,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "shopId": Any<String>,
+  "updatedAt": Any<String>,
+  "user": {
+    "admin": true,
+    "balance": 0,
+    "createdAt": Any<String>,
+    "email": "test@email.com",
+    "firstName": "TestFirstName",
+    "id": Any<String>,
+    "jobCounts": {
+      "completedCount": 0,
+      "excludedCount": 0,
+      "inProgressCount": 0,
+      "notStartedCount": 0,
+    },
+    "lastName": "TestLastName",
+    "name": "TestFirstName TestLastName",
+    "suspended": false,
+    "suspensionReason": null,
+    "totalJobs": 0,
+    "updatedAt": Any<String>,
+  },
+  "userId": Any<String>,
+}
+`;
+
+exports[`/shop/[shopId] > GET > returns a shop and a user's membership in said shop with users when the user is a shop-level admin 1`] = `
+{
+  "accountTitle": null,
+  "accountType": "ADMIN",
+  "active": true,
+  "blacklisted": false,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "shopId": Any<String>,
+  "updatedAt": Any<String>,
+  "user": {
+    "admin": false,
+    "balance": 0,
+    "createdAt": Any<String>,
+    "email": "test@email.com",
+    "firstName": "TestFirstName",
+    "id": Any<String>,
+    "jobCounts": {
+      "completedCount": 0,
+      "excludedCount": 0,
+      "inProgressCount": 0,
+      "notStartedCount": 0,
+    },
+    "lastName": "TestLastName",
+    "name": "TestFirstName TestLastName",
+    "suspended": false,
+    "suspensionReason": null,
+    "totalJobs": 0,
+    "updatedAt": Any<String>,
+  },
+  "userId": Any<String>,
+}
+`;
+
+exports[`/shop/[shopId] > GET > returns a shop and a user's membership in said shop with users when the user is an operator 1`] = `
+{
+  "accountTitle": null,
+  "accountType": "OPERATOR",
+  "active": true,
+  "blacklisted": false,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "shopId": Any<String>,
+  "updatedAt": Any<String>,
+  "user": {
+    "admin": false,
+    "balance": 0,
+    "createdAt": Any<String>,
+    "email": "test@email.com",
+    "firstName": "TestFirstName",
+    "id": Any<String>,
+    "jobCounts": {
+      "completedCount": 0,
+      "excludedCount": 0,
+      "inProgressCount": 0,
+      "notStartedCount": 0,
+    },
+    "lastName": "TestLastName",
+    "name": "TestFirstName TestLastName",
+    "suspended": false,
+    "suspensionReason": null,
+    "totalJobs": 0,
+    "updatedAt": Any<String>,
+  },
+  "userId": Any<String>,
+}
+`;
+
+exports[`/shop/[shopId] > PUT > logs the shop update 1`] = `
+{
+  "billingGroupId": null,
+  "billingGroupInvitationLinkId": null,
+  "commentId": null,
+  "createdAt": 2024-11-22T17:28:54.046Z,
+  "from": Any<String>,
+  "id": Any<String>,
+  "jobId": null,
+  "jobItemId": null,
+  "ledgerItemId": null,
+  "materialId": null,
+  "materialImageId": null,
+  "message": null,
+  "resourceId": null,
+  "resourceImageId": null,
+  "resourceTypeId": null,
+  "shopId": Any<String>,
+  "to": Any<String>,
+  "type": "SHOP_MODIFIED",
+  "updatedAt": 2024-11-22T17:28:54.046Z,
+  "userBillingGroupId": null,
+  "userId": Any<String>,
+}
+`;

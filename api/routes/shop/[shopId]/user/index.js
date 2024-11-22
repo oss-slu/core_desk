@@ -19,13 +19,14 @@ export const get = [
       return res.status(400).json({ error: "Unauthorized" });
     }
 
-    // if (
-    //   !req.user.admin &&
-    //   userShop.accountType !== "ADMIN" &&
-    //   userShop.accountType !== "OPERATOR"
-    // ) {
-    //   return res.status(400).json({ error: "Unauthorized" });
-    // }
+    if (
+      !req.user.admin &&
+      userShop.accountType !== "ADMIN" &&
+      userShop.accountType !== "OPERATOR" &&
+      userShop.accountType !== "GROUP_ADMIN"
+    ) {
+      return res.status(400).json({ error: "Unauthorized" });
+    }
 
     let users = await prisma.userShop.findMany({
       where: {

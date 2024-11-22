@@ -1,6 +1,34 @@
+import { LogType } from "@prisma/client";
 import { prisma } from "../../../util/prisma.js";
 import { verifyAuth } from "../../../util/verifyAuth.js";
 import { SHOP_SELECT } from "../shared.js";
+import { z } from "zod";
+
+const shopSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  address: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().email("Invalid email").optional(),
+  website: z.string().url("Invalid website URL").optional(),
+  description: z.string().optional(),
+  imageUrl: z.string().url("Invalid image URL").optional(),
+  color: z
+    .enum([
+      "RED",
+      "BLUE",
+      "GREEN",
+      "YELLOW",
+      "ORANGE",
+      "PURPLE",
+      "PINK",
+      "TEAL",
+    ])
+    .optional(),
+  startingDeposit: z
+    .number()
+    .min(0, "Starting deposit must be a positive number")
+    .optional(),
+});
 
 export const get = [
   verifyAuth,
@@ -57,7 +85,7 @@ export const get = [
             req.user.admin
           )
         ) {
-          return res.status(400).json({ error: "Forbidden" });
+          return res.status(403).json({ error: "Unauthorized" });
         }
 
         users = await prisma.userShop.findMany({
@@ -170,14 +198,46 @@ export const put = [
         return res.status(403).json({ error: "User is not an admin" });
       }
 
-      req.body.startingDeposit = parseFloat(req.body.startingDeposit);
+      if (!isNaN(parseFloat(req.body.startingDeposit))) {
+        req.body.startingDeposit = parseFloat(req.body.startingDeposit);
+      }
+
+      const validationResult = shopSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Invalid data",
+          issues: validationResult.error.format(),
+        });
+      }
+
+      const validatedData = validationResult.data;
 
       const updatedShop = await prisma.shop.update({
         where: {
           id: shop.id,
         },
-        data: req.body,
+        data: {
+          name: validatedData.name,
+          address: validatedData.address,
+          phone: validatedData.phone,
+          email: validatedData.email,
+          website: validatedData.website,
+          description: validatedData.description,
+          imageUrl: validatedData.imageUrl,
+          color: validatedData.color,
+          startingDeposit: validatedData.startingDeposit,
+        },
         select: SHOP_SELECT,
+      });
+
+      await prisma.logs.create({
+        data: {
+          type: LogType.SHOP_MODIFIED,
+          userId: req.user.id,
+          shopId: shop.id,
+          from: JSON.stringify(shop),
+          to: JSON.stringify(updatedShop),
+        },
       });
 
       res.json({ shop: updatedShop });
