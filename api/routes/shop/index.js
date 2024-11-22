@@ -1,7 +1,7 @@
-import { LogType } from "@prisma/client";
+import { LedgerItemType, LogType } from "@prisma/client";
 import { prisma } from "../../util/prisma.js";
 import { verifyAuth } from "../../util/verifyAuth.js";
-import { SHOP_SELECT } from "./shared.js";
+import { SHOP_SELECT, SHOP_SELECT_WITH_LEDGER } from "./shared.js";
 
 export const get = [
   verifyAuth,
@@ -55,6 +55,26 @@ export const post = [
   verifyAuth,
   async (req, res) => {
     try {
+      if (!req.user.admin) {
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+
+      if (!req.body.name) {
+        return res.status(400).json({
+          error: "Name is required",
+        });
+      }
+
+      let startingDeposit = null;
+      if (req.body.startingDeposit) {
+        startingDeposit = parseFloat(req.body.startingDeposit);
+        if (isNaN(startingDeposit)) {
+          return res.status(400).json({
+            error: "startingDeposit must be floaty",
+          });
+        }
+      }
+
       const shop = await prisma.shop.create({
         data: {
           name: req.body.name,
@@ -63,13 +83,25 @@ export const post = [
           email: req.body.email,
           description: req.body.description,
           imageUrl: req.body.imageUrl,
+          startingDeposit: startingDeposit,
           users: {
             create: {
               userId: req.user.id,
+              accountType: "ADMIN",
             },
           },
+          ledgerItems:
+            startingDeposit > 0
+              ? {
+                  create: {
+                    userId: req.user.id,
+                    type: LedgerItemType.INITIAL,
+                    value: startingDeposit,
+                  },
+                }
+              : undefined,
         },
-        select: SHOP_SELECT,
+        select: startingDeposit ? SHOP_SELECT_WITH_LEDGER : SHOP_SELECT,
       });
 
       await prisma.logs.create({
@@ -80,6 +112,17 @@ export const post = [
           to: JSON.stringify(shop),
         },
       });
+
+      if (startingDeposit) {
+        await prisma.logs.create({
+          data: {
+            type: LogType.LEDGER_ITEM_CREATED,
+            userId: req.user.id,
+            shopId: shop.id,
+            ledgerItemId: shop.ledgerItems[0].id,
+          },
+        });
+      }
 
       const shops = await prisma.shop.findMany({
         where: {
@@ -104,8 +147,10 @@ export const post = [
         },
       });
 
+      delete shop.ledgerItems;
+
       res.json({
-        newShop: shop,
+        shop,
         shops,
         meta: {
           total: totalShops,

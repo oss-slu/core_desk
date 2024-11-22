@@ -93,6 +93,25 @@ describe("/[userId]", () => {
       expect(updatedUser.suspensionReason).toBe("Test reason");
       expect(updatedUser.logs).toHaveLength(1);
     });
+
+    it("should allow a suspended user to access /api/auth/me", async () => {
+      const res = await request(app)
+        .get(`/api/auth/me`)
+        .set(...(await gt({ suspended: true })))
+        .send();
+
+      expect(res.status).toBe(200);
+      expect(res.body.user.suspended).toBe(true);
+    });
+
+    it("should not allow a suspended user to access other routes", async () => {
+      const res = await request(app)
+        .get(`/api/shop`)
+        .set(...(await gt({ suspended: true })))
+        .send();
+
+      expect(res.status).toBe(401);
+    });
   });
 
   describe("Unsuspend user", async () => {

@@ -3,20 +3,27 @@ import jwt from "jsonwebtoken";
 
 export const gt = async (options) => {
   const ga = options?.ga || false;
-  let user;
+  const suspended = options?.suspended || false;
+  let user = await prisma.user.findFirst({
+    where: {
+      email: "test@email.com",
+    },
+  });
+
   if (ga) {
     user = await prisma.user.update({
-      where: {
-        email: "test@email.com",
-      },
+      where: { id: user.id },
       data: {
         admin: true,
       },
     });
-  } else {
-    user = await prisma.user.findFirst({
-      where: {
-        email: "test@email.com",
+  }
+
+  if (suspended) {
+    user = await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        suspended: true,
       },
     });
   }

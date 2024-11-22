@@ -1,3 +1,5 @@
+import { Prisma } from "@prisma/client";
+
 export const SHOP_SELECT = {
   id: true,
   name: true,
@@ -9,4 +11,10 @@ export const SHOP_SELECT = {
   color: true,
   logoUrl: true,
   startingDeposit: true,
+};
+
+/** @type {Prisma.ShopSelect} */
+export const SHOP_SELECT_WITH_LEDGER = {
+  ...SHOP_SELECT,
+  ledgerItems: true,
 };

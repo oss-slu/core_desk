@@ -12,6 +12,9 @@ beforeEach(async () => {
       throw new Error("Cannot reset the database outside of localhost.");
     }
 
+    // Disable triggers
+    await prisma.$executeRawUnsafe("SET session_replication_role = 'replica';");
+
     // Reset the database
     await prisma.$transaction([
       prisma.user.deleteMany(),
@@ -32,6 +35,9 @@ beforeEach(async () => {
       prisma.billingGroupInvitationLink.deleteMany(),
       prisma.userBillingGroup.deleteMany(),
     ]);
+
+    // Re-enable triggers
+    await prisma.$executeRawUnsafe("SET session_replication_role = 'origin';");
 
     // Create an initial user
     const globalUser = await prisma.user.create({
