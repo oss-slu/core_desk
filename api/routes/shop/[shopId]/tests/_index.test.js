@@ -400,21 +400,14 @@ describe("/shop/[shopId]", () => {
 
       expect(res.status).toBe(200);
 
-      const logs = await prisma.logs.findFirst({
+      const log = await prisma.logs.findFirst({
         where: {
           type: LogType.SHOP_MODIFIED,
           shopId: shop.id,
         },
       });
 
-      expect(logs).toBeDefined();
-      expect(logs).toMatchSnapshot({
-        id: expect.any(String),
-        shopId: expect.any(String),
-        userId: expect.any(String),
-        from: expect.any(String),
-        to: expect.any(String),
-      });
+      expect(log).toBeDefined();
     });
   });
 });

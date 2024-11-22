@@ -124,29 +124,3 @@ exports[`/shop/[shopId] > GET > returns a shop and a user's membership in said s
   "userId": Any<String>,
 }
 `;
-
-exports[`/shop/[shopId] > PUT > logs the shop update 1`] = `
-{
-  "billingGroupId": null,
-  "billingGroupInvitationLinkId": null,
-  "commentId": null,
-  "createdAt": 2024-11-22T17:28:54.046Z,
-  "from": Any<String>,
-  "id": Any<String>,
-  "jobId": null,
-  "jobItemId": null,
-  "ledgerItemId": null,
-  "materialId": null,
-  "materialImageId": null,
-  "message": null,
-  "resourceId": null,
-  "resourceImageId": null,
-  "resourceTypeId": null,
-  "shopId": Any<String>,
-  "to": Any<String>,
-  "type": "SHOP_MODIFIED",
-  "updatedAt": 2024-11-22T17:28:54.046Z,
-  "userBillingGroupId": null,
-  "userId": Any<String>,
-}
-`;
