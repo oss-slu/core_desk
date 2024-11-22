@@ -2,6 +2,8 @@ import prisma from "#prisma";
 import { AccountType } from "@prisma/client";
 import { beforeEach } from "vitest";
 
+export let tc = {};
+
 beforeEach(async () => {
   if (process.env.NODE_ENV === "test") {
     if (
@@ -48,7 +50,9 @@ beforeEach(async () => {
       },
     });
 
-    await prisma.shop.create({
+    tc.globalUser = globalUser;
+
+    const shop = await prisma.shop.create({
       data: {
         name: "TestShop",
         users: {
@@ -59,5 +63,7 @@ beforeEach(async () => {
         },
       },
     });
+
+    tc.shop = shop;
   }
 });

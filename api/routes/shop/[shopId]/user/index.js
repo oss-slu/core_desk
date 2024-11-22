@@ -25,7 +25,7 @@ export const get = [
       userShop.accountType !== "OPERATOR" &&
       userShop.accountType !== "GROUP_ADMIN"
     ) {
-      return res.status(400).json({ error: "Unauthorized" });
+      return res.status(403).json({ error: "Unauthorized" });
     }
 
     let users = await prisma.userShop.findMany({

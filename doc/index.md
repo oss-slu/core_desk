@@ -95,6 +95,7 @@ import { app } from "#index";
 import { gt } from "#gt";
 import { prisma as mockPrisma } from "#mock-prisma";
 import { prisma } from "#prisma";
+import {tc} from "#setup";
 
 describe("/users", () => {
   describe("GET", () => {
@@ -155,6 +156,7 @@ The integration test environment has Prisma mocked for spying on database calls,
 | `gt` | A function that generates and returns an array of auth headers for the test user. Looks like `['Authorization': 'Bearer {jwt}']`. Accepts options to set up the user at [gt() options](#gt-options). |
 | `prisma` from `#mock-prisma` | The mocked prisma client to be used for function spying |
 | `prisma` from `#prisma` | The real prisma client to be used for database operations |
+| `tc` from `#setup` | An object containing generated test data. Looks like `{ globalUser<user>, shop<shop> }`. |
 
 #### gt() options
 

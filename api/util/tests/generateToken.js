@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 export const gt = async (options) => {
   const ga = options?.ga || false;
   const suspended = options?.suspended || false;
+  const sat = options?.sat || null;
+
   let user = await prisma.user.findFirst({
     where: {
       email: "test@email.com",
@@ -24,6 +26,16 @@ export const gt = async (options) => {
       where: { id: user.id },
       data: {
         suspended: true,
+      },
+    });
+  }
+
+  if (sat) {
+    // Shop accountType
+    await prisma.userShop.updateMany({
+      where: { userId: user.id },
+      data: {
+        accountType: sat,
       },
     });
   }
