@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-unused-vars
 import { Prisma } from "@prisma/client";
 
 export const SHOP_SELECT = {

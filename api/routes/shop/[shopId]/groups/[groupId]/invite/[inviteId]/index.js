@@ -1,11 +1,11 @@
 import { prisma } from "#prisma";
-import { verifyAuth, verifyAuthAlone } from "#verifyAuth";
+import { verifyAuth } from "#verifyAuth";
 import { LedgerItemType, LogType } from "@prisma/client";
 
 export const get = [
   async (req, res) => {
     try {
-      const { shopId, inviteId } = req.params;
+      const { inviteId } = req.params;
 
       const invite = await prisma.billingGroupInvitationLink.findFirst({
         where: {

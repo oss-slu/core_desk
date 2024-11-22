@@ -1,6 +1,6 @@
 import prisma from "#prisma";
 import { AccountType } from "@prisma/client";
-import { afterAll, beforeEach } from "vitest";
+import { beforeEach } from "vitest";
 
 beforeEach(async () => {
   if (process.env.NODE_ENV === "test") {

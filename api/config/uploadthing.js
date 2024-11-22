@@ -88,7 +88,7 @@ export const uploadRouter = {
       }
 
       if (scope === "group.fileUpload") {
-        const { shopId, groupId, jobId } = metadata;
+        const { groupId, jobId } = metadata;
 
         if (user.admin) {
           return { ...metadata, userId: user.id, scope };
