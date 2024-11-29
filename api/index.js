@@ -14,6 +14,7 @@ import { createRouteHandler } from "uploadthing/express";
 import { uploadRouter } from "./config/uploadthing.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import registerRoutes from "./util/router.js";
 
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -184,7 +185,9 @@ app.use(
   })
 );
 
-app.use("/api", await router());
+// app.use("/api", await router());
+
+await registerRoutes(app, path.join(process.cwd(), "routes"));
 
 app.use(express.static("../app/dist"));
 
