@@ -34,7 +34,7 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/sluop-test
           JWT_SECRET: TEST_JWT_SECRET
           BASE_URL: "http://localhost:5173"
-        run: yarn test coverage
+        run: yarn test --coverage
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
