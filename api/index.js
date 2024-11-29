@@ -5,7 +5,6 @@ import bodyParser from "body-parser";
 import samlConfig from "./config/saml-config.js";
 import cors from "cors";
 import jwt from "jsonwebtoken";
-import { router } from "express-file-routing";
 import dotenv from "dotenv";
 import { prisma } from "./util/prisma.js";
 import { LogType } from "@prisma/client";
