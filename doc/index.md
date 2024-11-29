@@ -95,7 +95,7 @@ import { app } from "#index";
 import { gt } from "#gt";
 import { prisma as mockPrisma } from "#mock-prisma";
 import { prisma } from "#prisma";
-import {tc} from "#setup";
+import { tc } from "#setup";
 
 describe("/users", () => {
   describe("GET", () => {

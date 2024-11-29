@@ -1,0 +1,103 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/shop/[shopId]/user/[userId] > GET > returns a user's shop information to admins 1`] = `
+{
+  "accountTitle": null,
+  "accountType": "CUSTOMER",
+  "active": true,
+  "blacklisted": false,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "shopId": Any<String>,
+  "updatedAt": Any<String>,
+  "user": {
+    "admin": true,
+    "balance": 0,
+    "createdAt": Any<String>,
+    "email": "test@email.com",
+    "firstName": "TestFirstName",
+    "id": Any<String>,
+    "isMe": true,
+    "jobCounts": {
+      "completedCount": 0,
+      "excludedCount": 0,
+      "inProgressCount": 0,
+      "notStartedCount": 0,
+    },
+    "jobs": [],
+    "lastName": "TestLastName",
+    "suspended": false,
+    "suspensionReason": null,
+    "updatedAt": Any<String>,
+  },
+  "userId": Any<String>,
+}
+`;
+
+exports[`/shop/[shopId]/user/[userId] > GET > returns a user's shop information to workshop admins 1`] = `
+{
+  "accountTitle": null,
+  "accountType": "CUSTOMER",
+  "active": true,
+  "blacklisted": false,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "shopId": Any<String>,
+  "updatedAt": Any<String>,
+  "user": {
+    "admin": false,
+    "balance": 0,
+    "createdAt": Any<String>,
+    "email": "new@email.com",
+    "firstName": "John",
+    "id": Any<String>,
+    "isMe": false,
+    "jobCounts": {
+      "completedCount": 0,
+      "excludedCount": 0,
+      "inProgressCount": 0,
+      "notStartedCount": 0,
+    },
+    "jobs": [],
+    "lastName": "Doe",
+    "suspended": false,
+    "suspensionReason": null,
+    "updatedAt": Any<String>,
+  },
+  "userId": Any<String>,
+}
+`;
+
+exports[`/shop/[shopId]/user/[userId] > GET > returns a user's shop information to workshop operators 1`] = `
+{
+  "accountTitle": null,
+  "accountType": "CUSTOMER",
+  "active": true,
+  "blacklisted": false,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "shopId": Any<String>,
+  "updatedAt": Any<String>,
+  "user": {
+    "admin": false,
+    "balance": 0,
+    "createdAt": Any<String>,
+    "email": "new@email.com",
+    "firstName": "John",
+    "id": Any<String>,
+    "isMe": false,
+    "jobCounts": {
+      "completedCount": 0,
+      "excludedCount": 0,
+      "inProgressCount": 0,
+      "notStartedCount": 0,
+    },
+    "jobs": [],
+    "lastName": "Doe",
+    "suspended": false,
+    "suspensionReason": null,
+    "updatedAt": Any<String>,
+  },
+  "userId": Any<String>,
+}
+`;

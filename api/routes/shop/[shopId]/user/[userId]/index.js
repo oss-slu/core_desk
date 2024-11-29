@@ -18,7 +18,18 @@ export const get = [
       });
 
       if (!authUserShop) {
-        return res.status(400).json({ error: "Unauthorized" });
+        return res.status(403).json({ error: "Unauthorized" });
+      }
+
+      const targetUserShop = await prisma.userShop.findFirst({
+        where: {
+          userId: userId,
+          shopId: shopId,
+        },
+      });
+
+      if (targetUserShop.active === false) {
+        return res.status(404).json({ error: "User is not active in shop" });
       }
 
       if (
@@ -28,7 +39,7 @@ export const get = [
           authUserShop.accountType === "OPERATOR"
         )
       ) {
-        return res.status(400).json({ error: "Unauthorized" });
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       const user = await prisma.userShop.findFirst({
@@ -123,6 +134,24 @@ export const post = [
     try {
       const userId = req.params.userId;
       const shopId = req.params.shopId;
+
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const shop = await prisma.shop.findUnique({
+        where: {
+          id: shopId,
+        },
+      });
+      if (!shop) {
+        return res.status(404).json({ error: "Shop not found" });
+      }
 
       // Make sure the current user has authority to add users to the shop.
       const shopAdmin = await prisma.shop.findUnique({
@@ -255,6 +284,26 @@ export const del = [
       const userId = req.params.userId;
       const shopId = req.params.shopId;
 
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const shop = await prisma.shop.findUnique({
+        where: {
+          id: shopId,
+        },
+      });
+
+      if (!shop) {
+        return res.status(404).json({ error: "Shop not found" });
+      }
+
       // Make sure the current user has authority to remove users from the shop.
       const shopAdmin = await prisma.shop.findUnique({
         where: {
@@ -341,6 +390,26 @@ export const put = [
         },
       });
 
+      const user = await prisma.user.findUnique({
+        where: {
+          id: userId,
+        },
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      const shop = await prisma.shop.findUnique({
+        where: {
+          id: shopId,
+        },
+      });
+
+      if (!shop) {
+        return res.status(404).json({ error: "Shop not found" });
+      }
+
       if (!req.user.admin && !shopAdmin) {
         return res.status(403).json({ error: "Unauthorized" });
       }
@@ -356,6 +425,19 @@ export const put = [
 
       if (!connectionExists) {
         return res.status(400).json({ error: "User is not connected to shop" });
+      }
+
+      if (
+        !["CUSTOMER", "OPERATOR", "ADMIN", "GROUP_ADMIN"].includes(
+          req.body.role
+        )
+      ) {
+        return res.status(400).json({ error: "Invalid role" });
+      }
+
+      // Make sure the user's current role is not the same as the role they are trying to change to.
+      if (connectionExists.accountType === req.body.role) {
+        return res.status(200).json({ message: "success" });
       }
 
       // Update the user's role in the shop.
