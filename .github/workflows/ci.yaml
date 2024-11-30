@@ -53,7 +53,11 @@ jobs:
         with:
           node-version: "lts/*"
 
-      - name: Install Dependencies
+      - name: Install backend Dependencies
+        working-directory: ./api
+        run: yarn install
+
+      - name: Install frontend Dependencies
         working-directory: ./api
         run: yarn install
 
