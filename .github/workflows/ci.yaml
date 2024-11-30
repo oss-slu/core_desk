@@ -57,8 +57,12 @@ jobs:
         working-directory: ./api
         run: yarn install
 
-      - name: Run Lint
+      - name: Run backend lint
         working-directory: ./api
+        run: yarn lint
+
+      - name: Run frontend lint
+        working-directory: ./app
         run: yarn lint
 
   docker:
