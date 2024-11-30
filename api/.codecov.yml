@@ -1,5 +1,5 @@
 comment: # this is a top-level key
-  layout: " diff, flags, files"
+  layout: "header, diff, flags, files"
   behavior: default
   require_changes: false # learn more in the Requiring Changes section below
   require_base: false # [true :: must have a base report to post]
