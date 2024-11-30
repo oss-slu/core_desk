@@ -7,7 +7,6 @@ import { MOMENT_FORMAT } from "../../util/constants";
 import { switchStatusForBadge } from "../../routes/shops/[shopId]/jobs";
 import { Util, Switch, Typography } from "tabler-react-2";
 import { Spinner } from "tabler-react-2/dist/spinner";
-import { Button } from "tabler-react-2/dist/button";
 
 export const JobsTable = () => {
   const { shopId, groupId } = useParams();

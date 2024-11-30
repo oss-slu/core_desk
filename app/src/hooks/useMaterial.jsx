@@ -57,7 +57,7 @@ export const useMaterial = (shopId, resourceTypeId, materialId) => {
     }
     try {
       setOpLoading(true);
-      const r = await authFetch(
+      await authFetch(
         `/api/shop/${shopId}/resources/type/${resourceTypeId}/material/${materialId}`,
         {
           method: "DELETE",
@@ -74,7 +74,7 @@ export const useMaterial = (shopId, resourceTypeId, materialId) => {
   const deleteMaterialImage = async (imageId) => {
     try {
       setOpLoading(true);
-      const r = await authFetch(
+      await authFetch(
         `/api/shop/${shopId}/resources/type/${resourceTypeId}/material/${materialId}/images/${imageId}`,
         {
           method: "DELETE",

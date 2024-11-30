@@ -10,12 +10,8 @@ import { useParams } from "react-router-dom";
 const EditBillingGroupInvitationModalContent = ({ invitationId, refetch }) => {
   const { shopId, groupId } = useParams();
 
-  const {
-    billingGroupInvitation,
-    updateBillingGroupInvitation,
-    opLoading,
-    loading,
-  } = useBillingGroupInvitation(shopId, groupId, invitationId);
+  const { billingGroupInvitation, updateBillingGroupInvitation, opLoading } =
+    useBillingGroupInvitation(shopId, groupId, invitationId);
 
   const [newInvitation, setNewInvitation] = useState(billingGroupInvitation);
   useEffect(() => {

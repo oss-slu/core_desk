@@ -145,15 +145,10 @@ export const JobCostingPage = () => {
 
 const ItemCostCard = ({ item, refetchJob }) => {
   const { shopId } = useParams();
-  const { updateJobItem, loading, opLoading } = useJobItem(
-    shopId,
-    item.jobId,
-    item.id,
-    {
-      initialValue: item,
-      shouldFetchJobItem: true,
-    }
-  );
+  const { updateJobItem, opLoading } = useJobItem(shopId, item.jobId, item.id, {
+    initialValue: item,
+    shouldFetchJobItem: true,
+  });
 
   return (
     <>

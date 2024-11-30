@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [
     // Put the Sentry vite plugin after all other plugins
     sentryVitePlugin({
+      // eslint-disable-next-line
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "jc-apps",
       project: "slu-open-project",

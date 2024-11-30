@@ -1,6 +1,5 @@
 import React from "react";
 import { Util } from "tabler-react-2";
-import { Icon } from "../../util/Icon";
 
 export const Price = ({ value = 0, icon, size }) => {
   return (

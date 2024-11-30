@@ -53,12 +53,20 @@ jobs:
         with:
           node-version: "lts/*"
 
-      - name: Install Dependencies
+      - name: Install backend Dependencies
         working-directory: ./api
         run: yarn install
 
-      - name: Run Lint
+      - name: Install frontend Dependencies
+        working-directory: ./app
+        run: yarn install
+
+      - name: Run backend lint
         working-directory: ./api
+        run: yarn lint
+
+      - name: Run frontend lint
+        working-directory: ./app
         run: yarn lint
 
   docker:

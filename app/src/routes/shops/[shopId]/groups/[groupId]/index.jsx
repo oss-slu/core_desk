@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   useAuth,
   useBillingGroup,
@@ -27,7 +27,7 @@ import { MarkdownRender } from "../../../../../components/markdown/MarkdownRende
 export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
   const { user } = useAuth();
-  const { userShop, shop } = useShop(shopId);
+  const { userShop } = useShop(shopId);
 
   const {
     billingGroup,
