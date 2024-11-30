@@ -58,7 +58,7 @@ jobs:
         run: yarn install
 
       - name: Install frontend Dependencies
-        working-directory: ./api
+        working-directory: ./app
         run: yarn install
 
       - name: Run backend lint
