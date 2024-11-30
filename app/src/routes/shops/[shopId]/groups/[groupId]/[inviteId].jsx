@@ -1,5 +1,5 @@
 import React from "react";
-import { Card, Typography, Button, Util } from "tabler-react-2";
+import { Card, Button, Util } from "tabler-react-2";
 import { useBillingGroupInvitation } from "../../../../../hooks/useBillingGroupInvitation";
 import { useParams } from "react-router-dom";
 import { Loading } from "../../../../../components/loading/Loading";

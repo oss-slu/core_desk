@@ -13,7 +13,7 @@ import { Price } from "../../../../components/price/RenderPrice";
 import { Icon } from "../../../../util/Icon";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
 import { Avatar } from "tabler-react-2/dist/avatar";
-const { H1, H2, H3 } = Typography;
+const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {
   switch (type) {
@@ -47,7 +47,7 @@ const switchAccountTypeForBadge = (type) => {
 export const ShopUsersPage = () => {
   const { shopId } = useParams();
   const { user } = useAuth();
-  const { userShop, shop, loading, users } = useShop(shopId, {
+  const { userShop, loading, users } = useShop(shopId, {
     includeUsers: true,
   });
 

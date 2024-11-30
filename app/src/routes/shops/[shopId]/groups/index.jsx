@@ -15,7 +15,7 @@ import { MOMENT_FORMAT } from "../../../../util/constants";
 export const BillingGroupsPage = () => {
   const { shopId } = useParams();
   const { user } = useAuth();
-  const { userShop, shop } = useShop(shopId);
+  const { userShop } = useShop(shopId);
   const { billingGroups, loading, createBillingGroup, opLoading } =
     useBillingGroups(shopId);
 

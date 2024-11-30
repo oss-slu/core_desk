@@ -5,7 +5,7 @@ import { Loading } from "../../../components/loading/Loading";
 import { Typography, Util, Input } from "tabler-react-2";
 import { Icon } from "../../../util/Icon";
 import { useParams } from "react-router-dom";
-const { H1, H2, H3 } = Typography;
+const { H1, H2 } = Typography;
 import { useShop } from "../../../hooks/useShop";
 import { Button } from "tabler-react-2/dist/button";
 import { MarkdownRender } from "../../../components/markdown/MarkdownRender";
@@ -107,13 +107,7 @@ export const shopSidenavItems = (
 export const ShopPage = () => {
   const { user, loading } = useAuth();
   const { shopId } = useParams();
-  const {
-    shop,
-    userShop,
-    updateShop,
-    opLoading,
-    refetch: refetchShop,
-  } = useShop(shopId);
+  const { shop, userShop, updateShop, opLoading } = useShop(shopId);
   const [editing, setEditing] = useState(false);
   const [newShop, setNewShop] = useState(shop);
   useEffect(() => {

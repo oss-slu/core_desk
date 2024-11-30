@@ -1,10 +1,8 @@
 import React from "react";
 import { useAuth } from "../hooks/useAuth";
 import { Loading } from "../components/loading/Loading";
-import { Typography } from "tabler-react-2";
 import { Page, sidenavItems } from "../components/page/page";
 import { MarkdownRender } from "../components/markdown/MarkdownRender";
-const { H1 } = Typography;
 
 const content = `
 # Welcome to SLU Open Project!

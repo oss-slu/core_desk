@@ -11,7 +11,6 @@ export const useResourceType = (shopId, resourceTypeId) => {
   const [resources, setResources] = useState([]);
 
   const {
-    data,
     error: fetchError,
     isLoading,
     mutate,

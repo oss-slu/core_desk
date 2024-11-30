@@ -16,7 +16,6 @@ import { PieProgressChart } from "../../../../components/piechart/PieProgressCha
 import { Icon } from "../../../../util/Icon";
 import { Avatar } from "tabler-react-2/dist/avatar";
 import { ShopUserPicker } from "../../../../components/shopUserPicker/ShopUserPicker";
-import { Modal } from "tabler-react-2/dist/modal";
 import { Price } from "../../../../components/price/RenderPrice";
 
 export const switchStatusForBadge = (status) => {

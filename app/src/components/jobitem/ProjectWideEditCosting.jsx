@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Util, Typography, Switch, Input, Card } from "tabler-react-2";
-import { HELP_TEXT, QuantityInput, TimeInput } from "./EditCosting";
+import { Util, Typography, Switch, Card } from "tabler-react-2";
+import { QuantityInput, TimeInput } from "./EditCosting";
 import { Button } from "tabler-react-2/dist/button";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
