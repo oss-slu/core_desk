@@ -187,15 +187,12 @@ export const put = [
         where: {
           userId: req.user.id,
           shopId: shop.id,
+          active: true,
         },
       });
 
-      if (!userShop.active) {
-        return res.status(403).json({ error: "User is not active in shop" });
-      }
-
       if (userShop.accountType !== "ADMIN" && !req.user.admin) {
-        return res.status(403).json({ error: "User is not an admin" });
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       if (!isNaN(parseFloat(req.body.startingDeposit))) {
