@@ -22,14 +22,14 @@ export default [
           ignoreTemplateLiterals: true,
         },
       ],
-      "max-lines-per-function": [
-        "warn",
-        {
-          max: 100,
-          skipBlankLines: true,
-          skipComments: true,
-        },
-      ],
+      // "max-lines-per-function": [
+      //   "warn",
+      //   {
+      //     max: 100,
+      //     skipBlankLines: true,
+      //     skipComments: true,
+      //   },
+      // ],
     },
   },
   {

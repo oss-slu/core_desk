@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import request from "supertest";
 import { app } from "#index";
 import { gt } from "#gt";
+import { tc } from "#setup";
 import { prisma } from "#prisma";
 import { LedgerItemType, LogType } from "@prisma/client";
 
@@ -314,6 +315,16 @@ describe("/shop/[shopId]", () => {
 
       expect(res.body.users[0].user.balance).toBe(140);
     });
+
+    it("returns 404 if the shop does not exist", async () => {
+      const res = await request(app)
+        .get(`/api/shop/12345`)
+        .set(...(await gt({ ga: true })))
+        .send();
+
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ error: "Shop not found" });
+    });
   });
 
   describe("PUT", () => {
@@ -355,6 +366,28 @@ describe("/shop/[shopId]", () => {
         });
 
       expect(res.status).toBe(400);
+    });
+
+    it("forces a floaty starting deposit to be a float", async () => {
+      const shop = await prisma.shop.findFirst({});
+
+      const res = await request(app)
+        .put(`/api/shop/${shop.id}`)
+        .set(...(await gt({ ga: true })))
+        .send({
+          name: "TestShop2",
+          startingDeposit: "100.5",
+        });
+
+      expect(res.status).toBe(200);
+
+      const updatedShop = await prisma.shop.findFirst({
+        where: {
+          id: shop.id,
+        },
+      });
+
+      expect(updatedShop.startingDeposit).toBe(100.5);
     });
 
     it("ignores erroneous keys", async () => {
@@ -408,6 +441,26 @@ describe("/shop/[shopId]", () => {
       });
 
       expect(log).toBeDefined();
+    });
+
+    it("returns 404 if the shop does not exist", async () => {
+      const res = await request(app)
+        .put(`/api/shop/12345`)
+        .set(...(await gt({ ga: true })))
+        .send();
+
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ error: "Shop not found" });
+    });
+
+    it("returns 403 if the user is not an admin", async () => {
+      const res = await request(app)
+        .put(`/api/shop/${tc.shop.id}`)
+        .set(...(await gt()))
+        .send();
+
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual({ error: "Unauthorized" });
     });
   });
 });
