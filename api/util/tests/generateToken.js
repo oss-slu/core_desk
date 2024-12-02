@@ -6,11 +6,13 @@ export const gt = async (options) => {
   const suspended = options?.suspended || false;
   const sat = options?.sat || null;
 
-  let user = await prisma.user.findFirst({
-    where: {
-      email: "test@email.com",
-    },
-  });
+  let user =
+    options?.user ||
+    (await prisma.user.findFirst({
+      where: {
+        email: "test@email.com",
+      },
+    }));
 
   if (ga) {
     user = await prisma.user.update({
@@ -38,12 +40,6 @@ export const gt = async (options) => {
         accountType: sat,
       },
     });
-  }
-
-  if (!user) {
-    throw new Error(
-      "User not found. Are tests running properly? Check /api/util/tests/setup.js"
-    );
   }
 
   const token = jwt.sign(

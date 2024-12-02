@@ -3,6 +3,7 @@ import request from "supertest";
 import { app } from "#index";
 import { gt } from "#gt";
 import { tc } from "#setup";
+import { prisma } from "#prisma";
 
 describe("/shop/[shopId]/user", () => {
   describe("GET", () => {
@@ -62,6 +63,24 @@ describe("/shop/[shopId]/user", () => {
       const res = await request(app)
         .get(`/api/shop/${tc.shop.id}/user`)
         .set(...(await gt()))
+        .send();
+
+      expect(res.status).toBe(403);
+      expect(res.body).toEqual({ error: "Unauthorized" });
+    });
+
+    it("returns 403 when the user is not a member of the shop", async () => {
+      const user = await prisma.user.create({
+        data: {
+          email: "new@email.com",
+          firstName: "TestFirstName",
+          lastName: "TestLastName",
+        },
+      });
+
+      const res = await request(app)
+        .get(`/api/shop/${tc.shop.id}/user`)
+        .set(...(await gt({ user })))
         .send();
 
       expect(res.status).toBe(403);
