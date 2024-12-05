@@ -4,8 +4,7 @@ import { app } from "#index";
 import { gt } from "#gt";
 import { prisma } from "#prisma";
 import { tc } from "#setup";
-import { AccountType, LedgerItemType, LogType } from "@prisma/client";
-import { prisma as mockPrisma } from "#mock-prisma";
+import { AccountType, LedgerItemType } from "@prisma/client";
 
 describe("/shop/[shopId]/user/[userId]/ledger", () => {
   describe("GET", () => {

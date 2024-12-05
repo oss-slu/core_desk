@@ -74,6 +74,10 @@ export const post = [
       },
     });
 
+    if (!userShop) {
+      return res.status(404).json({ error: "Not found" });
+    }
+
     const reqUserShop = await prisma.userShop.findFirst({
       where: {
         userId: req.user.id,
