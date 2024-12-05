@@ -402,5 +402,18 @@ describe("/shop/[shopId]/user/[userId]/ledger", () => {
       expect(res.status).toBe(200);
       expect(res.body.balance).toBe(50);
     });
+
+    it("returns 404 when the user is not a member of the shop", async () => {
+      const res = await request(app)
+        .post(`/api/shop/${tc.shop.id}/user/1234/ledger`)
+        .set(...(await gt()))
+        .send({
+          type: "MANUAL_REDUCTION",
+          value: 50,
+        });
+
+      expect(res.status).toBe(404);
+      expect(res.body).toEqual({ error: "Not found" });
+    });
   });
 });
