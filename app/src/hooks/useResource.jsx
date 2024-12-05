@@ -11,7 +11,9 @@ export const useResource = (shopId, resourceId) => {
   const fetchResource = async () => {
     try {
       setLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/resources/${resourceId}`);
+      const r = await authFetch(
+        `/api/shop/${shopId}/resources/resource/${resourceId}`
+      );
       const data = await r.json();
       if (data.resource) {
         setResource(data.resource);
@@ -33,10 +35,13 @@ export const useResource = (shopId, resourceId) => {
   const updateResource = async (data) => {
     try {
       setOpLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/resources/${resourceId}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
-      });
+      const r = await authFetch(
+        `/api/shop/${shopId}/resources/resource/${resourceId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify(data),
+        }
+      );
       const res = await r.json();
       if (res.resource) {
         setResource(res.resource);
@@ -85,9 +90,12 @@ export const useResource = (shopId, resourceId) => {
       return;
     try {
       setOpLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/resources/${resourceId}`, {
-        method: "DELETE",
-      });
+      const r = await authFetch(
+        `/api/shop/${shopId}/resources/resource/${resourceId}`,
+        {
+          method: "DELETE",
+        }
+      );
       const res = await r.json();
       if (res.success) {
         setOpLoading(false);

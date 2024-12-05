@@ -61,6 +61,7 @@ export const ResourcesPage = () => {
         userShop.balance < 0
       )}
     >
+      {JSON.stringify(resourceTypes)}
       <Util.Responsive threshold={600} justify="between" align="center">
         <H1>Resources</H1>
         {(user.admin || userShop.accountType === "ADMIN") && (
