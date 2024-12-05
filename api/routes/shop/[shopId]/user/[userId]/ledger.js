@@ -15,15 +15,26 @@ export const get = [
       },
     });
 
+    const reqUserShop = await prisma.userShop.findFirst({
+      where: {
+        userId: req.user.id,
+        shopId,
+      },
+    });
+
+    if (!userShop || !reqUserShop) {
+      return res.status(404).json({ error: "Not found" });
+    }
+
     if (
       !(
         req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR" ||
+        reqUserShop.accountType === "ADMIN" ||
+        reqUserShop.accountType === "OPERATOR" ||
         req.user.id === userId
       )
     ) {
-      return res.status(400).json({ error: "Unauthorized" });
+      return res.status(403).json({ error: "Unauthorized" });
     }
 
     const ledgerItems = await prisma.ledgerItem.findMany({
@@ -53,7 +64,7 @@ export const post = [
   verifyAuth,
   async (req, res) => {
     const { shopId, userId } = req.params;
-    const { type, value } = req.body;
+    const { type, value: startValue } = req.body;
 
     const userShop = await prisma.userShop.findFirst({
       where: {
@@ -63,14 +74,42 @@ export const post = [
       },
     });
 
+    if (!userShop) {
+      return res.status(404).json({ error: "Not found" });
+    }
+
+    const reqUserShop = await prisma.userShop.findFirst({
+      where: {
+        userId: req.user.id,
+        shopId,
+        active: true,
+      },
+    });
+
     if (
       !(
         req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR"
+        reqUserShop.accountType === "ADMIN" ||
+        reqUserShop.accountType === "OPERATOR"
       )
     ) {
-      return res.status(400).json({ error: "Unauthorized" });
+      return res.status(403).json({ error: "Unauthorized" });
+    }
+
+    let value = null;
+    if (startValue) {
+      value = parseFloat(startValue);
+      if (isNaN(value)) {
+        return res.status(400).json({
+          error: "value must be floaty",
+        });
+      }
+    }
+
+    if (value < 0) {
+      return res.status(400).json({
+        error: "Invalid value",
+      });
     }
 
     const existingLedgerItems = await prisma.ledgerItem.findMany({
@@ -97,6 +136,11 @@ export const post = [
             .status(400)
             .json({ error: "Balance is greater than topup" });
         }
+
+        if (parseFloat(value) - balance === 0) {
+          return res.status(400).json({ error: "Balance is unchanged" });
+        }
+
         valueToPost = parseFloat(value) - balance;
         break;
       case "MANUAL_DEPOSIT":
@@ -130,6 +174,8 @@ export const post = [
         shopId: shopId,
         to: JSON.stringify({
           postedBy: req.user.id,
+          type: type,
+          value: value,
         }),
       },
     });

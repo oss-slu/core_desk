@@ -51,6 +51,7 @@ beforeEach(async () => {
     });
 
     tc.globalUser = globalUser;
+    tc.user = globalUser;
 
     const shop = await prisma.shop.create({
       data: {
