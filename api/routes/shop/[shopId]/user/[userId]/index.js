@@ -116,10 +116,6 @@ export const get = [
 
       user.user.jobs = updatedJobs;
 
-      if (!user) {
-        return res.status(400).json({ error: "User is not connected to shop" });
-      }
-
       res.json({ userShop: user });
     } catch (e) {
       console.error(e);
@@ -344,12 +340,6 @@ export const del = [
           active: false,
         },
       });
-
-      if (!connection) {
-        return res
-          .status(400)
-          .json({ error: "Failed to remove user from shop" });
-      }
 
       await prisma.logs.create({
         data: {
