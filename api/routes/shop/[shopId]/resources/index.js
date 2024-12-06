@@ -1,13 +1,27 @@
 import { LogType } from "@prisma/client";
-import { prisma } from "../../../../util/prisma.js";
-import { verifyAuth } from "../../../../util/verifyAuth.js";
+import { prisma } from "#prisma";
+import { verifyAuth } from "#verifyAuth";
+import { forceTestError } from "#forceError";
 
 export const get = [
   verifyAuth,
   async (req, res) => {
     try {
+      forceTestError(req);
+
       // Make sure the user exists on the shop
       const { shopId } = req.params;
+
+      const shop = await prisma.shop.findUnique({
+        where: {
+          id: shopId,
+        },
+      });
+
+      if (!shop) {
+        return res.status(404).json({ error: "Not found" });
+      }
+
       const userId = req.user.id;
       const userShop = await prisma.userShop.findFirst({
         where: {
@@ -18,7 +32,7 @@ export const get = [
       });
 
       if (!userShop) {
-        return res.status(403).send("You are not a member of this shop");
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       let resources;
@@ -50,7 +64,6 @@ export const get = [
                 active: true,
               },
             },
-            // logs: true,
           },
         });
       }
@@ -80,7 +93,7 @@ export const get = [
     } catch (e) {
       console.error(e);
       res.status(500).json({
-        message: "An error occurred",
+        error: "Internal Server Error",
       });
     }
   },
@@ -90,6 +103,8 @@ export const post = [
   verifyAuth,
   async (req, res) => {
     try {
+      forceTestError(req);
+
       const { shopId } = req.params;
       const userId = req.user.id;
 
@@ -102,21 +117,21 @@ export const post = [
       });
 
       if (!userShop) {
-        return res.status(403).send("You are not a member of this shop");
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       if (userShop.accountType !== "ADMIN" && !req.user.admin) {
-        return res.status(403).send("You are not an admin of this shop");
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       const { title, resourceTypeId } = req.body;
 
       if (!title) {
-        return res.status(400).send("Title is required");
+        return res.status(400).json({ error: "Title is required" });
       }
 
       if (!resourceTypeId) {
-        return res.status(400).send("Resource Type is required");
+        return res.status(400).json({ error: "Resource Type is required" });
       }
 
       const resource = await prisma.resource.create({
@@ -141,7 +156,7 @@ export const post = [
     } catch (e) {
       console.error(e);
       res.status(500).json({
-        message: "An error occurred",
+        error: "Internal Server Error",
       });
     }
   },
