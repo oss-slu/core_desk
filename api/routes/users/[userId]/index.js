@@ -164,7 +164,7 @@ export const get = [
       });
     } catch (e) {
       console.error(e);
-      return res.status(500).json({ message: "An error occurred" });
+      return res.status(500).json({ error: "Internal Server Error" });
     }
   },
 ];

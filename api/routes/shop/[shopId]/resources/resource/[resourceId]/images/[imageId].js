@@ -94,7 +94,7 @@ export const del = [
     } catch (e) {
       console.error(e);
       res.status(500).json({
-        message: "An error occurred",
+        error: "Internal Server Error",
       });
     }
   },
