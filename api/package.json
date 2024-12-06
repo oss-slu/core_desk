@@ -57,6 +57,7 @@
     "#mock-prisma": "./util/__mocks__/prisma.js",
     "#gt": "./util/tests/generateToken.js",
     "#index": "./index.js",
-    "#setup": "./util/tests/setup.js"
+    "#setup": "./util/tests/setup.js",
+    "#forceError": "./util/tests/forceError.js"
   }
 }
