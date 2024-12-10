@@ -1,11 +1,14 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
+import { forceTestError } from "#forceError";
 
 export const get = [
   verifyAuth,
   async (req, res) => {
     try {
+      forceTestError(req);
+
       const userId = req.user.id;
       const { resourceId, shopId } = req.params;
 
@@ -18,7 +21,9 @@ export const get = [
       });
 
       if (!userShop) {
-        return res.status(403).send("You are not a member of this shop");
+        return res.status(403).json({
+          error: "Unauthorized",
+        });
       }
 
       const resource = await prisma.resource.findFirst({
@@ -37,7 +42,7 @@ export const get = [
       });
 
       if (!resource) {
-        return res.status(404).send("Resource not found");
+        return res.status(404).json({ error: "Resource not found" });
       }
 
       if (!resource.quantityPublic) {
