@@ -63,6 +63,8 @@ export const put = [
   verifyAuth,
   async (req, res) => {
     try {
+      forceTestError(req);
+
       const userId = req.user.id;
       const { resourceId, shopId } = req.params;
 
@@ -75,11 +77,11 @@ export const put = [
       });
 
       if (!userShop) {
-        return res.status(403).send("You are not a member of this shop");
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
-      if (userShop.accountType === "CUSTOMER" && !req.user.admin) {
-        return res.status(403).send("You are not authorized to edit resources");
+      if (!(req.user.admin || userShop.accountType === "ADMIN")) {
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       const resource = await prisma.resource.findFirst({
@@ -90,7 +92,7 @@ export const put = [
       });
 
       if (!resource) {
-        return res.status(404).send("Resource not found");
+        return res.status(404).json({ error: "Resource not found" });
       }
 
       let data = req.body;
@@ -150,6 +152,7 @@ export const del = [
   verifyAuth,
   async (req, res) => {
     try {
+      forceTestError(req);
       const userId = req.user.id;
       const { resourceId, shopId } = req.params;
 
@@ -162,13 +165,11 @@ export const del = [
       });
 
       if (!userShop) {
-        return res.status(403).send("You are not a member of this shop");
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       if (userShop.accountType !== "ADMIN" && !req.user.admin) {
-        return res
-          .status(403)
-          .send("You are not authorized to delete resources");
+        return res.status(403).json({ error: "Unauthorized" });
       }
 
       const resource = await prisma.resource.findFirst({
@@ -179,11 +180,11 @@ export const del = [
       });
 
       if (!resource) {
-        return res.status(404).send("Resource not found");
+        return res.status(404).json({ error: "Resource not found" });
       }
 
       if (resource.active === false) {
-        return res.status(400).send("Resource already deleted");
+        return res.status(400).json({ error: "Resource already deleted" });
       }
 
       await prisma.resource.update({
