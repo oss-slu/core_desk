@@ -162,4 +162,6 @@ The integration test environment has Prisma mocked for spying on database calls,
 
 | Option | Description | Default |
 | --- | --- | --- |
-| `ga` | Global Admin | `false` |
+| `ga` | Sets if the requesting user is a Global Admin | `false` |
+| `suspended` | Sets if the requesting user is suspended | `false` |
+| `sat` | (Shop Account Type) Sets the requesting user's account type. One of `CUSTOMER`, `OPERATOR`, `ADMIN`, `GROUP_ADMIN`. | `CUSTOMER` |
