@@ -8,6 +8,14 @@ See the [Development documentation](doc/index.md) for more information and conve
 
 ## Installation & Quickstart
 
+1. Install node.js
+
+1. Install yarn
+
+```bash
+npm install --global yarn
+```
+
 1. Clone the repository
 
 ```bash
