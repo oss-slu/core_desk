@@ -19,7 +19,7 @@ npm install --global yarn
 1. Clone the repository
 
 ```bash
-git clone https://github.com/jackcrane/slu-open-project.git
+git clone https://github.com/oss-slu/open-project.git
 ```
 
 1. Set up environment variables
@@ -42,6 +42,11 @@ yarn
 
 ```bash
 cd app
+yarn
+```
+
+```bash
+cd api
 yarn
 ```
 
