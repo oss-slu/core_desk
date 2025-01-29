@@ -5,7 +5,7 @@ dotenv.config();
 
 export default {
   entryPoint: "https://dev-31211352.okta.com/app/sso/saml",
-  issuer: "slucam-management-platform-10161409",
+  issuer: "slu-open-project",
   callbackUrl: process.env.BASE_URL + "/assertion",
   cert: fs.readFileSync("./okta.cert", "utf-8"), // Add X.509 certificate here
   login:
