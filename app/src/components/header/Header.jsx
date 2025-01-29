@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import styles from "./Header.module.css";
 import logo from "../../assets/sluop-logo.png";
-import { Dropdown } from "tabler-react-2/dist/dropdown";
+import { Dropdown, Button } from "tabler-react-2";
 import { Icon } from "../../util/Icon";
 import { useShop } from "../../hooks/index";
 const IconLogout = () => <Icon i={"logout"} size={18} />;
@@ -38,28 +38,39 @@ export const Header = () => {
           )}
         </h1>
       </div>
-      <Dropdown
-        prompt={loggedIn ? user?.firstName + " " + user?.lastName : "Account"}
-        items={
-          loggedIn
-            ? [
-                {
-                  text: "Log Out",
-                  onclick: logout,
-                  type: "item",
-                  icon: <IconLogout />,
-                },
-              ]
-            : [
-                {
-                  text: "Log In",
-                  onclick: login,
-                  type: "item",
-                  icon: <IconLogin2 />,
-                },
-              ]
-        }
-      />
+      <div className={styles.headerGroup}>
+        <a
+          className="btn"
+          href="https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog"
+          style={{
+            height: 36,
+          }}
+        >
+          Feedback
+        </a>
+        <Dropdown
+          prompt={loggedIn ? user?.firstName + " " + user?.lastName : "Account"}
+          items={
+            loggedIn
+              ? [
+                  {
+                    text: "Log Out",
+                    onclick: logout,
+                    type: "item",
+                    icon: <IconLogout />,
+                  },
+                ]
+              : [
+                  {
+                    text: "Log In",
+                    onclick: login,
+                    type: "item",
+                    icon: <IconLogin2 />,
+                  },
+                ]
+          }
+        />
+      </div>
     </header>
   );
 };
