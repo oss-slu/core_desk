@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import styles from "./Header.module.css";
 import logo from "../../assets/sluop-logo.png";
-import { Dropdown, Button } from "tabler-react-2";
+import { Dropdown } from "tabler-react-2";
 import { Icon } from "../../util/Icon";
 import { useShop } from "../../hooks/index";
 const IconLogout = () => <Icon i={"logout"} size={18} />;
