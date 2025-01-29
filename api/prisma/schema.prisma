@@ -96,6 +96,7 @@ model Shop {
   logoName        String?
   color           Color?
   startingDeposit Float?
+  autoJoin        Boolean        @default(false)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
   billingGroups   BillingGroup[]
