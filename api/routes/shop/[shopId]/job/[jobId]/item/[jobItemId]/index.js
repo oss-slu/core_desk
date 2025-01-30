@@ -1,7 +1,7 @@
 import { LogType } from "@prisma/client";
-import { prisma } from "../../../../../../util/prisma.js";
-import { verifyAuth } from "../../../../../../util/verifyAuth.js";
-import { utapi } from "../../../../../../config/uploadthing.js";
+import { prisma } from "#prisma";
+import { verifyAuth } from "#verifyAuth";
+import { utapi } from "../../../../../../../config/uploadthing.js";
 
 export const get = [
   verifyAuth,

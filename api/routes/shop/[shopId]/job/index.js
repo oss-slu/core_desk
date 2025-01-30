@@ -9,6 +9,7 @@ export const post = [
     try {
       const { shopId } = req.params;
       const userId = req.user.id;
+      let userToCreateJobAs = userId;
 
       // Check to see if the user exists on the shop
       const userShop = await prisma.userShop.findFirst({
@@ -23,14 +24,81 @@ export const post = [
         return res.status(400).json({ error: "Unauthorized" });
       }
 
-      const { title, description, dueDate } = req.body;
+      const {
+        title,
+        description,
+        dueDate,
+        onBehalfOf,
+        onBehalfOfUserId,
+        onBehalfOfUserEmail,
+        onBehalfOfUserFirstName,
+        onBehalfOfUserLastName,
+      } = req.body;
+
+      if (onBehalfOf) {
+        if (
+          userShop.accountType !== "ADMIN" &&
+          userShop.accountType !== "OPERATOR"
+        ) {
+          return res.status(403).json({ error: "Unauthorized" });
+        }
+
+        if (onBehalfOfUserId) {
+          userToCreateJobAs = onBehalfOfUserId;
+        }
+
+        if (onBehalfOfUserEmail) {
+          const user = await prisma.user.create({
+            data: {
+              email: onBehalfOfUserEmail,
+              firstName: onBehalfOfUserFirstName,
+              lastName: onBehalfOfUserLastName,
+            },
+          });
+
+          const shopsToJoin = await prisma.shop.findMany({
+            where: {
+              autoJoin: true,
+            },
+          });
+
+          for (const shop of shopsToJoin) {
+            await prisma.userShop.create({
+              data: {
+                userId: user.id,
+                shopId: shop.id,
+                active: true,
+              },
+            });
+
+            await prisma.logs.create({
+              data: {
+                userId: user.id,
+                type: LogType.USER_CONNECTED_TO_SHOP,
+                shopId: shop.id,
+              },
+            });
+          }
+
+          await prisma.logs.create({
+            data: {
+              userId: user.id,
+              type: LogType.USER_CREATED,
+            },
+          });
+
+          userToCreateJobAs = user.id;
+        }
+      }
+
+      console.log(await prisma.shop.findUnique({ where: { id: shopId } }));
 
       const job = await prisma.job.create({
         data: {
           title,
           description,
-          shopId,
-          userId,
+          shop: { connect: { id: shopId } },
+          user: { connect: { id: userToCreateJobAs } },
           dueDate: new Date(dueDate),
         },
       });
@@ -38,9 +106,15 @@ export const post = [
       await prisma.logs.create({
         data: {
           type: LogType.JOB_CREATED,
-          userId,
-          shopId,
-          jobId: job.id,
+          user: { connect: { id: userId } },
+          shop: { connect: { id: shopId } },
+          job: { connect: { id: job.id } },
+          to: JSON.stringify({
+            userId: userToCreateJobAs,
+            requestingUserId: userId,
+            shopId,
+            jobId: job.id,
+          }),
         },
       });
 

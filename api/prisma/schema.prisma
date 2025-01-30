@@ -244,7 +244,7 @@ model Job {
   resourceType           ResourceType?            @relation(fields: [resourceTypeId], references: [id])
   secondaryMaterial      Material?                @relation("Job::secondaryMaterial", fields: [secondaryMaterialId], references: [id])
   shop                   Shop                     @relation(fields: [shopId], references: [id])
-  user                   user                     @relation(fields: [userId], references: [id])
+  user                   user                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments               JobComment[]
   items                  JobItem[]
   ledgerItems            LedgerItem?
@@ -264,7 +264,7 @@ model LedgerItem {
   updatedAt  DateTime       @updatedAt
   job        Job?           @relation(fields: [jobId], references: [id], onDelete: Cascade)
   shop       Shop           @relation(fields: [shopId], references: [id])
-  user       user           @relation(fields: [userId], references: [id])
+  user       user           @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs       logs[]
 }
 
@@ -276,7 +276,7 @@ model JobComment {
   jobId     String
   userId    String
   job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  user      user     @relation(fields: [userId], references: [id])
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs      logs[]
 }
 
@@ -333,7 +333,7 @@ model JobItem {
   material          Material?      @relation(fields: [materialId], references: [id])
   resource          Resource?      @relation(fields: [resourceId], references: [id])
   resourceType      ResourceType?  @relation(fields: [resourceTypeId], references: [id])
-  user              user?          @relation(fields: [userId], references: [id])
+  user              user?          @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs              logs[]
 }
 
@@ -373,7 +373,7 @@ model UserBillingGroup {
   updatedAt      DateTime             @updatedAt
   active         Boolean              @default(true)
   billingGroup   BillingGroup         @relation(fields: [billingGroupId], references: [id])
-  user           user                 @relation(fields: [userId], references: [id])
+  user           user                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs           logs[]
 }
 
