@@ -163,7 +163,7 @@ app.use((req, res, next) => {
       await prisma.logs.create({
         data: {
           type: LogType.FORBIDDEN_ACTION,
-          userId: req.user.id,
+          userId: req.user?.id,
           message: JSON.stringify({
             message: res.body?.message,
             error: res.body?.error,
