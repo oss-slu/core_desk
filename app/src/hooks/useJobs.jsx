@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 import { useModal } from "tabler-react-2/dist/modal";
-import {
-  Input,
-  Spinner,
-  Util,
-  Switch,
-  DropdownInput,
-  Card,
-} from "tabler-react-2";
+import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
 import { Button } from "tabler-react-2/dist/button";
 import { useParams } from "react-router-dom";
 import { useUserShop } from "./useUserShop";
@@ -32,7 +25,7 @@ const CreateJobModalContent = ({ onSubmit }) => {
   };
 
   useEffect(() => {
-    let [name, domain] = onBehalfOfUserEmail.split("@");
+    let [name] = onBehalfOfUserEmail.split("@");
     name = name.replace(/\d/g, "");
 
     setOnBehalfOfUserFirstName(capitalize(name.split(".")[0]) || "");
