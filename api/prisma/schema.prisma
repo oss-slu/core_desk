@@ -1,11 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
+}
+
+generator docs {
+  provider = "node node_modules/prisma-docs-generator"
 }
 
 datasource db {
@@ -13,90 +11,376 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator docs {
-  provider = "node node_modules/prisma-docs-generator"
-}
-
 model user {
-  id        String @id @default(cuid())
-  email     String @unique
-  firstName String
-  lastName  String
-
-  logs          logs[]
-  shops         UserShop[]
-  jobs          Job[]
-  jobItems      JobItem[]
-  comments      JobComment[]
-  ledgerItems   LedgerItem[]
-  billingGroups UserBillingGroup[]
-
-  admin            Boolean @default(false)
-  suspended        Boolean @default(false)
+  id               String             @id @default(cuid())
+  email            String             @unique
+  firstName        String
+  lastName         String
+  admin            Boolean            @default(false)
+  suspended        Boolean            @default(false)
   suspensionReason String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  jobs             Job[]
+  comments         JobComment[]
+  jobItems         JobItem[]
+  ledgerItems      LedgerItem[]
+  billingGroups    UserBillingGroup[]
+  shops            UserShop[]
+  logs             logs[]
 }
 
 model logs {
-  id      String  @id @default(cuid())
-  type    LogType
-  message String?
-  from    String? @db.Text
-  to      String? @db.Text
-
-  user   user?   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String?
-
-  shop   Shop?   @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  shopId String?
-
-  job   Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  jobId String?
-
-  jobItem   JobItem? @relation(fields: [jobItemId], references: [id], onDelete: Cascade)
-  jobItemId String?
-
-  resource   Resource? @relation(fields: [resourceId], references: [id], onDelete: Cascade)
-  resourceId String?
-
-  resourceImage   ResourceImage? @relation(fields: [resourceImageId], references: [id], onDelete: Cascade)
-  resourceImageId String?
-
-  material   Material? @relation(fields: [materialId], references: [id], onDelete: Cascade)
-  materialId String?
-
-  materialImage   MaterialImage? @relation(fields: [materialImageId], references: [id], onDelete: Cascade)
-  materialImageId String?
-
-  resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
-  resourceTypeId String?
-
-  comment   JobComment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  commentId String?
-
-  ledgerItem   LedgerItem? @relation(fields: [ledgerItemId], references: [id], onDelete: Cascade)
-  ledgerItemId String?
-
-  billingGroup   BillingGroup? @relation(fields: [billingGroupId], references: [id], onDelete: Cascade)
-  billingGroupId String?
-
-  userBillingGroup   UserBillingGroup? @relation(fields: [userBillingGroupId], references: [id], onDelete: Cascade)
-  userBillingGroupId String?
-
-  billingGroupInvitationLink   BillingGroupInvitationLink? @relation(fields: [billingGroupInvitationLinkId], references: [id], onDelete: Cascade)
+  id                           String                      @id @default(cuid())
+  type                         LogType
+  message                      String?
+  from                         String?
+  to                           String?
+  userId                       String?
+  shopId                       String?
+  jobId                        String?
+  jobItemId                    String?
+  resourceId                   String?
+  resourceImageId              String?
+  materialId                   String?
+  materialImageId              String?
+  resourceTypeId               String?
+  commentId                    String?
+  ledgerItemId                 String?
+  billingGroupId               String?
+  userBillingGroupId           String?
   billingGroupInvitationLinkId String?
+  createdAt                    DateTime                    @default(now())
+  updatedAt                    DateTime                    @updatedAt
+  billingGroup                 BillingGroup?               @relation(fields: [billingGroupId], references: [id], onDelete: Cascade)
+  billingGroupInvitationLink   BillingGroupInvitationLink? @relation(fields: [billingGroupInvitationLinkId], references: [id], onDelete: Cascade)
+  comment                      JobComment?                 @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  job                          Job?                        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobItem                      JobItem?                    @relation(fields: [jobItemId], references: [id], onDelete: Cascade)
+  ledgerItem                   LedgerItem?                 @relation(fields: [ledgerItemId], references: [id], onDelete: Cascade)
+  material                     Material?                   @relation(fields: [materialId], references: [id], onDelete: Cascade)
+  materialImage                MaterialImage?              @relation(fields: [materialImageId], references: [id], onDelete: Cascade)
+  resource                     Resource?                   @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  resourceImage                ResourceImage?              @relation(fields: [resourceImageId], references: [id], onDelete: Cascade)
+  resourceType                 ResourceType?               @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
+  shop                         Shop?                       @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  userBillingGroup             UserBillingGroup?           @relation(fields: [userBillingGroupId], references: [id], onDelete: Cascade)
+  user                         user?                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
+model UserShop {
+  id           String      @id @default(cuid())
+  userId       String
+  shopId       String
+  accountType  AccountType @default(CUSTOMER)
+  accountTitle String?
+  active       Boolean     @default(true)
+  blacklisted  Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  shop         Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  user         user        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Shop {
+  id              String         @id @default(cuid())
+  name            String
+  address         String?
+  phone           String?
+  email           String?
+  website         String?
+  description     String?
+  imageUrl        String?
+  logoUrl         String?
+  logoKey         String?
+  logoName        String?
+  color           Color?
+  startingDeposit Float?
+  autoJoin        Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  billingGroups   BillingGroup[]
+  jobs            Job[]
+  ledgerItems     LedgerItem[]
+  materials       Material[]
+  resources       Resource[]
+  resourceTypes   ResourceType[]
+  users           UserShop[]
+  logs            logs[]
+}
+
+model Resource {
+  id                    String                   @id @default(cuid())
+  title                 String
+  description           String?
+  public                Boolean                  @default(false)
+  primaryCategory       String?
+  secondaryCategory     String?
+  resourceTypeId        String
+  shopId                String
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
+  active                Boolean                  @default(true)
+  quantity              Int?
+  quantityPublic        Boolean                  @default(true)
+  costPerUnit           Float?
+  fixedCost             Float?
+  costPerTime           Float?
+  materialLabel         String?
+  costPerProcessingTime Float?
+  costingPublic         Boolean                  @default(true)
+  userSuppliedMaterial  SuppliedMaterialLevels   @default(NEVER)
+  additionalCostItems   AdditionalCostLineItem[]
+  jobs                  Job[]
+  jobItems              JobItem[]
+  resourceType          ResourceType             @relation(fields: [resourceTypeId], references: [id])
+  shop                  Shop                     @relation(fields: [shopId], references: [id])
+  images                ResourceImage[]
+  logs                  logs[]
+}
+
+model Material {
+  id                  String                   @id @default(cuid())
+  title               String
+  description         String?
+  manufacturer        String?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  active              Boolean                  @default(true)
+  shopId              String
+  costPerUnit         Float?
+  unitDescriptor      String?
+  costPublic          Boolean                  @default(true)
+  resourceTypeId      String
+  msdsFileKey         String?
+  msdsFileUrl         String?
+  msdsFileName        String?
+  msdsFileType        String?
+  tdsFileKey          String?
+  tdsFileUrl          String?
+  tdsFileName         String?
+  tdsFileType         String?
+  additionalCostItems AdditionalCostLineItem[]
+  jobs                Job[]                    @relation("Job::primaryMaterial")
+  jobsSecondary       Job[]                    @relation("Job::secondaryMaterial")
+  jobItems            JobItem[]
+  resourceType        ResourceType             @relation(fields: [resourceTypeId], references: [id])
+  shop                Shop                     @relation(fields: [shopId], references: [id])
+  images              MaterialImage[]
+  logs                logs[]
+}
+
+model MaterialImage {
+  id          String   @id @default(cuid())
+  fileKey     String
+  fileUrl     String
+  fileName    String
+  fileType    String
+  description String?
+  active      Boolean  @default(true)
+  materialId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  material    Material @relation(fields: [materialId], references: [id])
+  logs        logs[]
+}
+
+model ResourceImage {
+  id          String   @id @default(cuid())
+  fileKey     String
+  fileUrl     String
+  fileName    String
+  fileType    String
+  description String?
+  active      Boolean  @default(true)
+  resourceId  String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  resource    Resource @relation(fields: [resourceId], references: [id])
+  logs        logs[]
+}
+
+model ResourceType {
+  id                  String                   @id @default(cuid())
+  title               String
+  description         String?
+  createdAt           DateTime                 @default(now())
+  updatedAt           DateTime                 @updatedAt
+  active              Boolean                  @default(true)
+  shopId              String
+  additionalCostItems AdditionalCostLineItem[]
+  jobs                Job[]
+  jobItems            JobItem[]
+  materials           Material[]
+  resources           Resource[]
+  shop                Shop                     @relation(fields: [shopId], references: [id])
+  logs                logs[]
+}
+
+model Job {
+  id                     String                   @id @default(cuid())
+  title                  String
+  description            String?
+  imageUrl               String?
+  createdAt              DateTime                 @default(now())
+  updatedAt              DateTime                 @updatedAt
+  shopId                 String
+  userId                 String
+  materialId             String?
+  resourceTypeId         String?
+  resourceId             String?
+  groupId                String?
+  dueDate                DateTime?
+  finalized              Boolean                  @default(false)
+  finalizedAt            DateTime?
+  /// If true, the additional cost will be used _instead_ of the calculated cost. If false, it will be used in addition.
+  additionalCostOverride Boolean                  @default(false)
+  status                 ProgressStatus           @default(NOT_STARTED)
+  secondaryMaterialId    String?
+  additionalCosts        AdditionalCostLineItem[]
+  group                  BillingGroup?            @relation(fields: [groupId], references: [id])
+  material               Material?                @relation("Job::primaryMaterial", fields: [materialId], references: [id])
+  resource               Resource?                @relation(fields: [resourceId], references: [id])
+  resourceType           ResourceType?            @relation(fields: [resourceTypeId], references: [id])
+  secondaryMaterial      Material?                @relation("Job::secondaryMaterial", fields: [secondaryMaterialId], references: [id])
+  shop                   Shop                     @relation(fields: [shopId], references: [id])
+  user                   user                     @relation(fields: [userId], references: [id])
+  comments               JobComment[]
+  items                  JobItem[]
+  ledgerItems            LedgerItem?
+  logs                   logs[]
+}
+
+model LedgerItem {
+  id         String         @id @default(cuid())
+  userId     String
+  shopId     String
+  jobId      String?        @unique
+  type       LedgerItemType
+  invoiceUrl String?
+  invoiceKey String?
+  value      Float
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  job        Job?           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  shop       Shop           @relation(fields: [shopId], references: [id])
+  user       user           @relation(fields: [userId], references: [id])
+  logs       logs[]
+}
+
+model JobComment {
+  id        String   @id @default(cuid())
+  message   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  jobId     String
+  userId    String
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user      user     @relation(fields: [userId], references: [id])
+  logs      logs[]
+}
+
+model AdditionalCostLineItem {
+  id                String        @id @default(cuid())
+  resourceTypeId    String?
+  resourceId        String?
+  materialId        String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  unitQty           Float?
+  timeQty           Float?
+  materialQty       Float?
+  processingTimeQty Float?
+  active            Boolean       @default(true)
+  jobId             String
+  job               Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  material          Material?     @relation(fields: [materialId], references: [id])
+  resource          Resource?     @relation(fields: [resourceId], references: [id])
+  resourceType      ResourceType? @relation(fields: [resourceTypeId], references: [id])
+}
+
+model JobItem {
+  id                String         @id @default(cuid())
+  title             String
+  status            ProgressStatus @default(NOT_STARTED)
+  qty               Float?
+  fileKey           String
+  fileUrl           String
+  fileName          String
+  fileType          String
+  fileThumbnailKey  String?
+  fileThumbnailUrl  String?
+  fileThumbnailName String?
+  stlVolume         Float?
+  stlBoundingBoxX   Float?
+  stlBoundingBoxY   Float?
+  stlBoundingBoxZ   Float?
+  stlIsWatertight   Boolean?
+  resourceId        String?
+  resourceTypeId    String?
+  materialId        String?
+  userId            String?
+  approved          Boolean?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  active            Boolean        @default(true)
+  processingTimeQty Float?
+  timeQty           Float?
+  unitQty           Float?
+  materialQty       Float?
+  jobId             String
+  job               Job            @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  material          Material?      @relation(fields: [materialId], references: [id])
+  resource          Resource?      @relation(fields: [resourceId], references: [id])
+  resourceType      ResourceType?  @relation(fields: [resourceTypeId], references: [id])
+  user              user?          @relation(fields: [userId], references: [id])
+  logs              logs[]
+}
+
+model BillingGroup {
+  id                   String                       @id @default(cuid())
+  title                String
+  description          String?
+  createdAt            DateTime                     @default(now())
+  updatedAt            DateTime                     @updatedAt
+  active               Boolean                      @default(true)
+  shopId               String
+  membersCanCreateJobs Boolean                      @default(false)
+  shop                 Shop                         @relation(fields: [shopId], references: [id])
+  invitationLinks      BillingGroupInvitationLink[]
+  jobs                 Job[]
+  users                UserBillingGroup[]
+  logs                 logs[]
+}
+
+model BillingGroupInvitationLink {
+  id             String       @id @default(cuid())
+  active         Boolean      @default(true)
+  expires        DateTime?
+  billingGroupId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+  billingGroup   BillingGroup @relation(fields: [billingGroupId], references: [id])
+  logs           logs[]
+}
+
+model UserBillingGroup {
+  id             String               @id @default(cuid())
+  userId         String
+  billingGroupId String
+  role           UserBillingGroupRole @default(MEMBER)
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  active         Boolean              @default(true)
+  billingGroup   BillingGroup         @relation(fields: [billingGroupId], references: [id])
+  user           user                 @relation(fields: [userId], references: [id])
+  logs           logs[]
 }
 
 enum LogType {
   USER_LOGIN
   USER_CREATED
   SHOP_CREATED
-  SHOP_MODIFIED
   USER_CONNECTED_TO_SHOP
   USER_DISCONNECTED_FROM_SHOP
   USER_SHOP_ROLE_CHANGED
@@ -149,24 +433,7 @@ enum LogType {
   BILLING_GROUP_INVITATION_LINK_DELETED
   BILLING_GROUP_INVITATION_LINK_MODIFIED
   FORBIDDEN_ACTION
-}
-
-model UserShop {
-  id     String @id @default(cuid())
-  user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
-  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  shopId String
-
-  accountType  AccountType @default(CUSTOMER)
-  accountTitle String?
-
-  active Boolean @default(true)
-
-  blacklisted Boolean @default(false)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  SHOP_MODIFIED
 }
 
 enum AccountType {
@@ -174,183 +441,6 @@ enum AccountType {
   OPERATOR
   ADMIN
   GROUP_ADMIN
-}
-
-model Shop {
-  id          String  @id @default(cuid())
-  name        String
-  address     String?
-  phone       String?
-  email       String?
-  website     String?
-  description String? @db.Text
-  imageUrl    String?
-
-  logoUrl  String?
-  logoKey  String?
-  logoName String?
-
-  color Color?
-
-  logs          logs[]
-  users         UserShop[]
-  jobs          Job[]
-  billingGroups BillingGroup[]
-
-  resourceTypes ResourceType[]
-  resources     Resource[]
-  materials     Material[]
-
-  ledgerItems LedgerItem[]
-
-  startingDeposit Float?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Resource {
-  id          String          @id @default(cuid())
-  title       String
-  description String?         @db.Text
-  images      ResourceImage[]
-  public      Boolean         @default(false)
-
-  primaryCategory   String?
-  secondaryCategory String?
-
-  resourceType   ResourceType @relation(fields: [resourceTypeId], references: [id])
-  resourceTypeId String
-
-  shop   Shop   @relation(fields: [shopId], references: [id])
-  shopId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  active Boolean @default(true)
-
-  quantity       Int?
-  quantityPublic Boolean @default(true)
-
-  costPerUnit           Float?
-  fixedCost             Float?
-  costPerTime           Float?
-  materialLabel         String?
-  costPerProcessingTime Float?
-  costingPublic         Boolean @default(true)
-
-  userSuppliedMaterial SuppliedMaterialLevels @default(NEVER)
-
-  jobItems JobItem[]
-  jobs     Job[]
-
-  logs logs[]
-
-  additionalCostItems AdditionalCostLineItem[]
-}
-
-model Material {
-  id           String  @id @default(cuid())
-  title        String
-  description  String? @db.Text
-  manufacturer String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  active    Boolean  @default(true)
-
-  jobItems      JobItem[]
-  jobs          Job[]     @relation("Job::primaryMaterial")
-  jobsSecondary Job[]     @relation("Job::secondaryMaterial")
-
-  shopId String
-  shop   Shop   @relation(fields: [shopId], references: [id])
-
-  costPerUnit    Float?
-  unitDescriptor String?
-  costPublic     Boolean @default(true)
-
-  resourceTypeId String
-  resourceType   ResourceType @relation(fields: [resourceTypeId], references: [id])
-
-  images MaterialImage[]
-
-  msdsFileKey  String?
-  msdsFileUrl  String?
-  msdsFileName String?
-  msdsFileType String?
-
-  tdsFileKey  String?
-  tdsFileUrl  String?
-  tdsFileName String?
-  tdsFileType String?
-
-  logs logs[]
-
-  additionalCostItems AdditionalCostLineItem[]
-}
-
-model MaterialImage {
-  id String @id @default(cuid())
-
-  fileKey  String
-  fileUrl  String
-  fileName String
-  fileType String
-
-  description String?
-
-  active Boolean @default(true)
-
-  material   Material @relation(fields: [materialId], references: [id])
-  materialId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  logs      logs[]
-}
-
-model ResourceImage {
-  id String @id @default(cuid())
-
-  fileKey  String
-  fileUrl  String
-  fileName String
-  fileType String
-
-  description String?
-
-  active Boolean @default(true)
-
-  resource   Resource @relation(fields: [resourceId], references: [id])
-  resourceId String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  logs      logs[]
-}
-
-model ResourceType {
-  id          String  @id @default(cuid())
-  title       String
-  description String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  active    Boolean  @default(true)
-
-  shopId String
-  shop   Shop   @relation(fields: [shopId], references: [id])
-
-  resources Resource[]
-  jobItems  JobItem[]
-  jobs      Job[]
-  materials Material[]
-
-  logs logs[]
-
-  additionalCostItems AdditionalCostLineItem[]
 }
 
 enum SuppliedMaterialLevels {
@@ -371,78 +461,6 @@ enum Color {
   TEAL
 }
 
-model Job {
-  id          String  @id @default(cuid())
-  title       String
-  description String? @db.Text
-  imageUrl    String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  shop   Shop   @relation(fields: [shopId], references: [id])
-  shopId String
-
-  user   user   @relation(fields: [userId], references: [id])
-  userId String
-
-  material   Material? @relation("Job::primaryMaterial", fields: [materialId], references: [id])
-  materialId String?
-
-  secondaryMaterial   Material? @relation("Job::secondaryMaterial", fields: [secondaryMaterialId], references: [id])
-  secondaryMaterialId String?
-
-  resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id])
-  resourceTypeId String?
-
-  resource   Resource? @relation(fields: [resourceId], references: [id])
-  resourceId String?
-
-  group   BillingGroup? @relation(fields: [groupId], references: [id])
-  groupId String?
-
-  dueDate DateTime?
-
-  finalized   Boolean      @default(false)
-  finalizedAt DateTime?
-  ledgerItems LedgerItem[]
-
-  additionalCostOverride Boolean                  @default(false) /// If true, the additional cost will be used _instead_ of the calculated cost. If false, it will be used in addition.
-  additionalCosts        AdditionalCostLineItem[]
-
-  logs  logs[]
-  items JobItem[]
-
-  comments JobComment[]
-
-  status ProgressStatus @default(NOT_STARTED)
-}
-
-model LedgerItem {
-  id String @id @default(cuid())
-
-  userId String
-  user   user   @relation(fields: [userId], references: [id])
-
-  shopId String
-  shop   Shop   @relation(fields: [shopId], references: [id])
-
-  jobId String? @unique
-  job   Job?    @relation(fields: [jobId], references: [id], onDelete: Cascade)
-
-  type LedgerItemType
-
-  invoiceUrl String?
-  invoiceKey String?
-
-  value Float
-
-  logs logs[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 enum LedgerItemType {
   INITIAL
   JOB
@@ -455,98 +473,6 @@ enum LedgerItemType {
   REFUND
 }
 
-model JobComment {
-  id        String   @id @default(cuid())
-  message   String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  jobId String
-
-  user   user   @relation(fields: [userId], references: [id])
-  userId String
-
-  logs logs[]
-}
-
-model AdditionalCostLineItem {
-  id String @id @default(cuid())
-
-  resourceTypeId String?
-  resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id])
-
-  resourceId String?
-  resource   Resource? @relation(fields: [resourceId], references: [id])
-
-  materialId String?
-  material   Material? @relation(fields: [materialId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  unitQty           Float?
-  timeQty           Float?
-  materialQty       Float?
-  processingTimeQty Float?
-
-  active Boolean @default(true)
-
-  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  jobId String
-}
-
-model JobItem {
-  id     String         @id @default(cuid())
-  title  String
-  status ProgressStatus @default(NOT_STARTED)
-
-  qty Float?
-
-  fileKey  String
-  fileUrl  String
-  fileName String
-  fileType String
-
-  fileThumbnailKey  String?
-  fileThumbnailUrl  String?
-  fileThumbnailName String?
-
-  stlVolume       Float?
-  stlBoundingBoxX Float?
-  stlBoundingBoxY Float?
-  stlBoundingBoxZ Float?
-  stlIsWatertight Boolean?
-
-  resource   Resource? @relation(fields: [resourceId], references: [id])
-  resourceId String?
-
-  resourceType   ResourceType? @relation(fields: [resourceTypeId], references: [id])
-  resourceTypeId String?
-
-  material   Material? @relation(fields: [materialId], references: [id])
-  materialId String?
-
-  user   user?   @relation(fields: [userId], references: [id])
-  userId String?
-
-  approved Boolean?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  active Boolean @default(true)
-
-  processingTimeQty Float?
-  timeQty           Float?
-  unitQty           Float?
-  materialQty       Float?
-
-  jobId String
-  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  logs  logs[]
-}
-
 enum ProgressStatus {
   NOT_STARTED
   IN_PROGRESS
@@ -556,58 +482,6 @@ enum ProgressStatus {
   CANCELLED
   WONT_DO
   WAITING
-}
-
-model BillingGroup {
-  id          String  @id @default(cuid())
-  title       String
-  description String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  active    Boolean  @default(true)
-
-  shopId String
-  shop   Shop   @relation(fields: [shopId], references: [id])
-
-  membersCanCreateJobs Boolean @default(false)
-
-  users           UserBillingGroup[]
-  logs            logs[]
-  jobs            Job[]
-  invitationLinks BillingGroupInvitationLink[]
-}
-
-model BillingGroupInvitationLink {
-  id      String    @id @default(cuid())
-  active  Boolean   @default(true)
-  expires DateTime?
-
-  billingGroupId String
-  billingGroup   BillingGroup @relation(fields: [billingGroupId], references: [id])
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  logs logs[]
-}
-
-model UserBillingGroup {
-  id String @id @default(cuid())
-
-  userId String
-  user   user   @relation(fields: [userId], references: [id])
-
-  billingGroupId String
-  billingGroup   BillingGroup @relation(fields: [billingGroupId], references: [id])
-
-  role UserBillingGroupRole @default(MEMBER)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  active    Boolean  @default(true)
-
-  logs logs[]
 }
 
 enum UserBillingGroupRole {

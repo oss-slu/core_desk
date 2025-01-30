@@ -50,12 +50,17 @@ export const calculateTotalCostOfJob = (data) => {
   data.items.forEach((item) => {
     if (!item.resource || !item.material) return;
 
-    totalCost += (item.timeQty || 0) * (item.resource.costPerTime || 0);
-    totalCost +=
+    let localTotalCost = 0;
+
+    localTotalCost += (item.timeQty || 0) * (item.resource.costPerTime || 0);
+    localTotalCost +=
       (item.processingTimeQty || 0) *
       (item.resource.costPerProcessingTime || 0);
-    totalCost += (item.unitQty || 0) * (item.resource.costPerUnit || 0);
-    totalCost += (item.materialQty || 0) * (item.material.costPerUnit || 0);
+    localTotalCost += (item.unitQty || 0) * (item.resource.costPerUnit || 0);
+    localTotalCost +=
+      (item.materialQty || 0) * (item.material.costPerUnit || 0);
+
+    totalCost += localTotalCost * item.qty;
   });
 
   return totalCost;

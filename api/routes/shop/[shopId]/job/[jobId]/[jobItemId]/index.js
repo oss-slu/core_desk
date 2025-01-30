@@ -88,20 +88,6 @@ export const put = [
       });
     }
 
-    if (job.groupId) {
-      const userGroup = await prisma.userBillingGroup.findFirst({
-        where: {
-          userId,
-          billingGroupId: job.groupId,
-          active: true,
-        },
-      });
-
-      if (!userGroup) {
-        return res.status(400).json({ error: "User group not found" });
-      }
-    }
-
     if (!job) {
       return res.status(404).json({ error: "Not found" });
     }

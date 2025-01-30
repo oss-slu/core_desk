@@ -79,6 +79,30 @@ passport.use(
           },
         });
 
+        const shopsToJoin = await prisma.shop.findMany({
+          where: {
+            autoJoin: true,
+          },
+        });
+
+        for (const shop of shopsToJoin) {
+          await prisma.userShop.create({
+            data: {
+              userId: user.id,
+              shopId: shop.id,
+              active: true,
+            },
+          });
+
+          await prisma.logs.create({
+            data: {
+              userId: user.id,
+              type: LogType.USER_CONNECTED_TO_SHOP,
+              shopId: shop.id,
+            },
+          });
+        }
+
         await prisma.logs.create({
           data: {
             userId: user.id,

@@ -23,7 +23,7 @@ export const verifyAuth = async (req, res, next) => {
 
       // Make sure user is not suspended. If they are, they are still allowed to access /api/auth/me.
       if (_user.suspended && req.originalUrl !== "/api/auth/me") {
-        return res.sendStatus(401); // Unauthorized
+        return res.sendStatus(403); // Forbidden
       }
 
       req.user = _user;
