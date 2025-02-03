@@ -51,7 +51,7 @@ describe("/shop/[shopId]/job", () => {
             
             const jobDueDate = new Date();
 
-            const res = request(app)
+            const res = await request(app)
                 .post(`/api/shop/${shop.id}/job`)
                 .set(...(await gt({ ga: true })))
                 .send({
@@ -82,7 +82,7 @@ describe("/shop/[shopId]/job", () => {
         it("denies job creation if a user doesn't exist on the shop"), async () => {
             prisma.userShop.findFirst = findFirstSpy.mockResolvedValue(null);
 
-            const res = request(app)
+            const res = await request(app)
                 .post(`/api/shop/${shop.id}/job`)
                 .set(...(await gt({ ga: true })))
                 .send({
