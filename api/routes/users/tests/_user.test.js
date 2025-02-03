@@ -99,3 +99,39 @@ describe("/users", () => {
     });
   });
 });
+
+describe("/jobs", () => {
+  describe("POST", () => {
+    it("Should create a job successfully with valid input", async () => {
+      const jobData = {
+        //Job Type (Valid Input Data)
+      };
+
+      const res = await request(app)
+        .post("/api/jobs")
+        .set(...(await gt()))
+        .send(jobData);
+
+      expect(res.status).toBe(201);
+      expect(res.body).toHaveProperty("id");
+      expect(res.body.title).toBe(jobData.title);
+    });
+
+    it("Should not create a duplicate job", async () => {
+      const jobData = {
+        //Job Type (Copy of Input Data)
+      };
+
+      // Create job initially
+      await realPrisma.job.create({ data: jobData });
+
+      const res = await request(app)
+        .post("/api/jobs")
+        .set(...(await gt()))
+        .send(jobData);
+
+      expect(res.status).toBe(400);
+      expect(res.body).toEqual({ error: "Job already exists" });
+    });
+  });
+});
