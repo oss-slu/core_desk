@@ -11,7 +11,7 @@ describe("/shop/[shopId]/job", () => {
         let shop;
 
         beforeAll(async () => {
-            shop = await prisma.create({
+            shop = await prisma.shop.create({
                 data: {
                     name: "JobCreationTestShop",
                     description: "JobCreationTestShop description",
