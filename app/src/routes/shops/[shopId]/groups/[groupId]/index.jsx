@@ -134,7 +134,7 @@ export const BillingGroupPage = () => {
         <p>
           <b>Admin</b>: {billingGroup.adminUsers[0]?.name || "Unset"}
           <br />
-          {billingGroup.userCount} user{billingGroup.userCount > 1 ? "s" : ""}
+          {billingGroup.userCount} user{billingGroup.userCount != 1 ? "s" : ""}
         </p>
       )}
       <Util.Spacer size={1} />
