@@ -10,7 +10,7 @@ import { shopSidenavItems } from "../..";
 import { Page } from "../../../../../components/page/page";
 import { Loading } from "../../../../../components/loading/Loading";
 import { Button } from "tabler-react-2/dist/button";
-import { Util } from "tabler-react-2";
+import { Util, Alert } from "tabler-react-2";
 import { useModal } from "tabler-react-2/dist/modal";
 import { CreateBillingGroupInvitation } from "../../../../../components/billingGroup/CreateBillingGroupInvitation";
 import { Table } from "tabler-react-2/dist/table";
@@ -109,6 +109,14 @@ export const BillingGroupPage = () => {
           )}
         </Util.Row>
       </Util.Row>
+      {billingGroup.adminUsers.length === 0 &&
+      billingGroup.users.length === 0 ? (
+        <Alert variant="danger" title="No Members">
+          This group does not have any members
+        </Alert>
+      ) : (
+        <></>
+      )}
       {editing ? (
         <>
           <EditBillingGroup
@@ -124,7 +132,7 @@ export const BillingGroupPage = () => {
         </>
       ) : (
         <p>
-          <b>Admin</b>: {billingGroup.adminUsers[0].name}
+          <b>Admin</b>: {billingGroup.adminUsers[0]?.name || "Unset"}
           <br />
           {billingGroup.userCount} user{billingGroup.userCount > 1 ? "s" : ""}
         </p>
