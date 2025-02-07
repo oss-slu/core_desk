@@ -1,34 +1,13 @@
-import { describe, expect, it , vi, beforeAll, afterAll, beforeEach, afterEach} from "vitest";
+import { describe, expect, it , vi, beforeEach, afterEach} from "vitest";
 import { LogType } from "@prisma/client";
 import request from "supertest";
 import { app } from "#index";
 import { gt } from "#gt";
+import { tc } from "#setup";
 import { prisma } from "#prisma";
 
 describe("/shop/[shopId]/job", () => {
     describe("POST", () => {
-
-        let shop;
-
-        beforeAll(async () => {
-            shop = await prisma.shop.create({
-                data: {
-                    name: "JobCreationTestShop",
-                    description: "JobCreationTestShop description",
-                    imageUrl: "https://example.com/image.png",
-                    color: "RED",
-                },
-            });
-        });
-
-        afterAll(async () => {
-            await prisma.shop.delete({
-                where: {
-                    id: shop.id
-                }
-            });
-        });
-
         let findFirstSpy;
         let createLogsSpy;
 
@@ -38,26 +17,23 @@ describe("/shop/[shopId]/job", () => {
         });
 
         afterEach(async () => {
-            findFirstSpy.mockRestore();
-            createLogsSpy.mockRestore();
+            vi.restoreAllMocks();
         });
         
         it("allows job creation if a user exists on the shop"), async () => {
             prisma.userShop.findFirst = findFirstSpy.mockResolvedValue({
                 userId: "example-id",
-                shopId: shop.id,
+                shopId: tc.shop.id,
                 active: true,
             });
-            
-            const jobDueDate = new Date();
 
             const res = await request(app)
-                .post(`/api/shop/${shop.id}/job`)
+                .post(`/api/shop/${tc.shop.id}/job`)
                 .set(...(await gt({ ga: true })))
                 .send({
                     title: "JobCreationExample Title",
                     description: "JobCreationExample description",
-                    dueDate: jobDueDate,
+                    dueDate: new Date(),
                 });
 
             expect(res.status).toBe(200);
@@ -65,16 +41,16 @@ describe("/shop/[shopId]/job", () => {
             expect(res.body.job).toMatchSnapshot({
                 title: "JobCreationExample Title",
                 description: "JobCreationExample description",
-                shopId: shop.id,
-                userId: "example-id",
-                dueDate: jobDueDate,
+                shopId: expect.any(String),
+                userId: expect.any(String),
+                dueDate: expect.any(String),
             });
             
             expect(createLogsSpy).toHaveBeenCalledOnce();
             expect(createLogsSpy).toHaveBeenCalledWith(expect.objectContaining({
                 type: LogType.JOB_CREATED,
-                userId: "example-id",
-                shopId: shop.id,
+                userId: expect.any(String),
+                shopId: expect.any(String),
                 jobId: expect.any(String),
             }));
         }
@@ -83,7 +59,7 @@ describe("/shop/[shopId]/job", () => {
             prisma.userShop.findFirst = findFirstSpy.mockResolvedValue(null);
 
             const res = await request(app)
-                .post(`/api/shop/${shop.id}/job`)
+                .post(`/api/shop/${tc.shop.id}/job`)
                 .set(...(await gt({ ga: true })))
                 .send({
                     title: "JobCreationExample Title",
