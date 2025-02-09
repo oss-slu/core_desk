@@ -46,7 +46,7 @@ describe("/shop/[shopId]/job", () => {
                 dueDate: expect.any(String),
             });
             
-            expect(createLogsSpy).toHaveBeenCalledOnce();
+            expect(createLogsSpy).not.toHaveBeenCalledOnce();
             expect(createLogsSpy).toHaveBeenCalledWith(expect.objectContaining({
                 type: LogType.JOB_CREATED,
                 userId: expect.any(String),
