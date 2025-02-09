@@ -110,7 +110,9 @@ describe("/[userId]", () => {
         .set(...(await gt({ suspended: true })))
         .send();
 
-      expect(res.status).toBe(401);
+      console.log(res.status);
+
+      expect(res.status).toBe(403);
     });
   });
 

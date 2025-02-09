@@ -27,6 +27,8 @@ export const JobCostingPage = () => {
     updateJob,
     opLoading,
     ConfirmModal,
+    downloadDraftInvoice,
+    draftInvoiceLoading,
   } = useJob(shopId, jobId);
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
@@ -114,6 +116,10 @@ export const JobCostingPage = () => {
               </>
             )
           )}
+          <Util.Spacer size={1} />
+          <Button onClick={downloadDraftInvoice} loading={draftInvoiceLoading}>
+            Download draft invoice
+          </Button>
         </Card>
       </Util.Responsive>
       <Util.Spacer size={2} />

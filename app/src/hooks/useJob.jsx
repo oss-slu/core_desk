@@ -7,6 +7,7 @@ export const useJob = (shopId, jobId) => {
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [job, setJob] = useState({});
+  const [draftInvoiceLoading, setDraftInvoiceLoading] = useState(false);
 
   const fetchJob = async (shouldSetLoading = true) => {
     try {
@@ -66,6 +67,22 @@ export const useJob = (shopId, jobId) => {
     }
   };
 
+  const downloadDraftInvoice = async () => {
+    try {
+      setDraftInvoiceLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/job/${jobId}/draft-invoice`
+      );
+      const data = await r.json();
+      console.log(data);
+      window.open(data.url, "_blank");
+      setDraftInvoiceLoading(false);
+    } catch (error) {
+      setError(error);
+      setDraftInvoiceLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchJob();
   }, [shopId, jobId]);
@@ -78,5 +95,7 @@ export const useJob = (shopId, jobId) => {
     updateJob,
     opLoading,
     ConfirmModal,
+    downloadDraftInvoice,
+    draftInvoiceLoading,
   };
 };
