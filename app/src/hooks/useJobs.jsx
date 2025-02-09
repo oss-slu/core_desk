@@ -1,14 +1,40 @@
 import React, { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 import { useModal } from "tabler-react-2/dist/modal";
-import { Input } from "tabler-react-2";
+import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
 import { Button } from "tabler-react-2/dist/button";
+import { useParams } from "react-router-dom";
+import { useUserShop } from "./useUserShop";
+import { useAuth } from "./useAuth";
+import { ShopUserPicker } from "../components/shopUserPicker/ShopUserPicker";
 
 const CreateJobModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
+  const [onBehalfOf, setOnBehalfOf] = useState(false);
+  const [onBehalfOfUserId, setOnBehalfOfUserId] = useState(null);
+  const [onBehalfOfUserEmail, setOnBehalfOfUserEmail] = useState("");
+  const [onBehalfOfUserFirstName, setOnBehalfOfUserFirstName] = useState("");
+  const [onBehalfOfUserLastName, setOnBehalfOfUserLastName] = useState("");
+
+  const capitalize = (s) => {
+    if (typeof s !== "string") return "";
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+
+  useEffect(() => {
+    let [name] = onBehalfOfUserEmail.split("@");
+    name = name.replace(/\d/g, "");
+
+    setOnBehalfOfUserFirstName(capitalize(name.split(".")[0]) || "");
+    setOnBehalfOfUserLastName(capitalize(name.split(".")[1]) || "");
+  }, [onBehalfOfUserEmail]);
+
+  const { shopId } = useParams();
+  const { user } = useAuth();
+  const { loading: userShopLoading, userShop } = useUserShop(shopId, user?.id);
 
   return (
     <div>
@@ -30,13 +56,81 @@ const CreateJobModalContent = ({ onSubmit }) => {
         onChange={(e) => setDueDate(e + "T00:00:00")}
         value={dueDate?.split("T")[0]}
       />
+      {userShopLoading ? (
+        <>
+          <Spinner />
+          <br />
+        </>
+      ) : (
+        (userShop.accountType === "OPERATOR" ||
+          userShop.accountType === "ADMIN") && (
+          <>
+            <Switch
+              label="Create on behalf of another user"
+              value={onBehalfOf}
+              onChange={setOnBehalfOf}
+            />
+            {onBehalfOf && (
+              <Card
+                size="md"
+                variantPos="top"
+                tabs={[
+                  {
+                    title: "Select an existing user",
+                    content: (
+                      <ShopUserPicker
+                        value={onBehalfOfUserId}
+                        onChange={setOnBehalfOfUserId}
+                        includeNone={true}
+                      />
+                    ),
+                  },
+                  {
+                    title: "Create a new user",
+                    content: (
+                      <>
+                        <Input
+                          value={onBehalfOfUserEmail}
+                          onChange={setOnBehalfOfUserEmail}
+                          label="Email"
+                          placeholder="first.last@slu.edu"
+                        />
+                        <Input
+                          value={onBehalfOfUserFirstName}
+                          onChange={setOnBehalfOfUserFirstName}
+                          label="First Name"
+                        />
+                        <Input
+                          value={onBehalfOfUserLastName}
+                          onChange={setOnBehalfOfUserLastName}
+                          label="Last Name"
+                        />
+                      </>
+                    ),
+                  },
+                ]}
+              />
+            )}
+            <Util.Spacer size={2} />
+          </>
+        )
+      )}
       {title.length > 1 && dueDate.length > 1 ? (
         <Button
           variant="primary"
           loading={loading}
           onClick={() => {
             setLoading(true);
-            onSubmit(title, description, dueDate);
+            onSubmit(
+              title,
+              description,
+              dueDate,
+              onBehalfOf,
+              onBehalfOfUserId,
+              onBehalfOfUserEmail,
+              onBehalfOfUserFirstName,
+              onBehalfOfUserLastName
+            );
           }}
         >
           Submit
@@ -56,13 +150,31 @@ export const useJobs = (shopId) => {
   const [opLoading, setOpLoading] = useState(false);
   const [microLoading, setMicroLoading] = useState(false);
 
-  const _createJob = async (title, description, dueDate) => {
+  const _createJob = async (
+    title,
+    description,
+    dueDate,
+    onBehalfOf,
+    onBehalfOfUserId,
+    onBehalfOfUserEmail,
+    onBehalfOfUserFirstName,
+    onBehalfOfUserLastName
+  ) => {
     try {
       setOpLoading(true);
 
       const r = await authFetch(`/api/shop/${shopId}/job`, {
         method: "POST",
-        body: JSON.stringify({ title, description, dueDate }),
+        body: JSON.stringify({
+          title,
+          description,
+          dueDate,
+          onBehalfOf,
+          onBehalfOfUserId,
+          onBehalfOfUserEmail,
+          onBehalfOfUserFirstName,
+          onBehalfOfUserLastName,
+        }),
       });
       const data = await r.json();
       document.location.href = `/shops/${shopId}/jobs/${data.job.id}`;

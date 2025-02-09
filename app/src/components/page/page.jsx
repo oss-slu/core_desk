@@ -2,6 +2,7 @@ import React from "react";
 import { Sidenav } from "../sidenav/Sidenav";
 import { Icon } from "../../util/Icon";
 import { useAuth } from "../../hooks/useAuth";
+import { useNavigationListener } from "../../hooks/useNavigationListener";
 
 export const sidenavItems = (activeText, userIsAdmin) => {
   const items = [
@@ -65,6 +66,8 @@ export const sidenavItems = (activeText, userIsAdmin) => {
 
 export const Page = ({ children, sidenavItems: _sidenavItems }) => {
   const { loading } = useAuth();
+
+  useNavigationListener();
 
   if (loading) {
     return <div>Loading...</div>;
