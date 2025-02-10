@@ -20,7 +20,7 @@ describe("/shop/[shopId]/job", () => {
             vi.restoreAllMocks();
         });
         
-        it("allows job creation if a user exists on the shop"), async () => {
+        it("allows job creation if a user exists on the shop", async () => {
             prisma.userShop.findFirst = findFirstSpy.mockResolvedValue({
                 userId: "example-id",
                 shopId: tc.shop.id,
@@ -38,7 +38,7 @@ describe("/shop/[shopId]/job", () => {
 
             expect(res.status).toBe(200);
             expect(res.body).toHaveProperty("job");
-            expect(res.body.job).toMatchSnapshot({
+            expect(res.body.job).toMatchObject({
                 title: "JobCreationExample Title",
                 description: "JobCreationExample description",
                 shopId: expect.any(String),
@@ -47,15 +47,20 @@ describe("/shop/[shopId]/job", () => {
             });
             
             expect(createLogsSpy).toHaveBeenCalledOnce();
-            expect(createLogsSpy).toHaveBeenCalledWith(expect.objectContaining({
-                type: LogType.JOB_CREATED,
-                userId: expect.any(String),
-                shopId: expect.any(String),
-                jobId: expect.any(String),
-            }));
-        }
+            expect(createLogsSpy).toHaveBeenCalledWith(
+                expect.objectContaining({
+                  data: expect.objectContaining({
+                    type: LogType.JOB_CREATED,
+                    user: { connect: { id: expect.any(String) } },
+                    shop: { connect: { id: expect.any(String) } },
+                    job: { connect: { id: expect.any(String) } },
+                    to: expect.any(String), 
+                  }),
+                })  
+            );    
+        });
 
-        it("denies job creation if a user doesn't exist on the shop"), async () => {
+        it("denies job creation if a user doesn't exist on the shop", async () => {
             prisma.userShop.findFirst = findFirstSpy.mockResolvedValue(null);
 
             const res = await request(app)
@@ -70,6 +75,6 @@ describe("/shop/[shopId]/job", () => {
             expect(res.status).toBe(400);
             expect(res.body.error).toBe("Unauthorized")
             expect(createLogsSpy).not.toHaveBeenCalled();
-        }
+        });
     })
 })
