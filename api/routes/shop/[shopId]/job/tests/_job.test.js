@@ -17,7 +17,7 @@ describe("/shop/[shopId]/job", () => {
           });
   
         expect(res.status).toBe(200); 
-        expect(res.body.title).toBe(expect.any("String"));
+        expect(res.body.title).toBe("My test title");
         expect(res.body.dueDate).toBe(expect.any("String"));
             
       });
