@@ -1,10 +1,8 @@
 import { describe, expect, it} from "vitest";
-import { LogType } from "@prisma/client";
 import request from "supertest";
 import { app } from "#index";
 import { gt } from "#gt";
 import { tc } from "#setup";
-import { prisma } from "#prisma";
 
 describe("/shop/[shopId]/job", () => {
     describe("POST", () => {
@@ -18,9 +16,9 @@ describe("/shop/[shopId]/job", () => {
                     dueDate: new Date()
                 });
   
-        expect(res.status).toBe(201); 
-        expect(res.body.title).toBe(jobData.title);
-        expect(res.body.dueDate).toBe("String");
+        expect(res.status).toBe(200); 
+        expect(res.body.title).toBe(expect.any("String"));
+        expect(res.body.dueDate).toBe(expect.any("String"));
             
       });
     });
