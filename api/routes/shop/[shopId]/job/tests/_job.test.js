@@ -9,12 +9,12 @@ describe("/shop/[shopId]/job", () => {
       it("Should create a job successfully with valid input", async () => {
         const res = await request(app)
           .post(`/api/shop/${tc.shop.id}/job`)
-            .set(...(await gt()))
-                .send({
-                    jobId: "Job Id",
-                    shopId: tc.shop.id,
-                    dueDate: new Date()
-                });
+          .set(...(await gt()))
+          .send({
+            title: "My test title",
+            description: "Test Description",
+            dueDate: new Date(),
+          });
   
         expect(res.status).toBe(200); 
         expect(res.body.title).toBe(expect.any("String"));
