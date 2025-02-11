@@ -66,7 +66,6 @@ export const del = [
 export const get = [
   verifyAuth,
   async (req, res) => {
-    console.log("GEtting User");
     const userId = req.user.id;
     const { shopId, groupId, userId: targetUserId } = req.params;
 
@@ -78,16 +77,23 @@ export const get = [
       },
     });
 
-    if (!userShop) {
+    if (!userShop && !req.user.admin) {
       return res.status(400).json({ error: "Forbidden" });
     }
+
+    const userBillingGroup = await prisma.userBillingGroup.findFirst({
+      where: {
+        userId: req.user.id,
+        billingGroupId: groupId,
+      },
+    });
 
     const userIsPrivileged =
       req.user.admin ||
       userShop.accountType === "ADMIN" ||
       userShop.accountType === "OPERATOR" ||
-      userShop.accountType === "GROUP_ADMIN" ||
-      userId === targetUserId;
+      userId === targetUserId ||
+      userBillingGroup?.role === "ADMIN";
 
     if (!userIsPrivileged) {
       return res.status(400).json({ error: "Forbidden" });
