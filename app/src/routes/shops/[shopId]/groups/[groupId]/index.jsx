@@ -25,7 +25,7 @@ import { Icon } from "../../../../../util/Icon";
 import { MarkdownRender } from "../../../../../components/markdown/MarkdownRender";
 import { ShopUserPicker } from "../../../../../components/shopUserPicker/ShopUserPicker";
 
-const AddUserToBillingGroupModal = ({ refetch }) => {
+const AddUserToBillingGroupModal = () => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
