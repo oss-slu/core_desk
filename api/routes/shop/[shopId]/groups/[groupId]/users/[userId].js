@@ -103,3 +103,101 @@ export const get = [
     res.send({ billingGroupUser });
   },
 ];
+
+export const post = [
+  verifyAuth,
+  async (req, res) => {
+    const { shopId, groupId, userId } = req.params;
+    const { role } = req.body;
+
+    // Make sure requesting user is privileged
+    const requestingUserShop = await prisma.userShop.findFirst({
+      where: {
+        userId: req.user.id,
+        shopId,
+        active: true,
+      },
+    });
+
+    if (
+      !requestingUserShop ||
+      requestingUserShop.accountType !== "ADMIN" ||
+      !req.user.admin
+    ) {
+      return res.status(400).json({ error: "Forbidden" });
+    }
+
+    if (!["ADMIN", "MEMBER"].includes(role)) {
+      return res.status(400).json({ error: "Invalid role" });
+    }
+
+    const billingGroupUser = await prisma.userBillingGroup.findFirst({
+      where: {
+        userId: userId,
+        billingGroupId: groupId,
+      },
+    });
+
+    if (billingGroupUser) {
+      if (billingGroupUser.role === role && billingGroupUser.active) {
+        return res.json({ success: true });
+      } else {
+        await prisma.userBillingGroup.update({
+          where: {
+            id: billingGroupUser.id,
+          },
+          data: {
+            role,
+            active: true,
+          },
+        });
+
+        await prisma.logs.create({
+          data: {
+            type: LogType.USER_BILLING_GROUP_ROLE_CHANGED,
+            userId: userId,
+            shopId,
+            billingGroupId: groupId,
+            userBillingGroupId: billingGroupUser.id,
+          },
+        });
+
+        return res.json({ success: true });
+      }
+    }
+
+    const userShop = await prisma.userShop.findFirst({
+      where: {
+        userId,
+        shopId,
+        active: true,
+      },
+    });
+
+    if (!userShop) {
+      return res.status(400).send({ error: "Forbidden" });
+    }
+
+    // Add the user to the billing group
+    const newUbg = await prisma.userBillingGroup.create({
+      data: {
+        userId,
+        billingGroupId: groupId,
+        role,
+      },
+    });
+
+    await prisma.logs.create({
+      data: {
+        type: LogType.USER_ADDED_TO_BILLING_GROUP,
+        userId: userId,
+        shopId,
+        billingGroupId: groupId,
+        userBillingGroupId: newUbg.id,
+        to: JSON.stringify(newUbg),
+      },
+    });
+
+    res.json({ success: true });
+  },
+];

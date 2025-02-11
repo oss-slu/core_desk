@@ -7,10 +7,19 @@ import { MOMENT_FORMAT } from "../../util/constants";
 import { switchStatusForBadge } from "../../routes/shops/[shopId]/jobs";
 import { Util, Switch, Typography } from "tabler-react-2";
 import { Spinner } from "tabler-react-2/dist/spinner";
+import { Button } from "tabler-react-2/dist/button";
 
 export const JobsTable = () => {
   const { shopId, groupId } = useParams();
-  const { jobs, loading, updateJob, opLoading, microLoading } = useJobs(shopId);
+  const {
+    jobs,
+    loading,
+    updateJob,
+    opLoading,
+    microLoading,
+    createJob,
+    ModalElement,
+  } = useJobs(shopId);
   const { user } = useAuth();
 
   if (loading) return <div>Loading...</div>;
@@ -24,8 +33,10 @@ export const JobsTable = () => {
 
   return (
     <>
+      {ModalElement}
       <Util.Row align="center" justify="between">
         <Typography.H3>Pick an existing job</Typography.H3>
+        <Button onClick={createJob}>Create a new job</Button>
       </Util.Row>
       <Util.Spacer size={1} />
       <Table
