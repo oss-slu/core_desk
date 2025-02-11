@@ -3,11 +3,6 @@ import { useParams } from "react-router-dom";
 import { useBillingGroups } from "../../hooks";
 import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
 
-const truncate = (str, n = 20) => {
-  if (str.length <= n) return str;
-  return str.slice(0, n - 1) + "...";
-};
-
 export const BillingGroupPicker = ({ value, onChange, includeNone }) => {
   const { shopId } = useParams();
   const { billingGroups, loading } = useBillingGroups(shopId);
