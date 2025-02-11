@@ -137,7 +137,7 @@ export const post = [
           description,
           shop: { connect: { id: shopId } },
           user: { connect: { id: userToCreateJobAs } },
-          groupId: billingGroupToCreateJobAs?.id,
+          group: { connect: { id: billingGroupToCreateJobAs?.id } },
           dueDate: new Date(dueDate),
         },
       });

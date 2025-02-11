@@ -5,7 +5,7 @@ export const useBillingGroups = (shopId) => {
   const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [billingGroups, setBillingGroups] = useState({});
+  const [billingGroups, setBillingGroups] = useState([]);
 
   const fetchBillingGroups = async (shouldSetLoading = true) => {
     try {

@@ -79,7 +79,7 @@ export const get = [
     });
 
     if (!userShop) {
-      return res.status(400).send({ error: "Forbidden" });
+      return res.status(400).json({ error: "Forbidden" });
     }
 
     const userIsPrivileged =
@@ -90,7 +90,7 @@ export const get = [
       userId === targetUserId;
 
     if (!userIsPrivileged) {
-      return res.status(400).send({ error: "Forbidden" });
+      return res.status(400).json({ error: "Forbidden" });
     }
 
     const billingGroupUser = await prisma.userBillingGroup.findFirst({
@@ -120,9 +120,10 @@ export const post = [
     });
 
     if (
-      !requestingUserShop ||
-      requestingUserShop.accountType !== "ADMIN" ||
-      !req.user.admin
+      !(
+        (requestingUserShop && requestingUserShop.accountType === "ADMIN") ||
+        req.user.admin
+      )
     ) {
       return res.status(400).json({ error: "Forbidden" });
     }
