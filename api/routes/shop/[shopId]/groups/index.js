@@ -197,7 +197,7 @@ export const get = [
         include: {
           users: {
             where: {
-              role: "ADMIN",
+              OR: [{ role: "ADMIN" }, { userId: req.user.id }],
             },
             orderBy: {
               createdAt: "asc",
@@ -228,6 +228,16 @@ export const get = [
       // Process each group to find the admin user and rename _count.users to userCount
       const groupsWithUserCountAndAdmin = groups.map((group) => {
         const adminUsers = group.users.filter((user) => user.role === "ADMIN");
+
+        const userHasPermissionToCreateJobsOnBillingGroup =
+          !!group.users.find(
+            (user) => user.role === "ADMIN" && user.user.id === req.user.id
+          ) ||
+          userShop.accountType === "ADMIN" ||
+          userShop.accountType === "OPERATOR" ||
+          req.user.admin ||
+          group.membersCanCreateJobs;
+
         return {
           ...group,
           userCount: group._count.users,
@@ -235,6 +245,7 @@ export const get = [
             name: user.user.firstName + " " + user.user.lastName,
             id: user.user.id,
           })),
+          userHasPermissionToCreateJobsOnBillingGroup,
           users: undefined,
           _count: undefined,
         };

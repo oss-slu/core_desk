@@ -8,7 +8,7 @@
     "test": "./scripts/run-integration.sh",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "coverage": "yarn test --coverage",
+    "coverage": "yarn test --coverage --ui",
     "lint": "eslint ."
   },
   "keywords": [],

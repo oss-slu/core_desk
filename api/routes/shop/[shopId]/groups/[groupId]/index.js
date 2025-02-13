@@ -208,7 +208,29 @@ export const get = [
         }
       }
 
-      res.json({ group });
+      const userShop = await prisma.userShop.findFirst({
+        where: {
+          userId: user.id,
+          shopId,
+          active: true,
+        },
+      });
+
+      let userHasPermissionToCreateJobsOnBillingGroup = false;
+      if (group.membersCanCreateJobs)
+        userHasPermissionToCreateJobsOnBillingGroup = true;
+      if (user.admin) userHasPermissionToCreateJobsOnBillingGroup = true;
+      if (userShop.accountType === "ADMIN")
+        userHasPermissionToCreateJobsOnBillingGroup = true;
+      if (group.userRole === "ADMIN")
+        userHasPermissionToCreateJobsOnBillingGroup = true;
+
+      return res.json({
+        group: {
+          ...group,
+          userHasPermissionToCreateJobsOnBillingGroup,
+        },
+      });
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: "Internal server error" });
