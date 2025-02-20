@@ -85,7 +85,7 @@ export const BillingGroupsPage = () => {
           {
             label: "Admin",
             accessor: "adminUsers",
-            render: (adminUsers) => adminUsers[0].name,
+            render: (adminUsers) => adminUsers[0]?.name,
           },
         ]}
         data={billingGroups}
