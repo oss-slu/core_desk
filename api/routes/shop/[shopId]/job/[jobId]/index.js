@@ -6,7 +6,7 @@ import { generateInvoice } from "../../../../../util/docgen/invoice.js";
 import { SHOP_SELECT_WITH_LEDGER } from "../../../shared.js";
 import { z } from "zod";
 
-const shopSchema = z.object({
+const userSchema = z.object({
   ledgerItemId: z.string().optional
 });
 
@@ -298,7 +298,7 @@ export const put = [
           },
         });
 
-        const validationResult = shopSchema.safeParse(req.body);
+        const validationResult = userSchema.safeParse(req.body);
           if (!validationResult.success) {
             return res.status(400).json({
           error: "Invalid data",

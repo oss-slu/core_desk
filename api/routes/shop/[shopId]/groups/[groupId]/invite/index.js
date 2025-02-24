@@ -3,10 +3,8 @@ import { verifyAuth } from "#verifyAuth";
 import { LogType } from "@prisma/client";
 import { z } from "zod"
 
-const shopSchema  = z.object({
-  //userID: 
-  //billingGroupId:
-
+const logsSchema  = z.object({
+  billingGroupId: z.string().optional()
 });
 
 
@@ -98,9 +96,19 @@ export const post = [
       return res.status(400).send({ error: "Forbidden" });
     }
 
+    const validationResult = logsSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Invalid data",
+          issues: validationResult.error.format(),
+        });
+      }
+
+      const validatedData = validationResult.data;
+
     const invite = await prisma.billingGroupInvitationLink.create({
       data: {
-        billingGroupId: groupId,
+        billingGroupId: validatedData.billingGroupId,
         expires,
       },
     });

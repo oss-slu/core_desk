@@ -1,5 +1,11 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
+import { z } from "zod";
+
+const logSchema = z.object({
+  message: z.string().optional(),
+  userId: z.string().min(1, "User ID Required")
+});
 
 export const get = [
   verifyAuth,

@@ -7,7 +7,7 @@ const shopSchema = z.object({
   //expires: z.string,
   title: z.string().min(1, "Title is Required"),
   description: z.string().optional(),
-  active: z.boolean().min(1, "Status required")
+  active: z.boolean()
 });
 
 export const get = [

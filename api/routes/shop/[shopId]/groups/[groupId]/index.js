@@ -3,7 +3,7 @@ import { verifyAuth, verifyAuthAlone } from "#verifyAuth";
 import { LogType } from "@prisma/client";
 import { z } from "zod";
 
-const shopSchema = z.object({
+const billingGroupSchema = z.object({
   title: z.string().min(1, "Title is Required"),
   description: z.string().optional,
   // membersCanCreateJobs: z.bool().???(????)
@@ -48,7 +48,7 @@ export const put = [
         },
       });
 
-      const validationResult = shopSchema.safeParse(req.body);
+      const validationResult = billingGroupSchema.safeParse(req.body);
       if (!validationResult.success) {
         return res.status(400).json({
           error: "Invalid data",

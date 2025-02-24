@@ -1,6 +1,16 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { LogType } from "@prisma/client";
+import { z } from "zod";
+
+const materialSchema = z.object({
+  title: z.string().min(1, "Material must have Title"),
+  manufacturer: z.string().optional(),
+  resourceTypeId: z.string().min(1, "Resource must have ID"),
+  costPerUnit: z.float().optional(),
+  unitDescriptor: z.string().optional(),
+  shopId: z.string().min(1, "Shop must have ID"),
+});
 
 export const get = [
   verifyAuth,
@@ -82,14 +92,24 @@ export const post = [
     const costPerUnit = parseFloat(req.body.costPerUnit);
     const unitDescriptor = req.body.unitDescriptor;
 
+    const validationResult = materialSchema.safeParse(req.body);
+      if (!validationResult.success) {
+        return res.status(400).json({
+          error: "Invalid data",
+          issues: validationResult.error.format(),
+        });
+      }
+
+    const validatedData = validationResult.data;
+
     const material = await prisma.material.create({
       data: {
-        title,
-        manufacturer,
-        resourceTypeId,
-        costPerUnit,
-        unitDescriptor,
-        shopId,
+        title: validatedData.title,
+        manufacturer: validatedData.manufacturer,
+        resourceTypeId: validatedData.resourceTypeId,
+        costPerUnit: validatedData.costPerUnit,
+        unitDescriptor: validatedData.unitDescriptor,
+        shopId: validatedData.shopId,
       },
       include: {
         resourceType: true,
