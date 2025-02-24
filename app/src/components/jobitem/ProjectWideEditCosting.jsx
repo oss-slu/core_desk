@@ -38,7 +38,7 @@ export const ProjectWideEditCosting = ({
     setJob(initialJob);
   }, [initialJob]);
   const { user } = useAuth();
-  const { userShop } = useShop();
+  const { userShop } = useShop(initialJob.shopId);
 
   const userIsPrivileged =
     user?.admin ||
@@ -131,6 +131,16 @@ const CostCard = ({
     localLineItem?.resourceTypeId,
     localLineItem?.materialId
   );
+
+  console.log("MAT", material);
+
+  const { loading: secondaryMaterialLoading, secondaryMaterial } = useMaterial(
+    shopId,
+    localLineItem?.resourceTypeId,
+    localLineItem?.secondaryMaterialId
+  );
+
+  console.log("MATS", secondaryMaterial);
   const { loading: resourceLoading, resource } = useResource(
     shopId,
     localLineItem?.resourceId
@@ -151,7 +161,7 @@ const CostCard = ({
       (processingTimeQty * resource?.costPerProcessingTime || 0) +
       (unitQty * resource?.costPerUnit || 0) +
       (materialQty * material?.costPerUnit || 0) + 
-      (secondaryMaterialQty * material?.costPerUnit || 0)
+      (secondaryMaterialQty * secondaryMaterial?.costPerUnit || 0)
     );
   };
 
@@ -175,6 +185,7 @@ const CostCard = ({
                     resourceTypeId: value,
                     resourceId: null,
                     materialId: null,
+                    secondaryMaterialId: null,
                   })
                 }
                 loading={opLoading}
@@ -224,6 +235,24 @@ const CostCard = ({
                     </span>
                   </Util.Col>
                 )}
+                {userIsPrivileged ? (
+                  <MaterialPicker
+                    value={localLineItem.secondaryMaterialId}
+                    resourceTypeId={localLineItem.resourceTypeId}
+                    onChange={(value) =>
+                      setLocalLineItem({ ...localLineItem, secondaryMaterialId: value })
+                    }
+                    loading={opLoading}
+                    materialType={"Secondary"}
+                  />
+                ) : (
+                  <Util.Col gap={1}>
+                    <span className="form-label mb-0">secondaryMaterial</span>
+                    <span>
+                      <Badge soft>{localLineItem.secondaryMaterial?.title}</Badge>
+                    </span>
+                  </Util.Col>
+                )}
               </Util.Row>
             ) : (
               <i style={{ alignSelf: "center" }}>
@@ -249,15 +278,16 @@ const CostCard = ({
           <H3>Line Item Quantities</H3>
           {localLineItem.resourceTypeId &&
           localLineItem.resourceId &&
-          localLineItem.materialId ? (
+          localLineItem.materialId &&
+          localLineItem.secondaryMaterialId ? (
             <>
-              {materialLoading || resourceLoading ? (
+              {materialLoading || secondaryMaterialLoading || resourceLoading ? (
                 <Spinner />
-              ) : !resource || !material ? (
+              ) : !resource || !material || !secondaryMaterial ? (
                 <span>
                   <Badge color="danger" soft>
                     <Icon i="coin-off" />
-                    Costing unavailable without material and resource
+                    Costing unavailable1 without material, secondaryMaterial and resource
                   </Badge>
                 </span>
               ) : (
@@ -303,6 +333,16 @@ const CostCard = ({
                     }
                     showInput={userIsPrivileged}
                   />
+                  <QuantityInput
+                    label={`Secondary material quantity in ${secondaryMaterial.unitDescriptor}s`}
+                    quantity={localLineItem.secondaryMaterialQty || 0}
+                    costPerUnit={secondaryMaterial.costPerUnit || 0}
+                    icon={<Icon i="weight" />}
+                    onChange={(value) =>
+                      setLocalLineItem({ ...localLineItem, secondaryMaterialQty: value })
+                    }
+                    showInput={userIsPrivileged}
+                  />
                   <Util.Row gap={1} align="center" justify="end">
                     <span className={styles.bottomLine}>
                       <Util.Row gap={1}>
@@ -318,7 +358,7 @@ const CostCard = ({
             <span>
               <Badge color="danger" soft>
                 <Icon i="coin-off" />
-                Costing unavailable without material and resource
+                Costing unavailable2 without material, secondaryMaterial and resource
               </Badge>
             </span>
           )}
