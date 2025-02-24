@@ -145,12 +145,13 @@ const CostCard = ({
   if (!localLineItem) return null;
 
   const calculateTotalCost = () => {
-    const { timeQty, processingTimeQty, unitQty, materialQty } = localLineItem;
+    const { timeQty, processingTimeQty, unitQty, materialQty, secondaryMaterialQty } = localLineItem;
     return (
       (timeQty * resource?.costPerTime || 0) +
       (processingTimeQty * resource?.costPerProcessingTime || 0) +
       (unitQty * resource?.costPerUnit || 0) +
-      (materialQty * material?.costPerUnit || 0)
+      (materialQty * material?.costPerUnit || 0) + 
+      (secondaryMaterialQty * material?.costPerUnit || 0)
     );
   };
 
@@ -213,6 +214,7 @@ const CostCard = ({
                       setLocalLineItem({ ...localLineItem, materialId: value })
                     }
                     loading={opLoading}
+                    materialType={"Primary"}
                   />
                 ) : (
                   <Util.Col gap={1}>

@@ -14,12 +14,14 @@ export const calculateTotalCostOfJobByJobId = async (jobId) => {
         include: {
           resource: true,
           material: true,
+          secondaryMaterial: true,
         },
       },
       additionalCosts: {
         include: {
           resource: true,
           material: true,
+          secondaryMaterial: true,
         },
       },
     },
@@ -41,6 +43,7 @@ export const calculateTotalCostOfJob = (data) => {
       (cost.processingTimeQty || 0) *
       (cost.resource.costPerProcessingTime || 0);
     totalCost += (cost.materialQty || 0) * (cost.material.costPerUnit || 0);
+    totalCost += (cost.secondaryMaterialQty || 0) * (cost.secondaryMaterial.costPerUnit || 0);
   });
 
   // if additionalCostOverride is true, return totalCost
@@ -59,6 +62,8 @@ export const calculateTotalCostOfJob = (data) => {
     localTotalCost += (item.unitQty || 0) * (item.resource.costPerUnit || 0);
     localTotalCost +=
       (item.materialQty || 0) * (item.material.costPerUnit || 0);
+    localTotalCost +=
+      (item.secondaryMaterialQty || 0) * (item.secondaryMaterial.costPerUnit || 0);
 
     totalCost += localTotalCost * item.qty;
   });

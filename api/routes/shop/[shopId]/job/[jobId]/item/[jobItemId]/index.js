@@ -109,12 +109,14 @@ export const put = [
       req.body.data.resourceTypeId !== jobItem.resourceTypeId
     ) {
       req.body.data.materialId = null;
+      req.body.data.secondaryMaterialId = null;
       req.body.data.resourceId = null;
     }
 
     delete req.body.data.resource;
     delete req.body.data.resourceType;
     delete req.body.data.material;
+    delete req.body.data.secondaryMaterial;
 
     console.log(req.body.data);
 
@@ -139,12 +141,19 @@ export const put = [
             unitDescriptor: true,
           },
         },
+        secondaryMaterial: {
+          select: {
+            costPerUnit: true,
+            unitDescriptor: true,
+          },
+        },
       },
     });
 
     const updatedItemToLog = JSON.parse(JSON.stringify(updatedItem));
     delete updatedItemToLog.resource;
     delete updatedItemToLog.material;
+    //delete updatedItemToLog.secondaryMaterial;  MIGHT NEED TO UPDATE LOGS TABLE...
 
     await prisma.logs.create({
       data: {
