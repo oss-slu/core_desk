@@ -35,7 +35,7 @@ export const calculateTotalCostOfJob = (data) => {
 
   // First, add up the additional line items
   data.additionalCosts.forEach((cost) => {
-    if (!cost.resource || !cost.material) return;
+    if (!cost.resource || !cost.material || !cost.secondaryMaterial) return;
 
     totalCost += (cost.unitQty || 0) * (cost.resource.costPerUnit || 0);
     totalCost += (cost.timeQty || 0) * (cost.resource.costPerTime || 0);
@@ -52,7 +52,7 @@ export const calculateTotalCostOfJob = (data) => {
 
   // Next, add up the item costs
   data.items.forEach((item) => {
-    if (!item.resource || !item.material) return;
+    if (!item.resource || !item.material || !item.secondaryMaterial) return;
 
     let localTotalCost = 0;
 

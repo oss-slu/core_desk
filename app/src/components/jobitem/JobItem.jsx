@@ -367,7 +367,7 @@ export const JobItem = ({
               title: "Costing",
               content: (
                 <>
-                  {item.materialId && item.resourceId ? (
+                  {item.materialId && item.resourceId && item.secondaryMaterialId ? (
                     <EditCosting
                       item={item}
                       onChange={(value) => updateJobItem(value)}
@@ -377,7 +377,7 @@ export const JobItem = ({
                   ) : (
                     <Badge color="red" soft>
                       <Icon i="coin-off" />
-                      Costing unavailable without material and resource
+                      Costing unavailable without material, secondaryMaterial and resource
                     </Badge>
                   )}
                 </>
