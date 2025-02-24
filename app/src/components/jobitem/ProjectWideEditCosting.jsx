@@ -132,15 +132,12 @@ const CostCard = ({
     localLineItem?.materialId
   );
 
-  console.log("MAT", material);
-
-  const { loading: secondaryMaterialLoading, secondaryMaterial } = useMaterial(
+  const { loading: secondaryMaterialLoading, material: secondaryMaterial } = useMaterial(
     shopId,
     localLineItem?.resourceTypeId,
     localLineItem?.secondaryMaterialId
   );
 
-  console.log("MATS", secondaryMaterial);
   const { loading: resourceLoading, resource } = useResource(
     shopId,
     localLineItem?.resourceId
