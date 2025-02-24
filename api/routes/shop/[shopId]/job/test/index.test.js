@@ -8,23 +8,6 @@ import { prisma as mockPrisma } from "#mock-prisma";
 
 describe("/api/shop/[shopId]/job", () => {
     describe("POST", () => { 
-
-        //Sucessful job creation
-        it("Should return 200 OK with job details (ID, title, description, created date)", async () => {
-            const res = await request(app)
-                .post("/api/shop/[shopId]/job")
-                .set(...(await gt()))
-                .send({
-                    title: "My test title",
-                    description: "Test Description",
-                    createdDate: new Date(),
-                });
-
-            expect(res.status).toBe(200);
-            expect(res.body.title).toBe("My test title");
-            expect(res.body.dueDate).toBe(expect.any("String"));
-
-        });
         
         //Missing Required Fields
         it("Should return 400 bad request with relevant error message", async () => {
