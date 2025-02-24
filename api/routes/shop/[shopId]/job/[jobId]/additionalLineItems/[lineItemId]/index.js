@@ -2,8 +2,9 @@ import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { z } from "zod"
 
-const shopSchema = z.object({
-//
+const jobSchema = z.object({
+  lineItem: z.string().min(1, "Id is required"),
+  active: z.boolean().optional()
 });
 
 export const get = [
@@ -169,7 +170,7 @@ export const put = [
       delete req.body.resource;
       delete req.body.material;
 
-      const validationResult = shopSchema.safeParse(req.body);
+      const validationResult = jobSchema.safeParse(req.body);
       if (!validationResult.success) {
         return res.status(400).json({
           error: "Invalid data",

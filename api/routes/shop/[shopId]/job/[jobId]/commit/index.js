@@ -3,9 +3,9 @@ import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../../util/docgen/invoice.js";
 import { z } from "zod"
 
-const shopSchema = z.object({
-  finalized: z.boolean().optional,
-  finalizedAt: z.date
+const jobSchema = z.object({
+  finalized: z.boolean(),
+  //finalizedAt: "DateTime is not capatable with Zod"
 });
 
 export const post = [
@@ -66,7 +66,7 @@ export const post = [
 
     const { url, key, value } = await generateInvoice(job);
 
-    const validationResult = shopSchema.safeParse(req.body);
+    const validationResult = jobSchema.safeParse(req.body);
       if (!validationResult.success) {
         return res.status(400).json({
           error: "Invalid data",
@@ -82,7 +82,7 @@ export const post = [
       },
       data: {
         finalized: validatedData.finalized,
-        finalizedAt: validatedData.finalizedAt,
+        finalizedAt: newDate(),
       },
       //
     });
