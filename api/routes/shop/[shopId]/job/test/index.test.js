@@ -8,7 +8,7 @@ import { prisma as mockPrisma } from "#mock-prisma";
 
 describe("/api/shop/[shopId]/job", () => {
     describe("POST", () => { 
-        
+
         //Missing Required Fields
         it("Should return 400 bad request with relevant error message", async () => {
             const res = await request(app)
@@ -17,7 +17,7 @@ describe("/api/shop/[shopId]/job", () => {
                 .send({});
         
             expect(res.status).toBe(400);
-            expect(res.status).toBe("Required Field Missing");
+            expect(res.body.message).toBe("Required Field Missing");
             expect(res.body).toMatchSnapshot({
                 job: 
                     {
