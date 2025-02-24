@@ -3,7 +3,7 @@ export const calculateTotalCostOfJob = (data) => {
 
   // First, add up the additional line items
   data.additionalCosts.forEach((cost) => {
-    if (!cost.resource || !cost.material) return;
+    if (!cost.resource || !cost.material || !cost.secondaryMaterial) return;
 
     totalCost += (cost.unitQty || 0) * (cost.resource.costPerUnit || 0);
     totalCost += (cost.timeQty || 0) * (cost.resource.costPerTime || 0);
@@ -11,6 +11,7 @@ export const calculateTotalCostOfJob = (data) => {
       (cost.processingTimeQty || 0) *
       (cost.resource.costPerProcessingTime || 0);
     totalCost += (cost.materialQty || 0) * (cost.material.costPerUnit || 0);
+    totalCost += (cost.secondaryMaterialQty || 0) * (cost.secondaryMaterial.costPerUnit || 0);
   });
 
   // if additionalCostOverride is true, return totalCost
@@ -18,7 +19,7 @@ export const calculateTotalCostOfJob = (data) => {
 
   // Next, add up the item costs
   data.items.forEach((item) => {
-    if (!item.resource || !item.material) return;
+    if (!item.resource || !item.material || !item.secondaryMaterial) return;
 
     let localTotalCost = 0;
 
@@ -29,6 +30,8 @@ export const calculateTotalCostOfJob = (data) => {
     localTotalCost += (item.unitQty || 0) * (item.resource.costPerUnit || 0);
     localTotalCost +=
       (item.materialQty || 0) * (item.material.costPerUnit || 0);
+    localTotalCost +=
+      (item.secondaryMaterialQty || 0) * (item.secondaryMaterial.costPerUnit || 0);
 
     totalCost += localTotalCost * item.qty;
   });

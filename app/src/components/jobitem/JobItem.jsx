@@ -325,6 +325,17 @@ export const JobItem = ({
                           resourceTypeId={item.resourceTypeId}
                           opLoading={opLoading}
                           includeNone={true}
+                          materialType={"Primary"}
+                        />
+                        <MaterialPicker
+                          value={item.secondaryMaterialId}
+                          onChange={(value) =>
+                            updateJobItem({ secondaryMaterialId: value })
+                          }
+                          resourceTypeId={item.resourceTypeId}
+                          opLoading={opLoading}
+                          includeNone={true}
+                          materialType={"Secondary"}
                         />
                         {userIsPrivileged ? (
                           <ResourcePicker
@@ -356,7 +367,7 @@ export const JobItem = ({
               title: "Costing",
               content: (
                 <>
-                  {item.materialId && item.resourceId ? (
+                  {item.materialId && item.resourceId && item.secondaryMaterialId ? (
                     <EditCosting
                       item={item}
                       onChange={(value) => updateJobItem(value)}
@@ -366,7 +377,7 @@ export const JobItem = ({
                   ) : (
                     <Badge color="red" soft>
                       <Icon i="coin-off" />
-                      Costing unavailable without material and resource
+                      Costing unavailable without material, secondaryMaterial and resource
                     </Badge>
                   )}
                 </>
