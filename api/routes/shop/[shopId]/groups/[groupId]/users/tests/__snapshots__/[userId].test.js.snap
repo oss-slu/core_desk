@@ -1,0 +1,49 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/shop/[shopId]/groups/[groupId]/users/[userId] > GET > allows a billing group admin to get a user in their group 1`] = `
+{
+  "active": true,
+  "billingGroupId": Any<String>,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "role": "MEMBER",
+  "updatedAt": Any<String>,
+  "userId": Any<String>,
+}
+`;
+
+exports[`/shop/[shopId]/groups/[groupId]/users/[userId] > GET > allows a global admin who is not a member of the shop to get a user 1`] = `
+{
+  "active": true,
+  "billingGroupId": Any<String>,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "role": "MEMBER",
+  "updatedAt": Any<String>,
+  "userId": Any<String>,
+}
+`;
+
+exports[`/shop/[shopId]/groups/[groupId]/users/[userId] > GET > allows a shop admin to get a user 1`] = `
+{
+  "active": true,
+  "billingGroupId": Any<String>,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "role": "MEMBER",
+  "updatedAt": Any<String>,
+  "userId": Any<String>,
+}
+`;
+
+exports[`/shop/[shopId]/groups/[groupId]/users/[userId] > GET > allows a shop operator to get a user 1`] = `
+{
+  "active": true,
+  "billingGroupId": Any<String>,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "role": "MEMBER",
+  "updatedAt": Any<String>,
+  "userId": Any<String>,
+}
+`;

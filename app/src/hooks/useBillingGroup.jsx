@@ -1,33 +1,35 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import useSWR from "swr";
 import { authFetch } from "../util/url";
+import toast from "react-hot-toast";
+
+const fetcher = async (url) => {
+  const r = await authFetch(url);
+  const data = await r.json();
+  if (data.group) {
+    return data.group;
+  }
+  throw new Error("Failed to fetch billing group");
+};
 
 export const useBillingGroup = (shopId, billingGroupId) => {
-  const [loading, setLoading] = useState(true);
   const [opLoading, setOpLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [billingGroup, setBillingGroup] = useState({});
 
-  const fetchBillingGroup = async (shouldSetLoading = true) => {
-    try {
-      shouldSetLoading && setLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/groups/${billingGroupId}`);
-      const data = await r.json();
-      if (data.group) {
-        setBillingGroup(data.group);
-        setLoading(false);
-      } else {
-        setError(data);
-        setLoading(false);
-      }
-    } catch (error) {
-      setError(error);
-      setLoading(false);
-    }
-  };
+  const {
+    data: billingGroup,
+    error,
+    mutate,
+    isLoading,
+  } = useSWR(
+    shopId && billingGroupId
+      ? `/api/shop/${shopId}/groups/${billingGroupId}`
+      : null,
+    fetcher
+  );
 
   const updateBillingGroup = async (data) => {
+    setOpLoading(true);
     try {
-      setOpLoading(true);
       const r = await authFetch(
         `/api/shop/${shopId}/groups/${billingGroupId}`,
         {
@@ -35,54 +37,71 @@ export const useBillingGroup = (shopId, billingGroupId) => {
           body: JSON.stringify(data),
         }
       );
-      const updatedBillingGroup = await r.json();
-      if (updatedBillingGroup.group) {
-        setBillingGroup(updatedBillingGroup.group);
-        setOpLoading(false);
+      const updatedData = await r.json();
+      if (updatedData.group) {
+        mutate(updatedData.group, false);
       } else {
-        setError(updatedBillingGroup);
-        setOpLoading(false);
+        throw new Error("Failed to update billing group");
       }
     } catch (error) {
-      setError(error);
+      console.error(error);
+    } finally {
       setOpLoading(false);
     }
   };
 
   const removeUserFromGroup = async (userId) => {
+    setOpLoading(true);
     try {
-      setOpLoading(true);
       const r = await authFetch(
         `/api/shop/${shopId}/groups/${billingGroupId}/users/${userId}`,
-        {
-          method: "DELETE",
-        }
+        { method: "DELETE" }
       );
       const res = await r.json();
       if (res.success) {
-        setOpLoading(false);
-        fetchBillingGroup(false);
+        mutate();
       } else {
-        setError(res);
-        setOpLoading(false);
+        throw new Error("Failed to remove user from group");
       }
     } catch (error) {
-      setError(error);
+      console.error(error);
+    } finally {
       setOpLoading(false);
     }
   };
 
-  useEffect(() => {
-    fetchBillingGroup();
-  }, []);
+  const addUserToGroup = async (userId, role) => {
+    setOpLoading(true);
+    try {
+      const r = await authFetch(
+        `/api/shop/${shopId}/groups/${billingGroupId}/users/${userId}`,
+        {
+          method: "POST",
+          body: JSON.stringify({ role }),
+        }
+      );
+      const res = await r.json();
+      if (res.success) {
+        toast.success("User added to billing group");
+        mutate();
+      } else {
+        throw new Error("Failed to add user to group");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setOpLoading(false);
+    }
+  };
 
   return {
     billingGroup,
-    loading,
+    loading: isLoading,
     error,
-    refetch: fetchBillingGroup,
+    refetch: mutate,
     updateBillingGroup,
     removeUserFromGroup,
+    addUserToGroup,
     opLoading,
   };
 };

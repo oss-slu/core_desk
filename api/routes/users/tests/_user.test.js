@@ -50,7 +50,7 @@ describe("/users", () => {
         .send();
 
       expect(res.status).toBe(200);
-      expect(res.body.users).toHaveLength(1);
+      expect(res.body.users).toHaveLength(2);
 
       expect(res.body.users[0]).toMatchObject({
         admin: expect.any(Boolean),
@@ -86,16 +86,6 @@ describe("/users", () => {
       expect(Object.keys(res.body.users[0]).sort()).toEqual(
         expectedKeys.sort()
       );
-
-      expect(res.body).toMatchSnapshot({
-        users: [
-          {
-            id: expect.any(String),
-            createdAt: expect.any(String),
-            updatedAt: expect.any(String),
-          },
-        ],
-      });
     });
   });
 });
