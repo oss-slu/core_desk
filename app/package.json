@@ -30,7 +30,7 @@
     "remark-admonitions": "^1.2.1",
     "remark-gfm": "^4.0.0",
     "swr": "^2.2.5",
-    "tabler-react-2": "^0.1.70",
+    "tabler-react-2": "^0.1.76",
     "three": "^0.169.0",
     "uploadthing": "^7.2.0",
     "wasm-stl-thumbnailer": "^0.1.8"

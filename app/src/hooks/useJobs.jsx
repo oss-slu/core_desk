@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { useUserShop } from "./useUserShop";
 import { useAuth } from "./useAuth";
 import { ShopUserPicker } from "../components/shopUserPicker/ShopUserPicker";
+import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
 
 const CreateJobModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
@@ -18,6 +19,9 @@ const CreateJobModalContent = ({ onSubmit }) => {
   const [onBehalfOfUserEmail, setOnBehalfOfUserEmail] = useState("");
   const [onBehalfOfUserFirstName, setOnBehalfOfUserFirstName] = useState("");
   const [onBehalfOfUserLastName, setOnBehalfOfUserLastName] = useState("");
+  const [onBehalfOfBillingGroup, setOnBehalfOfBillingGroup] = useState(false);
+  const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] =
+    useState(null);
 
   const capitalize = (s) => {
     if (typeof s !== "string") return "";
@@ -81,7 +85,7 @@ const CreateJobModalContent = ({ onSubmit }) => {
                       <ShopUserPicker
                         value={onBehalfOfUserId}
                         onChange={setOnBehalfOfUserId}
-                        includeNone={true}
+                        includeNone={false}
                       />
                     ),
                   },
@@ -115,6 +119,26 @@ const CreateJobModalContent = ({ onSubmit }) => {
           </>
         )
       )}
+      {!onBehalfOf ? (
+        <>
+          <label className="form-label">Billing Group</label>
+          <Switch
+            label="Create this job on a billing group"
+            value={onBehalfOfBillingGroup}
+            onChange={setOnBehalfOfBillingGroup}
+          />
+          {onBehalfOfBillingGroup && (
+            <>
+              <BillingGroupPicker
+                value={onBehalfOfBillingGroupId}
+                onChange={setOnBehalfOfBillingGroupId}
+                includeNone={false}
+              />
+            </>
+          )}
+        </>
+      ) : null}
+      <Util.Spacer size={2} />
       {title.length > 1 && dueDate.length > 1 ? (
         <Button
           variant="primary"
@@ -129,7 +153,9 @@ const CreateJobModalContent = ({ onSubmit }) => {
               onBehalfOfUserId,
               onBehalfOfUserEmail,
               onBehalfOfUserFirstName,
-              onBehalfOfUserLastName
+              onBehalfOfUserLastName,
+              onBehalfOfBillingGroup,
+              onBehalfOfBillingGroupId
             );
           }}
         >
@@ -158,7 +184,9 @@ export const useJobs = (shopId) => {
     onBehalfOfUserId,
     onBehalfOfUserEmail,
     onBehalfOfUserFirstName,
-    onBehalfOfUserLastName
+    onBehalfOfUserLastName,
+    onBehalfOfBillingGroup,
+    onBehalfOfBillingGroupId
   ) => {
     try {
       setOpLoading(true);
@@ -174,6 +202,8 @@ export const useJobs = (shopId) => {
           onBehalfOfUserEmail,
           onBehalfOfUserFirstName,
           onBehalfOfUserLastName,
+          onBehalfOfBillingGroup,
+          billingGroupId: onBehalfOfBillingGroupId,
         }),
       });
       const data = await r.json();

@@ -2,9 +2,9 @@ import { prisma } from "#prisma";
 import jwt from "jsonwebtoken";
 
 export const gt = async (options) => {
-  const ga = options?.ga || false;
+  const ga = options?.ga || false; // Global Admin
   const suspended = options?.suspended || false;
-  const sat = options?.sat || null;
+  const sat = options?.sat || null; // Shop Account Type
 
   let user =
     options?.user ||

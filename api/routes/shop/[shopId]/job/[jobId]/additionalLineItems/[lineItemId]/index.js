@@ -70,6 +70,12 @@ export const get = [
               id: true,
             },
           },
+          secondaryMaterial: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
         },
       });
 
@@ -154,6 +160,12 @@ export const put = [
               id: true,
             },
           },
+          secondaryMaterial: {
+            select: {
+              title: true,
+              id: true,
+            }
+          }
         },
       });
 
@@ -169,6 +181,7 @@ export const put = [
       delete req.body.resourceType;
       delete req.body.resource;
       delete req.body.material;
+      delete req.body.secondaryMaterial;
 
       const validationResult = jobSchema.safeParse(req.body);
       if (!validationResult.success) {

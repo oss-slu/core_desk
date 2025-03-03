@@ -33,6 +33,13 @@ const JOB_INCLUDE = {
           title: true,
         },
       },
+      secondaryMaterial: {
+        select: {
+          costPerUnit: true,
+          unitDescriptor: true,
+          title: true,
+        },
+      },
       user: {
         select: {
           firstName: true,
@@ -61,6 +68,11 @@ const JOB_INCLUDE = {
         },
       },
       material: {
+        select: {
+          costPerUnit: true,
+        },
+      },
+      secondaryMaterial: {
         select: {
           costPerUnit: true,
         },
@@ -233,12 +245,14 @@ export const put = [
           additionalCosts: {
             include: {
               material: true,
+              secondaryMaterial: true,
               resource: true,
             },
           },
           items: {
             include: {
               material: true,
+              secondaryMaterial: true,
               resource: true,
             },
           },

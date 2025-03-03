@@ -6205,10 +6205,10 @@ swr@^2.2.5:
     client-only "^0.0.1"
     use-sync-external-store "^1.2.0"
 
-tabler-react-2@^0.1.70:
-  version "0.1.70"
-  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.70.tgz#e1f8c4ef275602edd732880431935df2b073ec62"
-  integrity sha512-vH/96rvytcFuYqSnQFCWvqlrdI2avvQBqdDeKHbcmCW5Xq+e1Kav0uDVkMuJbfTs2xZJKIM8YcvjGo7bu2fgcw==
+tabler-react-2@^0.1.76:
+  version "0.1.76"
+  resolved "https://registry.yarnpkg.com/tabler-react-2/-/tabler-react-2-0.1.76.tgz#8db0632ee201fc1c8bee1527280a0f0d15516f4c"
+  integrity sha512-/Bu7yvoq+Gyzlsm/LTEFypVkRJtKeZ73rmmzEEWEAs1yxqG9B4LqKhEkYUyZhh/TWozsp8ROMElV0cs+l3mMxA==
   dependencies:
     "@babel/cli" "^7.24.8"
     "@babel/core" "^7.24.8"

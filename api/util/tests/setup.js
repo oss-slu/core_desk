@@ -53,6 +53,15 @@ beforeEach(async () => {
     tc.globalUser = globalUser;
     tc.user = globalUser;
 
+    const targetUser = await prisma.user.create({
+      data: {
+        firstName: "TARGET_TestFirstName",
+        lastName: "TARGET_TestLastName",
+        email: "target_test@email.com",
+      },
+    });
+    tc.targetUser = targetUser;
+
     const shop = await prisma.shop.create({
       data: {
         name: "TestShop",

@@ -33,6 +33,7 @@ export const post = [
         onBehalfOfUserEmail,
         onBehalfOfUserFirstName,
         onBehalfOfUserLastName,
+        billingGroupId,
       } = req.body;
 
       if (onBehalfOf) {
@@ -91,7 +92,44 @@ export const post = [
         }
       }
 
-      console.log(await prisma.shop.findUnique({ where: { id: shopId } }));
+      let billingGroupToCreateJobAs = null;
+      if (billingGroupId) {
+        let billingGroup = await prisma.billingGroup.findFirst({
+          where: {
+            id: billingGroupId,
+            shopId,
+            active: true,
+          },
+        });
+
+        if (!billingGroup) {
+          return res.status(400).json({ error: "Forbidden" });
+        }
+
+        let userBillingGroup = await prisma.userBillingGroup.findFirst({
+          where: {
+            userId: req.user.id,
+            billingGroupId: billingGroupId,
+            active: true,
+          },
+        });
+
+        if (!userBillingGroup) {
+          return res.status(400).json({ error: "Forbidden" });
+        }
+
+        if (billingGroup.membersCanCreateJobs) {
+          billingGroupToCreateJobAs = billingGroup;
+        }
+
+        if (req.user.admin || userShop.accountType === "ADMIN") {
+          billingGroupToCreateJobAs = billingGroup;
+        }
+
+        if (userBillingGroup.role === "ADMIN") {
+          billingGroupToCreateJobAs = billingGroup;
+        }
+      }
 
       const job = await prisma.job.create({
         data: {
@@ -99,6 +137,7 @@ export const post = [
           description,
           shop: { connect: { id: shopId } },
           user: { connect: { id: userToCreateJobAs } },
+          group: { connect: { id: billingGroupToCreateJobAs?.id } },
           dueDate: new Date(dueDate),
         },
       });
@@ -117,6 +156,18 @@ export const post = [
           }),
         },
       });
+
+      if (billingGroupToCreateJobAs) {
+        await prisma.logs.create({
+          data: {
+            userId: req.user.id,
+            type: LogType.JOB_ADDED_TO_BILLING_GROUP,
+            shopId,
+            jobId: job.id,
+            billingGroupId: billingGroupToCreateJobAs.id,
+          },
+        });
+      }
 
       return res.json({ job });
     } catch (e) {
@@ -173,6 +224,7 @@ export const get = [
             },
             include: {
               material: true,
+              secondaryMaterial: true,
               resource: true,
             },
           },
@@ -186,6 +238,7 @@ export const get = [
           additionalCosts: {
             include: {
               material: true,
+              secondaryMaterial: true,
               resource: true,
             },
           },

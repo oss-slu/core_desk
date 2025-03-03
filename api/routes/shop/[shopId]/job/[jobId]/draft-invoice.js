@@ -18,12 +18,14 @@ export const get = [
         additionalCosts: {
           include: {
             material: true,
+            secondaryMaterial: true,
             resource: true,
           },
         },
         items: {
           include: {
             material: true,
+            secondaryMaterial: true,
             resource: true,
           },
         },
