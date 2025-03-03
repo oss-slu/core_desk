@@ -2,6 +2,7 @@ import { LogType } from "@prisma/client";
 import { prisma } from "../../../../util/prisma.js";
 import { verifyAuth } from "../../../../util/verifyAuth.js";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
+import client from "#postmark";
 
 export const post = [
   verifyAuth,
@@ -156,6 +157,39 @@ export const post = [
           }),
         },
       });
+
+      console.log("Email sent!");
+
+      /*
+
+      const adminsOperators = await prisma.userShop.findMany({
+        where: {
+          shopId: shopId,
+          accountType: {
+            in: ['ADMIN', 'OPERATOR'], 
+          },
+        },
+        include: {
+          user: true,
+        },
+      });
+
+      let emails = [];
+      emails.push(userShop.email);
+      adminsOperators.forEach((userShop) => {
+        userShop.user.email && emails.push(userShop.user.email);
+      });
+
+      client.sendEmail({
+        "From": "slu-open-project@jackcrane.rocks", 
+        "To": `${emails.join(',')}`,
+        "Subject": `A Job was Created on Your Shop`,
+        "HtmlBody": `A job was created on the ${userShop.accountTitle} shop.` , 
+        "TextBody": `A job was created on the ${userShop.accountTitle} shop.`,
+        "MessageStream": "outbound"
+      });
+
+      */
 
       if (billingGroupToCreateJobAs) {
         await prisma.logs.create({

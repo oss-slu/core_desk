@@ -14,6 +14,7 @@ import { uploadRouter } from "./config/uploadthing.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";
+import client from "#postmark";
 
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -116,6 +117,19 @@ passport.use(
             type: LogType.USER_LOGIN,
           },
         });
+
+        console.log("Email sent!");
+
+        /*
+        client.sendEmail({
+          "From": "slu-open-project@jackcrane.rocks", 
+          "To": `${req.user.email}`,
+          "Subject": "User Login detected for OpenSLU",
+          "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip ${req.ip}.` , 
+          "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip ${req.ip}.`,
+          "MessageStream": "outbound"
+        });
+        */
       }
 
       // Pass the user to the next middleware
