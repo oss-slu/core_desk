@@ -1,17 +1,16 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useUsers } from "../../hooks";
+import { useAuth, useUsers } from "../../hooks";
 import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
 
 export const ShopUserPicker = ({ value, onChange, includeNone }) => {
   const { shopId } = useParams();
   const { users, loading } = useUsers(shopId);
-
-  // return JSON.stringify(users);
+  const { user: activeUser, loading: authLoading } = useAuth();
 
   return (
     <LoadableDropdownInput
-      loading={loading}
+      loading={loading || authLoading}
       prompt={"Select a user"}
       showLabel={false}
       value={value}
@@ -22,7 +21,7 @@ export const ShopUserPicker = ({ value, onChange, includeNone }) => {
           : null,
         ...users.map((user) => ({
           id: user.id,
-          label: user.name,
+          label: `${user.name}${user.id === activeUser?.id ? " (You)" : ""}`,
         })),
       ].filter((v) => v)}
     />

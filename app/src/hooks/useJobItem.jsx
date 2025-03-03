@@ -21,7 +21,7 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
       setLoading(true);
       setError(null);
       const res = await authFetch(
-        `/api/shop/${shopId}/job/${jobId}/${jobItemId}`
+        `/api/shop/${shopId}/job/${jobId}/item/${jobItemId}`
       );
       const data = await res.json();
       if (data.item) {
@@ -42,7 +42,7 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
       setOpLoading(true);
       setError(null);
       const res = await authFetch(
-        `/api/shop/${shopId}/job/${jobId}/${jobItemId}`,
+        `/api/shop/${shopId}/job/${jobId}/item/${jobItemId}`,
         {
           method: "PUT",
           headers: {
@@ -78,7 +78,7 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
       setOpLoading(true);
       setError(null);
       const res = await authFetch(
-        `/api/shop/${shopId}/job/${jobId}/${jobItemId}`,
+        `/api/shop/${shopId}/job/${jobId}/item/${jobItemId}`,
         {
           method: "DELETE",
         }

@@ -5,12 +5,12 @@ import {
   useBillingGroupInvitations,
   useShop,
 } from "../../../../../hooks";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { shopSidenavItems } from "../..";
 import { Page } from "../../../../../components/page/page";
 import { Loading } from "../../../../../components/loading/Loading";
 import { Button } from "tabler-react-2/dist/button";
-import { Util } from "tabler-react-2";
+import { Util, Alert, DropdownInput } from "tabler-react-2";
 import { useModal } from "tabler-react-2/dist/modal";
 import { CreateBillingGroupInvitation } from "../../../../../components/billingGroup/CreateBillingGroupInvitation";
 import { Table } from "tabler-react-2/dist/table";
@@ -23,6 +23,53 @@ import { EditBillingGroupInvitation } from "../../../../../components/editBillin
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { Icon } from "../../../../../util/Icon";
 import { MarkdownRender } from "../../../../../components/markdown/MarkdownRender";
+import { ShopUserPicker } from "../../../../../components/shopUserPicker/ShopUserPicker";
+
+const AddUserToBillingGroupModal = () => {
+  const navigate = useNavigate();
+
+  const [user, setUser] = useState(null);
+  const [role, setRole] = useState("member");
+  const { shopId, groupId } = useParams();
+  const { opLoading, addUserToGroup } = useBillingGroup(shopId, groupId);
+
+  return (
+    <div>
+      <label className="form-label">
+        Choose a user to add to the billing group
+      </label>
+      <ShopUserPicker value={user} onChange={setUser} />
+      <label className="form-label mt-2">Role</label>
+      <DropdownInput
+        value={role}
+        onChange={setRole}
+        prompt="Pick a role"
+        values={[
+          {
+            id: "ADMIN",
+            label: "Admin",
+          },
+          {
+            id: "MEMBER",
+            label: "Member",
+          },
+        ]}
+      />
+      <Button
+        className="mt-2"
+        variant="primary"
+        onClick={async () => {
+          await addUserToGroup(user, role.id);
+          navigate(0);
+        }}
+        disabled={!user || !role}
+        loading={opLoading}
+      >
+        Add User
+      </Button>
+    </div>
+  );
+};
 
 export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
@@ -55,6 +102,18 @@ export const BillingGroupPage = () => {
     ),
   });
 
+  const { modal: selectUserModal, ModalElement: SelectUserModalElement } =
+    useModal({
+      title: "Add a user to the billing group",
+      text: (
+        <AddUserToBillingGroupModal
+          billingGroup={billingGroup}
+          shopId={shopId}
+          refetch={refetchBillingGroup}
+        />
+      ),
+    });
+
   const [editing, setEditing] = useState(false);
 
   const [copiedText, copyToClipboard] = useCopyToClipboard();
@@ -63,7 +122,7 @@ export const BillingGroupPage = () => {
     user.admin ||
     userShop.accountType === "ADMIN" ||
     userShop.accountType === "OPERATOR" ||
-    billingGroup.userRole === "ADMIN";
+    billingGroup?.userRole === "ADMIN";
 
   if (loading || loadingInvitations)
     return (
@@ -91,6 +150,7 @@ export const BillingGroupPage = () => {
       )}
     >
       {ModalElement}
+      {SelectUserModalElement}
       <Util.Row justify="between" align="center">
         <h1>{billingGroup.title}</h1>
         <Util.Row gap={1}>
@@ -109,6 +169,14 @@ export const BillingGroupPage = () => {
           )}
         </Util.Row>
       </Util.Row>
+      {billingGroup.adminUsers?.length == 0 &&
+      billingGroup.users?.length == 0 ? (
+        <Alert variant="danger" title="No Members">
+          This group does not have any members
+        </Alert>
+      ) : (
+        <></>
+      )}
       {editing ? (
         <>
           <EditBillingGroup
@@ -124,9 +192,9 @@ export const BillingGroupPage = () => {
         </>
       ) : (
         <p>
-          <b>Admin</b>: {billingGroup.adminUsers[0].name}
+          <b>Admin</b>: {billingGroup.adminUsers?.[0]?.name || "Unset"}
           <br />
-          {billingGroup.userCount} user{billingGroup.userCount > 1 ? "s" : ""}
+          {billingGroup.userCount} user{billingGroup.userCount != 1 ? "s" : ""}
         </p>
       )}
       <Util.Spacer size={1} />
@@ -134,7 +202,10 @@ export const BillingGroupPage = () => {
         <>
           <Util.Row justify="between" align="center">
             <h2>Invitations</h2>
-            <Button onClick={modal}>Create a new invitation link</Button>
+            <Util.Row gap={1}>
+              <Button onClick={selectUserModal}>Add a user</Button>
+              <Button onClick={modal}>Create a new invitation link</Button>
+            </Util.Row>
           </Util.Row>
           <Util.Spacer size={1} />
           {billingGroupInvitations.length === 0 ? (
