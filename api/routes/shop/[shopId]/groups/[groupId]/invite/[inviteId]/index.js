@@ -159,7 +159,7 @@ export const post = [
         },
       });
 
-      const validationResult = shopSchema.safeParse(req.body);
+      const validationResult = billingGroupSchema.safeParse(req.body);
       if (!validationResult.success) {
         return res.status(400).json({
           error: "Invalid data",
