@@ -14,7 +14,7 @@ import { uploadRouter } from "./config/uploadthing.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";
-import client from "#postmark";
+// import client from "#postmark";
 
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);

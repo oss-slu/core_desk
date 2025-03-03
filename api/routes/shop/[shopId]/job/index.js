@@ -2,7 +2,7 @@ import { LogType } from "@prisma/client";
 import { prisma } from "../../../../util/prisma.js";
 import { verifyAuth } from "../../../../util/verifyAuth.js";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
-import client from "#postmark";
+// import client from "#postmark";
 
 export const post = [
   verifyAuth,
