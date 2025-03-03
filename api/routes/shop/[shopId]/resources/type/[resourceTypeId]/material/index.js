@@ -7,7 +7,7 @@ const materialSchema = z.object({
   title: z.string().min(1, "Material must have Title"),
   manufacturer: z.string().optional(),
   resourceTypeId: z.string().min(1, "Resource must have ID"),
-  costPerUnit: z.float().optional(),
+  costPerUnit: z.number().float().optional(),
   unitDescriptor: z.string().optional(),
   shopId: z.string().min(1, "Shop must have ID"),
 });
@@ -85,12 +85,6 @@ export const post = [
     if (!req.user.admin || !userShop.accountType === "ADMIN") {
       return res.status(400).json({ message: "Unauthorized" });
     }
-
-    const title = req.body.title;
-    const manufacturer = req.body.manufacturer;
-    const resourceTypeId = req.body.resourceTypeId;
-    const costPerUnit = parseFloat(req.body.costPerUnit);
-    const unitDescriptor = req.body.unitDescriptor;
 
     const validationResult = materialSchema.safeParse(req.body);
       if (!validationResult.success) {

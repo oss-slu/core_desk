@@ -5,8 +5,8 @@ import { z } from "zod";
 
 const billingGroupSchema = z.object({
   title: z.string().min(1, "Title is Required"),
-  description: z.string().optional,
-  // membersCanCreateJobs: z.bool().???(????)
+  description: z.string().optional(),
+  membersCanCreateJobs: z.boolean().optional()
 });
 
 export const put = [
@@ -66,8 +66,7 @@ export const put = [
           title: validatedData.title,
           description: validatedData.description,
           membersCanCreateJobs: validatedData.membersCanCreateJobs,
-        },
-        // select: GROUP?
+        }
       });
 
       await prisma.logs.create({

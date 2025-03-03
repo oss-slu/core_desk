@@ -5,7 +5,7 @@ import { z } from "zod"
 
 const jobSchema = z.object({
   finalized: z.boolean(),
-  //finalizedAt: "DateTime is not capatable with Zod"
+  finalizedAt: z.string().datetime(),
 });
 
 export const post = [
@@ -76,7 +76,7 @@ export const post = [
         });
       }
 
-      const validatedData = validationResult.data;
+    const validatedData = validationResult.data;
 
     await prisma.job.update({
       where: {
@@ -84,9 +84,8 @@ export const post = [
       },
       data: {
         finalized: validatedData.finalized,
-        finalizedAt: newDate(),
-      },
-      //
+        finalizedAt: validatedData.finalizedAt,
+      }
     });
 
     await prisma.ledgerItem.create({

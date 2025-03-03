@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
+import react from "react-hot-toast";
 
 export const useUserLogs = (userId) => {
   const [loading, setLoading] = useState(true);
@@ -15,6 +16,7 @@ export const useUserLogs = (userId) => {
         setLogs(data.user?.logs);
         setLoading(false);
       } else {
+        toast.error(data);
         setError(data);
         setLoading(false);
       }

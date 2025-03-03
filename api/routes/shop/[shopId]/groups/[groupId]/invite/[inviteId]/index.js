@@ -3,8 +3,8 @@ import { verifyAuth } from "#verifyAuth";
 import { LedgerItemType, LogType } from "@prisma/client";
 import { z } from "zod";
 
-const shopSchema = z.object({
-  //expires: z.string,
+const billingGroupSchema = z.object({
+  expires: z.date().safeParse(new Date()).optional(),
   title: z.string().min(1, "Title is Required"),
   description: z.string().optional(),
   active: z.boolean()
@@ -233,15 +233,13 @@ export const put = [
       return res.status(400).send({ error: "Forbidden" });
     }
 
-    const { expires, title, description, active } = req.body;
-
     const originalInvite = await prisma.billingGroupInvitationLink.findFirst({
       where: {
         id: inviteId,
       },
     });
 
-    const validationResult = shopSchema.safeParse(req.body);
+    const validationResult = billingGroupSchema.safeParse(req.body);
       if (!validationResult.success) {
         return res.status(400).json({
           error: "Invalid data",
@@ -256,12 +254,11 @@ export const put = [
         id: inviteId,
       },
       data: {
-        expires: expires ? new Date(expires) : undefined,
+        expires: validatedData.expires,
         title: validatedData.title,
         description: validatedData.description,
         active: validatedData.active,
-      },
-      //select: ??
+      }
     });
 
     await prisma.logs.create({

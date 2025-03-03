@@ -81,8 +81,6 @@ export const post = [
       });
     }
 
-    const { title } = req.body;
-
     const validationResult = resourceSchema.safeParse(req.body);
       if (!validationResult.success) {
         return res.status(400).json({

@@ -3,7 +3,6 @@ import { LedgerItemType, LogType, Prisma } from "@prisma/client";
 import { prisma } from "../../../../../util/prisma.js";
 import { verifyAuth } from "../../../../../util/verifyAuth.js";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";
-import { SHOP_SELECT_WITH_LEDGER } from "../../../shared.js";
 import { z } from "zod";
 
 const userSchema = z.object({
@@ -328,8 +327,7 @@ export const put = [
           },
           data: {
             ledgerItemId: validatedData.ledgerItem,
-          },
-          select: SHOP_SELECT_WITH_LEDGER_SELECT
+          }
         });
 
         await prisma.logs.createMany({

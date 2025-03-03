@@ -1,11 +1,5 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import { z } from "zod"
-
-const jobSchema = z.object({
-  lineItem: z.string().min(1, "Id is required"),
-  active: z.boolean().optional()
-});
 
 export const get = [
   verifyAuth,
@@ -182,16 +176,6 @@ export const put = [
       delete req.body.resource;
       delete req.body.material;
       delete req.body.secondaryMaterial;
-
-      const validationResult = jobSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        return res.status(400).json({
-          error: "Invalid data",
-          issues: validationResult.error.format(),
-        });
-      }
-
-      const validatedData = validationResult.data;
 
       const updatedLineItem = await prisma.additionalCostLineItem.update({
         where: {

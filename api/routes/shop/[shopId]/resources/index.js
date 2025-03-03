@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const resourceSchema = z.object({
   title: z.string().min(1, "Must have title"),
-  shopId: z.string().min(1, "Shop must have ID")
+  shopId: z.string().min(1, "Shop must have ID"),
   resourceTypeId: z.string().min(1, "resouce must have ID")
 });
 

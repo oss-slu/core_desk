@@ -23,7 +23,7 @@ export const get = [
           userId,
           active: true,
         },
-      });git 
+      });
 
       if (!userShop) {
         return res.status(403).json({

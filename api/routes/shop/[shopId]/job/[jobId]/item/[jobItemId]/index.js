@@ -6,9 +6,9 @@ import { z } from "zod";
 
 const jobSchema = z.object({
   costingPublic: z.boolean().optional(),
-  costPerProcessingTime: z.float().optional(),
-  costPerTime: z.float().optional(),
-  costPerUnit: z.float().optional(),
+  costPerProcessingTime: z.number().float().optional(),
+  costPerTime: z.number().float().optional(),
+  costPerUnit: z.number().float().optional(),
   unitDescriptor: z.string().optional(),
 });
 
