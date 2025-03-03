@@ -506,6 +506,7 @@ enum UserBillingGroupRole {
 enum automatedPostLedgerItemType{
   TOPUP
   DEPOSIT
+}
 
 model Navigation {
   id     String @id @default(cuid())
