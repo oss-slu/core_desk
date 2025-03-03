@@ -495,3 +495,14 @@ enum automatedPostLedgerItemType{
   TOPUP
   DEPOSIT
 }
+
+model Navigation {
+  id     String @id @default(cuid())
+  userId String
+  user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  url String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
