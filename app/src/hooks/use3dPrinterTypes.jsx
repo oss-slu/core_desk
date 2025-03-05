@@ -48,7 +48,6 @@ export const use3dPrinterTypes = (shopId) => {
             cachedPrinterTypes = null;
           }, 30000);
         } else {
-          toast.error(data.error);
           setError(data.error);
           setLoading(false);
         }
@@ -75,6 +74,7 @@ export const use3dPrinterTypes = (shopId) => {
         setPrinterTypes(data.types);
         setOpLoading(false);
       } else {
+        toast.error(data.error);
         setError(data.error);
         setOpLoading(false);
       }
@@ -106,6 +106,7 @@ export const use3dPrinterTypes = (shopId) => {
         setPrinterTypes(data.types);
         setOpLoading(false);
       } else {
+        toast.error(data.error);
         setError(data.error);
         setOpLoading(false);
       }

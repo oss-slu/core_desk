@@ -4,7 +4,7 @@ import { LedgerItemType, LogType } from "@prisma/client";
 import { z } from "zod";
 
 const billingGroupSchema = z.object({
-  expires: z.date().safeParse(new Date()).optional(),
+  //expires: z.date().safeParse(new Date()).optional(),
   title: z.string().min(1, "Title is Required"),
   description: z.string().optional(),
   active: z.boolean()
