@@ -17,25 +17,35 @@ beforeEach(async () => {
     // Disable triggers
     await prisma.$executeRawUnsafe("SET session_replication_role = 'replica';");
 
-    // Reset the database
+    // Reset the database in a safe order to avoid foreign key constraint issues.
     await prisma.$transaction([
-      prisma.user.deleteMany(),
+      // Delete records that do not depend on others first.
       prisma.logs.deleteMany(),
       prisma.userShop.deleteMany(),
-      prisma.shop.deleteMany(),
-      prisma.resource.deleteMany(),
-      prisma.material.deleteMany(),
-      prisma.materialImage.deleteMany(),
-      prisma.resourceImage.deleteMany(),
-      prisma.resourceType.deleteMany(),
-      prisma.job.deleteMany(),
-      prisma.ledgerItem.deleteMany(),
-      prisma.jobComment.deleteMany(),
-      prisma.additionalCostLineItem.deleteMany(),
-      prisma.jobItem.deleteMany(),
-      prisma.billingGroup.deleteMany(),
+
+      // Delete BillingGroup dependents first.
       prisma.billingGroupInvitationLink.deleteMany(),
       prisma.userBillingGroup.deleteMany(),
+      prisma.billingGroup.deleteMany(),
+
+      // Delete job-related dependents.
+      prisma.additionalCostLineItem.deleteMany(),
+      prisma.jobComment.deleteMany(),
+      prisma.job.deleteMany(),
+
+      // Delete other shop-related dependents.
+      prisma.ledgerItem.deleteMany(),
+      prisma.resourceImage.deleteMany(),
+      prisma.resource.deleteMany(),
+      prisma.resourceType.deleteMany(),
+      prisma.materialImage.deleteMany(),
+      prisma.material.deleteMany(),
+
+      // Now it is safe to delete the shop.
+      prisma.shop.deleteMany(),
+
+      // Finally, delete users.
+      prisma.user.deleteMany(),
     ]);
 
     // Re-enable triggers

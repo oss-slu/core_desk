@@ -1,0 +1,7 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/api/shop/[shopId]/job > POST > Job ID and data should match request and be valid in system 1`] = `
+{
+  "error": "Unauthorized",
+}
+`;
