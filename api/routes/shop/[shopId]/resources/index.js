@@ -6,8 +6,8 @@ import { z } from "zod";
 
 const resourceSchema = z.object({
   title: z.string().min(1, "Must have title"),
-  shopId: z.string().min(1, "Shop must have ID"),
-  resourceTypeId: z.string().min(1, "resouce must have ID")
+  //shopId: z.string().min(1, "Shop must have ID"),
+  //resourceTypeId: z.string().min(1, "resouce must have ID")
 });
 
 export const get = [
@@ -154,9 +154,9 @@ export const post = [
       const resource = await prisma.resource.create({
         data: {
           title: validatedData.title,
-          shopId: validatedData.shopId,
-          resourceTypeId: validatedData. resourceTypeId,
-        },
+          shopId,
+          resourceTypeId,
+        }
       });
 
       await prisma.logs.create({

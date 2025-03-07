@@ -2,11 +2,6 @@ import { LogType } from "@prisma/client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { forceTestError } from "#forceError";
-import { z } from "zod";
-
-const userShopSchema = z.object({
-  active: z.boolean()
-});
 
 export const get = [
   verifyAuth,
@@ -107,23 +102,13 @@ export const put = [
       delete data.shopId;
       delete data.createdAt;
       delete data.updatedAt;
-
+                
       if (data.quantity) data.quantity = parseInt(data.quantity);
       if (data.costPerUnit) data.costPerUnit = parseFloat(data.costPerUnit);
       if (data.fixedCost) data.fixedCost = parseFloat(data.fixedCost);
       if (data.costPerTime) data.costPerTime = parseFloat(data.costPerTime);
       if (data.costPerProcessingTime)
         data.costPerProcessingTime = parseFloat(data.costPerProcessingTime);
-
-      const validationResult = userShopSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        return res.status(400).json({
-          error: "Invalid data",
-          issues: validationResult.error.format(),
-        });
-      }
-
-      const validatedData = validationResult.data;
 
       const updatedResource = await prisma.resource.update({
         where: {
@@ -133,7 +118,7 @@ export const put = [
         include: {
           images: {
             where: {
-              active: validatedData.active,
+              active: true,
             },
           },
         },

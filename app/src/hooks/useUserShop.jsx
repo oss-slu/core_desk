@@ -16,7 +16,6 @@ export const useUserShop = (shopId, userId) => {
         setUserShop(data.userShop);
         setLoading(false);
       } else {
-        toast.error(data);
         setError(data);
         setLoading(false);
       }
