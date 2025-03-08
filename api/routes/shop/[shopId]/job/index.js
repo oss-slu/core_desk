@@ -158,10 +158,16 @@ export const post = [
         },
       });
 
-      console.log("Email sent!");
+      console.log("Email Sent! - mock");
 
-      /*
+      /* - When you uncomment this don't forget to remove the comment for importing postmark!!!
 
+      const { name: shopName } = await prisma.shop.findFirst({
+        where: {
+          id: shopId,
+        }
+      });
+      
       const adminsOperators = await prisma.userShop.findMany({
         where: {
           shopId: shopId,
@@ -170,22 +176,29 @@ export const post = [
           },
         },
         include: {
-          user: true,
+          user: {
+            select: {
+              email: true,
+            },
+          },
         },
       });
 
       let emails = [];
-      emails.push(userShop.email);
       adminsOperators.forEach((userShop) => {
         userShop.user.email && emails.push(userShop.user.email);
       });
 
+      if (!emails.includes(req.user.email)) {
+        emails.push(req.user.email);
+      }
+      
       client.sendEmail({
-        "From": "slu-open-project@jackcrane.rocks", 
+        "From": `${process.env.POSTMARK_FROM_EMAIL}`, 
         "To": `${emails.join(',')}`,
         "Subject": `A Job was Created on Your Shop`,
-        "HtmlBody": `A job was created on the ${userShop.accountTitle} shop.` , 
-        "TextBody": `A job was created on the ${userShop.accountTitle} shop.`,
+        "HtmlBody": `The job ${title} was created on the ${shopName} shop.` , 
+        "TextBody": `The job ${title} was created on the ${shopName} shop.`,
         "MessageStream": "outbound"
       });
 

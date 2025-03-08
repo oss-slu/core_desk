@@ -118,17 +118,19 @@ passport.use(
           },
         });
 
-        console.log("Email sent!");
-
+        console.log("Email Sent! - mock");
+        
         /*
+
         client.sendEmail({
-          "From": "slu-open-project@jackcrane.rocks", 
-          "To": `${req.user.email}`,
+          "From": `${process.env.POSTMARK_FROM_EMAIL}`, 
+          "To": `${user.email}`,
           "Subject": "User Login detected for OpenSLU",
-          "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip ${req.ip}.` , 
-          "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip ${req.ip}.`,
+          "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.` , 
+          "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
           "MessageStream": "outbound"
         });
+        
         */
       }
 
