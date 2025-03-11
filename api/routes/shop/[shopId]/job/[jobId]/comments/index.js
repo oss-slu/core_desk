@@ -114,6 +114,59 @@ export const post = [
       },
     });
 
+    console.log("Email Sent! - mock");
+
+    /* - When you uncomment this don't forget to remove the comment for importing postmark!!!
+
+    const { name: shopName } = await prisma.shop.findFirst({
+        where: {
+          id: shopId,
+        }
+      });
+
+    const operators = await prisma.userShop.findMany({
+      where: {
+        shopId: shopId,
+        accountType: 'OPERATOR',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+      },
+    });
+    
+    let emails = [];
+    for (const operator of operators) {
+      const jobLog = await prisma.logs.findFirst({
+        where: {
+          shopId: shopId,
+          userId: operator.user.id,
+          jobId: jobId,
+        }
+      });
+
+      jobLog && emails.push(operator.user.email);
+    }
+
+    if (!emails.includes(req.user.email)) {
+      emails.push(req.user.email);
+    }
+
+    client.sendEmail({
+      "From": `${process.env.POSTMARK_FROM_EMAIL}`, 
+      "To": `${emails.join(',')}`,
+      "Subject": `Comment created on job ${job.title} and shop ${shopName}`,
+      "HtmlBody": `The comment "${message}" was created on the job ${job.title} and shop ${shopName}`, 
+      "TextBody": `The comment "${message}" was created on the job ${job.title} and shop ${shopName}`,
+      "MessageStream": "outbound"
+    }); 
+
+    */
+
     const comments = await prisma.jobComment.findMany({
       where: {
         jobId,
