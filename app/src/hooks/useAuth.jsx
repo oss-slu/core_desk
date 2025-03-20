@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { u } from "../util/url";
 import { emitter } from "../util/mitt";
+import * as Sentry from "@sentry/react";
 
 // Create Auth Context
 const AuthContext = createContext();
@@ -47,6 +48,16 @@ export const AuthProvider = ({ children }) => {
 
     if (r.ok) {
       const { user } = await r.json();
+      Sentry.setUser({
+        id: user.id,
+        email: user.email,
+        name: user.firstName + " " + user.lastName,
+      });
+      console.log({
+        id: user.id,
+        email: user.email,
+        name: user.firstName + " " + user.lastName,
+      });
       setUser(user);
       setLoggedIn(true);
       setLoading(false);

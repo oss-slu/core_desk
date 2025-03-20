@@ -13,6 +13,18 @@ Sentry.init({
       colorScheme: "light",
     }),
   ],
+  beforeSend(event, hint) {
+    // Check if it is an exception, and if so, show the report dialog
+    if (event.exception && event.event_id) {
+      Sentry.showReportDialog({
+        eventId: event.event_id,
+        title: "The application has crashed.",
+        subtitle:
+          "An error report has already been generated and sent, but if you would like to help, please tell me what happened.",
+      });
+    }
+    return event;
+  },
   // Tracing
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
   // Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
