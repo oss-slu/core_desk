@@ -42,7 +42,7 @@ yarn
 
 ```bash
 cd app
-yarn
+yarn && yarn build
 ```
 
 ```bash
