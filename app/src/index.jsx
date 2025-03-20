@@ -8,7 +8,10 @@ Sentry.init({
   dsn: "https://37381b9d7fda2d0038ae25ded8c8af1d@o1104565.ingest.us.sentry.io/4508264105115648",
   integrations: [
     Sentry.browserTracingIntegration(),
-    Sentry.replayIntegration(),
+    Sentry.replayIntegration({
+      maskAllText: false,
+      maskAllInputs: false,
+    }),
     Sentry.feedbackIntegration({
       colorScheme: "light",
     }),
