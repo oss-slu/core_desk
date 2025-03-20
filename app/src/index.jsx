@@ -16,7 +16,7 @@ Sentry.init({
       colorScheme: "light",
     }),
   ],
-  beforeSend(event, hint) {
+  beforeSend(event) {
     // Check if it is an exception, and if so, show the report dialog
     if (event.exception && event.event_id) {
       Sentry.showReportDialog({
