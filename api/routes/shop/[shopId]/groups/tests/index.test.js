@@ -193,5 +193,22 @@ describe("/shop/[shopId]", () => {
       expect(req.status).toBe(200);
       expect(req.body.groups[0].title).toBe("TestCreationGroup");
     });
+
+    it("assigns admin to self if requested", async () => {
+      const req = await request(app)
+        .post(`/api/shop/${tc.shop.id}/groups`)
+        .set(
+          ...(await gt({
+            sat: "ADMIN",
+          }))
+        )
+        .send({
+          title: "TestCreationGroup",
+          assignAdminToSelf: true,
+        });
+
+      expect(req.status).toBe(200);
+      expect(req.body.groups[0].adminUsers[0].id).toBe(tc.user.id);
+    });
   });
 });
