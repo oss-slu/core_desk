@@ -6,12 +6,12 @@ import { z } from "zod";
 
 const shopSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  address: z.string().optional(),
-  phone: z.string().optional(),
-  email: z.string().email("Invalid email").optional(),
-  website: z.string().url("Invalid website URL").optional(),
-  description: z.string().optional(),
-  imageUrl: z.string().url("Invalid image URL").optional(),
+  address: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  email: z.string().email("Invalid email").nullable().optional(),
+  website: z.string().url("Invalid website URL").nullable().optional(),
+  description: z.string().nullable().optional(),
+  imageUrl: z.string().url("Invalid image URL").nullable().optional(),
   color: z
     .enum([
       "RED",
@@ -23,10 +23,12 @@ const shopSchema = z.object({
       "PINK",
       "TEAL",
     ])
+    .nullable()
     .optional(),
   startingDeposit: z
     .number()
     .min(0, "Starting deposit must be a positive number")
+    .nullable()
     .optional(),
 });
 
