@@ -20,7 +20,7 @@ import { Alert } from "tabler-react-2/dist/alert";
 import { useConfirm } from "tabler-react-2/dist/modal/confirm";
 import { NotFound } from "../../components/404/404";
 import { useUserLogs } from "../../hooks/useUserLogs";
-const { H1, H2, H3 } = Typography;
+const { H2, H3 } = Typography;
 
 const AddUserToShopForm = ({ user, onFinish }) => {
   const [selectedShop, setSelectedShop] = useState(null);
@@ -183,7 +183,7 @@ export const UserPage = () => {
         await updateUserName(editableFirstName, editableLastName);
         await refetch(true);
       } catch (error) {
-        console.error("Error Saving Name.");
+        console.error("Error Saving Name:", error);
       }
     }
     setIsEditing(false);
