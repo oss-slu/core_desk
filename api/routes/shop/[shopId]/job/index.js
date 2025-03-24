@@ -131,8 +131,9 @@ export const post = [
         }
       }
 
+      let job;
       if (billingGroupToCreateJobAs) {
-        const job = await prisma.job.create({
+        job = await prisma.job.create({
           data: {
             title,
             description,
@@ -143,7 +144,7 @@ export const post = [
           },
         });
       } else {
-        const job = await prisma.job.create({
+        job = await prisma.job.create({
           data: {
             title,
             description,
