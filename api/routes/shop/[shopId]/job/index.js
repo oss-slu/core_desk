@@ -131,16 +131,28 @@ export const post = [
         }
       }
 
-      const job = await prisma.job.create({
-        data: {
-          title,
-          description,
-          shop: { connect: { id: shopId } },
-          user: { connect: { id: userToCreateJobAs } },
-          group: { connect: { id: billingGroupToCreateJobAs?.id } },
-          dueDate: new Date(dueDate),
-        },
-      });
+      if (billingGroupToCreateJobAs) {
+        const job = await prisma.job.create({
+          data: {
+            title,
+            description,
+            shop: { connect: { id: shopId } },
+            user: { connect: { id: userToCreateJobAs } },
+            group: { connect: { id: billingGroupToCreateJobAs?.id } },
+            dueDate: new Date(dueDate),
+          },
+        });
+      } else {
+        const job = await prisma.job.create({
+          data: {
+            title,
+            description,
+            shop: { connect: { id: shopId } },
+            user: { connect: { id: userToCreateJobAs } },
+            dueDate: new Date(dueDate),
+          },
+        });
+      }
 
       await prisma.logs.create({
         data: {
