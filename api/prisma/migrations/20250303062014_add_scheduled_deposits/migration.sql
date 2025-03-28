@@ -8,5 +8,5 @@
 CREATE TYPE "automatedPostLedgerItemType" AS ENUM ('TOPUP', 'DEPOSIT');
 
 -- AlterTable
-ALTER TABLE "Shop" ADD COLUMN     "automatedLedgerItemType" "LedgerItemType" NOT NULL,
+ALTER TABLE "Shop" ADD COLUMN     "automatedLedgerItemType" "LedgerItemType" NULL,
 ADD COLUMN     "automatedLedgerItemValue" DOUBLE PRECISION;
