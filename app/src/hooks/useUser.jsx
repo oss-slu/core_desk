@@ -49,9 +49,9 @@ export const useUser = (userId) => {
         }),
       });
       console.log("User name updated.");
-      setLoading(false);
     } catch (error) {
       setError(error);
+    } finally {
       setLoading(false);
     }
   };

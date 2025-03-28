@@ -192,7 +192,7 @@ export const put = [
       res.json({ user: updatedUser });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Something went wrong" });
+      res.status(500).json({ error: "Error with updating user's name in prisma." });
     }
   },
 ];
