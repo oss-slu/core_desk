@@ -64,7 +64,11 @@ export const post = [
   verifyAuth,
   async (req, res) => {
     const { shopId, userId } = req.params;
-    const { type, automatedLedgerPostItemValue, automatedLedgerPostItemType } = req.body;
+    const { type,
+           automatedLedgerPostItemValue, 
+           automatedLedgerPostItemType,
+           startValue
+          } = req.body;
 
     // Validate input for manual and automated
     if (type === 'AUTOMATED_TOPUP' || type === 'AUTOMATED_DEPOSIT') {
