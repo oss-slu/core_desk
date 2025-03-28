@@ -229,16 +229,6 @@ describe("/shop/[shopId]/user/[userId]/ledger", () => {
       expect(ledgerItem.value).toBe(100);
     });
 
-    it: "GROUP_ADMIN" })))
-        .send({
-          type: "MAUTOMATED_DEPOSIT",
-          value: 100,
-        });
-
-      expect(res.status).toBe(403);
-      expect(res.body).toEqual({ error: "Unauthorized" });
-    });
-
     it("throws an error if the type is invalid", async () => {
       const res = await request(app)
         .post(`/api/shop/${tc.shop.id}/user/${tc.globalUser.id}/ledger`)
