@@ -108,7 +108,7 @@ model Shop {
   resourceTypes   ResourceType[]
   users           UserShop[]
   logs            logs[]
-  automatedLedgerItemType LedgerItemType
+  automatedLedgerItemType LedgerItemType?
   automatedLedgerItemValue Float?
 }
 
