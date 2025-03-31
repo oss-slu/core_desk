@@ -101,7 +101,6 @@ export const useShops = () => {
       if (createdShop.shop) {
         setShops(createdShop.shops);
       } else {
-        toast.error(createdShop);
         setError(createdShop);
       }
     } catch (error) {

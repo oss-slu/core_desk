@@ -22,7 +22,7 @@ export const Shops = () => {
       <Util.Row justify="between" align="center">
         <H1>Shops</H1>
         {user.admin &&(
-          <Button onClick={() => navigate("/app/shopId")}> {/*Implement UseState and connect to POST request implemented in UseShops*/}
+          <Button> {/*Implement UseState and connect to POST request implemented in UseShops*/}
             New Shop
           </Button>
         )}
