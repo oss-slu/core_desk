@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
+import { authFetch } from "#authFetch";
 import { useConfirm } from "tabler-react-2/dist/modal/confirm";
 import toast from "react-hot-toast";
 

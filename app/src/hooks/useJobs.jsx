@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
-import { useModal } from "tabler-react-2/dist/modal";
+import { authFetch } from "#authFetch";
+import { useModal } from "#useModal";
 import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { useParams } from "react-router-dom";
 import { useUserShop } from "./useUserShop";
 import { useAuth } from "./useAuth";

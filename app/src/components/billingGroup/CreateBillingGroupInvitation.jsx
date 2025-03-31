@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input, Util } from "tabler-react-2";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 
 export const CreateBillingGroupInvitation = ({
   createBillingGroupInvitation,

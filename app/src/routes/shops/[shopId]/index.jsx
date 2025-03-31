@@ -7,7 +7,7 @@ import { Icon } from "../../../util/Icon";
 import { useParams } from "react-router-dom";
 const { H1, H2 } = Typography;
 import { useShop } from "../../../hooks/useShop";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { MarkdownRender } from "../../../components/markdown/MarkdownRender";
 import { MarkdownEditor } from "../../../components/markdown/MarkdownEditor";
 import { NotFound } from "../../../components/404/404";

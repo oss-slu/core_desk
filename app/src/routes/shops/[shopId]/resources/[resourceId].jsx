@@ -20,9 +20,9 @@ import "@mdxeditor/editor/style.css";
 import { MarkdownEditor } from "../../../../components/markdown/MarkdownEditor";
 import Badge from "tabler-react-2/dist/badge";
 import { MarkdownRender } from "../../../../components/markdown/MarkdownRender";
-import { Alert } from "tabler-react-2/dist/alert";
-import { Table } from "tabler-react-2/dist/table";
-import { useModal } from "tabler-react-2/dist/modal";
+import { Alert } from "#alert";
+import { Table } from "#table";
+import { useModal } from "#useModal";
 import { NotFound } from "../../../../components/404/404";
 import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";
 
