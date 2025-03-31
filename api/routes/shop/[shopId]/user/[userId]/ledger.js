@@ -72,8 +72,13 @@ export const post = [
 
     // Validate input for manual and automated
     if (type === 'AUTOMATED_TOPUP' || type === 'AUTOMATED_DEPOSIT') {
-      if (typeof automatedLedgerPostItemValue !== 'number' || automatedLedgerPostItemValue < 0) {
-        return res.status(400).json({ error: "Invalid deposit value. Must be a number greater than or equal to zero." });
+      if (typeof automatedLedgerPostItemValue !== 'number' || automatedLedgerPostItemValue < 0) 
+      {
+        return res
+          .status(400)
+          .json({ 
+            error: 
+              "Invalid deposit value. Must be a number greater than or equal to zero." });
       }
 
       if (!['TOPUP', 'DEPOSIT'].includes(automatedLedgerPostItemType)) {
@@ -171,6 +176,15 @@ export const post = [
         console.error("Invalid type", type);
         return res.status(400).json({ error: "Invalid type" });
     }
+
+    const ledgerItem = await prisma.ledgerItem.create({
+      data: {
+        shopId,
+        userId,
+        value: valueToPost,
+        type,
+      },
+    });
 
     await prisma.logs.create({
       data: {
