@@ -12,8 +12,8 @@ import {
 import { Typography, Util, Button, Card } from "tabler-react-2";
 import { Loading } from "../../../../components/loading/Loading";
 import { Icon } from "../../../../util/Icon";
-import { Table } from "tabler-react-2/dist/table";
-import { Spinner } from "tabler-react-2/dist/spinner";
+import { Table } from "#table";
+import { Spinner } from "#spinner";
 const { H1, H2, H3 } = Typography;
 
 export const ResourcesPage = () => {

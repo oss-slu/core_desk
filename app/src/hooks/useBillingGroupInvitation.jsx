@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
+import { authFetch } from "#authFetch";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 

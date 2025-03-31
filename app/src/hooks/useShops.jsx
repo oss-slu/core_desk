@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
+import { authFetch } from "#authFetch";
 
 export const useShops = () => {
   const [loading, setLoading] = useState(true);
@@ -90,6 +90,26 @@ export const useShops = () => {
     }
   };
 
+
+  const newShop = async (data) => {
+    try { 
+      const r = await authFetch(`/api/shop`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const createdShop = await r.json();
+      if (createdShop.shop) {
+        setShops(createdShop.shops);
+      } else {
+        toast.error(createdShop);
+        setError(createdShop);
+      }
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+
   useEffect(() => {
     fetchShops();
   }, []);
@@ -103,6 +123,7 @@ export const useShops = () => {
     addUserToShop,
     removeUserFromShop,
     changeUserRole,
+    newShop,
     opLoading,
   };
 };

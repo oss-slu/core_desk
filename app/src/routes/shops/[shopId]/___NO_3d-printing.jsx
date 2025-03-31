@@ -9,9 +9,9 @@ import {
 } from "../../../hooks";
 import { useParams } from "react-router-dom";
 import { Typography, Util, Alert, DropdownInput } from "tabler-react-2";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { Loading } from "../../../components/loading/Loading";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 import { Modal } from "tabler-react-2/dist/modal";
 import { Input } from "tabler-react-2";
 import Badge from "tabler-react-2/dist/badge";

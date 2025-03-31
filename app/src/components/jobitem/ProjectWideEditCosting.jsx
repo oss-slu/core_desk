@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Util, Typography, Switch, Card } from "tabler-react-2";
 import { QuantityInput, TimeInput } from "./EditCosting";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
 import { MaterialPicker } from "../materialPicker/MaterialPicker";
@@ -14,7 +14,7 @@ import {
   useShop,
 } from "../../hooks";
 import { useParams } from "react-router-dom";
-import { Spinner } from "tabler-react-2/dist/spinner";
+import { Spinner } from "#spinner";
 import { Icon } from "../../util/Icon";
 import Badge from "tabler-react-2/dist/badge";
 import { Price } from "../price/RenderPrice";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import useSWR from "swr";
-import { authFetch } from "../util/url";
+import { authFetch } from "#authFetch";
 
 const fetcher = (url) => authFetch(url).then((res) => res.json());
 

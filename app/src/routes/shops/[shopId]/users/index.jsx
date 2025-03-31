@@ -6,13 +6,13 @@ import { useAuth } from "../../../../hooks/useAuth";
 import { useShop } from "../../../../hooks";
 import { Loading } from "../../../../components/loading/Loading";
 import { Typography, Util } from "tabler-react-2";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
 import { Price } from "../../../../components/price/RenderPrice";
 import { Icon } from "../../../../util/Icon";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
-import { Avatar } from "tabler-react-2/dist/avatar";
+import { Avatar } from "#avatar";
 const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {
