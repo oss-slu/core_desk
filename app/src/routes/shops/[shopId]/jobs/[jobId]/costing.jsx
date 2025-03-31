@@ -14,7 +14,7 @@ import { calculateTotalCostOfJob } from "../../../../../util/totalCost";
 import { Spinner } from "#spinner";
 import { Button } from "#button";
 import { useConfirm } from "tabler-react-2/dist/modal/confirm";
-import { Alert } from "tabler-react-2/dist/alert";
+import { Alert } from "#alert";
 import { Icon } from "../../../../../util/Icon";
 import { downloadFile } from "../../../../../components/jobitem/JobItem";
 

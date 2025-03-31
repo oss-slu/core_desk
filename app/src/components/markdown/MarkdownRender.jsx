@@ -2,7 +2,7 @@ import React from "react";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Typography } from "tabler-react-2";
-import { Alert } from "tabler-react-2/dist/alert";
+import { Alert } from "#alert";
 
 const { H1, H2, H3, H4, H5, H6, Text, B, I } = Typography;
 

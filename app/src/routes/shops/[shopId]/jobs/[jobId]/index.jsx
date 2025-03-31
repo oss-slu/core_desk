@@ -21,7 +21,7 @@ import { ResourceTypePicker } from "../../../../../components/resourceTypePicker
 import { MaterialPicker } from "../../../../../components/materialPicker/MaterialPicker";
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
 import { Comments } from "../../../../../components/comments/Comments";
-import { Alert } from "tabler-react-2/dist/alert";
+import { Alert } from "#alert";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {

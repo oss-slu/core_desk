@@ -3,7 +3,7 @@ import { useBillingGroupInvitation } from "../../hooks/useBillingGroupInvitation
 import { Button } from "#button";
 import { Icon } from "../../util/Icon";
 import { Input, Switch } from "tabler-react-2";
-import { useModal } from "tabler-react-2/dist/modal";
+import { useModal } from "#useModal";
 import { Spinner } from "#spinner";
 import { useParams } from "react-router-dom";
 

@@ -3,7 +3,7 @@ import { Card, Util, Typography, DropdownInput, Input } from "tabler-react-2";
 import { RenderMedia } from "../media/renderMedia";
 import { Button } from "#button";
 import { Icon } from "../../util/Icon";
-import { useModal } from "tabler-react-2/dist/modal";
+import { useModal } from "#useModal";
 import { useJobItem } from "../../hooks/useJobItem";
 import { Link, useParams } from "react-router-dom";
 import { Spinner } from "#spinner";

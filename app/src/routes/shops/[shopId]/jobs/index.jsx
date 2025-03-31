@@ -14,7 +14,7 @@ import moment from "moment";
 import { Loading } from "../../../../components/loading/Loading";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
 import { Icon } from "../../../../util/Icon";
-import { Avatar } from "tabler-react-2/dist/avatar";
+import { Avatar } from "#avatar";
 import { ShopUserPicker } from "../../../../components/shopUserPicker/ShopUserPicker";
 import { Price } from "../../../../components/price/RenderPrice";
 

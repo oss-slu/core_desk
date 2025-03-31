@@ -7,7 +7,7 @@ import { useLedger } from "../../../../hooks/useLedger";
 import { Loading } from "../../../../components/loading/Loading";
 import { Card, Typography, Util } from "tabler-react-2";
 import { Price } from "../../../../components/price/RenderPrice";
-import { Alert } from "tabler-react-2/dist/alert";
+import { Alert } from "#alert";
 import { LedgerTable } from "../../../../components/ledger/LedgerTable";
 const { H1 } = Typography;
 

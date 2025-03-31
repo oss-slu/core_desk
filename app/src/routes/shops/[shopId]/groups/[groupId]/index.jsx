@@ -11,7 +11,7 @@ import { Page } from "../../../../../components/page/page";
 import { Loading } from "../../../../../components/loading/Loading";
 import { Button } from "#button";
 import { Util, Alert, DropdownInput } from "tabler-react-2";
-import { useModal } from "tabler-react-2/dist/modal";
+import { useModal } from "#useModal";
 import { CreateBillingGroupInvitation } from "../../../../../components/billingGroup/CreateBillingGroupInvitation";
 import { Table } from "#table";
 import moment from "moment";

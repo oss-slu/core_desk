@@ -6,7 +6,7 @@ import { useAuth, useBillingGroups, useShop } from "../../../../hooks";
 import { Link, useParams } from "react-router-dom";
 import { Util } from "tabler-react-2";
 import { Button } from "#button";
-import { useModal } from "tabler-react-2/dist/modal";
+import { useModal } from "#useModal";
 import { CreateBillingGroup } from "../../../../components/billingGroup/CreateBillingGroup";
 import { Table } from "#table";
 import moment from "moment";

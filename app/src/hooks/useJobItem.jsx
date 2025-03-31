@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { authFetch } from "../util/url";
+import { authFetch } from "#authFetch";
 import toast from "react-hot-toast";
 
 export const useJobItem = (shopId, jobId, jobItemId, options) => {

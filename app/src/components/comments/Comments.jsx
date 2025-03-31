@@ -3,7 +3,7 @@ import { useComments } from "../../hooks/useComments";
 import { Card, Util, Input, Typography } from "tabler-react-2";
 import { Loading } from "../loading/Loading";
 import { Button } from "#button";
-import { Avatar } from "tabler-react-2/dist/avatar";
+import { Avatar } from "#avatar";
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
 import { useAuth } from "../../hooks";

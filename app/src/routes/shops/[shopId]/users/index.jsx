@@ -12,7 +12,7 @@ import Badge from "tabler-react-2/dist/badge";
 import { Price } from "../../../../components/price/RenderPrice";
 import { Icon } from "../../../../util/Icon";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
-import { Avatar } from "tabler-react-2/dist/avatar";
+import { Avatar } from "#avatar";
 const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {
