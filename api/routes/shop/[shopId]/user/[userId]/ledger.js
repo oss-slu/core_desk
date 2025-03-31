@@ -172,15 +172,6 @@ export const post = [
         return res.status(400).json({ error: "Invalid type" });
     }
 
-    const ledgerItem = await prisma.ledgerItem.create({
-      data: {
-        shopId,
-        userId,
-        type,
-        value: valueToPost,
-      },
-    });
-
     await prisma.logs.create({
       data: {
         type: LogType.LEDGER_ITEM_CREATED_MANUALLY,
