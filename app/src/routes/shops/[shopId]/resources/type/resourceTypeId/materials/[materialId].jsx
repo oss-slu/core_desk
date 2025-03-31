@@ -5,7 +5,7 @@ import { Link, useParams } from "react-router-dom";
 import { useAuth, useMaterial, useShop } from "../../../../../../../hooks";
 import { Typography, Util, Input, Card, Switch } from "tabler-react-2";
 import { Loading } from "../../../../../../../components/loading/Loading";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { Icon } from "../../../../../../../util/Icon";
 import { ResourceTypePicker } from "../../../../../../../components/resourceTypePicker/ResourceTypePicker";
 import Badge from "tabler-react-2/dist/badge";
@@ -13,7 +13,7 @@ import { UploadDropzone } from "../../../../../../../components/upload/uploader"
 import { MarkdownEditor } from "../../../../../../../components/markdown/MarkdownEditor";
 import { MarkdownRender } from "../../../../../../../components/markdown/MarkdownRender";
 import { Gallery } from "../../../../../../../components/gallery/gallery";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 const { H1, H2, H3, B } = Typography;
 
 const objectsAreEqual = (o1, o2) => {

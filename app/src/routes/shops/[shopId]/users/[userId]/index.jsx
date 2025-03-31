@@ -8,13 +8,13 @@ import { Typography, Util, Input, DropdownInput } from "tabler-react-2";
 import { Avatar } from "tabler-react-2/dist/avatar";
 import { Icon } from "../../../../../util/Icon";
 import Badge from "tabler-react-2/dist/badge";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 import moment from "moment";
 import { switchStatusToUI } from "../../../../../components/jobitem/JobItem";
 import { Price } from "../../../../../components/price/RenderPrice";
 import { useLedger } from "../../../../../hooks/useLedger";
 import { LedgerTable } from "../../../../../components/ledger/LedgerTable";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { useModal } from "tabler-react-2/dist/modal";
 const { H1, H2 } = Typography;
 

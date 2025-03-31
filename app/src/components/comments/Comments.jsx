@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useComments } from "../../hooks/useComments";
 import { Card, Util, Input, Typography } from "tabler-react-2";
 import { Loading } from "../loading/Loading";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { Avatar } from "tabler-react-2/dist/avatar";
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";

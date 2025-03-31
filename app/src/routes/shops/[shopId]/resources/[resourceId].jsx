@@ -21,7 +21,7 @@ import { MarkdownEditor } from "../../../../components/markdown/MarkdownEditor";
 import Badge from "tabler-react-2/dist/badge";
 import { MarkdownRender } from "../../../../components/markdown/MarkdownRender";
 import { Alert } from "tabler-react-2/dist/alert";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 import { useModal } from "tabler-react-2/dist/modal";
 import { NotFound } from "../../../../components/404/404";
 import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";

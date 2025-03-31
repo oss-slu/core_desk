@@ -10,7 +10,7 @@ import {
   JobItem,
   switchStatusToUI,
 } from "../../../../../components/jobitem/JobItem";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";

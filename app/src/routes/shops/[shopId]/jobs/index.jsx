@@ -8,7 +8,7 @@ import { Typography, Util, Input } from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { Button } from "tabler-react-2/dist/button";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 import Badge from "tabler-react-2/dist/badge";
 import moment from "moment";
 import { Loading } from "../../../../components/loading/Loading";
