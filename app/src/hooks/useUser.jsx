@@ -42,6 +42,9 @@ export const useUser = (userId) => {
       shouldSetLoading && setLoading(true);
       await authFetch(`/api/users/${userId}`, {
         method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           userId,
           firstName,
