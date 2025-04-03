@@ -82,7 +82,7 @@ export const useResourceTypes = (shopId) => {
     loading: !data && !error,
     error,
     refetch: mutate,
-    createResourceType: modal.show,
+    createResourceType: modal,
     opLoading,
     ModalElement,
   };
