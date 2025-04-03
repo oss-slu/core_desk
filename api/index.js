@@ -228,6 +228,10 @@ app.use(
 
 await registerRoutes(app, path.join(process.cwd(), "routes"));
 
+app.get("/health", (req, res) => {
+  res.send("OK");
+});
+
 app.use(express.static("../app/dist"));
 
 app.get("*", (req, res) => {

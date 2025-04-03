@@ -462,5 +462,27 @@ describe("/shop/[shopId]", () => {
       expect(res.status).toBe(403);
       expect(res.body).toEqual({ error: "Unauthorized" });
     });
+
+    it("allows updating with partial data", async () => {
+      const shop = await prisma.shop.findFirst({});
+
+      const res = await request(app)
+        .put(`/api/shop/${shop.id}`)
+        .set(...(await gt({ ga: true })))
+        .send({
+          name: "TestShop2",
+        });
+
+      expect(res.status).toBe(200);
+
+      const updatedShop = await prisma.shop.findFirst({
+        where: {
+          id: shop.id,
+        },
+      });
+
+      expect(updatedShop.name).toBe("TestShop2");
+      expect(res.status).toBe(200);
+    });
   });
 });
