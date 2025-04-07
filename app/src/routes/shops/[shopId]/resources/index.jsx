@@ -29,7 +29,7 @@ export const ResourcesPage = () => {
   const {
     resourceTypes,
     loading: resourceTypesLoading,
-    ModalElement: CreateResourceTypeModalElement,
+    createModalElement: CreateResourceTypeModalElement,
     createResourceType,
   } = useResourceTypes(shopId);
 
