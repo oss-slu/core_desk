@@ -117,6 +117,11 @@ const ResourceType = ({ resourceType, shopId, admin }) => {
   } = useMaterials(shopId, resourceType.id);
   const { ModalElement: CreateResourceModalElement, createResource } =
     useResources(shopId, resourceType.id);
+  const { useEditResourceTypeModal } = useResourceTypes(shopId);
+  const { 
+    editModal: editResourceType, 
+    editModalElement: EditResourceTypeModalElement
+  } = useEditResourceTypeModal(resourceType.id, resourceType.title);
 
   return (
     <div>
@@ -127,6 +132,10 @@ const ResourceType = ({ resourceType, shopId, admin }) => {
         <H2 id={resourceType.id}>{resourceType.title}</H2>
         {admin && (
           <Util.Row gap={1}>
+            <Button onClick={editResourceType}> 
+              <Icon i="tools" /> Edit Resource Type
+            </Button>
+            {EditResourceTypeModalElement}
             <Button onClick={createMaterial}>
               <Icon i="sandbox" /> Add Material
             </Button>
