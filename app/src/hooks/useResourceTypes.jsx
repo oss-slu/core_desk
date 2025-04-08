@@ -40,7 +40,7 @@ const EditResourceModalContent = ({ onSubmit , resourceTypeTitle}) => {
         label="Resource Type Title"
         value={title}
         onChange={setTitle}
-        placeholder={"FDM 3d Printer"}
+        placeholder={resourceTypeTitle}
       />
       {title.length > 1 ? (
         <Button
@@ -134,7 +134,7 @@ export const useResourceTypes = (shopId) => {
       title: "Edit Resource Type",
       text: (
         <EditResourceModalContent
-          onSubmit={_editResourceType(title, resourceTypeId)}
+          onSubmit={(title) => {_editResourceType(title, resourceTypeId)}}
           resourceTypeTitle={resourceTypeTitle}
         />
       ),
