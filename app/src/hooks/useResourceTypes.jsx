@@ -32,7 +32,7 @@ const CreateResourceModalContent = ({ onSubmit }) => {
 };
 
 const EditResourceModalContent = ({ onSubmit , resourceTypeTitle}) => {
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(resourceTypeTitle || "");
 
   return (
     <div>
@@ -40,7 +40,7 @@ const EditResourceModalContent = ({ onSubmit , resourceTypeTitle}) => {
         label="Resource Type Title"
         value={title}
         onChange={setTitle}
-        placeholder={resourceTypeTitle}
+        placeholder={"FDM 3d Printer"}
       />
       {title.length > 1 ? (
         <Button
@@ -134,9 +134,7 @@ export const useResourceTypes = (shopId) => {
       title: "Edit Resource Type",
       text: (
         <EditResourceModalContent
-          onSubmit={async (title) => {
-            await _editResourceType(title, resourceTypeId); 
-          }}
+          onSubmit={_editResourceType(title, resourceTypeId)}
           resourceTypeTitle={resourceTypeTitle}
         />
       ),
