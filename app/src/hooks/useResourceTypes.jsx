@@ -40,7 +40,7 @@ const EditResourceModalContent = ({ onSubmit , resourceTypeTitle}) => {
         label="Resource Type Title"
         value={title}
         onChange={setTitle}
-        placeholder={resourceTypeTitle}
+        placeholder={"FDM 3d Printer"}
       />
       {title.length > 1 ? (
         <Button
