@@ -1,6 +1,6 @@
 import { LogType } from "@prisma/client";
-import { prisma } from "../../../../util/prisma.js";
-import { verifyAuth } from "../../../../util/verifyAuth.js";
+import { prisma } from "#prisma";
+import { verifyAuth } from "#verifyAuth";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
 // import client from "#postmark";
 
@@ -132,16 +132,29 @@ export const post = [
         }
       }
 
-      const job = await prisma.job.create({
-        data: {
-          title,
-          description,
-          shop: { connect: { id: shopId } },
-          user: { connect: { id: userToCreateJobAs } },
-          group: { connect: { id: billingGroupToCreateJobAs?.id } },
-          dueDate: new Date(dueDate),
-        },
-      });
+      let job;
+      if (billingGroupToCreateJobAs) {
+        job = await prisma.job.create({
+          data: {
+            title,
+            description,
+            shop: { connect: { id: shopId } },
+            user: { connect: { id: userToCreateJobAs } },
+            group: { connect: { id: billingGroupToCreateJobAs?.id } },
+            dueDate: new Date(dueDate),
+          },
+        });
+      } else {
+        job = await prisma.job.create({
+          data: {
+            title,
+            description,
+            shop: { connect: { id: shopId } },
+            user: { connect: { id: userToCreateJobAs } },
+            dueDate: new Date(dueDate),
+          },
+        });
+      }
 
       await prisma.logs.create({
         data: {

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useShops } from "../../hooks/useShops";
 import { Loading } from "../../components/loading/Loading";
-import { Typography } from "tabler-react-2";
+import { Typography , Util} from "tabler-react-2";
 import { ShopCard } from "../../components/shopcard/ShopCard";
 import { Page, sidenavItems } from "../../components/page/page";
 import { Button } from "tabler-react-2/dist/button";

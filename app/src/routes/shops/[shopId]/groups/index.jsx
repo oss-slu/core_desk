@@ -5,10 +5,10 @@ import { Page } from "../../../../components/page/page";
 import { useAuth, useBillingGroups, useShop } from "../../../../hooks";
 import { Link, useParams } from "react-router-dom";
 import { Util } from "tabler-react-2";
-import { Button } from "tabler-react-2/dist/button";
-import { useModal } from "tabler-react-2/dist/modal";
+import { Button } from "#button";
+import { useModal } from "#useModal";
 import { CreateBillingGroup } from "../../../../components/billingGroup/CreateBillingGroup";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 import moment from "moment";
 import { MOMENT_FORMAT } from "../../../../util/constants";
 

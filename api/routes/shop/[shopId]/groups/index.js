@@ -12,9 +12,6 @@ export const post = [
       if (!title) {
         return res.status(400).send({ error: "Title is required" });
       }
-      if (!shopId) {
-        return res.status(400).send({ error: "Shop ID is required" });
-      }
 
       const userShop = await prisma.userShop.findFirst({
         where: {
@@ -161,10 +158,6 @@ export const get = [
     try {
       const userId = req.user.id;
       const { shopId } = req.params;
-
-      if (!shopId) {
-        return res.status(400).send({ error: "Shop ID is required" });
-      }
 
       const userShop = await prisma.userShop.findFirst({
         where: {

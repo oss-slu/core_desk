@@ -1,5 +1,5 @@
-import { prisma } from "../../../util/prisma.js";
-import { verifyAuth } from "../../../util/verifyAuth.js";
+import { prisma } from "#prisma";
+import { verifyAuth } from "#verifyAuth";
 
 export const get = [
   verifyAuth,
@@ -165,6 +165,34 @@ export const get = [
     } catch (e) {
       console.error(e);
       return res.status(500).json({ error: "Internal Server Error" });
+    }
+  },
+];
+
+export const put = [
+  verifyAuth,
+  async (req, res) => {
+    try {
+      const {userId, firstName, lastName} = req.body;
+
+      const updatedUser = await prisma.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          firstName: firstName,
+          lastName: lastName,
+        },
+      });
+
+      if (!updatedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json({ user: updatedUser });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error with updating user's name in prisma." });
     }
   },
 ];

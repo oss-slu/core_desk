@@ -10,7 +10,7 @@ import {
   JobItem,
   switchStatusToUI,
 } from "../../../../../components/jobitem/JobItem";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
@@ -21,7 +21,7 @@ import { ResourceTypePicker } from "../../../../../components/resourceTypePicker
 import { MaterialPicker } from "../../../../../components/materialPicker/MaterialPicker";
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
 import { Comments } from "../../../../../components/comments/Comments";
-import { Alert } from "tabler-react-2/dist/alert";
+import { Alert } from "#alert";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {

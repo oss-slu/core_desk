@@ -5,17 +5,17 @@ import { shopSidenavItems } from "../..";
 import { Page } from "../../../../../components/page/page";
 import { Loading } from "../../../../../components/loading/Loading";
 import { Typography, Util, Input, DropdownInput } from "tabler-react-2";
-import { Avatar } from "tabler-react-2/dist/avatar";
+import { Avatar } from "#avatar";
 import { Icon } from "../../../../../util/Icon";
 import Badge from "tabler-react-2/dist/badge";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 import moment from "moment";
 import { switchStatusToUI } from "../../../../../components/jobitem/JobItem";
 import { Price } from "../../../../../components/price/RenderPrice";
 import { useLedger } from "../../../../../hooks/useLedger";
 import { LedgerTable } from "../../../../../components/ledger/LedgerTable";
-import { Button } from "tabler-react-2/dist/button";
-import { useModal } from "tabler-react-2/dist/modal";
+import { Button } from "#button";
+import { useModal } from "useModal";
 const { H1, H2 } = Typography;
 
 const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {

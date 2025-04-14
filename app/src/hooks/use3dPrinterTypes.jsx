@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
+import { authFetch } from "#authFetch";
 import toast from "react-hot-toast";
 
 // Module-level variables for caching

@@ -6,7 +6,7 @@ import samlConfig from "./config/saml-config.js";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { prisma } from "./util/prisma.js";
+import { prisma } from "#prisma";
 import { LogType } from "@prisma/client";
 dotenv.config();
 import { createRouteHandler } from "uploadthing/express";
@@ -227,6 +227,10 @@ app.use(
 // app.use("/api", await router());
 
 await registerRoutes(app, path.join(process.cwd(), "routes"));
+
+app.get("/health", (req, res) => {
+  res.send("OK");
+});
 
 app.use(express.static("../app/dist"));
 

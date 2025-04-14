@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
+import { authFetch } from "#authFetch";
 import { useConfirm } from "tabler-react-2/dist/modal/confirm";
 
 export const useUser = (userId) => {
@@ -33,6 +33,28 @@ export const useUser = (userId) => {
       setLoading(false);
     } catch (error) {
       setError(error);
+      setLoading(false);
+    }
+  };
+
+  const updateUserName = async (firstName, lastName, shouldSetLoading = true) => {
+    try {
+      shouldSetLoading && setLoading(true);
+      await authFetch(`/api/users/${userId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          firstName,
+          lastName,
+        }),
+      });
+      console.log("User name updated.");
+    } catch (error) {
+      setError(error);
+    } finally {
       setLoading(false);
     }
   };
@@ -120,6 +142,7 @@ export const useUser = (userId) => {
     loading,
     error,
     refetch: fetchUser,
+    updateUserName,
     promoteUserToGlobalAdmin,
     opLoading,
     SuspendConfirmModal,

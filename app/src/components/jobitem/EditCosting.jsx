@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useModal } from "tabler-react-2/dist/modal";
+import { useModal } from "#useModal";
 import { Icon } from "../../util/Icon";
 import { Util, Input } from "tabler-react-2";
 import styles from "./jobItem.module.css";
 import { Price } from "../price/RenderPrice";
 import { Time } from "../time/RenderTime";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import Badge from "tabler-react-2/dist/badge";
 
 export const EditCosting = ({
