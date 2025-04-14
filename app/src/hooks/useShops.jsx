@@ -1,5 +1,78 @@
-import { useState, useEffect } from "react";
-import { authFetch } from "#authFetch";
+import React, { useState, useEffect } from "react";
+import { authFetch } from "../util/url";
+import { Input, Util } from "tabler-react-2";
+import { useModal } from "tabler-react-2/dist/modal";
+import { Button } from "tabler-react-2/dist/button";
+
+const CreateShopModalContent = ({ onSubmit }) => {
+  const [name, setName] = useState("");
+  const [address, setAddress] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [description, setDescription] = useState("");
+  const [color, setColor] = useState("");
+
+  return(
+    <div>
+      <Input
+        value={name}
+        onChange={(e) => setName(e)}
+        label="Shop Name"
+        placeholder="e.g. South Campus Shop"
+      />
+      <Input
+        value={address}
+        onChange={(e) => setAddress(e)}
+        label="Shop Address"
+        placeholder="e.g. 24 N Grand Blvd"
+      />
+      <Input
+        value={email}
+        onChange={(e) => setEmail(e)}
+        label="Shop Email"
+        placeholder="e.g. shop@slu.edu"
+      />
+      <Input
+        value={phone}
+        onChange={(e) => setPhone(e)}
+        label="Shop Phone"
+        placeholder="e.g. 123-456-7890"
+      />
+      <Input
+        value={description}
+        onChange={(e) => setDescription(e)}
+        label="Job description (optional)"
+        placeholder="e.g. Description"
+      />
+      <Input 
+        value ={color}
+        onChange={(e) => setColor(e)}
+        label = "Job Color"
+        placeholder = "e.g. purple"
+      />
+      <Util.Spacer size={1} />
+      {name.length > 1 ? (
+        <Button
+          variant = "primary"
+          onClick={() => {
+            onSubmit(
+              name,
+              address, 
+              phone,
+              email,
+              description,
+              color,
+            );
+          }}
+        >
+          Submit
+        </Button>
+      ) : (
+        <Button disabled>Submit</Button>
+      )}
+    </div>
+  );
+}
 
 export const useShops = () => {
   const [loading, setLoading] = useState(true);
@@ -7,6 +80,36 @@ export const useShops = () => {
   const [shops, setShops] = useState([]);
   const [meta, setMeta] = useState(null);
   const [opLoading, setOpLoading] = useState(false);
+
+  const _createShop = async (
+    name,
+    address, 
+    phone,
+    email,
+    description,
+    color,
+  ) => {
+    try {
+      await authFetch(`api/shops`, {
+        method: "POST",
+        body: JSON.stringify({
+          name,
+          address,
+          phone,
+          email,
+          description,
+          color,
+        }),
+      });
+    } catch (error) {
+      setError(error);
+    }
+  };
+
+  const { modal, ModalElement } = useModal({
+      title: "Create a new Shop",
+      text: <CreateShopModalContent onSubmit={_createShop} />,
+  });
 
   const fetchShops = async (shouldSetLoading = true) => {
     try {
@@ -20,6 +123,10 @@ export const useShops = () => {
       setError(error);
       setLoading(false);
     }
+  };
+
+  const createShop = async () => {
+    modal();
   };
 
   const addUserToShop = async (userId, shopId, role) => {
@@ -90,25 +197,6 @@ export const useShops = () => {
     }
   };
 
-
-  const newShop = async (data) => {
-    try { 
-      const r = await authFetch(`/api/shop`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      const createdShop = await r.json();
-      if (createdShop.shop) {
-        setShops(createdShop.shops);
-      } else {
-        setError(createdShop);
-      }
-    } catch (error) {
-      setError(error);
-    }
-  };
-
-
   useEffect(() => {
     fetchShops();
   }, []);
@@ -122,7 +210,8 @@ export const useShops = () => {
     addUserToShop,
     removeUserFromShop,
     changeUserRole,
-    newShop,
+    ModalElement,
+    createShop,
     opLoading,
   };
 };
