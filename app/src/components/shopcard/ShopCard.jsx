@@ -5,7 +5,12 @@ import styles from "./ShopCard.module.css";
 import { Link } from "react-router-dom";
 
 const COLOR_PAIRS = (color = "blue") => {
-  color = color.toLowerCase();
+  // Handle null, undefined, or non-string values
+  if (!color || typeof color !== "string") {
+    color = "blue";
+  } else {
+    color = color.toLowerCase();
+  }
 
   const pairs = {
     blue: ["rgb(1, 61, 165)", "rgb(83, 195, 238)"],

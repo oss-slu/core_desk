@@ -11,6 +11,7 @@ const CreateShopModalContent = ({ onSubmit }) => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
+  const [color, setColor] = useState("");
 
   return(
     <div>
@@ -18,7 +19,7 @@ const CreateShopModalContent = ({ onSubmit }) => {
         value={name}
         onChange={(e) => setName(e)}
         label="Shop Name"
-        placeholder="e.g. Example Name"
+        placeholder="e.g. South Campus Shop"
       />
       <Input
         value={address}
@@ -44,6 +45,12 @@ const CreateShopModalContent = ({ onSubmit }) => {
         label="Job description (optional)"
         placeholder="e.g. Description"
       />
+      <Input 
+        value ={color}
+        onChange={(e) => setColor(e)}
+        label = "Job Color"
+        placeholder = "e.g. purple"
+      />
       <Util.Spacer size={1} />
       {name.length > 1 ? (
         <Button
@@ -55,12 +62,12 @@ const CreateShopModalContent = ({ onSubmit }) => {
               phone,
               email,
               description,
+              color,
             );
           }}
         >
           Submit
         </Button>
-
       ) : (
         <Button disabled>Submit</Button>
       )}
@@ -81,6 +88,7 @@ export const useShops = () => {
     phone,
     email,
     description,
+    color,
   ) => {
     try {
       const r = await authFetch(`api/shops`, {
@@ -91,6 +99,7 @@ export const useShops = () => {
           phone,
           email,
           description,
+          color,
         }),
       });
     } catch (error) {
