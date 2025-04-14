@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { authFetch } from "../util/url";
 import { Input, Util } from "tabler-react-2";
 import { useModal } from "tabler-react-2/dist/modal";
-import { ShopUserPicker } from "../components/shopUserPicker/ShopUserPicker";
 import { Button } from "tabler-react-2/dist/button";
 
 const CreateShopModalContent = ({ onSubmit }) => {
@@ -91,7 +90,7 @@ export const useShops = () => {
     color,
   ) => {
     try {
-      const r = await authFetch(`api/shops`, {
+      await authFetch(`api/shops`, {
         method: "POST",
         body: JSON.stringify({
           name,
@@ -197,25 +196,6 @@ export const useShops = () => {
       setOpLoading(false);
     }
   };
-
-
-  const newShop = async (data) => {
-    try { 
-      const r = await authFetch(`/api/shop`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
-      const createdShop = await r.json();
-      if (createdShop.shop) {
-        setShops(createdShop.shops);
-      } else {
-        setError(createdShop);
-      }
-    } catch (error) {
-      setError(error);
-    }
-  };
-
 
   useEffect(() => {
     fetchShops();
