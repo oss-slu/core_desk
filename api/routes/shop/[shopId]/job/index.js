@@ -2,6 +2,7 @@ import { LogType } from "@prisma/client";
 import { prisma } from "../../../../util/prisma.js";
 import { verifyAuth } from "../../../../util/verifyAuth.js";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
+import { writeFileSync } from "fs";
 
 export const post = [
   verifyAuth,
@@ -254,8 +255,8 @@ export const get = [
             },
           },
         },
-        take: req.query.limit ? parseInt(req.query.limit) : 20,
-        skip: req.query.offset ? parseInt(req.query.offset) : 0,
+        // take: req.query.limit ? parseInt(req.query.limit) : 2000,
+        // skip: req.query.offset ? parseInt(req.query.offset) : 0,
       });
 
       jobs = jobs.map((job) => {
