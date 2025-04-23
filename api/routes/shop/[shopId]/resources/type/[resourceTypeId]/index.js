@@ -121,3 +121,68 @@ export const put = [
     res.json({ resourceType: updatedResourceType, resources });
   },
 ];
+
+export const del = [
+  verifyAuth,
+  async (req, res) => {
+    const { shopId, resourceTypeId } = req.params;
+
+    const userShop = prisma.userShop.findFirst({
+      where: {
+        userId: req.user.id,
+        shopId: shopId,
+        active: true,
+      },
+    });
+
+    if (!userShop) {
+      res.status(400).json({
+        message: "Unauthorized",
+      });
+    }
+
+    if (
+      !req.user.admin &&
+      userShop.accountType !== "ADMIN" &&
+      userShop.accountType !== "OPERATOR"
+    ) {
+      return res.status(400).json({
+        message: "Unauthorized",
+      });
+    }
+
+    const resourceType = await prisma.resourceType.findFirst({
+      where: {
+        id: resourceTypeId,
+        shopId,
+        active: true,
+      },
+    });
+
+    if (!resourceType) {
+      return res.status(404).json({
+        message: "Resource type not found",
+      });
+    }
+
+    await prisma.resourceType.update({
+      where: {
+        id: resourceTypeId,
+      },
+      data: {
+        active: false,
+      },
+    });
+
+    await prisma.logs.create({
+      data: {
+        userId: req.user.id,
+        shopId,
+        type: LogType.RESOURCE_TYPE_DELETED,
+        resourceTypeId,
+      },
+    });
+
+    res.json({ message: "Resource type deleted" });
+  },
+];
