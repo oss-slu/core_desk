@@ -9,7 +9,7 @@ import {
   useResourceTypes,
   useMaterials,
 } from "../../../../hooks";
-import { Typography, Util, Button, Card } from "tabler-react-2";
+import { Typography, Util, Button, Card, useConfirm } from "tabler-react-2";
 import { Loading } from "../../../../components/loading/Loading";
 import { Icon } from "../../../../util/Icon";
 import { Table } from "tabler-react-2/dist/table";
@@ -31,6 +31,7 @@ export const ResourcesPage = () => {
     loading: resourceTypesLoading,
     ModalElement: CreateResourceTypeModalElement,
     createResourceType,
+    deleteResourceType,
   } = useResourceTypes(shopId);
 
   const { ModalElement: CreateMaterialModalElement, createMaterial } =
@@ -94,6 +95,7 @@ export const ResourcesPage = () => {
           resourceType={resourceType}
           shopId={shopId}
           admin={user.admin || userShop.accountType === "ADMIN"}
+          onDelete={deleteResourceType}
         />
       ))}
 
@@ -108,7 +110,7 @@ export const ResourcesPage = () => {
   );
 };
 
-const ResourceType = ({ resourceType, shopId, admin }) => {
+const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
   const {
     materials,
     loading: materialsLoading,
@@ -117,11 +119,18 @@ const ResourceType = ({ resourceType, shopId, admin }) => {
   } = useMaterials(shopId, resourceType.id);
   const { ModalElement: CreateResourceModalElement, createResource } =
     useResources(shopId, resourceType.id);
+  const { confirm, ConfirmModal } = useConfirm({
+    title: "Are you sure you want to delete this resource type?",
+    text: "This action cannot be undone.",
+    commitText: "Delete",
+    cancelText: "Cancel",
+  });
 
   return (
     <div>
       {CreateMaterialModalElement}
       {CreateResourceModalElement}
+      {ConfirmModal}
       <Util.Hr />
       <Util.Row justify="between">
         <H2 id={resourceType.id}>{resourceType.title}</H2>
@@ -132,6 +141,13 @@ const ResourceType = ({ resourceType, shopId, admin }) => {
             </Button>
             <Button onClick={createResource}>
               <Icon i="tool" /> Add Resource
+            </Button>
+            <Button
+              onClick={async () => {
+                if (await confirm()) onDelete(resourceType.id);
+              }}
+            >
+              <Icon i="trash" /> Delete Resource Type
             </Button>
           </Util.Row>
         )}
