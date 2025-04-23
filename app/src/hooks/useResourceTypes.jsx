@@ -77,6 +77,30 @@ export const useResourceTypes = (shopId) => {
     ),
   });
 
+  const deleteResourceType = async (resourceTypeId) => {
+    try {
+      setOpLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/resources/type/${resourceTypeId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await r.json();
+      if (data.message) {
+        // Optimistically update the data
+        mutate();
+        setOpLoading(false);
+        document.location.reload();
+      } else {
+        throw data.error;
+      }
+    } catch (error) {
+      setOpLoading(false);
+      throw error;
+    }
+  };
+
   return {
     resourceTypes: data ? data.resourceTypes : [],
     loading: !data && !error,
@@ -85,5 +109,6 @@ export const useResourceTypes = (shopId) => {
     createResourceType: modal,
     opLoading,
     ModalElement,
+    deleteResourceType,
   };
 };
