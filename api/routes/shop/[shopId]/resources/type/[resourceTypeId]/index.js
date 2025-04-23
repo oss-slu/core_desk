@@ -127,7 +127,7 @@ export const del = [
   async (req, res) => {
     const { shopId, resourceTypeId } = req.params;
 
-    const userShop = prisma.userShop.findFirst({
+    const userShop = await prisma.userShop.findFirst({
       where: {
         userId: req.user.id,
         shopId: shopId,
