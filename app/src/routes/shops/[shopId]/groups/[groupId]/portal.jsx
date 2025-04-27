@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Card, Typography, Util } from "tabler-react-2";
-import { useBillingGroup, useJob, useShop } from "../../../../../hooks";
+import { useBillingGroup, useJob, useShop } from "#hooks";
 import { useParams } from "react-router-dom";
-import { Loading } from "../../../../../components/loading/Loading";
-import { MarkdownRender } from "../../../../../components/markdown/MarkdownRender";
+import { Loading } from "#loading";
+import { MarkdownRender } from "#markdownRender";
 import styles from "./portal.module.css";
 import { JobPicker } from "../../../../../components/jobPicker/JobPicker";
 import { UploadDropzone } from "../../../../../components/upload/uploader";

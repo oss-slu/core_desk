@@ -1,6 +1,6 @@
 import React from "react";
 import { Util } from "tabler-react-2";
-import { Icon } from "../../util/Icon";
+import { Icon } from "#icon";
 
 export const Time = ({ value = 0, icon }) => {
   // Integer value is hours, decimals is in fraction of hour

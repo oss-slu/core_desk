@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import styles from "./sidenav.module.css";
 import { Button } from "#button";
 import { Util } from "tabler-react-2";
-import { Icon } from "../../util/Icon";
+import { Icon } from "#icon";
 
 export const Sidenav = ({ items }) => {
   const [collapsed, setCollapsed] = useState(

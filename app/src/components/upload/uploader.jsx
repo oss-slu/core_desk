@@ -1,6 +1,6 @@
 import React from "react";
 import { generateUploadDropzone } from "@uploadthing/react";
-import { u } from "../../util/url.js";
+import { u } from "#url";
 import "@uploadthing/react/styles.css";
 import toast from "react-hot-toast";
 

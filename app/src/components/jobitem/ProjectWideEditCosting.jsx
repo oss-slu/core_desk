@@ -12,12 +12,12 @@ import {
   useMaterial,
   useResource,
   useShop,
-} from "../../hooks";
+} from "#hooks";
 import { useParams } from "react-router-dom";
 import { Spinner } from "#spinner";
-import { Icon } from "../../util/Icon";
+import { Icon } from "#icon";
 import Badge from "tabler-react-2/dist/badge";
-import { Price } from "../price/RenderPrice";
+import { Price } from "#renderPrice";
 const { H2, H3 } = Typography;
 import styles from "./jobItem.module.css";
 

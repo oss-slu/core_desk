@@ -1,7 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import { AuthProvider } from "./hooks/useAuth";
+import { AuthProvider } from "#useAuth";
 import * as Sentry from "@sentry/react";
 
 Sentry.init({
