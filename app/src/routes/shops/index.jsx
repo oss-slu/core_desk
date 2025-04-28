@@ -13,7 +13,7 @@ export const Shops = () => {
   const { user } = useAuth();
   const { shops, loading } = useShops();
   const {
-    ModalElement,
+    createModalElement,
     createShop,
   } = useShops();
 
@@ -25,13 +25,14 @@ export const Shops = () => {
         <div>
           <H1>Shops</H1>
         </div>
-        <Button onClick={createShop}>Create Job</Button>
+        <Button onClick={createShop}>Create Shop</Button>
+        <Button onClick={deleteShop}>Delete Shop</Button>  {/* Add DeleteShop to UserShops*/} 
       </Util.Row>
       <Util.Spacer size={1} />
       {shops.map((shop) => (
         <ShopCard key={shop.id} shop={shop} />
       ))} 
-      {ModalElement}
+      {createModalElement}
     </Page>
   );
 };
