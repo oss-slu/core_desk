@@ -26,7 +26,6 @@ const performAutomatedDeposits = async () => {
 
 const performAutomatedTopUp = async () => {
   await createAutomatedLedgerPost({
-    const topUpData = {
       type: 'AUTOMATED_TOPUP',
       automatedLedgerPostItemValue: 50.0, //default value, for now
       automatedLedgerPostItemType: 'TOPUP',
