@@ -1,37 +1,36 @@
 const { prisma } = require('#prisma'); 
 
-const performAutomatedDeposits = async () => {
+const createAutomatedLedgerPost = async ({ type, value, postItemType }) => {
   try {
-    const depositData = {
-      type: 'AUTOMATED_DEPOSIT',
-      automatedLedgerPostItemValue: 100.0, //default value, for now
-      automatedLedgerPostItemType: 'DEPOSIT',
-    };
     const ledgerItem = await prisma.ledgerItem.create({
-      data: depositData,
+      data: 
+      {
+        type,
+        automatedLedgerPostItemValue: value,
+        automatedLedgerPostItemType: postItemType,
+      },
     });
-
-    console.log('Automated deposit completed:', ledgerItem);
+    console.log(`${type} completed:`, ledgerItem);
   } catch (error) {
-    console.error('Error performing automated deposit:', error);
+    console.error(`Error performing ${type.toLowerCase()}:`, error);
   }
 };
 
+const performAutomatedDeposits = async () => {
+ await createAutomatedLedgerPost({
+    type: 'AUTOMATED_DEPOSIT',
+    automatedLedgerPostItemValue: 100.0, //default value, for now
+    automatedLedgerPostItemType: 'DEPOSIT',
+  });
+};
+
 const performAutomatedTopUp = async () => {
-  try {
+  await createAutomatedLedgerPost({
     const topUpData = {
       type: 'AUTOMATED_TOPUP',
       automatedLedgerPostItemValue: 50.0, //default value, for now
       automatedLedgerPostItemType: 'TOPUP',
-    };
-    const ledgerItem = await prisma.ledgerItem.create({
-      data: topUpData,
-    });
-
-    console.log('Automated top-up completed:', ledgerItem);
-  } catch (error) {
-    console.error('Error performing automated top-up:', error);
-  }
+  });
 };
 
 module.exports = { performAutomatedDeposits, performAutomatedTopUp };
