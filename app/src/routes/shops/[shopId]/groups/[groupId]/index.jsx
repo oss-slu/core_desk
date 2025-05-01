@@ -4,26 +4,26 @@ import {
   useBillingGroup,
   useBillingGroupInvitations,
   useShop,
-} from "../../../../../hooks";
+} from "#hooks";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { shopSidenavItems } from "../..";
-import { Page } from "../../../../../components/page/page";
-import { Loading } from "../../../../../components/loading/Loading";
+import { Page } from "#page";
+import { Loading } from "#loading";
 import { Button } from "#button";
 import { Util, Alert, DropdownInput } from "tabler-react-2";
-import { useModal } from "#useModal";
+import { useModal } from "#modal";
 import { CreateBillingGroupInvitation } from "../../../../../components/billingGroup/CreateBillingGroupInvitation";
 import { Table } from "#table";
 import moment from "moment";
-import { MOMENT_FORMAT } from "../../../../../util/constants";
+import { MOMENT_FORMAT } from "#constants";
 import Badge from "tabler-react-2/dist/badge";
 import { EditBillingGroup } from "../../../../../components/billingGroup/EditBillingGroup";
 import { switchStatusForBadge } from "../../jobs";
 import { EditBillingGroupInvitation } from "../../../../../components/editBillingGroupInvitation/EditBillingGroupInvitation";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
-import { Icon } from "../../../../../util/Icon";
-import { MarkdownRender } from "../../../../../components/markdown/MarkdownRender";
-import { ShopUserPicker } from "../../../../../components/shopUserPicker/ShopUserPicker";
+import { Icon } from "#icon";
+import { MarkdownRender } from "#markdownRender";
+import { ShopUserPicker } from "#shopUserPicker";
 
 const AddUserToBillingGroupModal = () => {
   const navigate = useNavigate();

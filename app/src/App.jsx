@@ -1,12 +1,11 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Header } from "./components/header/Header";
-
+import { Header } from "#header";
 import { Home } from "#home";
-import { useAuth } from "useAuth";
+import { useAuth } from "#useAuth";
 import { Button } from "#button";
 import { UsersPage } from "#usersPage";
-import { UserPage } from "#usePage";
+import { UserPage } from "#userPage";
 import { ShopPage } from "#shopPage";
 import { Shops } from "#shops";
 import { Jobs } from "#jobs";

@@ -1,7 +1,7 @@
 import React from "react";
-import { useResources } from "../../hooks";
+import { useResources } from "#hooks";
 import { useParams } from "react-router-dom";
-import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
+import { LoadableDropdownInput } from "#loadableDropdown";
 import { Util } from "tabler-react-2";
 
 export const ResourcePicker = ({

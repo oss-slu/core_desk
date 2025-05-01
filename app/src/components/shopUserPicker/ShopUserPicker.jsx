@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useAuth, useUsers } from "../../hooks";
-import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
+import { useAuth, useUsers } from "#hooks";
+import { LoadableDropdownInput } from "#loadableDropdown";
 
 export const ShopUserPicker = ({ value, onChange, includeNone }) => {
   const { shopId } = useParams();

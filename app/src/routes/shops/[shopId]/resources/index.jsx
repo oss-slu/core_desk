@@ -1,5 +1,5 @@
 import React from "react";
-import { Page } from "../../../../components/page/page";
+import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -8,10 +8,10 @@ import {
   useResources,
   useResourceTypes,
   useMaterials,
-} from "../../../../hooks";
+} from "#hooks";
 import { Typography, Util, Button, Card } from "tabler-react-2";
-import { Loading } from "../../../../components/loading/Loading";
-import { Icon } from "../../../../util/Icon";
+import { Loading } from "#loading";
+import { Icon } from "#icon";
 import { Table } from "#table";
 import { Spinner } from "#spinner";
 const { H1, H2, H3 } = Typography;
