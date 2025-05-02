@@ -81,7 +81,7 @@ describe("gt", () => {
       lastName: "Last",
     };
 
-    const [_, value] = await gt({ user: customUser });
+    const [value] = await gt({ user: customUser });
     const token = value.split(" ")[1];
     const decoded = jwt.decode(token);
 
