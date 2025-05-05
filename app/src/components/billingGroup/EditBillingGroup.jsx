@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Input, Util, Button, Typography, Switch } from "tabler-react-2";
-import { flatten } from "../../util/flatten";
-import { MarkdownEditor } from "../markdown/MarkdownEditor";
+import { flatten } from "#flatten";
+import { MarkdownEditor } from "#markdownEditor";
 import { JobsTable } from "./JobsTable";
 const { H2 } = Typography;
 

@@ -1,8 +1,8 @@
 import useSWR from "swr";
 import React, { useState } from "react";
-import { authFetch } from "../util/url";
+import { authFetch } from "#url";
 import { Input, Button } from "tabler-react-2";
-import { useModal } from "#useModal";
+import { useModal } from "#modal";
 
 const CreateResourceModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
@@ -13,7 +13,7 @@ const CreateResourceModalContent = ({ onSubmit }) => {
         label="Resource Type Title"
         value={title}
         onChange={setTitle}
-        placeholder={"FDM 3d Printer"}
+        placeholder="FDM 3d Printer"
       />
       {title.length > 1 ? (
         <Button

@@ -1,11 +1,11 @@
 import React from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "#useAuth";
 import { useShops } from "../../hooks/useShops";
-import { Loading } from "../../components/loading/Loading";
-import { Typography , Util} from "tabler-react-2";
+import { Loading } from "#loading";
+import { Typography, Util } from "tabler-react-2";
 import { ShopCard } from "../../components/shopcard/ShopCard";
-import { Page, sidenavItems } from "../../components/page/page";
-import { Button } from "tabler-react-2/dist/button";
+import { Page, sidenavItems } from "#page";
+import { Button } from "#button";
 
 const { H1 } = Typography;
 

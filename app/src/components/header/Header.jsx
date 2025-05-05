@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "#useAuth";
 import styles from "./Header.module.css";
-import logo from "../../assets/sluop-logo.png";
+import logo from "#sluopLogo";
 import { Dropdown } from "tabler-react-2";
-import { Icon } from "../../util/Icon";
-import { useShop } from "../../hooks/index";
+import { Icon } from "#icon";
+import { useShop } from "#index";
 const IconLogout = () => <Icon i={"logout"} size={18} />;
 const IconLogin2 = () => <Icon i={"login-2"} size={18} />;
 import classNames from "classnames";

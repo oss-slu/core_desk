@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useBillingGroupInvitation } from "../../hooks/useBillingGroupInvitation";
+import { useBillingGroupInvitation } from "#useBillingGroupInvitation";
 import { Button } from "#button";
-import { Icon } from "../../util/Icon";
+import { Icon } from "#icon";
 import { Input, Switch } from "tabler-react-2";
-import { useModal } from "#useModal";
+import { useModal } from "#modal";
 import { Spinner } from "#spinner";
 import { useParams } from "react-router-dom";
 

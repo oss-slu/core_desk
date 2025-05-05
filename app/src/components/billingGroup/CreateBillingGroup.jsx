@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Input, Button, Util, Switch } from "tabler-react-2";
-import { ShopUserPicker } from "../shopUserPicker/ShopUserPicker";
+import { ShopUserPicker } from "#shopUserPicker";
 
 export const CreateBillingGroup = ({
   userShop,

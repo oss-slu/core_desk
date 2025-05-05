@@ -1,11 +1,11 @@
 import React from "react";
 import { Card, Button, Util } from "tabler-react-2";
-import { useBillingGroupInvitation } from "../../../../../hooks/useBillingGroupInvitation";
+import { useBillingGroupInvitation } from "#useBillingGroupInvitation";
 import { useParams } from "react-router-dom";
-import { Loading } from "../../../../../components/loading/Loading";
-import { useAuth, useBillingGroup } from "../../../../../hooks";
+import { Loading } from "#loading";
+import { useAuth, useBillingGroup } from "#hooks";
 import moment from "moment";
-import { MOMENT_FORMAT } from "../../../../../util/constants";
+import { MOMENT_FORMAT } from "#constants";
 
 export const BillingGroupInvitationPage = () => {
   const { shopId, groupId, inviteId } = useParams();

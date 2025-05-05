@@ -1,21 +1,21 @@
 import React, { useState } from "react";
-import { useAuth, useShop, useUserShop } from "../../../../../hooks";
+import { useAuth, useShop, useUserShop } from "#hooks";
 import { Link, useParams } from "react-router-dom";
 import { shopSidenavItems } from "../..";
-import { Page } from "../../../../../components/page/page";
-import { Loading } from "../../../../../components/loading/Loading";
+import { Page } from "#page";
+import { Loading } from "#loading";
 import { Typography, Util, Input, DropdownInput } from "tabler-react-2";
 import { Avatar } from "#avatar";
-import { Icon } from "../../../../../util/Icon";
+import { Icon } from "#icon";
 import Badge from "tabler-react-2/dist/badge";
 import { Table } from "#table";
 import moment from "moment";
 import { switchStatusToUI } from "../../../../../components/jobitem/JobItem";
-import { Price } from "../../../../../components/price/RenderPrice";
+import { Price } from "#renderPrice";
 import { useLedger } from "../../../../../hooks/useLedger";
 import { LedgerTable } from "../../../../../components/ledger/LedgerTable";
 import { Button } from "#button";
-import { useModal } from "useModal";
+import { useModal } from "#modal";
 const { H1, H2 } = Typography;
 
 const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {

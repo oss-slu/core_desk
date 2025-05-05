@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Page } from "../../../../../components/page/page";
-import { Icon } from "../../../../../util/Icon";
+import { Page } from "#page";
+import { Icon } from "#icon";
 import { Link, useParams } from "react-router-dom";
 import { Typography, Util, Input, Card } from "tabler-react-2";
 import { useJob } from "../../../../../hooks/useJob";
-import { Loading } from "../../../../../components/loading/Loading";
+import { Loading } from "#loading";
 import { UploadDropzone } from "../../../../../components/upload/uploader";
 import {
   JobItem,
@@ -14,9 +14,9 @@ import { Button } from "#button";
 const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
-import { NotFound } from "../../../../../components/404/404";
+import { NotFound } from "#notFound";
 import { LoadableDropdownInput } from "../../../../../components/loadableDropdown/LoadableDropdown";
-import { useAuth, useShop } from "../../../../../hooks";
+import { useAuth, useShop } from "#hooks";
 import { ResourceTypePicker } from "../../../../../components/resourceTypePicker/ResourceTypePicker";
 import { MaterialPicker } from "../../../../../components/materialPicker/MaterialPicker";
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";

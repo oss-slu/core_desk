@@ -1,10 +1,10 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useAuth, useJobs } from "../../hooks";
+import { useAuth, useJobs } from "#hooks";
 import { Table } from "#table";
 import moment from "moment";
-import { MOMENT_FORMAT } from "../../util/constants";
-import { switchStatusForBadge } from "../../routes/shops/[shopId]/jobs";
+import { MOMENT_FORMAT } from "#constants";
+import { switchStatusForBadge } from "#jobs";
 import { Util, Switch, Typography } from "tabler-react-2";
 import { Spinner } from "#spinner";
 import { Button } from "#button";

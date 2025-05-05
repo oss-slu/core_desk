@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
-import { Input, Util } from "tabler-react-2";
-import { useModal } from "tabler-react-2/dist/modal";
-import { Button } from "tabler-react-2/dist/button";
+import { authFetch } from "#url";
+import { Input } from "tabler-react-2";
+import { useModal } from "#modal";
+import { Button } from "#button";
 
 const CreateShopModalContent = ({ onSubmit }) => {
   const [name, setName] = useState("");
@@ -11,8 +11,9 @@ const CreateShopModalContent = ({ onSubmit }) => {
   const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
   const [color, setColor] = useState("");
+  const colors = ["RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "PURPLE", "PINK", "TEAL"];
 
-  return(
+  return (
     <div>
       <Input
         value={name}
@@ -23,19 +24,19 @@ const CreateShopModalContent = ({ onSubmit }) => {
       <Input
         value={address}
         onChange={(e) => setAddress(e)}
-        label="Shop Address"
+        label="Shop Address (optional)"
         placeholder="e.g. 24 N Grand Blvd"
       />
       <Input
         value={email}
         onChange={(e) => setEmail(e)}
-        label="Shop Email"
+        label="Shop Email (optional)"
         placeholder="e.g. shop@slu.edu"
       />
       <Input
         value={phone}
         onChange={(e) => setPhone(e)}
-        label="Shop Phone"
+        label="Shop Phone (optional)"
         placeholder="e.g. 123-456-7890"
       />
       <Input
@@ -45,23 +46,22 @@ const CreateShopModalContent = ({ onSubmit }) => {
         placeholder="e.g. Description"
       />
       <Input 
-        value ={color}
+        value={color}
         onChange={(e) => setColor(e)}
-        label = "Job Color"
-        placeholder = "e.g. purple"
+        label="Job Color (optional)"
+        placeholder="e.g. purple"
       />
-      <Util.Spacer size={1} />
-      {name.length > 1 ? (
+      {name.length > 0 ? (
         <Button
-          variant = "primary"
+          variant="primary"
           onClick={() => {
             onSubmit(
               name,
-              address, 
-              phone,
-              email,
-              description,
-              color,
+              address || null, 
+              phone || null,
+              email || null,
+              description || null,
+              colors.includes(color?.toUpperCase()) ? color.toUpperCase() : null,
             );
           }}
         >
@@ -72,7 +72,7 @@ const CreateShopModalContent = ({ onSubmit }) => {
       )}
     </div>
   );
-}
+};
 
 export const useShops = () => {
   const [loading, setLoading] = useState(true);
@@ -90,8 +90,13 @@ export const useShops = () => {
     color,
   ) => {
     try {
-      await authFetch(`api/shops`, {
+      setOpLoading(true);
+
+      await authFetch(`/api/shop`, {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
           name,
           address,
@@ -101,14 +106,18 @@ export const useShops = () => {
           color,
         }),
       });
+
+      document.location.reload();
     } catch (error) {
       setError(error);
+    } finally {
+      setOpLoading(false);
     }
   };
 
   const { modal: createModal, ModalElement: createModelElement } = useModal({
       title: "Create a new Shop",
-      text: <CreateShopModalContent onSubmit={_createShop} />,
+      text: <CreateShopModalContent onSubmit={_createShop}/>,
   });
 
   const { modal: deleteModal, ModalElement: deleteModalElement } = useModal({

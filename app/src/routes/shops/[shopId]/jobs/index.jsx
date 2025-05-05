@@ -1,22 +1,22 @@
 import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { Page } from "../../../../components/page/page";
+import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
 import { shopSidenavItems } from "../../[shopId]/index";
-import { useAuth } from "../../../../hooks/useAuth";
+import { useAuth } from "#useAuth";
 import { Typography, Util, Input } from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { Table } from "#table";
 import Badge from "tabler-react-2/dist/badge";
 import moment from "moment";
-import { Loading } from "../../../../components/loading/Loading";
+import { Loading } from "#loading";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
-import { Icon } from "../../../../util/Icon";
+import { Icon } from "#icon";
 import { Avatar } from "#avatar";
-import { ShopUserPicker } from "../../../../components/shopUserPicker/ShopUserPicker";
-import { Price } from "../../../../components/price/RenderPrice";
+import { ShopUserPicker } from "#shopUserPicker";
+import { Price } from "#renderPrice";
 
 export const switchStatusForBadge = (status) => {
   switch (status) {
