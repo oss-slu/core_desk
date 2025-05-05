@@ -115,7 +115,7 @@ export const useShops = () => {
     }
   };
 
-  const { modal: createModal, ModalElement: createModelElement } = useModal({
+  const { modal: createModal, ModalElement: createModalElement } = useModal({
       title: "Create a new Shop",
       text: <CreateShopModalContent onSubmit={_createShop}/>,
   });
@@ -219,7 +219,7 @@ export const useShops = () => {
     addUserToShop,
     removeUserFromShop,
     changeUserRole,
-    createModelElement,
+    createModalElement,
     createShop,
     opLoading,
   };

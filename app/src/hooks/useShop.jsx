@@ -58,16 +58,31 @@ export const useShop = (shopId, options) => {
     }
   };
 
+  const deleteShop = async () => {
+    setOpLoading(true);
+    try {
+      if (await deleteModal()) {
+        const r = await authFetch(`/api/shop/${shopId}`, {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        await fetchUser(false);
+        document.location.href = `/shops`;
+      }
+    } catch (error) {
+      setError(error);
+    }
+    setOpLoading(false);
+  };
+
   const { confirm: deleteModal, ConfirmModal: deleteModalElement } = useConfirm({
       title: "Confirm Delete",
       text: "This will set Shop status to Inactive",
       commitText: "Confirm",
       cancelText: "Cancel",
     });
-
-  const deleteShop = async () => {
-    deleteModal();
-  };
 
   useEffect(() => {
     fetchShop();

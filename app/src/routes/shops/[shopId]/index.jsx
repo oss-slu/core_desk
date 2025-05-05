@@ -150,7 +150,7 @@ export const ShopPage = () => {
                 <Icon i="pencil" /> Edit Shop
               </Button>
 
-              <Button onClick={deleteShop}>
+              <Button onClick={() => deleteShop()}>
                 <Icon i="trash" /> Delete Shop
               </Button>
             </Util.Row>
