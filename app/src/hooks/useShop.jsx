@@ -62,13 +62,12 @@ export const useShop = (shopId, options) => {
     setOpLoading(true);
     try {
       if (await deleteModal()) {
-        const r = await authFetch(`/api/shop/${shopId}`, {
+        await authFetch(`/api/shop/${shopId}`, {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
           },
         });
-        await fetchUser(false);
         document.location.href = `/shops`;
       }
     } catch (error) {
