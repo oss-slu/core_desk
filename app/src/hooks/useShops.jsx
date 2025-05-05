@@ -120,13 +120,6 @@ export const useShops = () => {
       text: <CreateShopModalContent onSubmit={_createShop}/>,
   });
 
-  const { modal: deleteModal, ModalElement: deleteModalElement } = useModal({
-    title: "Confirm Title",
-    text: "Text",
-    commitText: "Confirm",
-    cancelText: "Cancel",
-  });
-
   const fetchShops = async (shouldSetLoading = true) => {
     try {
       shouldSetLoading && setLoading(true);

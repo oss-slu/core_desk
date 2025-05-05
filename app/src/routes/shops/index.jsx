@@ -11,10 +11,11 @@ const { H1 } = Typography;
 
 export const Shops = () => {
   const { user } = useAuth();
-  const { shops, loading } = useShops();
   const {
+    shops, 
+    loading,
     createModalElement,
-    createShop,
+    createShop
   } = useShops();
 
   if (loading) return <Loading />;
@@ -26,7 +27,6 @@ export const Shops = () => {
           <H1>Shops</H1>
         </div>
         <Button onClick={createShop}>Create Shop</Button>
-        <Button onClick={deleteShop}>Delete Shop</Button>  {/* Add DeleteShop to UserShops*/} 
       </Util.Row>
       <Util.Spacer size={1} />
       {shops.map((shop) => (

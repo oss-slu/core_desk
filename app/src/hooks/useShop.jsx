@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { authFetch } from "#url";
 import toast from "react-hot-toast";
+import { useConfirm } from "tabler-react-2";
 
 export const useShop = (shopId, options) => {
   const includeUsers = options?.includeUsers || false;
@@ -57,6 +58,17 @@ export const useShop = (shopId, options) => {
     }
   };
 
+  const { confirm: deleteModal, ConfirmModal: deleteModalElement } = useConfirm({
+      title: "Confirm Delete",
+      text: "This will set Shop status to Inactive",
+      commitText: "Confirm",
+      cancelText: "Cancel",
+    });
+
+  const deleteShop = async () => {
+    deleteModal();
+  };
+
   useEffect(() => {
     fetchShop();
   }, [shopId]);
@@ -69,6 +81,8 @@ export const useShop = (shopId, options) => {
     error,
     refetch: fetchShop,
     updateShop,
+    deleteShop,
+    deleteModalElement,
     opLoading,
   };
 };
