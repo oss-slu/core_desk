@@ -11,10 +11,10 @@ const { H1 } = Typography;
 
 export const Shops = () => {
   const { user } = useAuth();
-  const { 
+  const {
     shops, 
     loading,
-    ModalElement,
+    createModalElement,
     createShop
   } = useShops();
 
@@ -32,7 +32,7 @@ export const Shops = () => {
       {shops.map((shop) => (
         <ShopCard key={shop.id} shop={shop} />
       ))} 
-      {ModalElement}
+      {createModalElement}
     </Page>
   );
 };

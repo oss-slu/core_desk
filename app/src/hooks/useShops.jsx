@@ -115,7 +115,7 @@ export const useShops = () => {
     }
   };
 
-  const { modal, ModalElement } = useModal({
+  const { modal: createModal, ModalElement: createModalElement } = useModal({
       title: "Create a new Shop",
       text: <CreateShopModalContent onSubmit={_createShop}/>,
   });
@@ -135,7 +135,7 @@ export const useShops = () => {
   };
 
   const createShop = async () => {
-    modal();
+    createModal();
   };
 
   const addUserToShop = async (userId, shopId, role) => {
@@ -219,7 +219,7 @@ export const useShops = () => {
     addUserToShop,
     removeUserFromShop,
     changeUserRole,
-    ModalElement,
+    createModalElement,
     createShop,
     opLoading,
   };

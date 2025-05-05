@@ -107,7 +107,7 @@ export const shopSidenavItems = (
 export const ShopPage = () => {
   const { user, loading } = useAuth();
   const { shopId } = useParams();
-  const { shop, userShop, updateShop, opLoading } = useShop(shopId);
+  const { shop, userShop, updateShop, opLoading, deleteShop, deleteModalElement} = useShop(shopId);
   const [editing, setEditing] = useState(false);
   const [newShop, setNewShop] = useState(shop);
   useEffect(() => {
@@ -145,11 +145,18 @@ export const ShopPage = () => {
         <H1>{shop.name}</H1>
         {user.admin || userShop.accountType === "ADMIN"
           ? !editing && (
+            <Util.Row justify="end">
               <Button onClick={() => setEditing(true)}>
                 <Icon i="pencil" /> Edit Shop
               </Button>
+
+              <Button onClick={() => deleteShop()}>
+                <Icon i="trash" /> Delete Shop
+              </Button>
+            </Util.Row>
             )
           : null}
+        {deleteModalElement}
       </Util.Row>
       <Util.Spacer size={1} />
       {editing ? (

@@ -97,6 +97,7 @@ model Shop {
   logoName        String?
   color           Color?
   startingDeposit Float?
+  active          Boolean        @default(true)
   autoJoin        Boolean        @default(false)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
