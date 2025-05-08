@@ -58,6 +58,33 @@ const EditResourceModalContent = ({ onSubmit , resourceTypeTitle}) => {
   );
 };
 
+const EditResourceModalContent = ({ onSubmit , resourceTypeTitle}) => {
+  const [title, setTitle] = useState(resourceTypeTitle || "");
+
+  return (
+    <div>
+      <Input
+        label="Resource Type Title"
+        value={title}
+        onChange={setTitle}
+        placeholder={"FDM 3d Printer"}
+      />
+      {title.length > 1 ? (
+        <Button
+          variant="primary"
+          onClick={() => {
+            onSubmit(title);
+          }}
+        >
+          Submit
+        </Button>
+      ) : (
+        <Button disabled>Submit</Button>
+      )}
+    </div>
+  );
+};
+
 const fetcher = (url) => authFetch(url).then((res) => res.json());
 
 export const useResourceTypes = (shopId) => {
