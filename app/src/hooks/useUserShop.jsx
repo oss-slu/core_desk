@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { authFetch } from "#authFetch";
+import { authFetch } from "#url";
 
 export const useUserShop = (shopId, userId) => {
   const [loading, setLoading] = useState(true);

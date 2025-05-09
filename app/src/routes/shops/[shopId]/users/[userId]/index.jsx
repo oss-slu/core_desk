@@ -1,21 +1,21 @@
 import React, { useState } from "react";
-import { useAuth, useShop, useUserShop } from "../../../../../hooks";
+import { useAuth, useShop, useUserShop } from "#hooks";
 import { Link, useParams } from "react-router-dom";
 import { shopSidenavItems } from "../..";
-import { Page } from "../../../../../components/page/page";
-import { Loading } from "../../../../../components/loading/Loading";
+import { Page } from "#page";
+import { Loading } from "#loading";
 import { Typography, Util, Input, DropdownInput } from "tabler-react-2";
 import { Avatar } from "#avatar";
-import { Icon } from "../../../../../util/Icon";
+import { Icon } from "#icon";
 import Badge from "tabler-react-2/dist/badge";
 import { Table } from "#table";
 import moment from "moment";
 import { switchStatusToUI } from "../../../../../components/jobitem/JobItem";
-import { Price } from "../../../../../components/price/RenderPrice";
+import { Price } from "#renderPrice";
 import { useLedger } from "../../../../../hooks/useLedger";
 import { LedgerTable } from "../../../../../components/ledger/LedgerTable";
 import { Button } from "#button";
-import { useModal } from "useModal";
+import { useModal } from "#modal";
 const { H1, H2 } = Typography;
 
 const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
@@ -43,7 +43,7 @@ const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
         type="number"
         label="Amount"
         value={value}
-        onChange={(e) => setValue(e)}
+        onChange={(e) => setValue(e.target.value)}
         placeholder="Select a topup amount"
         prependedText="$"
       />
@@ -52,6 +52,18 @@ const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
         lower than the specified amount. A deposit will add the fixed specified
         amount to the user's balance.
       </i>
+
+      {type && type.startsWith("AUTOMATED") && (
+        <div>
+          <p><i>Automated top-ups and deposits will be processed on a regular schedule.</i></p>
+          <p>
+            {type === "AUTOMATED_TOPUP" ? 
+              "The automated top-up will be applied to bring the user's balance to the specified amount." : 
+              "The automated deposit will add a fixed amount to the user's balance periodically."}
+          </p>
+        </div>
+      )}
+
       <Button
         loading={opLoading}
         onClick={async () => {

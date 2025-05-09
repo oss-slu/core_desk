@@ -1,14 +1,14 @@
 import React from "react";
-import { Page, sidenavItems } from "../../components/page/page";
-import { useAuth } from "../../hooks/useAuth";
+import { Page, sidenavItems } from "#page";
+import { useAuth } from "#useAuth";
 import { Typography, Util } from "tabler-react-2";
 import Badge from "tabler-react-2/dist/badge";
-import { useModal } from "#useModal";
+import { useModal } from "#modal";
 import { Table } from "#table";
 import { useUsers } from "../../hooks/useUsers";
 import { Spinner } from "#spinner";
 import { Avatar } from "#avatar";
-import { Icon } from "../../util/Icon";
+import { Icon } from "#icon";
 import { Link } from "react-router-dom";
 const { H1 } = Typography;
 import moment from "moment";

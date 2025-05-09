@@ -246,3 +246,50 @@ export const put = [
     }
   },
 ];
+
+export const del = [
+  verifyAuth,
+  async (req, res) => {
+    try {
+      const shop = await prisma.shop.findUnique({
+        where: {
+          id: req.params.shopId,
+          users: {
+            some: {
+              userId: req.user.id,
+              active: true,
+            },
+          },
+        },
+      });
+
+      if (!shop) {
+        return res.status(404).json({ error: "Shop not found" });
+      }
+
+      const updatedShop = await prisma.shop.update({
+        where: {
+          id: shop.id,
+        },
+        data: {
+          active: false,
+        },
+      });
+
+      await prisma.logs.create({
+        data: {
+          type: LogType.SHOP_MODIFIED,
+          userId: req.user.id,
+          shopId: shop.id,
+          from: JSON.stringify(shop),
+          to: JSON.stringify(updatedShop),
+        },
+      });
+
+      res.json({ shop: updatedShop });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Something went wrong" });
+    }
+  },
+];

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useBillingGroups } from "../../hooks";
-import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
+import { useBillingGroups } from "#hooks";
+import { LoadableDropdownInput } from "#loadableDropdown";
 
 export const BillingGroupPicker = ({ value, onChange, includeNone }) => {
   const { shopId } = useParams();

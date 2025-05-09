@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useModal } from "#useModal";
-import { Icon } from "../../util/Icon";
+import { useModal } from "#modal";
+import { Icon } from "#icon";
 import { Util, Input } from "tabler-react-2";
 import styles from "./jobItem.module.css";
-import { Price } from "../price/RenderPrice";
+import { Price } from "#renderPrice";
 import { Time } from "../time/RenderTime";
 import { Button } from "#button";
 import Badge from "tabler-react-2/dist/badge";

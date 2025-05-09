@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import useSWRMutation from "swr/mutation";
-import { authFetch } from "#authFetch";
+import { authFetch } from "#url";
 
 const postNavigation = async (url, { arg }) => {
   return authFetch(url, {

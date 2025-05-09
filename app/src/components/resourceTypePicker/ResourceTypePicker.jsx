@@ -1,8 +1,8 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { useResourceTypes } from "../../hooks";
+import { useResourceTypes } from "#hooks";
 import { useParams } from "react-router-dom";
-import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
+import { LoadableDropdownInput } from "#loadableDropdown";
 
 export const ResourceTypePicker = ({
   value,

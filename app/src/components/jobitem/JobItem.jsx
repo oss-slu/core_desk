@@ -2,21 +2,21 @@ import React, { useState } from "react";
 import { Card, Util, Typography, DropdownInput, Input } from "tabler-react-2";
 import { RenderMedia } from "../media/renderMedia";
 import { Button } from "#button";
-import { Icon } from "../../util/Icon";
-import { useModal } from "#useModal";
+import { Icon } from "#icon";
+import { useModal } from "#modal";
 import { useJobItem } from "../../hooks/useJobItem";
 import { Link, useParams } from "react-router-dom";
 import { Spinner } from "#spinner";
 const { H3, H4 } = Typography;
 import styles from "./jobItem.module.css";
-import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
+import { LoadableDropdownInput } from "#loadableDropdown";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 import Badge from "tabler-react-2/dist/badge";
 import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
 
 import { EditCosting } from "./EditCosting";
-import { useAuth, useBillingGroupUser } from "../../hooks";
+import { useAuth, useBillingGroupUser } from "#hooks";
 
 export function downloadFile(url, filename) {
   fetch(url)

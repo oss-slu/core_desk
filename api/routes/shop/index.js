@@ -82,6 +82,7 @@ export const post = [
           phone: req.body.phone,
           email: req.body.email,
           description: req.body.description,
+          color: req.body.color,
           imageUrl: req.body.imageUrl,
           startingDeposit: startingDeposit,
           users: {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
-import { useModal } from "#useModal";
+import { authFetch } from "#url";
+import { useModal } from "#modal";
 import { Input, Button, Util } from "tabler-react-2";
 import { ResourceTypePicker } from "../components/resourceTypePicker/ResourceTypePicker";
 import toast from "react-hot-toast";

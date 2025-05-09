@@ -1,7 +1,7 @@
 import React from "react";
 import { Sidenav } from "../sidenav/Sidenav";
-import { Icon } from "../../util/Icon";
-import { useAuth } from "../../hooks/useAuth";
+import { Icon } from "#icon";
+import { useAuth } from "#useAuth";
 import { useNavigationListener } from "../../hooks/useNavigationListener";
 
 export const sidenavItems = (activeText, userIsAdmin) => {

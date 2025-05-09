@@ -1,16 +1,16 @@
 import React from "react";
-import { Loading } from "../../../../components/loading/Loading";
+import { Loading } from "#loading";
 import { shopSidenavItems } from "..";
-import { Page } from "../../../../components/page/page";
-import { useAuth, useBillingGroups, useShop } from "../../../../hooks";
+import { Page } from "#page";
+import { useAuth, useBillingGroups, useShop } from "#hooks";
 import { Link, useParams } from "react-router-dom";
 import { Util } from "tabler-react-2";
 import { Button } from "#button";
-import { useModal } from "#useModal";
+import { useModal } from "#modal";
 import { CreateBillingGroup } from "../../../../components/billingGroup/CreateBillingGroup";
 import { Table } from "#table";
 import moment from "moment";
-import { MOMENT_FORMAT } from "../../../../util/constants";
+import { MOMENT_FORMAT } from "#constants";
 
 export const BillingGroupsPage = () => {
   const { shopId } = useParams();

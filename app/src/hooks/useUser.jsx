@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { authFetch } from "#authFetch";
-import { useConfirm } from "tabler-react-2/dist/modal/confirm";
+import { authFetch } from "#url";
+import { useConfirm } from "#confirm";
 
 export const useUser = (userId) => {
   const [loading, setLoading] = useState(true);
