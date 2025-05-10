@@ -108,10 +108,11 @@ export const post = [
       return res.status(400).json({ error: "Missing value" });
     }
     const value = parseFloat(startValue);
-    if (isNaN(value) || value < 0) {
-      return res.status(400).json({
-        error: "Invalid value: must be a number ≥ 0",
-        });
+    if (isNaN(value)){
+      return res.status(400).json({ error: "value must be floaty" });
+    }
+    if (value < 0) {
+      return res.status(400).json({error: "Invalid value" });
     }
    
     const existingLedgerItems = await prisma.ledgerItem.findMany({
