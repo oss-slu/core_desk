@@ -2,7 +2,6 @@ import { LogType } from "@prisma/client";
 import { prisma } from "../../../../util/prisma.js";
 import { verifyAuth } from "../../../../util/verifyAuth.js";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
-import { writeFileSync } from "fs";
 
 export const post = [
   verifyAuth,
