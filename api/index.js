@@ -27,7 +27,6 @@ app.get("/digitalocean-health-check", (_, res) => res.send("OK"));
 
 if (process.env.JACK == "true") {
   console.log("JACK SERVER, USING PROXY");
-  const target = "https://open-project-5skum.ondigitalocean.app";
   app.use((req, res, next) => {
     console.log(req.url);
     next();
