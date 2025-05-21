@@ -121,6 +121,7 @@ passport.use(
       // Pass the user to the next middleware
       return done(null, user);
     } catch (error) {
+      console.error(error);
       return done(error);
     }
   })
