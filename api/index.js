@@ -69,8 +69,11 @@ passport.use(
         where: { email: userEmail },
       });
 
+      console.log("User Found", user);
+
       // If user doesn't exist, create a new user
       if (!user) {
+        console.log("User not found, creating new user");
         user = await prisma.user.create({
           data: {
             email: userEmail,
@@ -78,12 +81,14 @@ passport.use(
             lastName: profile.lastName,
           },
         });
+        console.log("Created new user", user);
 
         const shopsToJoin = await prisma.shop.findMany({
           where: {
             autoJoin: true,
           },
         });
+        console.log("Shops to join", shopsToJoin);
 
         for (const shop of shopsToJoin) {
           await prisma.userShop.create({
