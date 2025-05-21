@@ -28,7 +28,7 @@ if (process.env.JACK == "true") {
     res.send("OK");
   });
 
-  app.get("*", (req, res) => {
+  app.all("*", (req, res) => {
     console.log(req.url, "redirecting");
     res.redirect("https://open-project-5skum.ondigitalocean.app/");
   });
