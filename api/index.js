@@ -24,6 +24,10 @@ let server;
 
 if (process.env.JACK == "true") {
   // Redirect
+  app.get("/digitalocean-health-check", (req, res) => {
+    res.send("OK");
+  });
+
   app.get("*", (req, res) => {
     console.log(req.url, "redirecting");
     res.redirect("https://open-project-5skum.ondigitalocean.app/");
