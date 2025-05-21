@@ -33,6 +33,9 @@ if (process.env.JACK == "true") {
     res.redirect("https://open-project-5skum.ondigitalocean.app/");
   });
 } else {
+  app.get("/digitalocean-health-check", (req, res) => {
+    res.send("OK");
+  });
   // Enable CORS for your React app
   app.use(
     cors({
@@ -244,13 +247,13 @@ if (process.env.JACK == "true") {
   });
 
   // Server Setup
-  const PORT = process.env.PORT || 3000;
+}
+const PORT = process.env.PORT || 3000;
 
-  if (process.env.NODE_ENV !== "test") {
-    server = app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  }
+if (process.env.NODE_ENV !== "test") {
+  server = app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
 }
 
 export { app, server };
