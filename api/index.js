@@ -14,6 +14,7 @@ import { uploadRouter } from "./config/uploadthing.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -22,16 +23,23 @@ const __dirname = path.dirname(__filename);
 const app = express();
 let server;
 
-if (process.env.JACK == "true") {
-  // Redirect
-  app.get("/digitalocean-health-check", (req, res) => {
-    res.send("OK");
-  });
+app.get("/digitalocean-health-check", (_, res) => res.send("OK"));
 
-  app.all("*", (req, res) => {
-    console.log(req.url, "redirecting");
-    res.redirect("https://open-project-5skum.ondigitalocean.app/");
+if (process.env.JACK == "true") {
+  console.log("JACK SERVER, USING PROXY");
+  const target = "https://open-project-5skum.ondigitalocean.app";
+  app.use((req, res, next) => {
+    console.log(req.url);
+    next();
   });
+  app.use(
+    createProxyMiddleware({
+      target: "https://open-project-5skum.ondigitalocean.app",
+      changeOrigin: true,
+      secure: false, // set false if the upstream has a self-signed cert
+      logLevel: "warn",
+    })
+  );
 } else {
   app.get("/digitalocean-health-check", (req, res) => {
     res.send("OK");
@@ -248,7 +256,7 @@ if (process.env.JACK == "true") {
 
   // Server Setup
 }
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3030;
 
 if (process.env.NODE_ENV !== "test") {
   server = app.listen(PORT, () => {
