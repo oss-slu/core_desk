@@ -1,5 +1,26 @@
 # Overall documentation
 
+## Getting Started
+
+To develop or run this project locally, you will need [Node.js](https://nodejs.org/en/) and [Yarn](https://yarnpkg.com/) installed. Additionally, you will need to have Docker installed and running.
+
+### Environment Variables
+
+You will need to set the following environment variables:
+
+```
+DATABASE_URL="postgresql://(some postgres connection string)"
+JWT_SECRET="(random string)"
+BASE_URL="http://localhost:5173"
+UPLOADTHING_TOKEN='(uploadthing token, soon to be replaced with S3)'
+SERVER_URL="(tunnel to the outside internet. I recommend Bore.sh)"
+SENTRY_AUTH_TOKEN="(sentry auth token)"
+```
+
+## Architecture
+
+![architecture](./images/architecture.png)
+
 ## Codebase Organization
 
 The React frontend lives in the `app/` directory, everything else is based in the root. `index.js` is the entrypoint for the API, and uses file-based routing to route requests to the appropriate file living in the `/routes` directory. The API is built using Express.js. The file-based router is implemented on the `/api/*` path, so all API requests going to the router folder should be prefixed with `/api/`. The API is pretty self-documenting based on the file structure.
@@ -30,6 +51,8 @@ export const get = [
 ```
 
 ## Auth flow
+
+![auth-flow](./images/auth-flow.png)
 
 We use SAML to log into the app via SLU SSO. The configuration for saml lives in the `/config/saml-config.js` file, and uses the cert file in the root directory `/okta.cert`.
 
