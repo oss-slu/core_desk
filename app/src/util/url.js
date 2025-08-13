@@ -3,7 +3,7 @@ import { emitter } from "./mitt";
 export const u = (path) =>
   // eslint-disable-next-line no-undef
   process.env.NODE_ENV === "development"
-    ? `http://localhost:3000${path}`
+    ? `http://localhost:3030${path}`
     : path;
 
 export const authFetch = async (url, options) => {
