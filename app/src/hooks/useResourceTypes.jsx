@@ -31,34 +31,7 @@ const CreateResourceModalContent = ({ onSubmit }) => {
   );
 };
 
-const EditResourceModalContent = ({ onSubmit , resourceTypeTitle}) => {
-  const [title, setTitle] = useState(resourceTypeTitle || "");
-
-  return (
-    <div>
-      <Input
-        label="Resource Type Title"
-        value={title}
-        onChange={setTitle}
-        placeholder={"FDM 3d Printer"}
-      />
-      {title.length > 1 ? (
-        <Button
-          variant="primary"
-          onClick={() => {
-            onSubmit(title);
-          }}
-        >
-          Submit
-        </Button>
-      ) : (
-        <Button disabled>Submit</Button>
-      )}
-    </div>
-  );
-};
-
-const EditResourceModalContent = ({ onSubmit , resourceTypeTitle}) => {
+const EditResourceModalContent = ({ onSubmit, resourceTypeTitle }) => {
   const [title, setTitle] = useState(resourceTypeTitle || "");
 
   return (
@@ -156,18 +129,44 @@ export const useResourceTypes = (shopId) => {
     ),
   });
 
+  const deleteResourceType = async (resourceTypeId) => {
+    try {
+      setOpLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/resources/type/${resourceTypeId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      const data = await r.json();
+      if (data.message) {
+        // Optimistically update the data
+        mutate();
+        setOpLoading(false);
+        document.location.reload();
+      } else {
+        throw data.error;
+      }
+    } catch (error) {
+      setOpLoading(false);
+      throw error;
+    }
+  };
+
   const useEditResourceTypeModal = (resourceTypeId, resourceTypeTitle) => {
     const { modal: editModal, ModalElement: editModalElement } = useModal({
       title: "Edit Resource Type",
       text: (
         <EditResourceModalContent
-          onSubmit={(title) => {_editResourceType(title, resourceTypeId)}}
+          onSubmit={(title) => {
+            _editResourceType(title, resourceTypeId);
+          }}
           resourceTypeTitle={resourceTypeTitle}
         />
       ),
     });
 
-    return { editModal, editModalElement }
+    return { editModal, editModalElement };
   };
 
   return {
@@ -178,6 +177,8 @@ export const useResourceTypes = (shopId) => {
     createResourceType: createModal,
     useEditResourceTypeModal,
     opLoading,
+    // ModalElement: modal,
+    deleteResourceType,
     createModalElement,
   };
 };

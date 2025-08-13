@@ -303,8 +303,8 @@ export const get = [
             },
           },
         },
-        take: req.query.limit ? parseInt(req.query.limit) : 20,
-        skip: req.query.offset ? parseInt(req.query.offset) : 0,
+        // take: req.query.limit ? parseInt(req.query.limit) : 2000,
+        // skip: req.query.offset ? parseInt(req.query.offset) : 0,
       });
 
       jobs = jobs.map((job) => {
