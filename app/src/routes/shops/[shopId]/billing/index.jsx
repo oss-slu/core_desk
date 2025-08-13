@@ -1,13 +1,13 @@
 import React from "react";
-import { Page } from "../../../../components/page/page";
+import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useShop } from "../../../../hooks";
+import { useAuth, useShop } from "#hooks";
 import { useLedger } from "../../../../hooks/useLedger";
-import { Loading } from "../../../../components/loading/Loading";
+import { Loading } from "#loading";
 import { Card, Typography, Util } from "tabler-react-2";
-import { Price } from "../../../../components/price/RenderPrice";
-import { Alert } from "tabler-react-2/dist/alert";
+import { Price } from "#renderPrice";
+import { Alert } from "#alert";
 import { LedgerTable } from "../../../../components/ledger/LedgerTable";
 const { H1 } = Typography;
 

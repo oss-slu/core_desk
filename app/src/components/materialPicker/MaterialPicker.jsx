@@ -1,7 +1,7 @@
 import React from "react";
-import { useMaterials } from "../../hooks";
+import { useMaterials } from "#hooks";
 import { useParams } from "react-router-dom";
-import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
+import { LoadableDropdownInput } from "#loadableDropdown";
 import { Util } from "tabler-react-2";
 
 export const MaterialPicker = ({
@@ -10,6 +10,7 @@ export const MaterialPicker = ({
   resourceTypeId,
   opLoading,
   includeNone,
+  materialType
 }) => {
   const { shopId } = useParams();
   const { materials, loading } = useMaterials(shopId, resourceTypeId);
@@ -34,7 +35,7 @@ export const MaterialPicker = ({
             : null,
         ].filter((v) => v)}
         prompt="Select Material"
-        label={"Material"}
+        label={`${materialType} Material`}
       />
     </Util.Col>
   );

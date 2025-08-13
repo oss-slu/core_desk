@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useModal } from "tabler-react-2/dist/modal";
-import { Icon } from "../../util/Icon";
+import { useModal } from "#modal";
+import { Icon } from "#icon";
 import { Util, Input } from "tabler-react-2";
 import styles from "./jobItem.module.css";
-import { Price } from "../price/RenderPrice";
+import { Price } from "#renderPrice";
 import { Time } from "../time/RenderTime";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import Badge from "tabler-react-2/dist/badge";
 
 export const EditCosting = ({
@@ -27,15 +27,18 @@ export const EditCosting = ({
       processingTimeQty,
       unitQty,
       materialQty,
+      secondaryMaterialQty,
       resource,
       material,
+      secondaryMaterial,
       qty,
     } = newItem;
     return (
       ((timeQty * resource.costPerTime || 0) +
         (processingTimeQty * resource.costPerProcessingTime || 0) +
         (unitQty * resource.costPerUnit || 0) +
-        (materialQty * material.costPerUnit || 0)) *
+        (materialQty * material.costPerUnit || 0) +
+        (secondaryMaterialQty * secondaryMaterial.costPerUnit || 0)) *
       (includeQty ? qty : 1)
     );
   };
@@ -88,6 +91,18 @@ export const EditCosting = ({
           />
           <Icon i="weight" />
           <span>{newItem.materialQty || 0}</span>
+        </Util.Row>
+        <Util.Row gap={1} align="center" justify="between">
+          <label className="form-label">Secondary Material quantity</label>
+          <div
+            style={{
+              flex: 1,
+              height: 2,
+              backgroundColor: "var(--tblr-border-color)",
+            }}
+          />
+          <Icon i="weight" />
+          <span>{newItem.secondaryMaterialQty || 0}</span>
         </Util.Row>
         <Util.Row gap={1} align="center" justify="between">
           <div />
@@ -154,6 +169,16 @@ export const EditCosting = ({
         modal={modal}
         showInput={userIsPrivileged}
       />
+      <QuantityInput
+        label={`Secondary material quantity in ${newItem.secondaryMaterial.unitDescriptor}s`}
+        helpText={HELP_TEXT.secondaryMaterial}
+        quantity={newItem.secondaryMaterialQty}
+        costPerUnit={newItem.secondaryMaterial.costPerUnit}
+        icon={<Icon i="weight" />}
+        onChange={(value) => setNewItem({ ...newItem, secondaryMaterialQty: value })}
+        modal={modal}
+        showInput={userIsPrivileged}
+      />      
       <Util.Row gap={1} align="center" justify="between">
         {JSON.stringify(newItem) !== JSON.stringify(item) ? (
           <Util.Row gap={1} align="center" wrap>
@@ -164,6 +189,7 @@ export const EditCosting = ({
                   processingTimeQty: newItem.processingTimeQty,
                   unitQty: newItem.unitQty,
                   materialQty: newItem.materialQty,
+                  secondaryMaterialQty: newItem.secondaryMaterialQty,
                 })
               }
               loading={loading}
@@ -330,4 +356,5 @@ export const HELP_TEXT = {
   processingTime: "The time an operator will spend processing this job item.",
   unit: "The number of actions for the item. This could be the number of build plates for 3d prints, or setups for traditional prints or machinery.",
   material: "The amount of material used for this job item.",
+  secondaryMaterial: "The amount of secondary material used for this job item.",
 };

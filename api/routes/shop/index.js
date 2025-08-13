@@ -1,6 +1,6 @@
 import { LedgerItemType, LogType } from "@prisma/client";
-import { prisma } from "../../util/prisma.js";
-import { verifyAuth } from "../../util/verifyAuth.js";
+import { prisma } from "#prisma";
+import { verifyAuth } from "#verifyAuth";
 import { SHOP_SELECT, SHOP_SELECT_WITH_LEDGER } from "./shared.js";
 
 export const get = [
@@ -82,6 +82,7 @@ export const post = [
           phone: req.body.phone,
           email: req.body.email,
           description: req.body.description,
+          color: req.body.color,
           imageUrl: req.body.imageUrl,
           startingDeposit: startingDeposit,
           users: {

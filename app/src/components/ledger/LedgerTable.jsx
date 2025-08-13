@@ -1,7 +1,7 @@
 import moment from "moment";
 import React from "react";
-import { Table } from "tabler-react-2/dist/table";
-import { Price } from "../price/RenderPrice";
+import { Table } from "#table";
+import { Price } from "#renderPrice";
 import { Link } from "react-router-dom";
 import { downloadFile } from "../jobitem/JobItem";
 import Badge from "tabler-react-2/dist/badge";

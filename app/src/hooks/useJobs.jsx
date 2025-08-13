@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { authFetch } from "../util/url";
-import { useModal } from "tabler-react-2/dist/modal";
+import { authFetch } from "#url";
+import { useModal } from "#modal";
 import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
 import { useParams } from "react-router-dom";
 import { useUserShop } from "./useUserShop";
-import { useAuth } from "./useAuth";
-import { ShopUserPicker } from "../components/shopUserPicker/ShopUserPicker";
+import { useAuth } from "#useAuth";
+import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
 
 const CreateJobModalContent = ({ onSubmit }) => {
@@ -139,7 +139,7 @@ const CreateJobModalContent = ({ onSubmit }) => {
         </>
       ) : null}
       <Util.Spacer size={2} />
-      {title.length > 1 && dueDate.length > 1 ? (
+      {title.length > 0 && dueDate.length > 0 ? (
         <Button
           variant="primary"
           loading={loading}

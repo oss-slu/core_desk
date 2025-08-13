@@ -1,21 +1,21 @@
 import React, { useState } from "react";
-import { Page } from "../../../components/page/page";
+import { Page } from "#page";
 import { shopSidenavItems } from ".";
 import {
   use3dPrinterMaterials,
   use3dPrinterTypes,
   useAuth,
   useShop,
-} from "../../../hooks";
+} from "#hooks";
 import { useParams } from "react-router-dom";
 import { Typography, Util, Alert, DropdownInput } from "tabler-react-2";
-import { Button } from "tabler-react-2/dist/button";
-import { Loading } from "../../../components/loading/Loading";
-import { Table } from "tabler-react-2/dist/table";
-import { Modal } from "tabler-react-2/dist/modal";
+import { Button } from "#button";
+import { Loading } from "#loading";
+import { Table } from "#table";
+import { Modal } from "#modal";
 import { Input } from "tabler-react-2";
 import Badge from "tabler-react-2/dist/badge";
-import { Icon } from "../../../util/Icon";
+import { Icon } from "#icon";
 
 const { H1, H2, Text } = Typography;
 

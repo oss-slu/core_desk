@@ -1,21 +1,21 @@
 import React from "react";
-import { Page } from "../../../../../components/page/page";
+import { Page } from "#page";
 import { sidenavItems } from ".";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useJob, useJobItem, useShop } from "../../../../../hooks";
-import { Loading } from "../../../../../components/loading/Loading";
+import { useAuth, useJob, useJobItem, useShop } from "#hooks";
+import { Loading } from "#loading";
 import { Card, Typography, Util } from "tabler-react-2";
 import { ProjectWideEditCosting } from "../../../../../components/jobitem/ProjectWideEditCosting";
 import { EditCosting } from "../../../../../components/jobitem/EditCosting";
 const { H1, H2 } = Typography;
 import styles from "./costing.module.css";
-import { Price } from "../../../../../components/price/RenderPrice";
+import { Price } from "#renderPrice";
 import { calculateTotalCostOfJob } from "../../../../../util/totalCost";
-import { Spinner } from "tabler-react-2/dist/spinner";
-import { Button } from "tabler-react-2/dist/button";
-import { useConfirm } from "tabler-react-2/dist/modal/confirm";
-import { Alert } from "tabler-react-2/dist/alert";
-import { Icon } from "../../../../../util/Icon";
+import { Spinner } from "#spinner";
+import { Button } from "#button";
+import { useConfirm } from "#confirm";
+import { Alert } from "#alert";
+import { Icon } from "#icon";
 import { downloadFile } from "../../../../../components/jobitem/JobItem";
 
 export const JobCostingPage = () => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Page } from "../../../../components/page/page";
+import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -8,12 +8,12 @@ import {
   useResources,
   useResourceTypes,
   useMaterials,
-} from "../../../../hooks";
+} from "#hooks";
 import { Typography, Util, Button, Card, useConfirm } from "tabler-react-2";
-import { Loading } from "../../../../components/loading/Loading";
-import { Icon } from "../../../../util/Icon";
-import { Table } from "tabler-react-2/dist/table";
-import { Spinner } from "tabler-react-2/dist/spinner";
+import { Loading } from "#loading";
+import { Icon } from "#icon";
+import { Table } from "#table";
+import { Spinner } from "#spinner";
 const { H1, H2, H3 } = Typography;
 
 export const ResourcesPage = () => {
@@ -29,7 +29,7 @@ export const ResourcesPage = () => {
   const {
     resourceTypes,
     loading: resourceTypesLoading,
-    ModalElement: CreateResourceTypeModalElement,
+    createModalElement: CreateResourceTypeModalElement,
     createResourceType,
     deleteResourceType,
   } = useResourceTypes(shopId);
@@ -119,12 +119,19 @@ const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
   } = useMaterials(shopId, resourceType.id);
   const { ModalElement: CreateResourceModalElement, createResource } =
     useResources(shopId, resourceType.id);
+
   const { confirm, ConfirmModal } = useConfirm({
     title: "Are you sure you want to delete this resource type?",
     text: "This action cannot be undone.",
     commitText: "Delete",
     cancelText: "Cancel",
   });
+
+  const { useEditResourceTypeModal } = useResourceTypes(shopId);
+  const { 
+    editModal: editResourceType, 
+    editModalElement: EditResourceTypeModalElement
+  } = useEditResourceTypeModal(resourceType.id, resourceType.title);
 
   return (
     <div>
@@ -136,6 +143,10 @@ const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
         <H2 id={resourceType.id}>{resourceType.title}</H2>
         {admin && (
           <Util.Row gap={1}>
+            <Button onClick={editResourceType}> 
+              <Icon i="tools" /> Edit Resource Type
+            </Button>
+            {EditResourceTypeModalElement}
             <Button onClick={createMaterial}>
               <Icon i="sandbox" /> Add Material
             </Button>

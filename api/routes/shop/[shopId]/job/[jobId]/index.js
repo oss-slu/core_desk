@@ -1,8 +1,13 @@
 // eslint-disable-next-line no-unused-vars
 import { LedgerItemType, LogType, Prisma } from "@prisma/client";
-import { prisma } from "../../../../../util/prisma.js";
-import { verifyAuth } from "../../../../../util/verifyAuth.js";
+import { prisma } from "#prisma";
+import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";
+import { z } from "zod";
+
+const userSchema = z.object({
+  ledgerItemId: z.string().optional
+});
 
 /** @type {Prisma.JobInclude} */
 const JOB_INCLUDE = {
@@ -21,6 +26,13 @@ const JOB_INCLUDE = {
         },
       },
       material: {
+        select: {
+          costPerUnit: true,
+          unitDescriptor: true,
+          title: true,
+        },
+      },
+      secondaryMaterial: {
         select: {
           costPerUnit: true,
           unitDescriptor: true,
@@ -55,6 +67,11 @@ const JOB_INCLUDE = {
         },
       },
       material: {
+        select: {
+          costPerUnit: true,
+        },
+      },
+      secondaryMaterial: {
         select: {
           costPerUnit: true,
         },
@@ -227,12 +244,14 @@ export const put = [
           additionalCosts: {
             include: {
               material: true,
+              secondaryMaterial: true,
               resource: true,
             },
           },
           items: {
             include: {
               material: true,
+              secondaryMaterial: true,
               resource: true,
             },
           },
@@ -292,13 +311,23 @@ export const put = [
           },
         });
 
+        const validationResult = userSchema.safeParse(req.body);
+          if (!validationResult.success) {
+            return res.status(400).json({
+          error: "Invalid data",
+          issues: validationResult.error.format(),
+          });
+        }
+
+        const validatedData = validationResult.data;
+
         await prisma.logs.update({
           where: {
             id: log.id,
           },
           data: {
-            ledgerItemId: ledgerItem.id,
-          },
+            ledgerItemId: validatedData.ledgerItem,
+          }
         });
 
         await prisma.logs.createMany({

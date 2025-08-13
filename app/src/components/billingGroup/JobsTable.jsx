@@ -1,13 +1,13 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { useAuth, useJobs } from "../../hooks";
-import { Table } from "tabler-react-2/dist/table";
+import { useAuth, useJobs } from "#hooks";
+import { Table } from "#table";
 import moment from "moment";
-import { MOMENT_FORMAT } from "../../util/constants";
-import { switchStatusForBadge } from "../../routes/shops/[shopId]/jobs";
+import { MOMENT_FORMAT } from "#constants";
+import { switchStatusForBadge } from "#jobs";
 import { Util, Switch, Typography } from "tabler-react-2";
-import { Spinner } from "tabler-react-2/dist/spinner";
-import { Button } from "tabler-react-2/dist/button";
+import { Spinner } from "#spinner";
+import { Button } from "#button";
 
 export const JobsTable = () => {
   const { shopId, groupId } = useParams();

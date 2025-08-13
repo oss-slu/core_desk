@@ -8,10 +8,18 @@ See the [Development documentation](doc/index.md) for more information and conve
 
 ## Installation & Quickstart
 
+1. Install node.js
+
+1. Install yarn
+
+```bash
+npm install --global yarn
+```
+
 1. Clone the repository
 
 ```bash
-git clone https://github.com/jackcrane/slu-open-project.git
+git clone https://github.com/oss-slu/open-project.git
 ```
 
 1. Set up environment variables
@@ -34,6 +42,11 @@ yarn
 
 ```bash
 cd app
+yarn && yarn build
+```
+
+```bash
+cd api
 yarn
 ```
 

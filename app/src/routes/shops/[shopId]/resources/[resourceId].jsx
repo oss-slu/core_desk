@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Page } from "../../../../components/page/page";
+import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useResource, useShop } from "../../../../hooks";
-import { Loading } from "../../../../components/loading/Loading";
+import { useAuth, useResource, useShop } from "#hooks";
+import { Loading } from "#loading";
 import {
   Typography,
   Util,
@@ -14,16 +14,16 @@ import {
 } from "tabler-react-2";
 import { Gallery } from "../../../../components/gallery/gallery";
 import { UploadDropzone } from "../../../../components/upload/uploader";
-import { Icon } from "../../../../util/Icon";
+import { Icon } from "#icon";
 const { H1, H2, H3, Text, B } = Typography;
 import "@mdxeditor/editor/style.css";
-import { MarkdownEditor } from "../../../../components/markdown/MarkdownEditor";
+import { MarkdownEditor } from "#markdownEditor";
 import Badge from "tabler-react-2/dist/badge";
-import { MarkdownRender } from "../../../../components/markdown/MarkdownRender";
-import { Alert } from "tabler-react-2/dist/alert";
-import { Table } from "tabler-react-2/dist/table";
-import { useModal } from "tabler-react-2/dist/modal";
-import { NotFound } from "../../../../components/404/404";
+import { MarkdownRender } from "#markdownRender";
+import { Alert } from "#alert";
+import { Table } from "#table";
+import { useModal } from "#modal";
+import { NotFound } from "#notFound";
 import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";
 
 export const ResourcePage = () => {

@@ -89,21 +89,22 @@
         </tr>
       </thead>
       <tbody>
-        <% items.forEach(item => { %> <% if (item.resource && item.material) {
+        <% items.forEach(item => { %> <% if (item.resource && item.material && item.secondaryMaterial) {
         %> <% const materialCost = (item.materialQty || 0) *
-        item.material.costPerUnit; %> <% const timeCost = (item.timeQty || 0) *
+        item.material.costPerUnit; %> <% const secondaryMaterialCost = (item.secondaryMaterialQty || 0 ) *
+        item.secondaryMaterial.costPerUnit; %> <% const timeCost = (item.timeQty || 0) *
         (item.resource.costPerTime || 0); %> <% const processingCost =
         (item.processingTimeQty || 0) * (item.resource.costPerProcessingTime ||
         0); %> <% const unitCost = (item.unitQty || 0) *
         (item.resource.costPerUnit || 0); %> <% const totalItemCost = timeCost +
-        processingCost + unitCost + materialCost; %>
+        processingCost + unitCost + materialCost + secondaryMaterialCost; %>
 
         <tr>
-          <td rowspan="4"><%= item.title %></td>
+          <td rowspan="5"><%= item.title %></td>
           <td><%= item.timeQty || '-' %> hours</td>
           <td>$<%= item.resource.costPerTime || 0 %> / hour</td>
           <td>$<%= timeCost.toFixed(2) %></td>
-          <td rowspan="4">$<%= totalItemCost.toFixed(2) %></td>
+          <td rowspan="5">$<%= totalItemCost.toFixed(2) %></td>
         </tr>
         <tr>
           <td><%= item.processingTimeQty || '-' %> units</td>
@@ -125,6 +126,16 @@
           </td>
           <td>$<%= materialCost.toFixed(2) %></td>
         </tr>
+        <tr>
+          <td>
+            <%= item.secondaryMaterialQty || '-' %> <%= item.secondaryMaterial.unitDescriptor %>
+          </td>
+          <td>
+            $<%= item.secondaryMaterial.costPerUnit %> / <%= item.secondaryMaterial.unitDescriptor
+            %>
+          </td>
+          <td>$<%= secondaryMaterialCost.toFixed(2) %></td>
+        </tr>
         <% } %> <% }) %>
       </tbody>
     </table>
@@ -144,20 +155,21 @@
       </thead>
       <tbody>
         <% additionalCosts.forEach(cost => { %> <% if (cost.resource &&
-        cost.material) { %> <% const materialCost = (cost.materialQty || 0) *
-        cost.material.costPerUnit; %> <% const timeCost = (cost.timeQty || 0) *
+        cost.material && cost.secondaryMaterial) { %> <% const materialCost = (cost.materialQty || 0) *
+        cost.material.costPerUnit; %> <% const secondaryMaterialCost = (cost.secondaryMaterialQty || 0) *
+        cost.secondaryMaterial.costPerUnit; %> <% const timeCost = (cost.timeQty || 0) *
         (cost.resource.costPerTime || 0); %> <% const processingCost =
         (cost.processingTimeQty || 0) * (cost.resource.costPerProcessingTime ||
         0); %> <% const unitCost = (cost.unitQty || 0) *
         (cost.resource.costPerUnit || 0); %> <% const totalCost = timeCost +
-        processingCost + unitCost + materialCost; %>
+        processingCost + unitCost + materialCost + secondaryMaterialCost; %>
 
         <tr>
-          <td rowspan="4">Manually Entered Cost</td>
+          <td rowspan="5">Manually Entered Cost</td>
           <td><%= cost.timeQty || '-' %> hours</td>
           <td>$<%= cost.resource.costPerTime || 0 %> / hour</td>
           <td>$<%= timeCost.toFixed(2) %></td>
-          <td rowspan="4">$<%= totalCost.toFixed(2) %></td>
+          <td rowspan="5">$<%= totalCost.toFixed(2) %></td>
         </tr>
         <tr>
           <td><%= cost.processingTimeQty || '-' %> units</td>
@@ -178,6 +190,16 @@
             %>
           </td>
           <td>$<%= materialCost.toFixed(2) %></td>
+        </tr>
+        <tr>
+          <td>
+            <%= cost.secondaryMaterialQty || '-' %> <%= cost.secondaryMaterial.unitDescriptor %>
+          </td>
+          <td>
+            $<%= cost.secondaryMaterial.costPerUnit %> / <%= cost.secondaryMaterial.unitDescriptor
+            %>
+          </td>
+          <td>$<%= secondaryMaterialCost.toFixed(2) %></td>
         </tr>
         <% } %> <% }) %>
       </tbody>

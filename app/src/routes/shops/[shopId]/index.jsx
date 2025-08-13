@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Page } from "../../../components/page/page";
-import { useAuth } from "../../../hooks/useAuth";
-import { Loading } from "../../../components/loading/Loading";
+import { Page } from "#page";
+import { useAuth } from "#useAuth";
+import { Loading } from "#loading";
 import { Typography, Util, Input } from "tabler-react-2";
-import { Icon } from "../../../util/Icon";
+import { Icon } from "#icon";
 import { useParams } from "react-router-dom";
 const { H1, H2 } = Typography;
 import { useShop } from "../../../hooks/useShop";
-import { Button } from "tabler-react-2/dist/button";
-import { MarkdownRender } from "../../../components/markdown/MarkdownRender";
-import { MarkdownEditor } from "../../../components/markdown/MarkdownEditor";
-import { NotFound } from "../../../components/404/404";
+import { Button } from "#button";
+import { MarkdownRender } from "#markdownRender";
+import { MarkdownEditor } from "#markdownEditor";
+import { NotFound } from "#notFound";
 import { UploadDropzone } from "../../../components/upload/uploader";
 
 export const shopSidenavItems = (
@@ -107,7 +107,7 @@ export const shopSidenavItems = (
 export const ShopPage = () => {
   const { user, loading } = useAuth();
   const { shopId } = useParams();
-  const { shop, userShop, updateShop, opLoading } = useShop(shopId);
+  const { shop, userShop, updateShop, opLoading, deleteShop, deleteModalElement} = useShop(shopId);
   const [editing, setEditing] = useState(false);
   const [newShop, setNewShop] = useState(shop);
   useEffect(() => {
@@ -145,11 +145,18 @@ export const ShopPage = () => {
         <H1>{shop.name}</H1>
         {user.admin || userShop.accountType === "ADMIN"
           ? !editing && (
+            <Util.Row justify="end">
               <Button onClick={() => setEditing(true)}>
                 <Icon i="pencil" /> Edit Shop
               </Button>
+
+              <Button onClick={() => deleteShop()}>
+                <Icon i="trash" /> Delete Shop
+              </Button>
+            </Util.Row>
             )
           : null}
+        {deleteModalElement}
       </Util.Row>
       <Util.Spacer size={1} />
       {editing ? (

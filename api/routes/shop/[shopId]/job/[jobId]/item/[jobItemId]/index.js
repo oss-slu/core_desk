@@ -2,6 +2,15 @@ import { LogType } from "@prisma/client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { utapi } from "../../../../../../../config/uploadthing.js";
+import { z } from "zod";
+
+const jobSchema = z.object({
+  costingPublic: z.boolean().optional(),
+  costPerProcessingTime: z.number().optional(),
+  costPerTime: z.number().optional(),
+  costPerUnit: z.number().optional(),
+  unitDescriptor: z.string().optional(),
+});
 
 export const get = [
   verifyAuth,
@@ -109,14 +118,26 @@ export const put = [
       req.body.data.resourceTypeId !== jobItem.resourceTypeId
     ) {
       req.body.data.materialId = null;
+      req.body.data.secondaryMaterialId = null;
       req.body.data.resourceId = null;
     }
 
     delete req.body.data.resource;
     delete req.body.data.resourceType;
     delete req.body.data.material;
+    delete req.body.data.secondaryMaterial;
 
     console.log(req.body.data);
+
+    const validationResult = jobSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: "Invalid data",
+        issues: validationResult.error.format(),
+      });
+    }
+
+    const validatedData = validationResult.data;
 
     const updatedItem = await prisma.jobItem.update({
       where: {
@@ -127,13 +148,19 @@ export const put = [
       include: {
         resource: {
           select: {
-            costingPublic: true,
-            costPerProcessingTime: true,
-            costPerTime: true,
-            costPerUnit: true,
+            costingPublic: validatedData.costingPublic,
+            costPerProcessingTime: validatedData.costingPerProcessingTime,
+            costPerTime: validatedData.costPerTime,
+            costPerUnit: validatedData.costPerUnit,
           },
         },
         material: {
+          select: {
+            costPerUnit: validatedData.costPerUnit,
+            unitDescriptor: validatedData.unitDescriptor,
+          },
+        },
+        secondaryMaterial: {
           select: {
             costPerUnit: true,
             unitDescriptor: true,
@@ -145,6 +172,7 @@ export const put = [
     const updatedItemToLog = JSON.parse(JSON.stringify(updatedItem));
     delete updatedItemToLog.resource;
     delete updatedItemToLog.material;
+    //delete updatedItemToLog.secondaryMaterial;  MIGHT NEED TO UPDATE LOGS TABLE...
 
     await prisma.logs.create({
       data: {

@@ -1,8 +1,8 @@
 import React from "react";
-import { useAuth } from "../hooks/useAuth";
-import { Loading } from "../components/loading/Loading";
-import { Page, sidenavItems } from "../components/page/page";
-import { MarkdownRender } from "../components/markdown/MarkdownRender";
+import { useAuth } from "#useAuth";
+import { Loading } from "#loading";
+import { Page, sidenavItems } from "#page";
+import { MarkdownRender } from "#markdownRender";
 
 const content = `
 # Welcome to SLU Open Project!

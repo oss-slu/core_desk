@@ -1,22 +1,22 @@
 import React, { useState } from "react";
 import { Card, Util, Typography, DropdownInput, Input } from "tabler-react-2";
 import { RenderMedia } from "../media/renderMedia";
-import { Button } from "tabler-react-2/dist/button";
-import { Icon } from "../../util/Icon";
-import { useModal } from "tabler-react-2/dist/modal";
+import { Button } from "#button";
+import { Icon } from "#icon";
+import { useModal } from "#modal";
 import { useJobItem } from "../../hooks/useJobItem";
 import { Link, useParams } from "react-router-dom";
-import { Spinner } from "tabler-react-2/dist/spinner";
+import { Spinner } from "#spinner";
 const { H3, H4 } = Typography;
 import styles from "./jobItem.module.css";
-import { LoadableDropdownInput } from "../loadableDropdown/LoadableDropdown";
+import { LoadableDropdownInput } from "#loadableDropdown";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 import Badge from "tabler-react-2/dist/badge";
 import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
 
 import { EditCosting } from "./EditCosting";
-import { useAuth, useBillingGroupUser } from "../../hooks";
+import { useAuth, useBillingGroupUser } from "#hooks";
 
 export function downloadFile(url, filename) {
   fetch(url)
@@ -325,6 +325,17 @@ export const JobItem = ({
                           resourceTypeId={item.resourceTypeId}
                           opLoading={opLoading}
                           includeNone={true}
+                          materialType={"Primary"}
+                        />
+                        <MaterialPicker
+                          value={item.secondaryMaterialId}
+                          onChange={(value) =>
+                            updateJobItem({ secondaryMaterialId: value })
+                          }
+                          resourceTypeId={item.resourceTypeId}
+                          opLoading={opLoading}
+                          includeNone={true}
+                          materialType={"Secondary"}
                         />
                         {userIsPrivileged ? (
                           <ResourcePicker
@@ -356,7 +367,7 @@ export const JobItem = ({
               title: "Costing",
               content: (
                 <>
-                  {item.materialId && item.resourceId ? (
+                  {item.materialId && item.resourceId && item.secondaryMaterialId ? (
                     <EditCosting
                       item={item}
                       onChange={(value) => updateJobItem(value)}
@@ -366,7 +377,7 @@ export const JobItem = ({
                   ) : (
                     <Badge color="red" soft>
                       <Icon i="coin-off" />
-                      Costing unavailable without material and resource
+                      Costing unavailable without material, secondaryMaterial and resource
                     </Badge>
                   )}
                 </>

@@ -1,18 +1,18 @@
 import React from "react";
-import { Page } from "../../../../components/page/page";
+import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
-import { useAuth } from "../../../../hooks/useAuth";
-import { useShop } from "../../../../hooks";
-import { Loading } from "../../../../components/loading/Loading";
+import { useAuth } from "#useAuth";
+import { useShop } from "#hooks";
+import { Loading } from "#loading";
 import { Typography, Util } from "tabler-react-2";
-import { Table } from "tabler-react-2/dist/table";
+import { Table } from "#table";
 import moment from "moment";
 import Badge from "tabler-react-2/dist/badge";
-import { Price } from "../../../../components/price/RenderPrice";
-import { Icon } from "../../../../util/Icon";
+import { Price } from "#renderPrice";
+import { Icon } from "#icon";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
-import { Avatar } from "tabler-react-2/dist/avatar";
+import { Avatar } from "#avatar";
 const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {

@@ -1,6 +1,6 @@
 // AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { u } from "../util/url";
+import { u } from "#url";
 import { emitter } from "../util/mitt";
 import * as Sentry from "@sentry/react";
 

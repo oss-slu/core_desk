@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useBillingGroupInvitation } from "../../hooks/useBillingGroupInvitation";
-import { Button } from "tabler-react-2/dist/button";
-import { Icon } from "../../util/Icon";
+import { useBillingGroupInvitation } from "#useBillingGroupInvitation";
+import { Button } from "#button";
+import { Icon } from "#icon";
 import { Input, Switch } from "tabler-react-2";
-import { useModal } from "tabler-react-2/dist/modal";
-import { Spinner } from "tabler-react-2/dist/spinner";
+import { useModal } from "#modal";
+import { Spinner } from "#spinner";
 import { useParams } from "react-router-dom";
 
 const EditBillingGroupInvitationModalContent = ({ invitationId, refetch }) => {

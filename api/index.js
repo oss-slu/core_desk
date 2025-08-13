@@ -6,7 +6,7 @@ import samlConfig from "./config/saml-config.js";
 import cors from "cors";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { prisma } from "./util/prisma.js";
+import { prisma } from "#prisma";
 import { LogType } from "@prisma/client";
 dotenv.config();
 import { createRouteHandler } from "uploadthing/express";
@@ -15,6 +15,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";
 import { createProxyMiddleware } from "http-proxy-middleware";
+// import client from "#postmark";
 
 // Define __dirname for ES modules
 const __filename = fileURLToPath(import.meta.url);
@@ -213,6 +214,21 @@ if (process.env.JACK == "true") {
               req.params?.billingGroupInvitationLinkId,
           },
         });
+
+        console.log("Email Sent! - mock");
+        
+        /*
+
+        client.sendEmail({
+          "From": `${process.env.POSTMARK_FROM_EMAIL}`, 
+          "To": `${user.email}`,
+          "Subject": "User Login detected for OpenSLU",
+          "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.` , 
+          "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
+          "MessageStream": "outbound"
+        });
+        
+        */
       }
 
       // Call the original send method
