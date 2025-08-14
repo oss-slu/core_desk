@@ -16,11 +16,11 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
 
   return (
     <>
-      {error && (
+      {/* {error && (
         <Alert variant="danger" className="mb-3" title="Error">
           {error}
         </Alert>
-      )}
+      )} */}
       <Row gap={1}>
         <Input
           style={{ flex: 1 }}

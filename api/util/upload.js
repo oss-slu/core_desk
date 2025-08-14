@@ -7,6 +7,7 @@ import NodeStl from "node-stl";
 const logging = false;
 
 export const handleUpload = async (data) => {
+  return;
   const { jobId, shopId, userId, scope, resourceId, materialId, groupId } =
     data.metadata;
 

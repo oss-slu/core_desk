@@ -1,4 +1,4 @@
-import { S3Client } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import cuid from "cuid";
 import multer from "multer";
 import multerS3 from "multer-s3";
@@ -20,7 +20,12 @@ export const rawUpload = multer({
     s3,
     bucket: process.env.AWS_BUCKET,
     key: (req, file, cb) => {
-      cb(null, `${process.env.PROJECT_NAME}/${cuid()}_${file.originalname}`);
+      cb(
+        null,
+        `${process.env.PROJECT_NAME}/${cuid()}_${encodeURIComponent(
+          file.originalname
+        )}`
+      );
     },
     acl: "public-read",
   }),
@@ -40,14 +45,19 @@ export const upload =
         key: (req, file, cb) => {
           cb(
             null,
-            `${process.env.PROJECT_NAME}/${cuid()}_${file.originalname}`
+            `${process.env.PROJECT_NAME}/${cuid()}_${encodeURIComponent(
+              file.originalname
+            )}`
           );
         },
         acl: "public-read",
       }),
       limits: { fileSize: maxFileSize },
       fileFilter: (req, file, cb) => {
-        if (allowedMimeTypes.includes(file.mimetype)) {
+        if (
+          allowedMimeTypes.includes(file.mimetype) ||
+          allowedMimeTypes === "*"
+        ) {
           cb(null, true);
         } else {
           return cb(
@@ -96,3 +106,98 @@ export const upload =
       }
     });
   };
+
+/**
+ * Upload a file directly to S3 (not via HTTP pipeline) and log it in Prisma.
+ *
+ * @param {Object} params
+ * @param {Buffer|Uint8Array|import("stream").Readable} params.body - File data.
+ * @param {string} params.originalname - Original filename (e.g. "report.pdf").
+ * @param {string} [params.mimetype] - Detected MIME type (e.g. "application/pdf").
+ * @param {string} [params.contentType] - Explicit content type; overrides mimetype if provided.
+ * @param {number} [params.size] - File size in bytes; inferred if body is Buffer/Uint8Array.
+ * @param {string|null} [params.userId=null] - Optional user id to associate with the file record.
+ * @param {Record<string,string>} [params.metadata] - Optional S3 object metadata.
+ * @param {string} [params.acl="public-read"] - S3 ACL.
+ * @param {string} [params.prefix=process.env.PROJECT_NAME] - Key prefix/folder.
+ *
+ * @returns {Promise<{ key:string, location:string, etag?:string, file:{id:string} }>}
+ */
+export const uploadFile = async ({
+  body,
+  originalname,
+  mimetype,
+  contentType,
+  size,
+  userId = null,
+  metadata = {},
+  acl = "public-read",
+  prefix = process.env.PROJECT_NAME,
+}) => {
+  if (!body) throw new Error("uploadFile: 'body' is required");
+  if (!originalname) throw new Error("uploadFile: 'originalname' is required");
+
+  const key = `${prefix}/${cuid()}_${originalname}`;
+  const ContentType = contentType || mimetype || "application/octet-stream";
+
+  const put = new PutObjectCommand({
+    Bucket: process.env.AWS_BUCKET,
+    Key: key,
+    Body: body,
+    ACL: acl,
+    ContentType,
+    Metadata: metadata,
+  });
+
+  const result = await s3.send(put);
+
+  const location = buildPublicUrl({
+    endpoint: process.env.AWS_ENDPOINT,
+    bucket: process.env.AWS_BUCKET,
+    region: process.env.AWS_REGION,
+    key,
+  });
+
+  const inferredSize =
+    typeof size === "number"
+      ? size
+      : Buffer.isBuffer(body) || body instanceof Uint8Array
+      ? body.byteLength
+      : null;
+
+  const fileRecord = await prisma.file.create({
+    data: {
+      userId,
+      key,
+      originalname,
+      mimetype: mimetype || ContentType,
+      contentType: ContentType,
+      size: inferredSize,
+      location: location.includes("https://")
+        ? location
+        : "https://" + location,
+    },
+  });
+
+  return {
+    key,
+    location: "https://" + location,
+    etag: result.ETag,
+    file: fileRecord,
+  };
+};
+
+/** Build a public URL for the uploaded object, handling AWS S3 and custom endpoints. */
+const buildPublicUrl = ({ endpoint, bucket, region, key }) => {
+  const cleanEndpoint = (endpoint || "").replace(/\/+$/, "");
+
+  // If using standard AWS S3 and no custom endpoint, prefer virtual-hosted–style URL.
+  if (!cleanEndpoint || /amazonaws\.com$/i.test(cleanEndpoint)) {
+    const r = region || "us-east-1";
+    return `https://${bucket}.s3.${r}.amazonaws.com/${encodeURI(key)}`;
+  }
+
+  // For custom endpoints (e.g., DigitalOcean Spaces), fall back to path-style by default.
+  // Example: https://nyc3.digitaloceanspaces.com/<bucket>/<key>
+  return `${cleanEndpoint}/${bucket}/${encodeURI(key)}`;
+};
