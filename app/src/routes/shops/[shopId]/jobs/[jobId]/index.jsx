@@ -298,6 +298,7 @@ export const JobPage = () => {
                       refetchJobs(false);
                     }}
                     useNewDropzone={true}
+                    endpoint={`/api/shop/${shopId}/job/${jobId}/upload`}
                   />
                 ),
               },

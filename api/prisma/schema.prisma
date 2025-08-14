@@ -29,6 +29,24 @@ model user {
   shops            UserShop[]
   logs             logs[]
   navigation       Navigation[]
+  files            File[]
+}
+
+model File {
+  id        String   @id @default(cuid())
+  userId    String?
+  user      user?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  key          String
+  originalname String
+  mimetype     String
+  contentType  String
+  size         Int
+  location     String
+  blurhash     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model logs {

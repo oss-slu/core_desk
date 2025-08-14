@@ -15,10 +15,11 @@ export const UploadDropzone = ({
   onUploadComplete,
   dropzoneAppearance,
   useNewDropzone = false,
+  endpoint,
 }) => {
   return useNewDropzone ? (
     <>
-      <Dropzone onSuccessfulUpload={onUploadComplete} />
+      <Dropzone onSuccessfulUpload={onUploadComplete} endpoint={endpoint} />
     </>
   ) : (
     <>

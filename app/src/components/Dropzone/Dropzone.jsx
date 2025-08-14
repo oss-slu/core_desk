@@ -4,13 +4,13 @@ import { useState } from "react";
 import { Row } from "../../util/Flex";
 import { useFileUploader } from "../../hooks/useFileUploader";
 
-export const Dropzone = ({ onSuccessfulUpload = () => {} }) => {
+export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
   const [files, setFiles] = useState([]);
   useEffect(() => {
     console.log(files);
   }, [files]);
 
-  const { data, error, loading, upload } = useFileUploader("/api/file", {
+  const { data, error, loading, upload } = useFileUploader(endpoint, {
     onSuccessfulUpload,
   });
 
