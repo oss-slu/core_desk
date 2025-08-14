@@ -297,6 +297,7 @@ export const JobPage = () => {
                     onUploadComplete={() => {
                       refetchJobs(false);
                     }}
+                    useNewDropzone={true}
                   />
                 ),
               },
