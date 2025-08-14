@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { prisma } from "#prisma";
 import inquirer from "inquirer";
 import ora from "ora";
-import { createUser } from "./createUser";
+import { createUser } from "./createUser.js";
 
 dotenv.config();
 
