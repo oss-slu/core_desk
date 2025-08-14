@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Input, Button, Alert } from "tabler-react-2";
+import { Input, Button } from "tabler-react-2";
 import { useState } from "react";
 import { Row } from "../../util/Flex";
 import { useFileUploader } from "../../hooks/useFileUploader";
@@ -10,7 +10,7 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
     console.log(files);
   }, [files]);
 
-  const { data, error, loading, upload } = useFileUploader(endpoint, {
+  const { loading, upload } = useFileUploader(endpoint, {
     onSuccessfulUpload,
   });
 

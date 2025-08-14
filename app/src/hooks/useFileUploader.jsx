@@ -21,6 +21,7 @@ const uploadFiles = async (url, { arg }) => {
       errorMessage = errorData?.message || response.statusText;
     } catch (parseError) {
       errorMessage = response.statusText || "Unknown error";
+      console.log(parseError);
     }
     console.error("Upload error:", errorMessage);
     throw errorMessage;
