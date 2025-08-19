@@ -38,6 +38,8 @@ export const get = [
       },
       include: {
         resourceType: true,
+        tdsFile: true,
+        msdsFile: true,
         images: {
           where: {
             active: true,
@@ -87,12 +89,12 @@ export const post = [
     }
 
     const validationResult = materialSchema.safeParse(req.body);
-      if (!validationResult.success) {
-        return res.status(400).json({
-          error: "Invalid data",
-          issues: validationResult.error.format(),
-        });
-      }
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: "Invalid data",
+        issues: validationResult.error.format(),
+      });
+    }
 
     const validatedData = validationResult.data;
 

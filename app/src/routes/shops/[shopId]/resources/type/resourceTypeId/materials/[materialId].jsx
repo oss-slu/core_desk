@@ -118,18 +118,21 @@ export const MaterialPage = () => {
           <Util.Col gap={1} align="start">
             <Button
               ghost
-              href={material.msdsFileUrl ? material.msdsFileUrl : null}
+              href={material.msdsFileUrl || material.msdsFile?.location || null}
               target="_blank"
               disabled
               variant="primary"
+              data-material={JSON.stringify(material)}
             >
               <Icon i="download" />
               Material Safety Data Sheet
-              {material.msdsFileUrl ? "" : " (Not Available)"}
+              {material.msdsFileUrl || material.msdsFile?.location
+                ? ""
+                : " (Not Available)"}
             </Button>
             <Button
               ghost
-              href={material.tdsFileUrl ? material.tdsFileUrl : null}
+              href={material.tdsFileUrl || material.tdsFile?.location || null}
               target="_blank"
               disabled
               variant="primary"
@@ -320,7 +323,6 @@ export const MaterialPage = () => {
               </Card>
             )}
             <UploadDropzone
-              scope="material.tds"
               metadata={{ shopId, materialId }}
               onUploadComplete={refetch}
               dropzoneAppearance={{
@@ -337,6 +339,8 @@ export const MaterialPage = () => {
                   backgroundColor: "var(--tblr-primary)",
                 },
               }}
+              useNewDropzone={true}
+              endpoint={`/api/shop/${shopId}/resources/type/${material.resourceTypeId}/material/${materialId}/uploadTds`}
             />
           </Util.Row>
           <Util.Spacer size={2} />
