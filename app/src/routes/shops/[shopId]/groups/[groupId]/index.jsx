@@ -350,7 +350,7 @@ export const BillingGroupPage = () => {
           />
           <Util.Spacer size={2} />
           <h2>Jobs</h2>
-          {billingGroup.jobs.length === 0 ? (
+          {billingGroup.jobs?.length === 0 ? (
             <i>
               There are no jobs in this billing group. You can add jobs by
               clicking the "Edit" button above and turning on job connections.
