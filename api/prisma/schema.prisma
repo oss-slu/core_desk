@@ -50,6 +50,8 @@ model File {
 
   jobItemsAsFile         JobItem[] @relation("JobItem_file")
   jobItemsAsThumbnail    JobItem[] @relation("JobItem_thumbnailFile")
+
+  resourceImagesAsFile   ResourceImage[] @relation("ResourceImage_file")
 }
 
 model logs {
@@ -212,11 +214,15 @@ model MaterialImage {
 
 model ResourceImage {
   id          String   @id @default(cuid())
-  fileKey     String
-  fileUrl     String
-  fileName    String
-  fileType    String
+  fileKey     String?
+  fileUrl     String?
+  fileName    String?
+  fileType    String?
   description String?
+
+  fileId      String?
+  file        File?    @relation("ResourceImage_file", fields: [fileId], references: [id], onDelete: Cascade)
+
   active      Boolean  @default(true)
   resourceId  String
   createdAt   DateTime @default(now())

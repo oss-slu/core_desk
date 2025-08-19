@@ -60,7 +60,6 @@ export const ResourcePage = () => {
 
   const HereUploadDropzone = ({ height = "100%", onComplete = refetch }) => (
     <UploadDropzone
-      scope="shop.resource.image"
       metadata={{
         shopId,
         resourceId,
@@ -75,6 +74,8 @@ export const ResourcePage = () => {
         },
       }}
       onUploadComplete={onComplete}
+      endpoint={`/api/shop/${shopId}/resources/resource/${resourceId}/images/upload`}
+      useNewDropzone={true}
     />
   );
 
@@ -413,9 +414,9 @@ const EditGallery = ({
           {
             label: "Image",
             accessor: "fileUrl",
-            render: (fileUrl) => (
+            render: (fileUrl, context) => (
               <img
-                src={fileUrl}
+                src={fileUrl || context.file?.location}
                 style={{
                   width: 100,
                   height: 100,
