@@ -273,7 +273,6 @@ export const MaterialPage = () => {
               </Card>
             )}
             <UploadDropzone
-              scope="material.msds"
               metadata={{ shopId, materialId }}
               onUploadComplete={() => {
                 setTimeout(() => {
@@ -294,6 +293,8 @@ export const MaterialPage = () => {
                   backgroundColor: "var(--tblr-primary)",
                 },
               }}
+              useNewDropzone={true}
+              endpoint={`/api/shop/${shopId}/resources/type/${material.resourceTypeId}/material/${materialId}/uploadMsds`}
             />
           </Util.Row>
           <Util.Spacer size={2} />

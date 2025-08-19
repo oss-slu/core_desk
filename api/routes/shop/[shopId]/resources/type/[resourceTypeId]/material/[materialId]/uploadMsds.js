@@ -43,12 +43,12 @@ export const post = [
         return res.status(404).json({ error: "Material not found" });
       }
 
-      await prisma.material.update({
+      const newMsds = await prisma.material.update({
         where: {
           id: materialId,
         },
         data: {
-          tdsFileId: req.fileLog.id,
+          msdsFileId: req.fileLog.id,
         },
       });
 
@@ -69,7 +69,7 @@ export const post = [
               id: materialId,
             },
           },
-          type: LogType.MATERIAL_TDS_UPLOADED,
+          type: LogType.MATERIAL_MSDS_UPLOADED,
         },
       });
 
