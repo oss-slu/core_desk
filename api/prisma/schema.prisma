@@ -55,6 +55,8 @@ model File {
 
   materialMsdsFile Material[] @relation("Material_msdsFile")
   materialTdsFile Material[] @relation("Material_tdsFile")
+
+  materialImageAsFile MaterialImage[] @relation("MaterialImage_file")
 }
 
 model logs {
@@ -211,10 +213,15 @@ model Material {
 
 model MaterialImage {
   id          String   @id @default(cuid())
-  fileKey     String
-  fileUrl     String
-  fileName    String
-  fileType    String
+
+  fileKey     String?
+  fileUrl     String?
+  fileName    String?
+  fileType    String?
+
+  fileId      String?
+  file        File?    @relation("MaterialImage_file", fields: [fileId], references: [id], onDelete: Cascade)
+
   description String?
   active      Boolean  @default(true)
   materialId  String
