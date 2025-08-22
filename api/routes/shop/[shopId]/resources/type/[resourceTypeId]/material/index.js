@@ -7,9 +7,8 @@ const materialSchema = z.object({
   title: z.string().min(1, "Material must have Title"),
   manufacturer: z.string().optional(),
   resourceTypeId: z.string().min(1, "Resource must have ID"),
-  costPerUnit: z.number().optional(),
+  costPerUnit: z.coerce.number().min(0, "Cost per unit must be a number"),
   unitDescriptor: z.string().optional(),
-  shopId: z.string().min(1, "Shop must have ID"),
 });
 
 export const get = [
@@ -43,6 +42,9 @@ export const get = [
         images: {
           where: {
             active: true,
+          },
+          include: {
+            file: true,
           },
         },
       },
@@ -90,6 +92,7 @@ export const post = [
 
     const validationResult = materialSchema.safeParse(req.body);
     if (!validationResult.success) {
+      console.log(validationResult.error.format());
       return res.status(400).json({
         error: "Invalid data",
         issues: validationResult.error.format(),
@@ -102,10 +105,18 @@ export const post = [
       data: {
         title: validatedData.title,
         manufacturer: validatedData.manufacturer,
-        resourceTypeId: validatedData.resourceTypeId,
+        resourceType: {
+          connect: {
+            id: validatedData.resourceTypeId,
+          },
+        },
         costPerUnit: validatedData.costPerUnit,
         unitDescriptor: validatedData.unitDescriptor,
-        shopId: validatedData.shopId,
+        shop: {
+          connect: {
+            id: req.params.shopId,
+          },
+        },
       },
       include: {
         resourceType: true,

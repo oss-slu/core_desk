@@ -160,7 +160,6 @@ export const MaterialPage = () => {
               </div>
             ) : user.admin || userShop.accountType === "ADMIN" ? (
               <UploadDropzone
-                scope="material.image"
                 metadata={{ shopId, materialId }}
                 onUploadComplete={refetch}
                 dropzoneAppearance={{
@@ -172,6 +171,8 @@ export const MaterialPage = () => {
                     display: "none",
                   },
                 }}
+                endpoint={`/api/shop/${shopId}/resources/type/${material.resourceTypeId}/material/${materialId}/images`}
+                useNewDropzone={true}
               />
             ) : (
               <i>No images found</i>
@@ -423,7 +424,6 @@ export const MaterialPage = () => {
           <Util.Spacer size={1} />
           <H3>Upload a new image</H3>
           <UploadDropzone
-            scope="material.image"
             metadata={{ shopId, materialId }}
             dropzoneAppearance={{
               container: {
@@ -438,6 +438,8 @@ export const MaterialPage = () => {
               },
             }}
             onUploadComplete={refetch}
+            endpoint={`/api/shop/${shopId}/resources/type/${material.resourceTypeId}/material/${materialId}/images`}
+            useNewDropzone={true}
           />
         </div>
       ) : (

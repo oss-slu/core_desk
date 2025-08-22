@@ -36,6 +36,9 @@ export const get = [
             where: {
               active: true,
             },
+            include: {
+              file: true,
+            },
           },
         },
       });

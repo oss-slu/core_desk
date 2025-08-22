@@ -57,6 +57,8 @@ model File {
   materialTdsFile Material[] @relation("Material_tdsFile")
 
   materialImageAsFile MaterialImage[] @relation("MaterialImage_file")
+
+  logoFileAsFile Shop[] @relation("Shop_logoFile")
 }
 
 model logs {
@@ -120,9 +122,14 @@ model Shop {
   website         String?
   description     String?
   imageUrl        String?
+
   logoUrl         String?
   logoKey         String?
   logoName        String?
+
+  logoFileId      String?
+  logoFile        File?          @relation("Shop_logoFile", fields: [logoFileId], references: [id], onDelete: Cascade)
+
   color           Color?
   startingDeposit Float?
   active          Boolean        @default(true)
