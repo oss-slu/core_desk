@@ -43,7 +43,7 @@ export const post = [
         return res.status(404).json({ error: "Material not found" });
       }
 
-      const newMsds = await prisma.material.update({
+      await prisma.material.update({
         where: {
           id: materialId,
         },
