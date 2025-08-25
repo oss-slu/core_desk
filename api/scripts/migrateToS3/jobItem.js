@@ -203,11 +203,11 @@ export const runMigration = async (records, opts = {}) => {
 
 // Default example using 'file' prefix:
 
-const FIELD_PREFIX = "tdsFile";
+const FIELD_PREFIX = "file";
 
 const __F = resolveFields({ fieldPrefix: FIELD_PREFIX });
 
-const records = await prisma.material.findMany({
+const records = await prisma.resourceImage.findMany({
   where: {
     [__F.key]: { not: null },
     [__F.id]: null,
@@ -222,7 +222,7 @@ if (records.length === 0) {
 console.log(`Running for ${records.length} records`);
 
 await runMigration(records, {
-  model: "material",
+  model: "resourceImage",
   fieldPrefix: FIELD_PREFIX,
   features: ["key", "url", "name", "type"],
 });

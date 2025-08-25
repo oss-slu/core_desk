@@ -225,10 +225,7 @@ model MaterialImage {
 
 model ResourceImage {
   id          String   @id @default(cuid())
-  fileKey     String?
-  fileUrl     String?
-  fileName    String?
-  fileType    String?
+
   description String?
 
   fileId      String?
