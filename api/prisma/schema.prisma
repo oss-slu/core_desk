@@ -367,19 +367,20 @@ model JobItem {
   status               ProgressStatus @default(NOT_STARTED)
   qty                  Float?
 
-  fileKey              String?
-  fileUrl              String?
-  fileName             String?
-  fileType             String?
-  fileThumbnailKey     String?
-  fileThumbnailUrl     String?
-  fileThumbnailName    String?
+  // fileKey              String?
+  // fileUrl              String?
+  // fileName             String?
+  // fileType             String?
+  // fileThumbnailKey     String?
+  // fileThumbnailUrl     String?
+  // fileThumbnailName    String?
 
   fileId          String?
   file            File? @relation("JobItem_file", fields: [fileId], references: [id], onDelete: Cascade)
 
-  thumbnailFileId String?
-  thumbnailFile   File? @relation("JobItem_thumbnailFile", fields: [thumbnailFileId], references: [id], onDelete: Cascade)
+  fileThumbnailId String? @map("thumbnailFileId")
+  fileThumbnail   File?   @relation("JobItem_thumbnailFile", fields: [fileThumbnailId], references: [id], onDelete: Cascade)
+
 
   stlVolume            Float?
   stlBoundingBoxX      Float?
