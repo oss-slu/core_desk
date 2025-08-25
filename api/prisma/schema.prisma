@@ -349,14 +349,6 @@ model JobItem {
   status               ProgressStatus @default(NOT_STARTED)
   qty                  Float?
 
-  // fileKey              String?
-  // fileUrl              String?
-  // fileName             String?
-  // fileType             String?
-  // fileThumbnailKey     String?
-  // fileThumbnailUrl     String?
-  // fileThumbnailName    String?
-
   fileId          String?
   file            File? @relation("JobItem_file", fields: [fileId], references: [id], onDelete: Cascade)
 

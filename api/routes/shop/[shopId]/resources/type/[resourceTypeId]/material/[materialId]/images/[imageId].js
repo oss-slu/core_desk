@@ -1,7 +1,6 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { LogType } from "@prisma/client";
-import { utapi } from "../../../../../../../../../config/uploadthing.js";
 
 export const del = [
   verifyAuth,
