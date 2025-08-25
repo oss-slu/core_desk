@@ -90,6 +90,7 @@ export const migrateRecords = async ({
   // choose which scalar text features to clear/touch; id is handled via relation connect/disconnect
   features = ["key", "url", "name", "type"],
 } = {}) => {
+  console.log(model);
   if (!Array.isArray(records) || records.length === 0) {
     throw new Error("migrateRecords: 'records' must be a non-empty array");
   }
@@ -180,7 +181,7 @@ export const migrateRecords = async ({
 export const runMigration = async (records, opts = {}) => {
   const result = await migrateRecords({
     records,
-    model: "jobItem",
+    // model: "jobItem",
     // e.g., migrating thumbnails that do NOT have a Type column:
     // fieldPrefix: "fileThumbnail",
     // features: ["key", "url", "name"], // omit "type" to avoid unknown-arg errors
@@ -202,20 +203,26 @@ export const runMigration = async (records, opts = {}) => {
 
 // Default example using 'file' prefix:
 
-const FIELD_PREFIX = "fileThumbnail";
+const FIELD_PREFIX = "tdsFile";
 
 const __F = resolveFields({ fieldPrefix: FIELD_PREFIX });
 
-const records = await prisma.jobItem.findMany({
+const records = await prisma.material.findMany({
   where: {
     [__F.key]: { not: null },
     [__F.id]: null,
   },
 });
 
+if (records.length === 0) {
+  console.log("No records found");
+  process.exit(0);
+}
+
 console.log(`Running for ${records.length} records`);
 
 await runMigration(records, {
+  model: "material",
   fieldPrefix: FIELD_PREFIX,
-  features: ["key", "url", "name"],
+  features: ["key", "url", "name", "type"],
 });

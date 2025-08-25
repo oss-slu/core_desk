@@ -127,8 +127,8 @@ model Shop {
   logoKey         String?
   logoName        String?
 
-  logoFileId      String?
-  logoFile        File?          @relation("Shop_logoFile", fields: [logoFileId], references: [id], onDelete: Cascade)
+  logoId      String?        @map("logoFileId")
+  logo        File?          @relation("Shop_logoFile", fields: [logoId], references: [id], onDelete: Cascade)
 
   color           Color?
   startingDeposit Float?
@@ -190,18 +190,8 @@ model Material {
   costPublic                   Boolean                  @default(true)
   resourceTypeId               String
 
-  msdsFileKey                  String?
-  msdsFileUrl                  String?
-  msdsFileName                 String?
-  msdsFileType                 String?
-
   msdsFileId                   String?
   msdsFile                     File?                    @relation("Material_msdsFile", fields: [msdsFileId], references: [id], onDelete: Cascade)
-
-  tdsFileKey                   String?
-  tdsFileUrl                   String?
-  tdsFileName                  String?
-  tdsFileType                  String?
 
   tdsFileId                    String?
   tdsFile                      File?                    @relation("Material_tdsFile", fields: [tdsFileId], references: [id], onDelete: Cascade)
@@ -220,11 +210,6 @@ model Material {
 
 model MaterialImage {
   id          String   @id @default(cuid())
-
-  fileKey     String?
-  fileUrl     String?
-  fileName    String?
-  fileType    String?
 
   fileId      String?
   file        File?    @relation("MaterialImage_file", fields: [fileId], references: [id], onDelete: Cascade)
