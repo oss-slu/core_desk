@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -47,9 +46,8 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
 
-  lint:
+  lint-api:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
@@ -63,13 +61,24 @@ jobs:
         working-directory: ./api
         run: yarn install
 
-      - name: Install frontend Dependencies
-        working-directory: ./app
-        run: yarn install
-
       - name: Run backend lint
         working-directory: ./api
         run: yarn lint
+
+  lint-app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "lts/*"
+
+      - name: Install frontend Dependencies
+        working-directory: ./app
+        run: yarn install
 
       - name: Run frontend lint
         working-directory: ./app
@@ -79,8 +88,9 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - test
-      - lint
-    if: github.ref == 'refs/heads/main' # Ensures this job runs only on the main branch
+      - lint-api
+      - lint-app
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -102,3 +112,18 @@ jobs:
           build-args: |
             DATABASE_URL=${{ secrets.DATABASE_URL }}
             SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs:
+      - docker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Deploy to DigitalOcean
+        uses: digitalocean/app_action/deploy@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_TOKEN }}
+          app_name: slu-open-project
+          print_build_logs: true
+          print_deploy_logs: true
