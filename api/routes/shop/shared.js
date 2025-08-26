@@ -13,7 +13,7 @@ export const SHOP_SELECT = {
   color: true,
   logoUrl: true,
   startingDeposit: true,
-  logoFile: true,
+  logo: true,
 };
 
 /** @type {Prisma.ShopSelect} */
