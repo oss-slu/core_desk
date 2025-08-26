@@ -10,6 +10,8 @@ This is an open source project management platform for distributed manufacturing
 
 1. Install node.js
 
+1. Install Postgres (or have access to a connection string)
+
 1. Install yarn
 
 ```bash
@@ -25,18 +27,23 @@ git clone https://github.com/oss-slu/open-project.git
 1. Set up environment variables
 
 ```
-DATABASE_URL=(postgres connection string)
+DATABASE_URL=(postgres connection string) (start a local postgres server and put that here)
 JWT_SECRET=(random string)
 BASE_URL=http://localhost:5173
-UPLOADTHING_TOKEN=(UploadThing API key from dashboard)
 SERVER_URL=(tunnel url accessible from the internet. Used for callbacks & webhooks)
 SENTRY_AUTH_TOKEN=(Sentry.io auth token)
+AWS_REGION=nyc3
+AWS_BUCKET=open-project
+AWS_ENDPOINT=https://nyc3.digitaloceanspaces.com
+PROJECT_NAME=dev-(your first name)
+AWS_ACCESS_KEY_ID=(get an api key from the tech lead)
+AWS_SECRET_ACCESS_KEY=(get an api key from the tech lead)
 ```
 
 1. Install dependencies
 
 ```bash
-cd slu-open-project
+cd open-project
 yarn
 ```
 
@@ -65,6 +72,16 @@ yarn start
 ```
 
 1. Open your browser to `http://localhost:5173` to view the app.
+
+1. To authenticate/log in, we typically use the SLU OKTA log in system, but that is a pain to connect in your local environment, so we have a workaround utility.
+
+In the /api folder, run 
+
+```bash
+yarn okta
+```
+
+If this is your first time logging in, allow it to create a new user for you. Once finished, it will give you a line of javascript. Copy/paste that into the browser's console, and that will log you in without having to go through the typical auth flow.
 
 ## Testing
 
