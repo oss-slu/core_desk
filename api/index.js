@@ -9,8 +9,6 @@ import dotenv from "dotenv";
 import { prisma } from "#prisma";
 import { LogType } from "@prisma/client";
 dotenv.config();
-import { createRouteHandler } from "uploadthing/express";
-import { uploadRouter } from "./config/uploadthing.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";
@@ -172,6 +170,21 @@ if (process.env.JACK == "true") {
 
       const relayState = req.body.RelayState;
 
+      console.log("Email Sent! - mock");
+
+      /*
+
+        client.sendEmail({
+          "From": `${process.env.POSTMARK_FROM_EMAIL}`,
+          "To": `${user.email}`,
+          "Subject": "User Login detected for OpenSLU",
+          "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.` ,
+          "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
+          "MessageStream": "outbound"
+        });
+
+        */
+
       // Send token to the client
       res.redirect(
         (relayState ? relayState : process.env.BASE_URL) + "?token=" + token
@@ -214,21 +227,6 @@ if (process.env.JACK == "true") {
               req.params?.billingGroupInvitationLinkId,
           },
         });
-
-        console.log("Email Sent! - mock");
-        
-        /*
-
-        client.sendEmail({
-          "From": `${process.env.POSTMARK_FROM_EMAIL}`, 
-          "To": `${user.email}`,
-          "Subject": "User Login detected for OpenSLU",
-          "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.` , 
-          "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
-          "MessageStream": "outbound"
-        });
-        
-        */
       }
 
       // Call the original send method
@@ -238,20 +236,32 @@ if (process.env.JACK == "true") {
     next();
   });
 
-  app.use(
-    "/api/files/upload",
-    createRouteHandler({
-      router: uploadRouter,
-      config: {
-        token: process.env.UPLOADTHING_TOKEN,
-        callbackUrl: process.env.SERVER_URL + "/api/files/upload",
-        logLevel: "Error",
-      },
-    })
-  );
+  // app.use(
+  //   "/api/files/upload",
+  //   createRouteHandler({
+  //     router: uploadRouter,
+  //     config: {
+  //       token: process.env.UPLOADTHING_TOKEN,
+  //       callbackUrl: process.env.SERVER_URL + "/api/files/upload",
+  //       logLevel: "Error",
+  //     },
+  //   })
+  // );
 
   // app.use("/api", await router());
 
+  // This route is used for training purposes only. It is not used in production.
+  app.use((req, res, next) => {
+    if (req.url.includes("joke/emoji")) {
+      res.setHeader(
+        "X-Punch-Line",
+        "The cowboy lost his hat doing a cartwheel."
+      );
+    }
+    next();
+  });
+
+  // Register all api routes
   await registerRoutes(app, path.join(process.cwd(), "routes"));
 
   app.get("/health", (req, res) => {
