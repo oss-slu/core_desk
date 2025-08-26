@@ -8,23 +8,23 @@ This is an open source project management platform for distributed manufacturing
 
 ## Installation & Quickstart
 
-1. Install node.js
+### 1. Install node.js
 
-1. Install Postgres (or have access to a connection string)
+### 2. Install Postgres (or have access to a connection string)
 
-1. Install yarn
+### 3. Install yarn
 
 ```bash
 npm install --global yarn
 ```
 
-1. Clone the repository
+### 4. Clone the repository
 
 ```bash
 git clone https://github.com/oss-slu/open-project.git
 ```
 
-1. Set up environment variables
+### 5. Set up environment variables
 
 ```
 DATABASE_URL=(postgres connection string) (start a local postgres server and put that here)
@@ -40,7 +40,7 @@ AWS_ACCESS_KEY_ID=(get an api key from the tech lead)
 AWS_SECRET_ACCESS_KEY=(get an api key from the tech lead)
 ```
 
-1. Install dependencies
+### 6. Install dependencies
 
 ```bash
 cd open-project
@@ -57,23 +57,23 @@ cd api
 yarn
 ```
 
-1. Start the development server
+### 7. Start the development server
 
 ```bash
 cd api
 yarn dev
 ```
 
-1. Start the react app
+### 8. Start the react app
 
 ```bash
 cd app
 yarn start
 ```
 
-1. Open your browser to `http://localhost:5173` to view the app.
+### 9. Open your browser to `http://localhost:5173` to view the app.
 
-1. To authenticate/log in, we typically use the SLU OKTA log in system, but that is a pain to connect in your local environment, so we have a workaround utility.
+### 10. To authenticate/log in, we typically use the SLU OKTA log in system, but that is a pain to connect in your local environment, so we have a workaround utility.
 
 In the /api folder, run 
 
