@@ -1,7 +1,6 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import { utapi } from "../../../../../../../config/uploadthing.js";
 
 export const del = [
   verifyAuth,
@@ -88,7 +87,7 @@ export const del = [
         },
       });
 
-      await utapi.deleteFiles(image.fileKey);
+      // await utapi.deleteFiles(image.fileKey);
 
       res.json({ resource: newResource });
     } catch (e) {

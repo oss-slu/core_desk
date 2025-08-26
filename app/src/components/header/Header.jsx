@@ -27,9 +27,9 @@ export const Header = () => {
       <div className={styles.headerGroup}>
         <img src={logo} className={styles.headerLogo} alt="SLUCAM Logo" />
         <h1 className={classNames(styles.headerTitle, "hos-600")}>
-          {shop?.logoUrl ? (
+          {shop?.logo?.location ? (
             <img
-              src={shop?.logoUrl}
+              src={shop?.logo?.location}
               className={styles.headerLogo}
               alt={shop?.name}
             />

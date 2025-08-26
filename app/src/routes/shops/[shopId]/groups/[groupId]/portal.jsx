@@ -52,7 +52,6 @@ export const BillingGroupPortal = () => {
             <>
               <Typography.H2>Files</Typography.H2>
               <UploadDropzone
-                scope="group.fileUpload"
                 metadata={{ jobId, shopId, groupId }}
                 onUploadComplete={() => {
                   setTimeout(() => {
@@ -78,6 +77,8 @@ export const BillingGroupPortal = () => {
                     backgroundColor: "var(--tblr-primary)",
                   },
                 }}
+                endpoint={`/api/shop/${shopId}/groups/${groupId}/upload?jobId=${jobId}`}
+                useNewDropzone={true}
               />
               <Util.Spacer size={2} />
               <Typography.H3>Your Files</Typography.H3>

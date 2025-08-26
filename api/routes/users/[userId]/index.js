@@ -80,9 +80,7 @@ export const get = [
               },
               resourceImage: {
                 select: {
-                  fileUrl: true,
-                  fileName: true,
-                  active: true,
+                  file: true,
                 },
               },
               job: {
@@ -94,8 +92,7 @@ export const get = [
                 select: {
                   title: true,
                   active: true,
-                  fileName: true,
-                  fileUrl: true,
+                  file: true,
                   status: true,
                 },
               },
@@ -103,10 +100,8 @@ export const get = [
                 select: {
                   title: true,
                   active: true,
-                  tdsFileUrl: true,
-                  tdsFileName: true,
-                  msdsFileUrl: true,
-                  msdsFileName: true,
+                  tdsFile: true,
+                  msdsFile: true,
                   resourceType: {
                     select: {
                       id: true,
@@ -118,8 +113,7 @@ export const get = [
               materialImage: {
                 select: {
                   active: true,
-                  fileUrl: true,
-                  fileName: true,
+                  file: true,
                   material: {
                     select: {
                       title: true,
@@ -173,7 +167,7 @@ export const put = [
   verifyAuth,
   async (req, res) => {
     try {
-      const {userId, firstName, lastName} = req.body;
+      const { userId, firstName, lastName } = req.body;
 
       const updatedUser = await prisma.user.update({
         where: {
@@ -192,7 +186,9 @@ export const put = [
       res.json({ user: updatedUser });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ error: "Error with updating user's name in prisma." });
+      res
+        .status(500)
+        .json({ error: "Error with updating user's name in prisma." });
     }
   },
 ];

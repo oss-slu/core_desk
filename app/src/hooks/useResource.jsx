@@ -61,7 +61,7 @@ export const useResource = (shopId, resourceId) => {
     try {
       setOpLoading(true);
       const r = await authFetch(
-        `/api/shop/${shopId}/resources/${resourceId}/images/${imageId}`,
+        `/api/shop/${shopId}/resources/resource/${resourceId}/images/${imageId}`,
         {
           method: "DELETE",
         }
