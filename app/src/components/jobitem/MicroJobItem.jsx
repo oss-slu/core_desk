@@ -24,9 +24,9 @@ export const MicroJobItem = ({ item: _item }) => {
     <Card>
       <Util.Row gap={1}>
         <RenderMedia
-          mediaUrl={item.fileUrl}
-          fileType={item.fileType}
-          thumbnailUrl={item.fileThumbnailUrl}
+          mediaUrl={item.file?.location}
+          fileType={item.file?.originalname?.split(".")?.pop() || "NONE"}
+          thumbnailUrl={item.fileThumbnail?.location}
           small
         />
         <Util.Col gap={0.5}>

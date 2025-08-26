@@ -1,7 +1,6 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import { utapi } from "../../../../../../../config/uploadthing.js";
 import { z } from "zod";
 
 const jobSchema = z.object({
@@ -35,6 +34,10 @@ export const get = [
         where: {
           id: jobItemId,
           jobId,
+        },
+        include: {
+          file: true,
+          fileThumbnail: true,
         },
       });
 
@@ -219,7 +222,7 @@ export const del = [
       return res.status(404).json({ error: "Not found" });
     }
 
-    const jobItem = await prisma.jobItem.update({
+    await prisma.jobItem.update({
       where: {
         id: jobItemId,
       },
@@ -228,9 +231,9 @@ export const del = [
       },
     });
 
-    await utapi.deleteFiles(
-      [jobItem.fileKey, jobItem.fileThumbnailKey].filter(Boolean)
-    );
+    // await utapi.deleteFiles(
+    //   [jobItem.fileKey, jobItem.fileThumbnailKey].filter(Boolean)
+    // );
 
     await prisma.logs.create({
       data: {

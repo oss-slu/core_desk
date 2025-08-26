@@ -1,6 +1,18 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { LogType } from "@prisma/client";
+import { z } from "zod";
+
+// schema
+const materialSchema = z.object({
+  title: z.string().min(1, "Material must have Title"),
+  description: z.string().optional().nullable(),
+  manufacturer: z.string().optional().nullable(),
+  costPerUnit: z.coerce.number().min(0, "Cost per unit must be a number"),
+  unitDescriptor: z.string().optional().nullable(),
+  costPublic: z.boolean().optional().nullable(),
+  active: z.boolean().optional(),
+});
 
 export const get = [
   verifyAuth,
@@ -85,21 +97,19 @@ export const put = [
       return res.status(400).json({ message: "Unauthorized" });
     }
 
-    delete req.body.id;
-    delete req.body.resourceType;
-    delete req.body.createdAt;
-    delete req.body.updatedAt;
-    delete req.body.active;
-    delete req.body.shopId;
-    delete req.body.images;
-
-    req.body.costPerUnit = parseFloat(req.body.costPerUnit);
+    const { data, success, error } = materialSchema.safeParse(req.body);
+    if (!success) {
+      return res.status(400).json({
+        error: "Invalid data",
+        issues: error.format(),
+      });
+    }
 
     const material = await prisma.material.update({
       where: {
         id: materialId,
       },
-      data: req.body,
+      data,
       include: {
         resourceType: true,
         images: {

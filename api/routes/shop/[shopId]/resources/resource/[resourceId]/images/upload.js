@@ -7,7 +7,7 @@ export const post = [
   verifyAuth,
   upload({
     // Image types
-    allowedMimeTypes: "image/jpeg,image/png,image/gif",
+    allowedMimeTypes: ["image/png", "image/jpeg", "image/jpg", "image/webp"],
     maxFileSize: 100 * 1024 * 1024, // 100 MB
   }),
   async (req, res) => {

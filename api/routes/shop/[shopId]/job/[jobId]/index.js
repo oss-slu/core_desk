@@ -17,7 +17,7 @@ const JOB_INCLUDE = {
     },
     include: {
       file: true,
-      thumbnailFile: true,
+      fileThumbnail: true,
       resource: {
         select: {
           costingPublic: true,

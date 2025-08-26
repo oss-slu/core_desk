@@ -3,7 +3,7 @@ import { upload } from "#upload";
 import { verifyAuth } from "#verifyAuth";
 import { uploadFileToJob } from "../../../../../util/uploadFileToJob.js";
 
-export const get = [
+export const post = [
   verifyAuth,
   upload({
     allowedMimeTypes: "*",

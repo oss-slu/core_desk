@@ -373,7 +373,7 @@ export const MaterialPage = () => {
             columns={[
               {
                 label: "Image",
-                accessor: "fileUrl",
+                accessor: "file.location",
                 render: (url) => (
                   <img
                     src={url}

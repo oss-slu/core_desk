@@ -24,10 +24,6 @@ export const uploadFileToJob = async ({
   const jobItem = await prisma.jobItem.create({
     data: {
       jobId: job.id,
-      fileType: file.originalname.split(".").pop(),
-      fileUrl: file.location?.includes("https://")
-        ? file.location
-        : "https://" + file.location,
       fileId: file.logId,
       title: file.originalname || "No Name",
     },
@@ -35,7 +31,7 @@ export const uploadFileToJob = async ({
 
   const fileType = file.originalname?.split(".")?.pop()?.toLowerCase();
   if (fileType === "stl") {
-    logging && console.log("Rendering STL…");
+    logging && console.log("Rendering STL...");
 
     const [pngData, stlData] = await renderStl(file.location);
 
@@ -51,7 +47,7 @@ export const uploadFileToJob = async ({
     await prisma.jobItem.update({
       where: { id: jobItem.id },
       data: {
-        thumbnailFileId: upload.file.id,
+        fileThumbnailId: upload.file.id,
         stlVolume: stlStats.volume,
         stlIsWatertight: stlStats.isWatertight,
         stlBoundingBoxX: stlStats.boundingBox[0] / 10,
