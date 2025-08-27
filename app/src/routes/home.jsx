@@ -3,6 +3,7 @@ import { useAuth } from "#useAuth";
 import { Loading } from "#loading";
 import { Page, sidenavItems } from "#page";
 import { MarkdownRender } from "#markdownRender";
+import { Typography, Util } from "tabler-react-2";
 
 const content = `
 # Welcome to SLU Open Project!
@@ -23,6 +24,13 @@ export const Home = () => {
   return (
     <Page sidenavItems={sidenavItems("Home", user.admin)}>
       <MarkdownRender markdown={content} />
+      <Util.Hr />
+      {import.meta.env.VITE_HASH && import.meta.env.VITE_BUILD_DATE && (
+        <Typography.Text>
+          SLU Open Project / CoreDesk version {import.meta.env.VITE_HASH} built
+          on {new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()}
+        </Typography.Text>
+      )}
     </Page>
   );
 };
