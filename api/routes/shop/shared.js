@@ -11,7 +11,6 @@ export const SHOP_SELECT = {
   description: true,
   imageUrl: true,
   color: true,
-  logoUrl: true,
   startingDeposit: true,
   logo: true,
 };
