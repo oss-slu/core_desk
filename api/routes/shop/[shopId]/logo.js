@@ -35,7 +35,7 @@ export const post = [
           id: shopId,
         },
         data: {
-          logoFile: {
+          logo: {
             connect: {
               id: req.fileLog.id,
             },

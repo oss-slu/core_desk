@@ -123,10 +123,6 @@ model Shop {
   description     String?
   imageUrl        String?
 
-  logoUrl         String?
-  logoKey         String?
-  logoName        String?
-
   logoId      String?        @map("logoFileId")
   logo        File?          @relation("Shop_logoFile", fields: [logoId], references: [id], onDelete: Cascade)
 
