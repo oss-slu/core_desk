@@ -17,6 +17,7 @@ export const Shops = () => {
     createModalElement,
     createShop
   } = useShops();
+  const { user: activeUser } = useAuth();
 
   if (loading) return <Loading />;
 
@@ -26,7 +27,9 @@ export const Shops = () => {
         <div>
           <H1>Shops</H1>
         </div>
-        <Button onClick={createShop}>Create Shop</Button>
+        {activeUser.admin && (
+          <Button onClick={createShop}>Create Shop</Button>
+        )}
       </Util.Row>
       <Util.Spacer size={1} />
       {shops.map((shop) => (
