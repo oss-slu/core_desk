@@ -1,8 +1,7 @@
 import prisma from "#prisma";
 import { LogType } from "@prisma/client";
 
-export const createUser = async (
-  { firstName, lastName, email },
+export const createUser = async ({ firstName, lastName, email },
   logging = false
 ) => {
   const user = await prisma.user.create({
@@ -24,6 +23,25 @@ export const createUser = async (
       autoJoin: true,
     },
   });
+
+    await prisma.user.update({
+              where: {
+                id: user.id,
+              },
+              data:{
+                admin: true,
+              },
+    });
+            console.log(`User ${user}, set as admin`);
+            
+    await prisma.logs.create({
+              data: {
+                type: LogType.USER_PROMOTED_TO_ADMIN,
+                userId: user.id,
+                message: "First user, promoted to admin",
+              }
+        });
+  
 
   for (const shop of shopsToJoin) {
     await prisma.userShop.create({
