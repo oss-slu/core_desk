@@ -91,58 +91,8 @@ if (process.env.JACK == "true") {
         let user = await prisma.user.findUnique({
           where: { email: userEmail },
         });
-        user = createUser(profile);
+        user = createUser(profile); // call the createUser function and pass the profile
 
-        // If user doesn't exist, create a new user
-        // if (!user) {
-        //   user = await prisma.user.create({
-        //     data: {
-        //       email: userEmail,
-        //       firstName: profile.firstName,
-        //       lastName: profile.lastName,
-        //     },
-        //   });
-
-        //   const shopsToJoin = await prisma.shop.findMany({
-        //     where: {
-        //       autoJoin: true,
-        //     },
-        //   });
-
-        //   for (const shop of shopsToJoin) {
-        //     await prisma.userShop.create({
-        //       data: {
-        //         userId: user.id,
-        //         shopId: shop.id,
-        //         active: true,
-        //       },
-        //     });
-
-        //     await prisma.logs.create({
-        //       data: {
-        //         userId: user.id,
-        //         type: LogType.USER_CONNECTED_TO_SHOP,
-        //         shopId: shop.id,
-        //       },
-        //     });
-        //   }
-
-        //   await prisma.logs.create({
-        //     data: {
-        //       userId: user.id,
-        //       type: LogType.USER_CREATED,
-        //     },
-        //   });
-        // } else {
-        //   await prisma.logs.create({
-        //     data: {
-        //       userId: user.id,
-        //       type: LogType.USER_LOGIN,
-        //     },
-        //   });
-        // }
-
-        // Pass the user to the next middleware
         return done(null, user);
       } catch (error) {
         console.error(error);
