@@ -154,6 +154,7 @@ if (process.env.JACK == "true") {
   // SAML Assertion Consumer Service (ACS) Endpoint
   app.post(
     "/assertion",
+    // This entire middleware below is only for SAML dev bypass (not using `yarn okta` but by sending a mock idp request.)
     (req, res, next) => {
       // Log incoming ACS payload basics (avoid logging full SAMLResponse)
       try {
@@ -295,17 +296,6 @@ if (process.env.JACK == "true") {
 
       const relayState = req.body.RelayState;
 
-      console.log("[SAML][ACS] Authentication success for:", req.user?.email);
-      console.log("[SAML][ACS] RelayState:", relayState || "<none>");
-      console.log(
-        "[SAML][ACS] Issuing JWT:",
-        token
-          ? `len=${token.length}, head=${token.slice(
-              0,
-              12
-            )}..., tail=...${token.slice(-8)}`
-          : "<none>"
-      );
       console.log("[SAML][ACS] Email notification mock.");
 
       /*
@@ -327,7 +317,7 @@ if (process.env.JACK == "true") {
         "?token" +
         "=" +
         token;
-      console.log("[SAML][ACS] Redirecting to:", redirectTo);
+
       res.redirect(redirectTo);
     }
   );
