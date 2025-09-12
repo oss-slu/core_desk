@@ -24,7 +24,10 @@ export const createUser = async ({ firstName, lastName, email },
     },
   });
 
-    await prisma.user.update({ //update the user to admin
+  const userCount = await prisma.user.count(); //get the userCount
+  
+  if (userCount === 1){ //if the user count is 1, make the user an admin
+        await prisma.user.update({ //update the user to admin
               where: {
                 id: user.id,
               },
@@ -41,6 +44,10 @@ export const createUser = async ({ firstName, lastName, email },
                 message: "First user, promoted to admin",
               }
         });
+
+  }
+
+
   
 
   for (const shop of shopsToJoin) {

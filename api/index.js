@@ -86,8 +86,6 @@ if (process.env.JACK == "true") {
             "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
           ];
 
-        // Check if the user exists in the database
-        console.log(profile);
         let user = await prisma.user.findUnique({
           where: { email: userEmail },
         });
@@ -139,7 +137,10 @@ if (process.env.JACK == "true") {
             console.warn(
               "[SAML][ACS][DEV] Unsigned SAMLResponse detected; using dev bypass."
             );
+
+            
             const extractAttr = (name) => {
+              //elint-ignore-next-line
               const re = new RegExp(
                 `<\\w*:Attribute\\s+Name=\"${name.replace(
                   /[-/\\.^$*+?()|[\]{}]/g,
@@ -150,12 +151,14 @@ if (process.env.JACK == "true") {
               const m = xml.match(re);
               return m ? m[1].trim() : null;
             };
+            
             const email =
               extractAttr(
                 "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
               ) ||
               (() => {
                 try {
+                  //elist-ignore-next-line
                   const nameIdRe = new RegExp(
                     "<(?:\\w+:)?NameID[^>]*>([^<]+)</(?:\\w+:)?NameID>",
                     "i"
@@ -163,6 +166,7 @@ if (process.env.JACK == "true") {
                   const m = xml.match(nameIdRe);
                   return m ? m[1].trim() : null;
                 } catch (_) {
+                  console.error(_);
                   return null;
                 }
               })();
