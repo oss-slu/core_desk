@@ -199,10 +199,10 @@ export const ShopPage = () => {
               label="Shop Name"
             />
             {user.admin && (
-              <Switch 
+              <Switch
+                value={newShop.autoJoin || false}
+                onChange={(autoJoin) => setNewShop({ ...newShop, autoJoin})}
                 label="Automatically add users to shop"
-                //value=
-                //onChange
               />)
             }
             <Input
