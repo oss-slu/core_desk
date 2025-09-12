@@ -138,9 +138,9 @@ if (process.env.JACK == "true") {
               "[SAML][ACS][DEV] Unsigned SAMLResponse detected; using dev bypass."
             );
 
-            
+            /* eslint-disable no-useless-escape */
             const extractAttr = (name) => {
-              // eslint-disable-next-line no-useless-escape
+              
               const re = new RegExp(
                 `<\\w*:Attribute\\s+Name=\"${name.replace(
                   /[-/\\.^$*+?()|[\]{}]/g,
@@ -151,6 +151,8 @@ if (process.env.JACK == "true") {
               const m = xml.match(re);
               return m ? m[1].trim() : null;
             };
+
+            /* eslint-disable no-useless-escape */
             
             const email =
               extractAttr(
