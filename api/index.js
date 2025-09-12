@@ -140,7 +140,7 @@ if (process.env.JACK == "true") {
 
             
             const extractAttr = (name) => {
-              // eslint-ignore-next-line
+              // eslint-disable-next-line no-useless-escape
               const re = new RegExp(
                 `<\\w*:Attribute\\s+Name=\"${name.replace(
                   /[-/\\.^$*+?()|[\]{}]/g,
@@ -158,7 +158,7 @@ if (process.env.JACK == "true") {
               ) ||
               (() => {
                 try {
-                  // eslint-ignore-next-line
+                  // eslint-disable-next-line no-useless-escape
                   const nameIdRe = new RegExp(
                     "<(?:\\w+:)?NameID[^>]*>([^<]+)</(?:\\w+:)?NameID>",
                     "i"
@@ -166,7 +166,7 @@ if (process.env.JACK == "true") {
                   const m = xml.match(nameIdRe);
                   return m ? m[1].trim() : null;
                 } catch (_) {
-                  console.error(_);
+                  console.error(_);   
                   return null;
                 }
               })();
