@@ -140,7 +140,7 @@ if (process.env.JACK == "true") {
 
             
             const extractAttr = (name) => {
-              //elint-ignore-next-line
+              // eslint-ignore-next-line
               const re = new RegExp(
                 `<\\w*:Attribute\\s+Name=\"${name.replace(
                   /[-/\\.^$*+?()|[\]{}]/g,
@@ -158,7 +158,7 @@ if (process.env.JACK == "true") {
               ) ||
               (() => {
                 try {
-                  //elist-ignore-next-line
+                  // eslint-ignore-next-line
                   const nameIdRe = new RegExp(
                     "<(?:\\w+:)?NameID[^>]*>([^<]+)</(?:\\w+:)?NameID>",
                     "i"
