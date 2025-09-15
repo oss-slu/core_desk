@@ -3,6 +3,7 @@ import { authFetch } from "#url";
 import { Input } from "tabler-react-2";
 import { useModal } from "#modal";
 import { Button } from "#button";
+import { toast } from "react-toastify";
 
 const CreateShopModalContent = ({ onSubmit }) => {
   const [name, setName] = useState("");
@@ -135,7 +136,15 @@ export const useShops = () => {
   };
 
   const createShop = async () => {
-    createModal();
+    try {
+      await createModal();
+    } catch (error) {
+      if (error.message.includes("not authorized")) {
+        toast.error("You are not authorized to create a shop.");
+      } else {
+        toast.error("Something went wrong while creating the shop.");
+      }
+    }
   };
 
   const addUserToShop = async (userId, shopId, role) => {
