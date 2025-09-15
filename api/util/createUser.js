@@ -34,7 +34,7 @@ export const createUser = async ({ firstName, lastName, email },
               data:{
                 admin: true,
               },
-    });
+    }); 
             console.log(`User ${user}, set as admin`);
             
     await prisma.logs.create({ //create a log for the user being promoted to admin
