@@ -1,4 +1,4 @@
-import prisma from "#prisma";
+import  prisma  from "#prisma";
 import { LogType } from "@prisma/client";
 
 export const createUser = async ({ firstName, lastName, email },

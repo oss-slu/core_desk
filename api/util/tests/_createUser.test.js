@@ -1,9 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createUser } from "../createUser";
-import { prisma } from "#prisma"; // import the mocked prisma so we can configure it
+import  prisma  from "#prisma"; // import the mocked prisma so we can configure it
 import { LogType } from "@prisma/client";
+
+
+
 vi.mock("#prisma", () => ({
-  prisma: {
+  default: {
     user: {
       create: vi.fn(),
       count: vi.fn(),
