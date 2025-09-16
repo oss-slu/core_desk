@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createUser } from "../createUser";
 import  prisma  from "#prisma"; // import the mocked prisma so we can configure it
-import { LogType } from "@prisma/client";
 
 
 
@@ -64,18 +63,3 @@ describe("createUser", () => {
 });
 
 
-
-//notes about differint types of testing, integration tests in core desk
-//understand the differinces. 
-//test coverage the percentage of your code that is covered by tests, that is imperfect a lot of managers like to enforce code coverage
-
-
-//red green, refactor. write the tests first before you write the code.
-
-
-//differint testing paraaigms, test to seee if the it should return x,y,z and it doesnt have a.,,c - shape testing
-
-//enviorment testing, make the api request - l
-
-//spy testing, configure viteest to spy on a specific function if it has been called.
-//snapshot testing - expect response.toMatch 
