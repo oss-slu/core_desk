@@ -44,34 +44,50 @@ export const handleUpload = async (data) => {
     const fileType = data.file.name.split(".").pop();
     if (fileType === "stl") {
       console.log("STL");
-      // Render stl
-      const [pngData, stlData] = await renderStl(data.file.url);
+      const MAX_STL_PREVIEW_BYTES = 20 * 1024 * 1024; // 20 MB
+      let tooLarge = false;
+      try {
+        const head = await fetch(data.file.url, { method: "HEAD" });
+        const len = head.headers.get("content-length");
+        if (len && parseInt(len, 10) > MAX_STL_PREVIEW_BYTES) {
+          tooLarge = true;
+        }
+      } catch (_) {
+        // If HEAD fails, attempt render; client also guards preview
+      }
 
-      const upload = await utapi.uploadFiles([
-        new File([pngData], `${data.file.name}.preview.png`, {
-          type: "image/png",
-        }),
-      ]);
+      if (!tooLarge) {
+        // Render stl
+        const [pngData, stlData] = await renderStl(data.file.url);
 
-      const stlStats = new NodeStl(Buffer.from(stlData));
-      console.log(stlStats);
+        const upload = await utapi.uploadFiles([
+          new File([pngData], `${data.file.name}.preview.png`, {
+            type: "image/png",
+          }),
+        ]);
 
-      const newJobItem = await prisma.jobItem.update({
-        where: {
-          id: jobItem.id,
-        },
-        data: {
-          fileThumbnailKey: upload[0].data.key,
-          fileThumbnailName: upload[0].data.name,
-          fileThumbnailUrl: upload[0].data.url,
-          stlVolume: stlStats.volume,
-          stlIsWatertight: stlStats.isWatertight,
-          stlBoundingBoxX: stlStats.boundingBox[0] / 10,
-          stlBoundingBoxY: stlStats.boundingBox[1] / 10,
-          stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
-        },
-      });
-      console.log(newJobItem);
+        const stlStats = new NodeStl(Buffer.from(stlData));
+        console.log(stlStats);
+
+        const newJobItem = await prisma.jobItem.update({
+          where: {
+            id: jobItem.id,
+          },
+          data: {
+            fileThumbnailKey: upload[0].data.key,
+            fileThumbnailName: upload[0].data.name,
+            fileThumbnailUrl: upload[0].data.url,
+            stlVolume: stlStats.volume,
+            stlIsWatertight: stlStats.isWatertight,
+            stlBoundingBoxX: stlStats.boundingBox[0] / 10,
+            stlBoundingBoxY: stlStats.boundingBox[1] / 10,
+            stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
+          },
+        });
+        console.log(newJobItem);
+      } else {
+        console.log("Skipping STL render: file too large (>20MB)");
+      }
     }
 
     await prisma.logs.create({
@@ -120,34 +136,50 @@ export const handleUpload = async (data) => {
     const fileType = data.file.name.split(".").pop();
     if (fileType === "stl") {
       console.log("STL");
-      // Render stl
-      const [pngData, stlData] = await renderStl(data.file.url);
+      const MAX_STL_PREVIEW_BYTES = 20 * 1024 * 1024; // 20 MB
+      let tooLarge = false;
+      try {
+        const head = await fetch(data.file.url, { method: "HEAD" });
+        const len = head.headers.get("content-length");
+        if (len && parseInt(len, 10) > MAX_STL_PREVIEW_BYTES) {
+          tooLarge = true;
+        }
+      } catch (_) {
+        // If HEAD fails, attempt render; client also guards preview
+      }
 
-      const upload = await utapi.uploadFiles([
-        new File([pngData], `${data.file.name}.preview.png`, {
-          type: "image/png",
-        }),
-      ]);
+      if (!tooLarge) {
+        // Render stl
+        const [pngData, stlData] = await renderStl(data.file.url);
 
-      const stlStats = new NodeStl(Buffer.from(stlData));
-      console.log(stlStats);
+        const upload = await utapi.uploadFiles([
+          new File([pngData], `${data.file.name}.preview.png`, {
+            type: "image/png",
+          }),
+        ]);
 
-      const newJobItem = await prisma.jobItem.update({
-        where: {
-          id: jobItem.id,
-        },
-        data: {
-          fileThumbnailKey: upload[0].data.key,
-          fileThumbnailName: upload[0].data.name,
-          fileThumbnailUrl: upload[0].data.url,
-          stlVolume: stlStats.volume,
-          stlIsWatertight: stlStats.isWatertight,
-          stlBoundingBoxX: stlStats.boundingBox[0] / 10,
-          stlBoundingBoxY: stlStats.boundingBox[1] / 10,
-          stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
-        },
-      });
-      console.log(newJobItem);
+        const stlStats = new NodeStl(Buffer.from(stlData));
+        console.log(stlStats);
+
+        const newJobItem = await prisma.jobItem.update({
+          where: {
+            id: jobItem.id,
+          },
+          data: {
+            fileThumbnailKey: upload[0].data.key,
+            fileThumbnailName: upload[0].data.name,
+            fileThumbnailUrl: upload[0].data.url,
+            stlVolume: stlStats.volume,
+            stlIsWatertight: stlStats.isWatertight,
+            stlBoundingBoxX: stlStats.boundingBox[0] / 10,
+            stlBoundingBoxY: stlStats.boundingBox[1] / 10,
+            stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
+          },
+        });
+        console.log(newJobItem);
+      } else {
+        console.log("Skipping STL render: file too large (>20MB)");
+      }
     }
 
     await prisma.logs.create({

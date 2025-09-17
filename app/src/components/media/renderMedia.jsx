@@ -117,12 +117,15 @@ export const RenderMedia = ({
     };
   }, [isStl, mediaUrl]);
 
-  useEffect(() => () => {
-    if (stlObjectUrlRef.current) {
-      URL.revokeObjectURL(stlObjectUrlRef.current);
-      stlObjectUrlRef.current = null;
-    }
-  }, []);
+  useEffect(
+    () => () => {
+      if (stlObjectUrlRef.current) {
+        URL.revokeObjectURL(stlObjectUrlRef.current);
+        stlObjectUrlRef.current = null;
+      }
+    },
+    []
+  );
 
   if (
     fileType === "png" ||
@@ -174,7 +177,11 @@ export const RenderMedia = ({
     }
 
     if (!stlReadyUrl) {
-      return <div className={stlClasses}>{stlLoading ? "Loading model…" : "Preparing model…"}</div>;
+      return (
+        <div className={stlClasses}>
+          {stlLoading ? "Loading model…" : "Preparing model…"}
+        </div>
+      );
     }
 
     return (
