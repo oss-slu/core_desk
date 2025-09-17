@@ -53,6 +53,7 @@ export const handleUpload = async (data) => {
           tooLarge = true;
         }
       } catch (_) {
+        console.warn("Unable to render preview", _);
         // If HEAD fails, attempt render; client also guards preview
       }
 
@@ -145,6 +146,7 @@ export const handleUpload = async (data) => {
           tooLarge = true;
         }
       } catch (_) {
+        console.warn("Unable to render preview", _);
         // If HEAD fails, attempt render; client also guards preview
       }
 
