@@ -1,3 +1,7 @@
+import dotenv from "dotenv";
+await dotenv.config();
+import "./tracing.js";
+
 import express from "express";
 import passport from "passport";
 import { Strategy as SamlStrategy } from "passport-saml";
@@ -5,10 +9,8 @@ import bodyParser from "body-parser";
 import samlConfig from "./config/saml-config.js";
 import cors from "cors";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import { prisma } from "#prisma";
 import { LogType } from "@prisma/client";
-dotenv.config();
 import path from "path";
 import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";

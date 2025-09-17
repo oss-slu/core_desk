@@ -3,6 +3,7 @@ import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { SHOP_SELECT } from "../shared.js";
 import { z } from "zod";
+import { trace } from "@opentelemetry/api";
 
 const shopSchema = z.object({
   name: z.string().min(1, "Name is required"),
@@ -36,6 +37,8 @@ export const get = [
   verifyAuth,
   async (req, res) => {
     try {
+      trace.getActiveSpan()?.setAttribute?.("shopId", req.params.shopId);
+      trace.getActiveSpan()?.setAttribute?.("userId", req.user.id);
       const shop = await prisma.shop.findUnique({
         where: {
           id: req.params.shopId,
