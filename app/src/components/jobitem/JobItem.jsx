@@ -108,7 +108,7 @@ export const JobItem = ({
         >
           <RenderMedia
             mediaUrl={item.file?.location}
-            fileType={item.file.originalname.split(".").pop()}
+            fileType={item.file?.originalname?.split(".")?.pop()}
             thumbnailUrl={item.fileThumbnail?.location || item.fileThumbnailUrl}
           />
           <Util.Row gap={2} align="start" threshold={1200} style={{ flex: 1 }}>

@@ -21,11 +21,41 @@ export const renderStl = async (stlUrl, size = 200) => {
     return res.arrayBuffer();
   });
 
+  // Basic validation to avoid parsing non-STL responses (e.g., HTML error pages)
   if (stlData.byteLength < 84) {
     throw new Error("STL file too small or malformed");
   }
 
-  const pngData = stl2png(stlData, {
+  const bytes = new Uint8Array(stlData);
+  const view = new DataView(stlData);
+
+  // Detect ASCII STL (starts with 'solid')
+  const asciiSig = String.fromCharCode(
+    bytes[0],
+    bytes[1],
+    bytes[2],
+    bytes[3],
+    bytes[4]
+  ).toLowerCase();
+
+  // Detect common HTML responses to guard early
+  const htmlSig = asciiSig.startsWith("<html") || asciiSig.startsWith("<!do");
+
+  // For binary STL, total bytes must equal 84 + 50 * triangleCount (little-endian)
+  const triCount = view.getUint32(80, true);
+  const expectedBinaryLength = 84 + 50 * triCount;
+  const looksBinary = expectedBinaryLength === stlData.byteLength;
+  const looksAscii = asciiSig.startsWith("solid");
+
+  if (htmlSig || (!looksAscii && !looksBinary)) {
+    // Provide a concise hint to the caller for easier debugging
+    throw new Error(
+      `URL did not return a valid STL (length=${stlData.byteLength}, head='${asciiSig}')`
+    );
+  }
+
+  // Ensure we pass a typed array; some runtimes are stricter
+  const pngData = stl2png(bytes, {
     width: size,
     height: size,
     materials: [mat],
