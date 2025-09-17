@@ -169,6 +169,8 @@ export const put = [
             unitDescriptor: true,
           },
         },
+        file: true,
+        fileThumbnail: true,
       },
     });
 

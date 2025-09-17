@@ -32,29 +32,35 @@ export const uploadFileToJob = async ({
   const fileType = file.originalname?.split(".")?.pop()?.toLowerCase();
   if (fileType === "stl") {
     logging && console.log("Rendering STL...");
+    try {
+      const [pngData, stlData] = await renderStl(file.location);
 
-    const [pngData, stlData] = await renderStl(file.location);
+      const upload = await uploadFile({
+        body: Buffer.isBuffer(pngData) ? pngData : Buffer.from(pngData),
+        originalname: `${file.originalname}.preview.png`,
+        mimetype: "image/png",
+        contentType: "application/octet-stream",
+      });
 
-    const upload = await uploadFile({
-      body: Buffer.isBuffer(pngData) ? pngData : Buffer.from(pngData),
-      originalname: `${file.originalname}.preview.png`,
-      mimetype: "image/png",
-      contentType: "application/octet-stream",
-    });
+      const stlStats = new NodeStl(Buffer.from(stlData));
 
-    const stlStats = new NodeStl(Buffer.from(stlData));
-
-    await prisma.jobItem.update({
-      where: { id: jobItem.id },
-      data: {
-        fileThumbnailId: upload.file.id,
-        stlVolume: stlStats.volume,
-        stlIsWatertight: stlStats.isWatertight,
-        stlBoundingBoxX: stlStats.boundingBox[0] / 10,
-        stlBoundingBoxY: stlStats.boundingBox[1] / 10,
-        stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
-      },
-    });
+      await prisma.jobItem.update({
+        where: { id: jobItem.id },
+        data: {
+          fileThumbnailId: upload.file.id,
+          stlVolume: stlStats.volume,
+          stlIsWatertight: stlStats.isWatertight,
+          stlBoundingBoxX: stlStats.boundingBox[0] / 10,
+          stlBoundingBoxY: stlStats.boundingBox[1] / 10,
+          stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
+        },
+      });
+    } catch (e) {
+      console.warn(
+        `STL rendering failed for jobItem ${jobItem.id}: ${e?.message || e}`
+      );
+      // Continue without thumbnail or STL stats
+    }
   }
 
   await prisma.logs.create({
