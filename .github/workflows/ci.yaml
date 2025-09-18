@@ -85,7 +85,7 @@ jobs:
         run: yarn lint
 
   e2e:
-    name: Cypress E2E Tests
+    name: e2e
     runs-on: ubuntu-latest
     timeout-minutes: 45
     env:
@@ -99,7 +99,7 @@ jobs:
         with:
           node-version: "lts/*"
 
-      - name: Run Dockerized Cypress suite
+      - name: Run e2e Tests
         run: npm run test:e2e:docker
 
       - name: Upload Cypress videos
