@@ -10,9 +10,8 @@
     "dev:api": "npm --workspace api run dev",
     "dev:app": "npm --workspace app run start",
     "dev:stack": "concurrently \"npm run dev:api\" \"npm run dev:app\"",
-    "test:e2e": "npm --workspace e2e run test",
-    "test:e2e:docker": "npm --workspace e2e run test:docker",
-    "down:e2e:docker": "npm --workspace e2e run down:docker"
+    "test:e2e": "npm --workspace e2e run test:docker",
+    "down:e2e": "npm --workspace e2e run down:docker"
   },
   "devDependencies": {
     "concurrently": "^9.0.0",

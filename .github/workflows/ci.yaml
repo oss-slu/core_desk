@@ -103,7 +103,7 @@ jobs:
           node-version: "lts/*"
 
       - name: Run e2e Tests
-        run: npm run test:e2e:docker
+        run: npm run test:e2e
 
       # Upload artifacts (give each an id so we can read their URLs)
       - name: Upload Cypress videos
