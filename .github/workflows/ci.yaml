@@ -88,6 +88,9 @@ jobs:
     name: e2e
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: read
+      pull-requests: write
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     steps:
@@ -102,8 +105,10 @@ jobs:
       - name: Run e2e Tests
         run: npm run test:e2e:docker
 
+      # Upload artifacts (give each an id so we can read their URLs)
       - name: Upload Cypress videos
         if: always()
+        id: upload_videos
         uses: actions/upload-artifact@v4
         with:
           name: cypress-videos
@@ -113,12 +118,40 @@ jobs:
 
       - name: Upload Cypress screenshots
         if: always()
+        id: upload_screens
         uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots
           path: e2e/screenshots
           if-no-files-found: ignore
           retention-days: 7
+
+      # Find existing comment (so we only ever have one)
+      - name: Find existing PR comment
+        if: always() && github.event_name == 'pull_request'
+        id: find_comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- e2e-artifacts -->"
+
+      # Create or update the single comment
+      - name: Post / update PR comment with artifact links
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- e2e-artifacts -->
+            **E2E Artifacts for run ${{ github.run_number }} (#${{ github.run_id }})**
+
+            ${{ steps.upload_videos.outputs.artifact-url && format('- Videos: [{0}]({0})', steps.upload_videos.outputs.artifact-url) || '- Videos: *(none uploaded)*' }}
+            ${{ steps.upload_screens.outputs.artifact-url && format('- Screenshots: [{0}]({0})', steps.upload_screens.outputs.artifact-url) || '- Screenshots: *(none uploaded)*' }}
+
+            _Artifacts expire per repository retention settings (7 days)._
 
   docker:
     runs-on: ubuntu-latest
