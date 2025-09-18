@@ -52,12 +52,22 @@ module.exports = defineConfig({
           return prisma.user.findUnique({ where: { email } });
         },
 
-        async "db:findMany"(model, where) {
+        async "db:findMany"(args) {
+          const { model, where } = args || {};
           return prisma[model].findMany(where);
         },
 
-        async "db:findAllUseres"() {
+        async "db:findAllUsers"() {
           return prisma.user.findMany();
+        },
+
+        log(message) {
+          console.log(
+            typeof message === "object"
+              ? JSON.stringify(message, null, 2)
+              : message
+          );
+          return null;
         },
       });
 
