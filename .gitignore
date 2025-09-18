@@ -7,3 +7,5 @@ defaultdb.dump
 defaultdb.sql
 node_modules
 node_modules/*
+e2e/videos
+e2e/screenshots

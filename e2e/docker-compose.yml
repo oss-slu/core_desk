@@ -1,0 +1,122 @@
+services:
+  minio:
+    image: minio/minio:latest
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server --console-address ":9001" /data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    ports:
+      - "9000:9000" # S3 API
+      - "9001:9001" # Console
+    volumes:
+      - miniodata:/data
+
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+          set -euo pipefail
+          mc alias set local http://minio:9000 minioadmin minioadmin
+          mc mb --ignore-existing local/sluop
+          cat >/tmp/cors.json <<'JSON'
+          [
+            {
+              "AllowedOrigins": ["*"],
+              "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+              "AllowedHeaders": ["*"],
+              "ExposeHeaders": ["ETag"],
+              "MaxAgeSeconds": 3000
+            }
+          ]
+          JSON
+          mc cors set local/sluop /tmp/cors.json || true
+          mc anonymous set download local/sluop || true
+          tail -f /dev/null
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: sluop
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ..
+      dockerfile: Dockerfile.e2e
+      args:
+        # Optional; pass through from your shell if set
+        SENTRY_AUTH_TOKEN: ${SENTRY_AUTH_TOKEN:-}
+    env_file:
+      - ./env/api.env
+    environment:
+      # Ensure Prisma can reach DB inside the Docker network
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/sluop
+      - PORT=3030
+      # S3/MinIO configuration for e2e
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin
+      - AWS_REGION=us-east-1
+      - AWS_BUCKET=sluop
+      - AWS_ENDPOINT=http://minio:9000
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3030/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    ports:
+      - "3030:3030"
+
+  cypress:
+    image: cypress/included:13.12.0
+    working_dir: /e2e
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      # Cypress config picks up BASE_URL in e2e/cypress.config.cjs
+      - BASE_URL=http://api:3030
+      # Also set the Cypress env var form for good measure
+      - CYPRESS_baseUrl=http://api:3030
+      # Optional: expose API URL for custom commands if they use it
+      - CYPRESS_API_URL=http://api:3030
+      # Prevent Chrome from sandboxing inside container by default
+      - CYPRESS_BROWSER=chrome
+    volumes:
+      - ./cypress:/e2e/cypress
+      - ./cypress.config.cjs:/e2e/cypress.config.cjs:ro
+      - ./videos:/e2e/cypress/videos
+      - ./screenshots:/e2e/cypress/screenshots
+    command: ["cypress", "run", "--e2e"]
+
+volumes:
+  dbdata:
+    driver: local
+  miniodata:
+    driver: local

@@ -1,0 +1,43 @@
+FROM node:20-alpine AS base
+
+# System deps for puppeteer/chromium used by the API
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    openssl \
+    wget \
+    bash \
+    netcat-openbsd
+
+ENV PUPPETEER_SKIP_DOWNLOAD=true \
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    NODE_ENV=production
+
+# Build-time args (optional)
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+
+# --- Build frontend ---
+WORKDIR /app
+COPY ./app/ ./
+RUN yarn install --frozen-lockfile || yarn install
+RUN yarn build
+
+# --- Prepare backend ---
+WORKDIR /api
+COPY ./api/ ./
+RUN yarn install --frozen-lockfile || yarn install
+RUN npx prisma generate
+
+# Copy e2e entrypoint
+WORKDIR /
+COPY e2e/docker/api-entrypoint.sh /api-entrypoint.sh
+RUN chmod +x /api-entrypoint.sh
+
+EXPOSE 3030
+ENTRYPOINT ["/api-entrypoint.sh"]
+CMD ["node", "/api/index.js"]

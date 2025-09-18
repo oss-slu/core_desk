@@ -3,6 +3,7 @@ describe("Smoke", () => {
     cy.visit("/");
     // Adjust selectors/text to your app
     cy.contains(/welcome|home|app/i).should("exist");
-    cy.request("/api/health").its("status").should("eq", 200);
+    // API serves /health
+    cy.request("/health").its("status").should("eq", 200);
   });
 });

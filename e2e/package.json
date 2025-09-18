@@ -9,6 +9,8 @@
   "scripts": {
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run --e2e",
-    "test": "start-server-and-test \"npm --prefix .. run dev:stack\" http://localhost:5173 \"npm run cy:run\""
+    "test": "start-server-and-test \"npm --prefix .. run dev:stack\" http://localhost:5173 \"npm run cy:run\"",
+    "test:docker": "sh -c 'docker compose -f ./docker-compose.yml up --build --exit-code-from cypress; code=$?; docker compose -f ./docker-compose.yml down -v; exit $code'",
+    "down:docker": "docker compose -f ./docker-compose.yml down -v"
   }
 }
