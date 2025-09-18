@@ -25,44 +25,44 @@ services:
     command:
       - -c
       - |
-          set -euo pipefail
-          mc alias set local http://minio:9000 minioadmin minioadmin
-          mc mb --ignore-existing local/sluop
-          cat >/tmp/cors.json <<'JSON'
-          [
+        set -euo pipefail
+        mc alias set local http://minio:9000 minioadmin minioadmin
+        mc mb --ignore-existing local/sluop
+        cat >/tmp/cors.json <<'JSON'
+        [
+          {
+            "AllowedOrigins": ["*"],
+            "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
+            "AllowedHeaders": ["*"],
+            "ExposeHeaders": ["ETag"],
+            "MaxAgeSeconds": 3000
+          }
+        ]
+        JSON
+        mc cors set local/sluop /tmp/cors.json || true
+        cat >/tmp/policy.json <<'JSON'
+        {
+          "Version": "2012-10-17",
+          "Statement": [
             {
-              "AllowedOrigins": ["*"],
-              "AllowedMethods": ["GET", "PUT", "POST", "DELETE", "HEAD"],
-              "AllowedHeaders": ["*"],
-              "ExposeHeaders": ["ETag"],
-              "MaxAgeSeconds": 3000
+              "Effect": "Allow",
+              "Principal": {"AWS": ["*"]},
+              "Action": [
+                "s3:GetObject",
+                "s3:PutObject",
+                "s3:DeleteObject",
+                "s3:ListBucket"
+              ],
+              "Resource": [
+                "arn:aws:s3:::sluop",
+                "arn:aws:s3:::sluop/*"
+              ]
             }
           ]
-          JSON
-          mc cors set local/sluop /tmp/cors.json || true
-          cat >/tmp/policy.json <<'JSON'
-          {
-            "Version": "2012-10-17",
-            "Statement": [
-              {
-                "Effect": "Allow",
-                "Principal": {"AWS": ["*"]},
-                "Action": [
-                  "s3:GetObject",
-                  "s3:PutObject",
-                  "s3:DeleteObject",
-                  "s3:ListBucket"
-                ],
-                "Resource": [
-                  "arn:aws:s3:::sluop",
-                  "arn:aws:s3:::sluop/*"
-                ]
-              }
-            ]
-          }
-          JSON
-          mc anonymous set-json local/sluop /tmp/policy.json || true
-          tail -f /dev/null
+        }
+        JSON
+        mc anonymous set-json local/sluop /tmp/policy.json || true
+        tail -f /dev/null
 
   db:
     image: postgres:15-alpine
@@ -129,12 +129,29 @@ services:
       - CYPRESS_API_URL=http://api:3030
       # Prevent Chrome from sandboxing inside container by default
       - CYPRESS_BROWSER=chrome
+      # Allow Prisma tasks to connect directly to Postgres
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/sluop
     volumes:
-      - ./cypress:/e2e/cypress
-      - ./cypress.config.cjs:/e2e/cypress.config.cjs:ro
-      - ./videos:/e2e/cypress/videos
-      - ./screenshots:/e2e/cypress/screenshots
-    command: ["cypress", "run", "--e2e"]
+      # Mount entire e2e workspace so package.json and node_modules live here
+      - ./:/e2e
+      # Mount Prisma schema from API so we can generate Debian engine client
+      - ../api/prisma:/api/prisma:ro
+    # cypress/included sets an ENTRYPOINT to `cypress`, so override it to run our setup first
+    entrypoint:
+      - /bin/bash
+      - -lc
+      - |
+        set -euo pipefail
+        cd /e2e
+        echo "[cypress-setup] Installing e2e dependencies..."
+        npm install --no-audit --no-fund --loglevel=error
+        echo "[cypress-setup] Preparing schema in local /e2e/prisma..."
+        mkdir -p prisma
+        cp /api/prisma/schema.prisma prisma/schema.prisma
+        echo "[cypress-setup] Generating Prisma client from ./prisma/schema.prisma..."
+        npx prisma generate --schema prisma/schema.prisma
+        echo "[cypress-setup] Starting Cypress..."
+        cypress run --e2e
 
 volumes:
   dbdata:
