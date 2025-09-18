@@ -5,3 +5,5 @@ api/response.json
 api/users.json
 defaultdb.dump
 defaultdb.sql
+node_modules
+node_modules/*
