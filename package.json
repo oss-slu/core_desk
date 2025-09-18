@@ -11,6 +11,7 @@
     "dev:app": "npm --workspace app run start",
     "dev:stack": "concurrently \"npm run dev:api\" \"npm run dev:app\"",
     "test:e2e": "npm --workspace e2e run test:docker",
+    "test:e2e:watch": "npm --workspace e2e run test:docker:watch",
     "down:e2e": "npm --workspace e2e run down:docker"
   },
   "devDependencies": {
