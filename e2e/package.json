@@ -1,5 +1,6 @@
 {
   "name": "e2e",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "devDependencies": {
@@ -8,6 +9,6 @@
   "scripts": {
     "cy:open": "cypress open --e2e",
     "cy:run": "cypress run --e2e",
-    "test": "start-server-and-test \"npm run dev:stack -w .\" http://localhost:5173 \"npm run cy:run\""
+    "test": "start-server-and-test \"npm --prefix .. run dev:stack\" http://localhost:5173 \"npm run cy:run\""
   }
 }
