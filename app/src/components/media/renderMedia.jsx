@@ -12,7 +12,12 @@ export const RenderMedia = ({
 }) => {
   const [preview, setPreview] = useState(true);
   const timeoutRef = useRef(null);
+  const stlObjectUrlRef = useRef(null);
   const fileType = originalFileType?.toLowerCase();
+  const isStl = fileType === "stl";
+  const [stlReadyUrl, setStlReadyUrl] = useState(null);
+  const [stlLoading, setStlLoading] = useState(false);
+  const [stlError, setStlError] = useState(null);
 
   const handleMouseOut = () => {
     timeoutRef.current = setTimeout(() => {
@@ -29,6 +34,98 @@ export const RenderMedia = ({
     // Cleanup timeout on unmount
     return () => clearTimeout(timeoutRef.current);
   }, []);
+
+  useEffect(() => {
+    if (!isStl || !mediaUrl) {
+      setStlReadyUrl(null);
+      setStlLoading(false);
+      setStlError(null);
+      if (stlObjectUrlRef.current) {
+        URL.revokeObjectURL(stlObjectUrlRef.current);
+        stlObjectUrlRef.current = null;
+      }
+      return;
+    }
+
+    let cancelled = false;
+
+    const prepare = async () => {
+      setStlReadyUrl(null);
+      setStlLoading(true);
+      setStlError(null);
+
+      try {
+        const response = await fetch(mediaUrl);
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`);
+        }
+
+        const buffer = await response.arrayBuffer();
+        let resolvedUrl = mediaUrl;
+        let createdObjectUrl = null;
+
+        if (buffer.byteLength >= 84) {
+          const faceSize = 50; // 12-byte normal, 36-byte vertices, 2-byte attribute
+          const reader = new DataView(buffer);
+          const faceCount = reader.getUint32(80, true);
+          const expectedLength = 84 + faceCount * faceSize;
+
+          if (expectedLength !== buffer.byteLength) {
+            const decoder = new TextDecoder("utf-8");
+            const withoutBom = decoder.decode(buffer).replace(/^\uFEFF/, "");
+            const trimmed = withoutBom.replace(/^\s+/, "");
+
+            if (trimmed.slice(0, 5).toLowerCase() === "solid") {
+              const blob = new Blob([trimmed], { type: "model/stl" });
+              createdObjectUrl = URL.createObjectURL(blob);
+              resolvedUrl = createdObjectUrl;
+            }
+          }
+        }
+
+        if (cancelled) {
+          if (createdObjectUrl) URL.revokeObjectURL(createdObjectUrl);
+          return;
+        }
+
+        if (stlObjectUrlRef.current) {
+          URL.revokeObjectURL(stlObjectUrlRef.current);
+          stlObjectUrlRef.current = null;
+        }
+
+        if (createdObjectUrl) {
+          stlObjectUrlRef.current = createdObjectUrl;
+        }
+
+        setStlReadyUrl(resolvedUrl);
+      } catch (error) {
+        if (!cancelled) {
+          setStlError(error);
+          setStlReadyUrl(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setStlLoading(false);
+        }
+      }
+    };
+
+    prepare();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isStl, mediaUrl]);
+
+  useEffect(
+    () => () => {
+      if (stlObjectUrlRef.current) {
+        URL.revokeObjectURL(stlObjectUrlRef.current);
+        stlObjectUrlRef.current = null;
+      }
+    },
+    []
+  );
 
   if (
     fileType === "png" ||
@@ -65,16 +162,34 @@ export const RenderMedia = ({
       );
     }
 
+    const stlClasses = classNames(
+      styles.image,
+      big ? styles.big : "",
+      small ? styles.small : ""
+    );
+
+    if (stlError) {
+      return (
+        <div className={classNames(stlClasses, styles.unsupported)}>
+          STL preview unavailable
+        </div>
+      );
+    }
+
+    if (!stlReadyUrl) {
+      return (
+        <div className={stlClasses}>
+          {stlLoading ? "Loading model…" : "Preparing model…"}
+        </div>
+      );
+    }
+
     return (
       <StlViewer
-        className={classNames(
-          styles.image,
-          big ? styles.big : "",
-          small ? styles.small : ""
-        )}
+        className={stlClasses}
         orbitControls
         shadows
-        url={mediaUrl}
+        url={stlReadyUrl}
         onMouseOut={handleMouseOut}
         onMouseEnter={handleMouseEnter}
         modelProps={{
