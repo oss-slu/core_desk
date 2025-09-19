@@ -102,8 +102,41 @@ jobs:
         with:
           node-version: "lts/*"
 
+      - name: Install e2e dependencies
+        working-directory: ./e2e
+        run: npm ci --no-audit --no-fund
+
+      - name: Generate Prisma client for e2e
+        working-directory: ./e2e
+        run: npm run prepare:prisma
+
+      - name: Build e2e Docker images
+        working-directory: ./e2e
+        run: docker compose -f ./docker-compose.yml build
+
+      - name: Start e2e stack (DB, MinIO, API)
+        working-directory: ./e2e
+        run: docker compose -f ./docker-compose.yml up -d db minio minio-init api
+
+      - name: Wait for API health
+        run: |
+          echo "Waiting for API to become healthy..."
+          for i in {1..60}; do
+            if curl -sf http://localhost:3030/health >/dev/null; then
+              echo "API is healthy"; exit 0;
+            fi
+            sleep 2
+          done
+          echo "API did not become healthy in time" >&2; exit 1
+
       - name: Run e2e Tests
-        run: npm run test:e2e
+        working-directory: ./e2e
+        run: docker compose -f ./docker-compose.yml run --rm --entrypoint cypress cypress run --e2e
+
+      - name: Teardown e2e stack
+        if: always()
+        working-directory: ./e2e
+        run: docker compose -f ./docker-compose.yml down -v
 
       # Upload artifacts (give each an id so we can read their URLs)
       - name: Upload Cypress videos
