@@ -13,6 +13,10 @@ describe("Create Shop", () => {
         admin: true,
       })
       .then((user) => cy.authenticateUser(user.id))
-      .then((jwt) => cy.task("log", jwt));
+      .then((jwt) => localStorage.setItem("token", jwt))
+      .visit("/");
+
+    // Wait 10 seconds
+    cy.wait(10000);
   });
 });
