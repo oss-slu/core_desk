@@ -112,7 +112,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cypress-videos
-          path: e2e/videos
+          path: e2e/cypress/videos
           if-no-files-found: ignore
           retention-days: 7
 
@@ -122,7 +122,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: cypress-screenshots
-          path: e2e/screenshots
+          path: e2e/cypress/screenshots
           if-no-files-found: ignore
           retention-days: 7
 
