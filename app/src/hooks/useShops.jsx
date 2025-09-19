@@ -11,7 +11,16 @@ const CreateShopModalContent = ({ onSubmit }) => {
   const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
   const [color, setColor] = useState("");
-  const colors = ["RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "PURPLE", "PINK", "TEAL"];
+  const colors = [
+    "RED",
+    "BLUE",
+    "GREEN",
+    "YELLOW",
+    "ORANGE",
+    "PURPLE",
+    "PINK",
+    "TEAL",
+  ];
 
   return (
     <div>
@@ -42,13 +51,13 @@ const CreateShopModalContent = ({ onSubmit }) => {
       <Input
         value={description}
         onChange={(e) => setDescription(e)}
-        label="Job description (optional)"
+        label="Shop description (optional)"
         placeholder="e.g. Description"
       />
-      <Input 
+      <Input
         value={color}
         onChange={(e) => setColor(e)}
-        label="Job Color (optional)"
+        label="Shop Color (optional)"
         placeholder="e.g. purple"
       />
       {name.length > 0 ? (
@@ -57,11 +66,11 @@ const CreateShopModalContent = ({ onSubmit }) => {
           onClick={() => {
             onSubmit(
               name,
-              address || null, 
+              address || null,
               phone || null,
               email || null,
               description || null,
-              colors.includes(color?.toUpperCase()) ? color.toUpperCase() : null,
+              colors.includes(color?.toUpperCase()) ? color.toUpperCase() : null
             );
           }}
         >
@@ -83,11 +92,11 @@ export const useShops = () => {
 
   const _createShop = async (
     name,
-    address, 
+    address,
     phone,
     email,
     description,
-    color,
+    color
   ) => {
     try {
       setOpLoading(true);
@@ -116,8 +125,8 @@ export const useShops = () => {
   };
 
   const { modal: createModal, ModalElement: createModalElement } = useModal({
-      title: "Create a new Shop",
-      text: <CreateShopModalContent onSubmit={_createShop}/>,
+    title: "Create a new Shop",
+    text: <CreateShopModalContent onSubmit={_createShop} />,
   });
 
   const fetchShops = async (shouldSetLoading = true) => {
