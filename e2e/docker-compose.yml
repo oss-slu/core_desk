@@ -143,8 +143,15 @@ services:
       - |
         set -euo pipefail
         cd /e2e
+        if [ "${REINSTALL_NODE_MODULES:-}" != "" ]; then
+          echo "[cypress-setup] --reinstall-node-modules requested; removing node_modules..."
+          rm -rf node_modules
+        fi
         echo "[cypress-setup] Installing e2e dependencies (npm ci)..."
-        npm ci --no-audit --no-fund --loglevel=error
+        if ! npm ci --no-audit --no-fund --loglevel=error; then
+          echo "[cypress-setup] npm ci failed; falling back to 'npm install' to resync lockfile..."
+          npm install --no-audit --no-fund --loglevel=error
+        fi
         echo "[cypress-setup] Preparing schema in local /e2e/prisma..."
         mkdir -p prisma
         cp /api/prisma/schema.prisma prisma/schema.prisma

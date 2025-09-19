@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "devDependencies": {
+    "@prisma/client": "6.16.2",
     "cypress": "13.17.0",
     "nodemon": "^3.1.7",
-    "@prisma/client": "6.16.2",
     "prisma": "6.16.2"
   },
   "scripts": {
@@ -18,5 +18,8 @@
     "test:docker": "sh -c 'docker compose -f ./docker-compose.yml up --build --exit-code-from cypress; code=$?; docker compose -f ./docker-compose.yml down -v; exit $code'",
     "test:docker:watch": "WATCH=1 docker compose -f ./docker-compose.yml up --build",
     "down:docker": "docker compose -f ./docker-compose.yml down -v"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
   }
 }
