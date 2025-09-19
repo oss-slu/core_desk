@@ -28,33 +28,29 @@ export const registerApiHelper = () => {
   });
 };
 
-export const registerLogin = () => {
-  // Example API login. Adjust to your app.
-  // Uses env vars AUTH_EMAIL / AUTH_PASSWORD (set in cypress.config or CLI).
-  Cypress.Commands.add("login", (email, password) => {
-    const user = email || Cypress.env("AUTH_EMAIL");
-    const pass = password || Cypress.env("AUTH_PASSWORD");
-    if (!user || !pass) {
-      throw new Error("Set AUTH_EMAIL and AUTH_PASSWORD in Cypress env.");
-    }
-    // Cache session between tests for speed
-    return cy.session([user], () => {
-      cy.request("POST", `${Cypress.env("API_URL") || ""}/api/auth/login`, {
-        email: user,
-        password: pass,
-      }).then((res) => {
-        // If your app returns a token, persist it as your app expects.
-        // Example: localStorage token
-        const token =
-          res.body?.token ||
-          res.body?.accessToken ||
-          res.headers["x-access-token"];
-        if (token) {
-          window.localStorage.setItem("auth_token", token);
+export const registerAuthenticateUser = () => {
+  // Generates a valid JWT for a user and optionally sets it.
+  // Usage:
+  //   cy.authenticateUser(userId) -> yields token
+  //   cy.authenticateUser({ userId, setLocalStorage: true }) -> sets localStorage 'token' in current app window (requires a visited page)
+  Cypress.Commands.add("authenticateUser", (arg) => {
+    const opts =
+      typeof arg === "string" ? { userId: arg } : arg || { userId: null };
+    if (!opts.userId) throw new Error("authenticateUser requires userId");
+    return cy
+      .task("cy:authenticateUser", {
+        userId: opts.userId,
+        expiresIn: opts.expiresIn,
+      })
+      .then((token) => {
+        if (opts.setLocalStorage) {
+          // Requires a page context; call after cy.visit or within cy.visit onBeforeLoad
+          cy.window({ log: false }).then((win) => {
+            win.localStorage.setItem("token", token);
+          });
         }
-        // Or if you rely on cookies, nothing else needed — cy.request preserves them.
+        return token;
       });
-    });
   });
 };
 
@@ -62,7 +58,7 @@ export const registerCommands = () => {
   registerGetByTestId();
   registerVisitApp();
   registerApiHelper();
-  registerLogin();
+  registerAuthenticateUser();
 };
 
 registerCommands();
