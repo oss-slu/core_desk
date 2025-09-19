@@ -99,3 +99,22 @@ yarn test
 ```bash
 docker-compose down -v
 ```
+
+### End-to-End (E2E) tests
+
+Quick, isolated runs use Docker (recommended):
+
+- Run once: `npm run test:e2e`
+- Watch mode: `npm run test:e2e:watch`
+- Clean up: `npm run down:e2e`
+
+Notes:
+- Requires Docker and Docker Compose. The compose stack brings up Postgres, MinIO (S3), the API (serving the app), and a Cypress runner.
+- Artifacts (videos/screenshots) are saved under `e2e/cypress/`.
+
+Local development runner (without Docker):
+- Start the stack in one terminal: `npm run dev:stack`
+- In another terminal, open Cypress: `npm --workspace e2e run cy:open`
+- Headless run locally: `npm --workspace e2e run cy:run`
+
+Tip: The Cypress base URL defaults to `http://localhost:5173` but can be overridden via `BASE_URL`.
