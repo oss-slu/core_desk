@@ -117,6 +117,9 @@ services:
   cypress:
     image: cypress/included:13.17.0
     working_dir: /e2e
+    user: "root"
+    stdin_open: true
+    tty: true
     depends_on:
       api:
         condition: service_healthy
@@ -131,12 +134,17 @@ services:
       - CYPRESS_BROWSER=chrome
       # Allow Prisma tasks to connect directly to Postgres
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/sluop
+      # Toggle interactive VNC Cypress App with INTERACTIVE=1
+      - INTERACTIVE=${INTERACTIVE:-}
     volumes:
       # Mount entire e2e workspace so package.json and node_modules live here
       - ./:/e2e
       # Mount Prisma schema from API so we can generate Debian engine client
       - ../api/prisma:/api/prisma:ro
     # cypress/included sets an ENTRYPOINT to `cypress`, so override it to run our setup first
+    ports:
+      # Expose VNC when INTERACTIVE=1 (x11vnc on :5900)
+      - "5900:5900"
     entrypoint:
       - /bin/bash
       - -lc
@@ -157,12 +165,36 @@ services:
         cp /api/prisma/schema.prisma prisma/schema.prisma
         echo "[cypress-setup] Generating Prisma client from ./prisma/schema.prisma..."
         npx prisma generate --schema prisma/schema.prisma
-        if [ "${WATCH:-}" = "1" ]; then
-          echo "[cypress-setup] Watch mode enabled. Starting nodemon to re-run tests on changes..."
-          npx nodemon --watch cypress --watch cypress.config.cjs --ext js,ts,jsx,tsx,cjs,mjs,json --exec "cypress run --e2e"
+        if [ "${INTERACTIVE:-}" = "1" ]; then
+          echo "[cypress-setup] Interactive mode enabled. Installing VNC tooling..."
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          # x11vnc provides VNC server; fluxbox is a lightweight WM; xvfb for virtual display
+          apt-get install -y --no-install-recommends x11vnc fluxbox xvfb > /dev/null
+          rm -rf /var/lib/apt/lists/*
+
+          echo "[cypress-setup] Starting Xvfb display :99 ..."
+          Xvfb :99 -screen 0 1920x1080x24 -ac +extension RANDR &
+          export DISPLAY=:99
+
+          echo "[cypress-setup] Starting lightweight window manager (fluxbox)..."
+          fluxbox >/tmp/fluxbox.log 2>&1 &
+
+          echo "[cypress-setup] Starting VNC server on :5900 (password: oss)..."
+          x11vnc -display :99 -passwd oss -forever -shared -rfbport 5900 -o /tmp/x11vnc.log &
+          sleep 1
+          echo "[cypress-setup] VNC ready at vnc://127.0.0.1:5900 (password: oss)"
+
+          echo "[cypress-setup] Launching Cypress in headed run mode (auto-exec tests)..."
+          exec cypress run --e2e --headed
         else
-          echo "[cypress-setup] Starting Cypress single run..."
-          cypress run --e2e
+          if [ "${WATCH:-}" = "1" ]; then
+            echo "[cypress-setup] Watch mode enabled. Starting nodemon to re-run tests on changes..."
+            npx nodemon --watch cypress --watch cypress.config.cjs --ext js,ts,jsx,tsx,cjs,mjs,json --exec "cypress run --e2e"
+          else
+            echo "[cypress-setup] Starting Cypress single run..."
+            cypress run --e2e
+          fi
         fi
 
 volumes:
