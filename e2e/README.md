@@ -14,6 +14,14 @@ Quick start
 - Tear down stack and remove volumes:
   - npm run down:docker (or root: npm run down:e2e:docker)
 
+Watch mode
+- Re-run tests automatically on spec/config changes via Docker:
+  - From repo root: `npm run test:e2e:watch`
+  - From this folder: `npm run test:docker:watch`
+- Re-run tests locally without Docker (requires local Cypress deps):
+  - `npm run cy:watch`
+- Note: Watch uses legacy polling under Docker to reliably catch changes on bind mounts.
+
 Environment
 - API service loads env from e2e/env/api.env and overrides DATABASE_URL in compose.
 - If your app build requires Sentry, set SENTRY_AUTH_TOKEN in your shell before running compose:
@@ -36,3 +44,8 @@ Notes
 - Each run ends with docker compose down -v to wipe containers/volumes for a clean DB next run.
 - The API builds and serves the frontend from /app/dist, so Cypress only needs the API URL.
 - Test artifacts (videos/screenshots) are written under e2e/cypress/.
+
+Interactive mode (VNC + watch)
+- From repo root: `npm run test:e2e:interactive`
+- Connect a VNC client to `vnc://127.0.0.1:5900` (password: `oss`).
+- The container runs Cypress with `nodemon --legacy-watch`, so tests re-run on spec/config changes automatically. The test browser is headed and visible via VNC.

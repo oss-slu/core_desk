@@ -16,6 +16,7 @@ describe("Create Shop", () => {
       .then((jwt) => localStorage.setItem("token", jwt))
       .visit("/");
 
+    cy.timeout(1000);
     cy.contains("Shops").click();
     cy.screenshot("shops-page");
 

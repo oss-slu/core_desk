@@ -185,12 +185,23 @@ services:
           sleep 1
           echo "[cypress-setup] VNC ready at vnc://127.0.0.1:5900 (password: oss)"
 
-          echo "[cypress-setup] Launching Cypress in headed run mode (auto-exec tests)..."
-          exec cypress run --e2e --headed
+          echo "[cypress-setup] Interactive watch mode enabled. Starting nodemon to re-run tests on changes (headed via Xvfb/VNC)..."
+          exec npx nodemon \
+            --legacy-watch \
+            --watch cypress \
+            --watch cypress.config.cjs \
+            --ext js,ts,jsx,tsx,cjs,mjs,json \
+            --exec "cypress run --e2e --headed"
         else
           if [ "${WATCH:-}" = "1" ]; then
-            echo "[cypress-setup] Watch mode enabled. Starting nodemon to re-run tests on changes..."
-            npx nodemon --watch cypress --watch cypress.config.cjs --ext js,ts,jsx,tsx,cjs,mjs,json --exec "cypress run --e2e"
+            echo "[cypress-setup] Watch mode enabled. Starting nodemon to re-run tests on changes (legacy polling for Docker)..."
+            # Use legacy watch/polling so file changes on bind mounts reliably trigger in Docker
+            npx nodemon \
+              --legacy-watch \
+              --watch cypress \
+              --watch cypress.config.cjs \
+              --ext js,ts,jsx,tsx,cjs,mjs,json \
+              --exec "cypress run --e2e"
           else
             echo "[cypress-setup] Starting Cypress single run..."
             cypress run --e2e
