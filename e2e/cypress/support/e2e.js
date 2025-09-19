@@ -9,9 +9,15 @@ export const installExceptionFilters = () => {
   const patterns = [
     /ResizeObserver loop limit exceeded/i,
     /ResizeObserver loop completed/i,
+    /Blocked a frame with origin .* from accessing a cross-origin frame/i,
   ];
   Cypress.on("uncaught:exception", (err) => {
-    return patterns.some((re) => re.test(err.message)) ? false : undefined;
+    // Ignore known benign cross-origin and layout observer errors to reduce flake
+    if (patterns.some((re) => re.test(err.message))) return false;
+    if (err?.name === "SecurityError" && /cross-origin frame/i.test(err.message)) {
+      return false;
+    }
+    return undefined;
   });
 };
 

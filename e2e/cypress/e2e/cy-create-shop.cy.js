@@ -5,18 +5,24 @@ describe("Create Shop", () => {
   });
 
   it("loads the app", () => {
-    cy.visit("/")
-      .task("db:createUser", {
-        email: "e2e@example.com",
-        firstName: "E2E",
-        lastName: "Test",
-        admin: true,
-      })
+    // Create user and pre-authenticate before first visit to avoid
+    // any unauthenticated redirects that might touch cross-origin frames.
+    cy.task("db:createUser", {
+      email: "e2e@example.com",
+      firstName: "E2E",
+      lastName: "Test",
+      admin: true,
+    })
       .then((user) => cy.authenticateUser(user.id))
-      .then((jwt) => localStorage.setItem("token", jwt))
-      .visit("/");
+      .then((jwt) => {
+        cy.visit("/", {
+          onBeforeLoad(win) {
+            win.localStorage.setItem("token", jwt);
+          },
+        });
+      });
 
-    cy.timeout(1000);
+    cy.wait(250);
     cy.contains("Shops").click();
     cy.screenshot("shops-page");
 
@@ -31,8 +37,7 @@ describe("Create Shop", () => {
 
     cy.screenshot("create-shop-inputs");
     cy.contains("Submit").click();
-
-    cy.timeout(1000);
+    cy.wait(250);
     cy.screenshot("created-shop");
   });
 });
