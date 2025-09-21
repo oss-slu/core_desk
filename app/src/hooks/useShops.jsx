@@ -3,7 +3,7 @@ import { authFetch } from "#url";
 import { Input } from "tabler-react-2";
 import { useModal } from "#modal";
 import { Button } from "#button";
-import { toast } from "react-toastify";
+import { toast } from "react-hot-toast";
 
 const CreateShopModalContent = ({ onSubmit }) => {
   const [name, setName] = useState("");
@@ -12,7 +12,16 @@ const CreateShopModalContent = ({ onSubmit }) => {
   const [email, setEmail] = useState("");
   const [description, setDescription] = useState("");
   const [color, setColor] = useState("");
-  const colors = ["RED", "BLUE", "GREEN", "YELLOW", "ORANGE", "PURPLE", "PINK", "TEAL"];
+  const colors = [
+    "RED",
+    "BLUE",
+    "GREEN",
+    "YELLOW",
+    "ORANGE",
+    "PURPLE",
+    "PINK",
+    "TEAL",
+  ];
 
   return (
     <div>
@@ -46,7 +55,7 @@ const CreateShopModalContent = ({ onSubmit }) => {
         label="Job description (optional)"
         placeholder="e.g. Description"
       />
-      <Input 
+      <Input
         value={color}
         onChange={(e) => setColor(e)}
         label="Job Color (optional)"
@@ -58,11 +67,11 @@ const CreateShopModalContent = ({ onSubmit }) => {
           onClick={() => {
             onSubmit(
               name,
-              address || null, 
+              address || null,
               phone || null,
               email || null,
               description || null,
-              colors.includes(color?.toUpperCase()) ? color.toUpperCase() : null,
+              colors.includes(color?.toUpperCase()) ? color.toUpperCase() : null
             );
           }}
         >
@@ -84,11 +93,11 @@ export const useShops = () => {
 
   const _createShop = async (
     name,
-    address, 
+    address,
     phone,
     email,
     description,
-    color,
+    color
   ) => {
     try {
       setOpLoading(true);
@@ -117,8 +126,8 @@ export const useShops = () => {
   };
 
   const { modal: createModal, ModalElement: createModalElement } = useModal({
-      title: "Create a new Shop",
-      text: <CreateShopModalContent onSubmit={_createShop}/>,
+    title: "Create a new Shop",
+    text: <CreateShopModalContent onSubmit={_createShop} />,
   });
 
   const fetchShops = async (shouldSetLoading = true) => {
