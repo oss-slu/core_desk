@@ -1,0 +1,98 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/api/shop/[shopId]/resources > GET > only returns a list of public resources in the shop for customers 1`] = `
+{
+  "active": true,
+  "costingPublic": true,
+  "createdAt": Any<String>,
+  "description": "TestResourceDescription",
+  "id": Any<String>,
+  "images": [],
+  "materialLabel": null,
+  "primaryCategory": null,
+  "public": true,
+  "quantityPublic": true,
+  "resourceTypeId": Any<String>,
+  "secondaryCategory": null,
+  "shopId": Any<String>,
+  "title": "TestResource",
+  "updatedAt": Any<String>,
+  "userSuppliedMaterial": "NEVER",
+}
+`;
+
+exports[`/api/shop/[shopId]/resources > GET > returns a list of resources in the shop 1`] = `
+{
+  "active": true,
+  "costPerProcessingTime": null,
+  "costPerTime": null,
+  "costPerUnit": null,
+  "costingPublic": true,
+  "createdAt": Any<String>,
+  "description": "TestResourceDescription",
+  "fixedCost": null,
+  "id": Any<String>,
+  "images": [],
+  "materialLabel": null,
+  "primaryCategory": null,
+  "public": true,
+  "quantity": null,
+  "quantityPublic": true,
+  "resourceTypeId": Any<String>,
+  "secondaryCategory": null,
+  "shopId": Any<String>,
+  "title": "TestResource",
+  "updatedAt": Any<String>,
+  "userSuppliedMaterial": "NEVER",
+}
+`;
+
+exports[`/api/shop/[shopId]/resources > POST > creates a new resource for global admins 1`] = `
+{
+  "active": true,
+  "costPerProcessingTime": null,
+  "costPerTime": null,
+  "costPerUnit": null,
+  "costingPublic": true,
+  "createdAt": Any<String>,
+  "description": null,
+  "fixedCost": null,
+  "id": Any<String>,
+  "materialLabel": null,
+  "primaryCategory": null,
+  "public": false,
+  "quantity": null,
+  "quantityPublic": true,
+  "resourceTypeId": Any<String>,
+  "secondaryCategory": null,
+  "shopId": Any<String>,
+  "title": "TestResource",
+  "updatedAt": Any<String>,
+  "userSuppliedMaterial": "NEVER",
+}
+`;
+
+exports[`/api/shop/[shopId]/resources > POST > creates a new resource for shop admins 1`] = `
+{
+  "active": true,
+  "costPerProcessingTime": null,
+  "costPerTime": null,
+  "costPerUnit": null,
+  "costingPublic": true,
+  "createdAt": Any<String>,
+  "description": null,
+  "fixedCost": null,
+  "id": Any<String>,
+  "materialLabel": null,
+  "primaryCategory": null,
+  "public": false,
+  "quantity": null,
+  "quantityPublic": true,
+  "resourceTypeId": Any<String>,
+  "secondaryCategory": null,
+  "shopId": Any<String>,
+  "title": "TestResource",
+  "updatedAt": Any<String>,
+  "userSuppliedMaterial": "NEVER",
+}
+`;

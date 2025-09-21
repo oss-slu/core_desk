@@ -1,0 +1,57 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/[userId] > Fetch user profile > should return a 404 if the user does not exist 1`] = `
+{
+  "message": "User not found",
+}
+`;
+
+exports[`/[userId] > Fetch user profile > should return a full profile if the user is a global admin 1`] = `
+{
+  "admin": false,
+  "createdAt": Any<String>,
+  "email": "targetUser@example.com",
+  "firstName": "Test",
+  "id": Any<String>,
+  "isMe": false,
+  "jobCount": 0,
+  "jobs": [],
+  "lastName": "User",
+  "name": "Test User",
+  "shopCount": 1,
+  "shops": Any<Array>,
+  "suspended": false,
+  "suspensionReason": null,
+  "updatedAt": Any<String>,
+}
+`;
+
+exports[`/[userId] > Fetch user profile > should return basic information if the user is not a global admin 1`] = `
+{
+  "firstName": "Test",
+  "id": Any<String>,
+  "lastName": "User",
+  "name": "Test User",
+}
+`;
+
+exports[`/[userId] > Fetch user profile > should return logs if includeLogs is true 1`] = `
+{
+  "admin": false,
+  "createdAt": Any<String>,
+  "email": "targetUser@example.com",
+  "firstName": "Test",
+  "id": Any<String>,
+  "isMe": false,
+  "jobCount": 0,
+  "jobs": [],
+  "lastName": "User",
+  "logs": Any<Array>,
+  "name": "Test User",
+  "shopCount": 0,
+  "shops": [],
+  "suspended": false,
+  "suspensionReason": null,
+  "updatedAt": Any<String>,
+}
+`;
