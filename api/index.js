@@ -89,7 +89,9 @@ if (process.env.JACK == "true") {
         let user = await prisma.user.findUnique({
           where: { email: userEmail },
         });
-        user = createUser(profile); // call the createUser function and pass the profile
+        if (!user) {
+          user = createUser(profile); // call the createUser function and pass the profile
+        }
 
         return done(null, user);
       } catch (error) {
