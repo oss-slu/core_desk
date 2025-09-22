@@ -1,9 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-}
-
-generator docs {
-  provider = "node node_modules/prisma-docs-generator"
+  binaryTargets = ["native", "linux-musl", "debian-openssl-3.0.x"]
 }
 
 datasource db {

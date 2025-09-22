@@ -52,13 +52,13 @@ const CreateShopModalContent = ({ onSubmit }) => {
       <Input
         value={description}
         onChange={(e) => setDescription(e)}
-        label="Job description (optional)"
+        label="Shop description (optional)"
         placeholder="e.g. Description"
       />
       <Input
         value={color}
         onChange={(e) => setColor(e)}
-        label="Job Color (optional)"
+        label="Shop Color (optional)"
         placeholder="e.g. purple"
       />
       {name.length > 0 ? (

@@ -1,0 +1,22 @@
+{
+  "name": "slu-open-project-oss-monorepo",
+  "private": true,
+  "workspaces": [
+    "api",
+    "app",
+    "e2e"
+  ],
+  "scripts": {
+    "dev:api": "npm --workspace api run dev",
+    "dev:app": "npm --workspace app run start",
+    "dev:stack": "concurrently \"npm run dev:api\" \"npm run dev:app\"",
+    "test:e2e": "npm --workspace e2e run test:docker",
+    "test:e2e:interactive": "npm --workspace e2e run test:docker:interactive",
+    "test:e2e:watch": "REINSTALL_NODE_MODULES=${npm_config_reinstall_node_modules:-} npm --workspace e2e run test:docker:watch",
+    "down:e2e": "npm --workspace e2e run down:docker"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "start-server-and-test": "^2.0.0"
+  }
+}

@@ -5,3 +5,10 @@ api/response.json
 api/users.json
 defaultdb.dump
 defaultdb.sql
+node_modules
+node_modules/*
+e2e/videos
+e2e/screenshots
+e2e/cypress/videos
+e2e/cypress/screenshots
+e2e/prisma

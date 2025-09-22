@@ -9,6 +9,11 @@ dotenv.config();
 import { prisma } from "#prisma";
 
 /** ---------- S3 client ---------- */
+// Enable path-style for custom (non-AWS) endpoints like MinIO
+const isCustomEndpoint =
+  !!process.env.AWS_ENDPOINT &&
+  !/amazonaws\.com$/i.test(String(process.env.AWS_ENDPOINT));
+
 export const s3 = new S3Client({
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -16,6 +21,7 @@ export const s3 = new S3Client({
   },
   region: process.env.AWS_REGION,
   endpoint: process.env.AWS_ENDPOINT,
+  forcePathStyle: isCustomEndpoint,
 });
 
 /** ---------- Key + URL helpers ---------- */

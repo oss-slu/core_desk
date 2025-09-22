@@ -1,0 +1,26 @@
+{
+  "name": "e2e",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "@prisma/client": "6.16.2",
+    "cypress": "13.17.0",
+    "nodemon": "^3.1.7",
+    "prisma": "6.16.2"
+  },
+  "scripts": {
+    "prepare:prisma": "prisma generate --schema ../api/prisma/schema.prisma",
+    "cy:open": "npm run prepare:prisma && cypress open --e2e",
+    "cy:run": "npm run prepare:prisma && cypress run --e2e",
+    "cy:watch": "npm run prepare:prisma && nodemon --legacy-watch --watch cypress --watch cypress.config.cjs --ext js,ts,jsx,tsx,cjs,mjs,json --exec \"cypress run --e2e\"",
+    "test": "start-server-and-test \"npm --prefix .. run dev:stack\" http://localhost:5173 \"npm run cy:run\"",
+    "test:docker": "sh -c 'docker compose -f ./docker-compose.yml up --build --exit-code-from cypress; code=$?; docker compose -f ./docker-compose.yml down -v; exit $code'",
+    "test:docker:interactive": "INTERACTIVE=1 docker compose -f ./docker-compose.yml up --build",
+    "test:docker:watch": "WATCH=1 docker compose -f ./docker-compose.yml up --build",
+    "down:docker": "docker compose -f ./docker-compose.yml down -v"
+  },
+  "dependencies": {
+    "jsonwebtoken": "^9.0.2"
+  }
+}
