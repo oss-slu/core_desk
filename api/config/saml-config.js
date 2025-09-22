@@ -3,11 +3,22 @@ import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config();
 
-export default {
+const baseConfig = {
   entryPoint: "https://auth.slu.edu/app/sso/saml",
   issuer: "slu-open-project",
   callbackUrl: process.env.BASE_URL + "/assertion",
-  cert: fs.readFileSync("./okta.cert", "utf-8"), // Add X.509 certificate here
   login:
     "https://auth.slu.edu/app/slu_sluopenproject_1/exkvyuwwmsE8VTbxh297/sso/saml",
 };
+
+// Always include IdP cert. passport-saml requires it at initialization time.
+baseConfig.cert = fs.readFileSync("./okta.cert", "utf-8");
+
+if (process.env.SAML_ALLOW_UNSIGNED === "true") {
+  // eslint-disable-next-line no-console
+  console.warn(
+    "[SAML] WARNING: UNSIGNED responses allowed via dev bypass (SAML_ALLOW_UNSIGNED=true)."
+  );
+}
+
+export default baseConfig;

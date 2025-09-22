@@ -13,7 +13,7 @@ const shopSchema = z.object({
   description: z.string().nullable().optional(),
   imageUrl: z.string().url("Invalid image URL").nullable().optional(),
   color: z
-    .enum([
+    .enum([ 
       "RED",
       "BLUE",
       "GREEN",
@@ -30,6 +30,7 @@ const shopSchema = z.object({
     .min(0, "Starting deposit must be a positive number")
     .nullable()
     .optional(),
+  autoJoin: z.boolean().optional(),
 });
 
 export const get = [
@@ -225,6 +226,7 @@ export const put = [
           imageUrl: validatedData.imageUrl,
           color: validatedData.color,
           startingDeposit: validatedData.startingDeposit,
+          autoJoin: req.user.admin? validatedData.autoJoin : undefined,
         },
         select: SHOP_SELECT,
       });

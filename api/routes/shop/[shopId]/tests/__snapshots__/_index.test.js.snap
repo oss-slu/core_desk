@@ -3,6 +3,7 @@
 exports[`/shop/[shopId] > GET > returns a shop and a user's membership in said shop 1`] = `
 {
   "address": null,
+  "autoJoin": false,
   "color": null,
   "description": null,
   "email": null,

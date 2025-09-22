@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Page } from "#page";
 import { useAuth } from "#useAuth";
 import { Loading } from "#loading";
-import { Typography, Util, Input } from "tabler-react-2";
+import { Typography, Util, Input, Switch } from "tabler-react-2";
 import { Icon } from "#icon";
 import { useParams } from "react-router-dom";
 const { H1, H2 } = Typography;
@@ -198,6 +198,13 @@ export const ShopPage = () => {
               placeholder="Your Shop's Name"
               label="Shop Name"
             />
+            {user.admin && (
+              <Switch
+                value={newShop.autoJoin || false}
+                onChange={(autoJoin) => setNewShop({ ...newShop, autoJoin})}
+                label="Automatically add users to shop"
+              />)
+            }
             <Input
               value={newShop.startingDeposit}
               prependedText="$"

@@ -483,6 +483,61 @@ describe("/shop/[shopId]", () => {
 
       expect(updatedShop.name).toBe("TestShop2");
       expect(res.status).toBe(200);
+
+    });
+
+    it("allows global admins to update autoJoin", async () => {
+      const shop = await prisma.shop.findFirst({});
+
+      const res = await request(app)
+        .put(`/api/shop/${shop.id}`)
+        .set(...(await gt({ ga:true })))
+        .send({
+          name: shop.name,
+          autoJoin: true,
+        });
+
+      expect(res.status).toBe(200);
+
+      const updatedShop = await prisma.shop.findFirst({
+        where: { id: shop.id },
+      });
+
+      expect(updatedShop.autoJoin).toBe(true);
+    });
+
+    it("does not allow a shop-level admin to update autoJoin", async () => {
+      const shop = await prisma.shop.findFirst({});
+
+      const userShop = await prisma.userShop.findFirst({
+        where: { shopId: shop.id },
+      });
+
+      await prisma.userShop.update({
+        where: { id: userShop.id },
+        data: { accountType: "ADMIN" },
+      });
+
+      await prisma.shop.update({
+        where: { id: shop.id },
+        data: { autoJoin: false },
+      });
+
+      const res = await request(app)
+        .put(`/api/shop/${shop.id}`)
+        .set(...(await gt()))
+        .send({
+          name: shop.name,
+          autoJoin: true,
+        });
+
+      expect(res.status).toBe(200);
+
+      const updatedShop = await prisma.shop.findFirst({
+        where: { id: shop.id },
+      });
+
+      expect(updatedShop.autoJoin).toBe(false);
     });
   });
 });
