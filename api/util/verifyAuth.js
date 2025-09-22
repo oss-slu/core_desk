@@ -12,7 +12,12 @@ export const verifyAuth = async (req, res, next) => {
         console.log("Error verifying token", err);
         return res.sendStatus(401); // Forbidden
       }
-      // req.user = user; // Attach the user object to the request
+
+      if (!user.id) {
+        console.log("User not found");
+        console.log(user);
+        return res.sendStatus(401); // Unauthorized
+      }
 
       const _user = await prisma.user.findUnique({
         where: { id: user.id },
@@ -45,6 +50,12 @@ export const verifyAuthAlone = async (auth) => {
       jwt.verify(token, process.env.JWT_SECRET, async (err, user) => {
         if (err) {
           return reject(err);
+        }
+
+        if (!user.id) {
+          console.log("User not found");
+          console.log(user);
+          return reject("User not found");
         }
 
         const _user = await prisma.user.findUnique({
