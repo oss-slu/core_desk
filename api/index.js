@@ -140,7 +140,6 @@ if (process.env.JACK == "true") {
 
             /* eslint-disable no-useless-escape */
             const extractAttr = (name) => {
-              
               const re = new RegExp(
                 `<\\w*:Attribute\\s+Name=\"${name.replace(
                   /[-/\\.^$*+?()|[\]{}]/g,
@@ -153,7 +152,7 @@ if (process.env.JACK == "true") {
             };
 
             /* eslint-disable no-useless-escape */
-            
+
             const email =
               extractAttr(
                 "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
@@ -168,7 +167,7 @@ if (process.env.JACK == "true") {
                   const m = xml.match(nameIdRe);
                   return m ? m[1].trim() : null;
                 } catch (_) {
-                  console.error(_);   
+                  console.error(_);
                   return null;
                 }
               })();
@@ -238,6 +237,7 @@ if (process.env.JACK == "true") {
       session: false,
     }),
     (req, res) => {
+      console.log("SAML Successful authentication with user", req.user);
       // Generate JWT
       const token = jwt.sign(
         {
