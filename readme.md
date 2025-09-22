@@ -8,11 +8,11 @@ This is an open source project management platform for distributed manufacturing
 
 ## Installation & Quickstart
 
-### 1. Install node.js
+### 1. Install node.js(https://nodejs.org/en/download/current)
 
-### 2. Install Postgres (or have access to a connection string)
+### 2. Install Postgres(https://www.postgresql.org/download/) (or have access to a connection string) and start local server
 
-### 3. Install yarn
+### 3. Install yarn (If using Windows machine, use Command Prompt as terminal)
 
 ```bash
 npm install --global yarn
@@ -21,13 +21,13 @@ npm install --global yarn
 ### 4. Clone the repository
 
 ```bash
-git clone https://github.com/oss-slu/open-project.git
+git clone https://github.com/oss-slu/core_desk.git
 ```
 
 ### 5. Set up environment variables
 
 ```
-DATABASE_URL=(postgres connection string) (start a local postgres server and put that here)
+DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/YOUR_DATABASE_NAME" (start a local postgres server and put that here)
 JWT_SECRET=(random string)
 BASE_URL=http://localhost:5173
 SERVER_URL=(tunnel url accessible from the internet. Used for callbacks & webhooks)
@@ -71,9 +71,9 @@ cd app
 yarn start
 ```
 
-### 9. Open your browser to `http://localhost:5173` to view the app.
+### 9. Open your browser to `http://localhost:5173` to view the app
 
-### 10. To authenticate/log in, we typically use the SLU OKTA log in system, but that is a pain to connect in your local environment, so we have a workaround utility.
+### 10. To authenticate/log in, we typically use the SLU OKTA log in system, but that is a pain to connect in your local environment, so we have a workaround utility
 
 In the /api folder, run 
 
@@ -82,6 +82,38 @@ yarn okta
 ```
 
 If this is your first time logging in, allow it to create a new user for you. Once finished, it will give you a line of javascript. Copy/paste that into the browser's console, and that will log you in without having to go through the typical auth flow.
+
+### 11. Migrate prisma database with local postgres server.
+
+Install Prisma Client
+```bash
+yarn add @prisma/client
+yarn add -D prisma
+```
+
+Generate Prisma Client
+```bash
+yarn prisma generate
+```
+
+Apply migrations
+```bash
+yarn prisma migrate dev
+```
+
+### 12. Open Prisma database
+
+Run the following in your terminal (Command Prompt for Windows) to open the database
+```bash
+yarn prisma studio
+```
+
+Toggle admin true/false status for user:
+1. Click on user model
+2. Select the admin true/false value for your user
+3. Click enter on keyboard to open the dropdown
+4. Select "true" or "false" to toggle between admin permissions
+5. Save changes
 
 ## Testing
 
