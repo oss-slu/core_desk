@@ -25,7 +25,7 @@ export const authFetch = async (url, options) => {
 };
 
 export const authFetchWithoutContentType = async (url, options) => {
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("token");;
   const res = await fetch(u(url), {
     ...options,
     headers: {

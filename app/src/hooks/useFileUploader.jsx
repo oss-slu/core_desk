@@ -3,33 +3,47 @@ import { authFetchWithoutContentType } from "../util/url";
 import toast from "react-hot-toast";
 
 const uploadFiles = async (url, { arg }) => {
-  const formData = new FormData();
 
-  Array.from(arg).forEach((file) => {
-    formData.append("files", file);
-  });
-
-  const response = await authFetchWithoutContentType(url, {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!response.ok) {
-    let errorMessage = "File upload failed";
-    try {
-      const errorData = await response.json();
-      errorMessage = errorData?.message || response.statusText;
-    } catch (parseError) {
-      errorMessage = response.statusText || "Unknown error";
-      console.log(parseError);
-    }
-    console.error("Upload error:", errorMessage);
-    throw errorMessage;
+  if (!arg || arg.length === 0) { //if the length of the file array is zero
+    return []; 
   }
 
-  return await response.json();
-};
+  const results = []; //create empty array to store each backend resposnse
 
+  for (const file of arg) { //loop over each file
+
+    const formData = new FormData();
+    formData.append("files", file);
+
+    try {
+      const response = await authFetchWithoutContentType(url, { //create a network response for each file
+        method: "POST",
+        body: formData,
+      });
+
+      const rawText = await response.text();
+      let data;
+      try {
+        data = JSON.parse(rawText);
+      } catch (jsonError) {
+        data = rawText;
+      
+      }
+
+      if (!response.ok) {
+        const errorMessage = (data && data.message) || "Upload failed";
+        console.error(`Upload error for file ${file.name}:`, errorMessage);
+        continue;
+      }
+
+      results.push(data);
+    } catch (err) {
+      console.error(`Unexpected error uploading file ${file.name}:`, err);
+    }
+  }
+
+  return results; //return the array
+};
 export const useFileUploader = (endpoint, options) => {
   const { onSuccessfulUpload } = options || {};
 
