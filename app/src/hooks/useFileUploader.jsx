@@ -21,17 +21,11 @@ const uploadFiles = async (url, { arg }) => {
         body: formData,
       });
 
-      const rawText = await response.text();
-      let data;
-      try {
-        data = JSON.parse(rawText);
-      } catch (jsonError) {
-        data = rawText;
-      
-      }
+      const data = await response.text();
 
       if (!response.ok) {
         const errorMessage = (data && data.message) || "Upload failed";
+        toast.error(`Error uploading ${file.name}`);
         console.error(`Upload error for file ${file.name}:`, errorMessage);
         continue;
       }
@@ -42,7 +36,7 @@ const uploadFiles = async (url, { arg }) => {
     }
   }
 
-  return results; //return the array
+  return results; //return
 };
 export const useFileUploader = (endpoint, options) => {
   const { onSuccessfulUpload } = options || {};
