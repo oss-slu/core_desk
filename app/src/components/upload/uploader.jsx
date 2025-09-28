@@ -5,6 +5,7 @@ export const UploadDropzone = ({ onUploadComplete, endpoint }) => {
   return (
     <>
       <Dropzone onSuccessfulUpload={onUploadComplete} endpoint={endpoint} />
+
     </>
   );
 };
