@@ -8,9 +8,9 @@ This is an open source project management platform for distributed manufacturing
 
 ## Installation & Quickstart
 
-### 1. Install node.js(https://nodejs.org/en/download/current)
+### 1. Install [node.js](https://nodejs.org/en/download/current)
 
-### 2. Install Postgres(https://www.postgresql.org/download/) (or have access to a connection string) and start local server
+### 2. Install [Postgres](https://www.postgresql.org/download/) (or have access to a connection string) and start local server
 
 ### 3. Install yarn (If using Windows machine, use Command Prompt as terminal)
 
@@ -101,7 +101,7 @@ Apply migrations
 yarn prisma migrate dev
 ```
 
-### 12. Open Prisma database
+### 12. If you need to access the database (not necessary for initial setup), open Prisma Studio
 
 Run the following in your terminal (Command Prompt for Windows) to open the database
 ```bash
@@ -119,30 +119,47 @@ Toggle admin true/false status for user:
 
 To run the tests, docker and docker-compose are required.
 
-1. Run the tests
+Install [Docker for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) or [Docker for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
 
+#### On Windows:
+1. Start Docker Desktop
+Open Docker Desktop and wait for the app to start completely.
+
+2. Start database from ./api folder (Only run if on Windows computer using Command Prompt. This step is not necessary if on Mac.)
+```bash
+cd api
+docker-compose up -d
+```
+
+3. Run the tests from ./api folder
+
+Mac:
 ```bash
 cd api
 yarn test
 ```
 
-2. To clean up
+Windows:
+```bash
+yarn test
+```
 
+4. To clean up
 ```bash
 docker-compose down -v
 ```
 
 ### End-to-End (E2E) tests
 
-Quick, isolated runs use Docker (recommended):
-
-- Run once: `npm run test:e2e`
-- Watch mode: `npm run test:e2e:watch`
-- Clean up: `npm run down:e2e`
-
 Notes:
 - Requires Docker and Docker Compose. The compose stack brings up Postgres, MinIO (S3), the API (serving the app), and a Cypress runner.
 - Artifacts (videos/screenshots) are saved under `e2e/cypress/`.
+- On Windows, run the following commands with Git Bash or WSL.
+
+Quick, isolated runs use Docker (recommended) from the root folder:
+- Run once: `npm run test:e2e`
+- Watch mode: `npm run test:e2e:watch`
+- Clean up: `npm run down:e2e`
 
 Local development runner (without Docker):
 - Start the stack in one terminal: `npm run dev:stack`
