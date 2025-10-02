@@ -3,6 +3,7 @@ import { Input, Button } from "tabler-react-2";
 import { Row } from "../../util/Flex";
 import { useFileUploader } from "../../hooks/useFileUploader";
 import { ImageUploadProgress } from "../imageUploadProgress/ImageUploadProgress";
+import { useProgressMap } from "../../hooks/useFileUploader";
 
 export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
   const [files, setFiles] = useState([]);
@@ -12,12 +13,13 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
     console.log(files);
   }, [files]);
 
-  const { loading, upload, progress, setProgress } = useFileUploader(endpoint, {
+  const { loading, upload, progress } = useFileUploader(endpoint, {
     onSuccessfulUpload,
   });
 
   useEffect(() => {
-    if (progress === 100) {
+    const allComplete = Object.values(progress).every((value) => value === 100); //uf they are all 100
+    if (allComplete) {
       setInputKey(Date.now()); //update the input 
     }
   }, [progress]);
@@ -53,7 +55,6 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
         files={files}
         setFiles={setFiles}
         progress={progress}
-        setProgress={setProgress}
       />
     </>
   );
