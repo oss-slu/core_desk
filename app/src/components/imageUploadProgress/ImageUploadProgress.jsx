@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-export const ImageUploadProgress = ({ files, progress }) => {
+export const ImageUploadProgress = ({ files, setFiles, progress, setProgress }) => {
   const [previews, setPreviews] = useState([]);
 
   useEffect(() => { //anytime new files are added display them
@@ -20,7 +20,12 @@ export const ImageUploadProgress = ({ files, progress }) => {
     });
   }, [files]);
 
-  //maybe we can add another useEffect that clears the previews when upload is complete?
+  useEffect(() => {
+    if(progress === 100){
+        setFiles([]);
+        setProgress(0);
+    }
+  }, [progress])
 
 
 
