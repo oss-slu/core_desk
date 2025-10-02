@@ -3,7 +3,6 @@ import { Input, Button } from "tabler-react-2";
 import { Row } from "../../util/Flex";
 import { useFileUploader } from "../../hooks/useFileUploader";
 import { ImageUploadProgress } from "../imageUploadProgress/ImageUploadProgress";
-import { useProgressMap } from "../../hooks/useFileUploader";
 
 export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
   const [files, setFiles] = useState([]);

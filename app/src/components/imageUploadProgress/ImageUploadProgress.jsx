@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useProgressMap } from "../../hooks/useFileUploader";
+import React, { useState, useEffect } from "react";;
 
 
 export const ImageUploadProgress = ({ files, setFiles, progress}) => {
@@ -35,9 +34,6 @@ useEffect(() => {
 
     }
     }, [progress, setFiles ]);
-
-
-    console.log("progress", progress);
 
 
 
