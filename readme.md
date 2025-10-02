@@ -169,6 +169,7 @@ Quick, isolated runs use Docker (recommended) from the root folder:
 - Clean up: `npm run down:e2e`
 
 Local development runner (without Docker):
+- Install `concurrently` if not already installed with `npm i -D concurrently` - [Documentation](https://www.npmjs.com/package/concurrently#installation)
 - Start the stack in one terminal: `npm run dev:stack`
 - In another terminal, open Cypress: `npm --workspace e2e run cy:open`
 - Headless run locally: `npm --workspace e2e run cy:run`
