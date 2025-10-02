@@ -121,7 +121,6 @@ To run the tests, docker and docker-compose are required.
 
 Install [Docker for Windows](https://docs.docker.com/desktop/setup/install/windows-install/) or [Docker for Mac](https://docs.docker.com/desktop/setup/install/mac-install/)
 
-#### On Windows:
 1. Start Docker Desktop
 Open Docker Desktop and wait for the app to start completely.
 
@@ -154,7 +153,15 @@ docker-compose down -v
 Notes:
 - Requires Docker and Docker Compose. The compose stack brings up Postgres, MinIO (S3), the API (serving the app), and a Cypress runner.
 - Artifacts (videos/screenshots) are saved under `e2e/cypress/`.
-- On Windows, run the following commands with Git Bash or WSL.
+- On Windows, run the following commands with Git Bash or WSL through VS Code.
+
+On Windows from Git Bash in VS Code, you need to convert the /api-entrypoint.sh file to Unix line endings:
+
+```bash
+cd e2e/docker
+dos2unix api-entrypoint.sh
+```
+If you are not using VS Code, be sure to have dos2unix installed.
 
 Quick, isolated runs use Docker (recommended) from the root folder:
 - Run once: `npm run test:e2e`
