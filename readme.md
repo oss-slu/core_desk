@@ -12,7 +12,7 @@ This is an open source project management platform for distributed manufacturing
 
 ### 2. Install [Postgres](https://www.postgresql.org/download/) (or have access to a connection string) and start local server
 
-### 3. Install yarn (If using Windows machine, use Command Prompt as terminal)
+### 3. Install yarn (If using Windows machine, use Command Prompt)
 
 ```bash
 npm install --global yarn
@@ -30,14 +30,14 @@ git clone https://github.com/oss-slu/core_desk.git
 DATABASE_URL="postgresql://USER:PASSWORD@localhost:5432/YOUR_DATABASE_NAME" (start a local postgres server and put that here)
 JWT_SECRET=(random string)
 BASE_URL=http://localhost:5173
-SERVER_URL=(tunnel url accessible from the internet. Used for callbacks & webhooks)
+SERVER_URL=(a globally accessible url, e.g. a tunnel. Ngrok, Bore, and Cloudflare Tunnels are good software options)
 SENTRY_AUTH_TOKEN=(Sentry.io auth token)
 AWS_REGION=nyc3
 AWS_BUCKET=open-project
 AWS_ENDPOINT=https://nyc3.digitaloceanspaces.com
 PROJECT_NAME=dev-(your first name)
-AWS_ACCESS_KEY_ID=(get an api key from the tech lead)
-AWS_SECRET_ACCESS_KEY=(get an api key from the tech lead)
+AWS_ACCESS_KEY_ID=(get api key from tech lead or provide your own)
+AWS_SECRET_ACCESS_KEY=(get api key from tech lead or provide your own)
 ```
 
 ### 6. Install dependencies
@@ -107,13 +107,6 @@ Run the following in your terminal (Command Prompt for Windows) to open the data
 ```bash
 yarn prisma studio
 ```
-
-Toggle admin true/false status for user:
-1. Click on user model
-2. Select the admin true/false value for your user
-3. Click enter on keyboard to open the dropdown
-4. Select "true" or "false" to toggle between admin permissions
-5. Save changes
 
 ## Testing
 
