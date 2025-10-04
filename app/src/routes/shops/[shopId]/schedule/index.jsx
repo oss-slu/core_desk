@@ -1,9 +1,9 @@
 import React from "react";
 import { Page } from "#page";
-import { Typography, Util } from "tabler-react-2";
+import { Typography, Util, useOffcanvas, Input } from "tabler-react-2";
 import { useAuth } from "#useAuth";
 import { sidenavItems } from "#page";
-import styles from "./SchedulingPage.module.css";
+import styles from "./SchedulePage.module.css";
 
 const { H1 } = Typography;
 
@@ -31,8 +31,12 @@ const hexToRgba = (hex, alpha = 0.2) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-export const SchedulingPage = () => {
+export const SchedulePage = () => {
   const { user, loading } = useAuth();
+  const { offcanvas, OffcanvasElement } = useOffcanvas({
+    offcanvasProps: { position: "end", size: 500, zIndex: 1051 },
+  });
+  const [activeEvent, setActiveEvent] = React.useState(null);
 
   if (loading) {
     return <Page sidenavItems={sidenavItems("Shops", user?.admin)}>Loading...</Page>;
@@ -46,23 +50,14 @@ export const SchedulingPage = () => {
       userId: "user1",
       user: {
         id: "user1",
-        email: "alice@example.com",
+        email: "bellaOtt@notSlu.edu",
         firstName: "Bella",
         lastName: "Ott",
       },
       resourceId: "res1",
       resource: {
-        active: true,
-        createdAt: "2025-01-01T00:00:00Z",
-        description: "TestResourceDescription",
-        id: "res1",
-        images: [],
         title: "Test 1",
-        updatedAt: "2025-01-01T00:00:00Z",
-        userSuppliedMaterial: "NEVER",
-        public: true,
-        costingPublic: true,
-        quantityPublic: true,
+        description: "TestResourceDescription",
       },
       color: "#4e73df",
     },
@@ -73,23 +68,14 @@ export const SchedulingPage = () => {
       userId: "user2",
       user: {
         id: "user2",
-        email: " ",
+        email: "jack.crane@notSlu.edu",
         firstName: "Jack",
         lastName: "Crane",
       },
       resourceId: "res1",
       resource: {
-        active: true,
-        createdAt: "2025-01-01T00:00:00Z",
-        description: "TestResourceDescription",
-        id: "res1",
-        images: [],
         title: "Test 2",
-        updatedAt: "2025-01-01T00:00:00Z",
-        userSuppliedMaterial: "NEVER",
-        public: true,
-        costingPublic: true,
-        quantityPublic: true,
+        description: "TestResourceDescription",
       },
       color: "#1cc88a",
     },
@@ -100,23 +86,14 @@ export const SchedulingPage = () => {
       userId: "user3",
       user: {
         id: "user3",
-        email: " ",
+        email: "plsdontsendmeemails@notslu.edu",
         firstName: "Paul",
         lastName: "Ongkiko",
       },
       resourceId: "res2",
       resource: {
-        active: true,
-        createdAt: "2025-01-01T00:00:00Z",
-        description: "TestResourceDescription",
-        id: "res2",
-        images: [],
         title: "Test 1",
-        updatedAt: "2025-01-01T00:00:00Z",
-        userSuppliedMaterial: "NEVER",
-        public: true,
-        costingPublic: true,
-        quantityPublic: true,
+        description: "TestResourceDescription",
       },
       color: "#f6c23e",
     },
@@ -124,6 +101,41 @@ export const SchedulingPage = () => {
 
   const resources = Array.from(new Set(mockEvents.map((evt) => evt.resource.title)));
   const timeSlots = generateTimeSlots();
+
+  const openEvent = (evt) => {
+    setActiveEvent(evt);
+
+    const startDate = new Date(evt.startTime);
+    const localDatetime = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+
+    offcanvas({
+      content: (
+        <div style={{ padding: 24 }}>
+          <h2 style={{ color: evt.color }}>{evt.user.firstName} {evt.user.lastName}</h2>
+          <h3>{evt.user.email}</h3>
+          <p>
+            {/*update with link to resource*/}
+            <strong>Resource:</strong> {evt.resource.title} {evt.resourceId}
+          </p>
+
+          <p>
+            <strong>Description:</strong> {evt.resource.description}
+          </p>
+
+          <div style={{ marginTop: 10 }}>
+            <Input
+              type="datetime-local"
+              label="Booking Time"
+              value={localDatetime}
+              onChange={() => {}}
+            />
+          </div>
+        </div>
+      ),
+    });
+  };
 
   return (
     <Page sidenavItems={sidenavItems("Shops", user.admin)}>
@@ -143,6 +155,7 @@ export const SchedulingPage = () => {
                 {slot}
               </div>
             ))}
+
             {resources.map((res, rowIdx) => {
               const rowNumber = rowIdx + 2;
               const labelCell = (
@@ -168,14 +181,16 @@ export const SchedulingPage = () => {
                 </React.Fragment>
               );
             })}
-            {mockEvents.map((evt, idx) => {
+
+            {mockEvents.map((evt) => {
               const rowIndex = resources.indexOf(evt.resource.title) + 2;
               const startCol = timeToSlotIndex(evt.startTime) + 2;
               const endCol = timeToSlotIndex(evt.endTime) + 2;
               return (
                 <div
-                  key={idx}
+                  key={evt.id}
                   className={styles.eventBlock}
+                  onClick={() => openEvent(evt)}
                   style={{
                     gridRow: rowIndex,
                     gridColumnStart: startCol,
@@ -184,6 +199,7 @@ export const SchedulingPage = () => {
                     backgroundColor: hexToRgba(evt.color, 0.2),
                     color: evt.color,
                     fontWeight: 500,
+                    cursor: "pointer",
                   }}
                 >
                   {evt.user.firstName} {evt.user.lastName}
@@ -192,6 +208,7 @@ export const SchedulingPage = () => {
             })}
           </div>
         </div>
+        {OffcanvasElement}
       </Util.Col>
     </Page>
   );
