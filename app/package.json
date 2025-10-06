@@ -75,6 +75,7 @@
     "#billingGroupPage": "./src/routes/shops/[shopId]/groups/[groupId]",
     "#billingGroupInvitationPage": "./src/routes/shops/[shopId]/groups/[groupId]/[inviteId]",
     "#billingGroupsPortal": "./src/routes/shops/[shopId]/groups/[groupId]/portal",
+    "#schedulePage": "./src/routes/shops/[shopId]/schedule/index",
     "#avatar": "tabler-react-2/dist/avatar",
     "#url": "./src/util/url",
     "#loading": "./src/components/loading/Loading",
