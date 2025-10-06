@@ -3,7 +3,7 @@ import { authFetchWithoutContentType } from "../util/url";
 import toast from "react-hot-toast";
 import { useState } from "react";
 
-
+//eslint-disable-next-line no-unused-vars
 const uploadFiles = async (url, { arg, addOrUpdateKey, deleteAllKeys }) => {
   const { files } = arg;
 
