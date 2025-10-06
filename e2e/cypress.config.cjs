@@ -5,6 +5,7 @@ module.exports = defineConfig({
     baseUrl: process.env.BASE_URL || "http://localhost:5173",
     specPattern: "cypress/e2e/**/*.cy.{js,ts,jsx,tsx}",
     supportFile: "cypress/support/e2e.js",
+    experimentalStudio: true,
     video: true,
     screenshotsFolder: "cypress/screenshots",
     setupNodeEvents(on, config) {
@@ -68,8 +69,27 @@ module.exports = defineConfig({
           return null;
         },
 
-        async "db:createUser"(data) {
-          return prisma.user.create({ data });
+        async "db:createUser"(data, { autoJoinShops = true } = {}) {
+          const user = await prisma.user.create({ data });
+
+          if (autoJoinShops) {
+            const shops = await prisma.shop.findMany({
+              where: {
+                autoJoin: true,
+              },
+            });
+            for (const shop of shops) {
+              await prisma.userShop.create({
+                data: {
+                  userId: user.id,
+                  shopId: shop.id,
+                  accountType: "CUSTOMER",
+                },
+              });
+            }
+          }
+
+          return user;
         },
 
         async "db:getUserByEmail"(email) {
@@ -112,6 +132,35 @@ module.exports = defineConfig({
             { expiresIn: expiresIn || "24h" }
           );
           return token;
+        },
+
+        async "cy:createShop"(
+          shopName,
+          {
+            connectAllUsers = false,
+            connectAllUsersAccountType = "CUSTOMER",
+          } = {}
+        ) {
+          const shop = await prisma.shop.create({
+            data: {
+              name: shopName,
+            },
+          });
+
+          if (connectAllUsers) {
+            const users = await prisma.user.findMany();
+            for (const user of users) {
+              await prisma.userShop.create({
+                data: {
+                  userId: user.id,
+                  shopId: shop.id,
+                  accountType: connectAllUsersAccountType,
+                },
+              });
+            }
+          }
+
+          return shop;
         },
 
         log(message) {

@@ -203,10 +203,10 @@ export const Jobs = () => {
   }
 
   // Apply filters to jobs
-  const filteredJobs = jobs.filter((job) => {
+  const filteredJobs = jobs?.filter((job) => {
     // Filter by status
     const statusMatches =
-      statusFilter.length === 0 || statusFilter.includes(job.status);
+      statusFilter?.length === 0 || statusFilter?.includes(job.status);
 
     // Filter by date range
     const dueDate = new Date(job.dueDate);
@@ -220,8 +220,8 @@ export const Jobs = () => {
       !submitterFilter || submitterId === submitterFilter;
 
     const finalizedMatches =
-      finalizedFilter.length === 0 ||
-      finalizedFilter.includes(job.finalized ? "true" : "false");
+      finalizedFilter?.length === 0 ||
+      finalizedFilter?.includes(job.finalized ? "true" : "false");
 
     // Return true if all conditions are met
     return (
@@ -370,7 +370,7 @@ export const Jobs = () => {
       <Util.Spacer size={2} />
 
       {/* Jobs Table */}
-      {filteredJobs.length === 0 ? (
+      {filteredJobs?.length === 0 ? (
         <i>
           No jobs found. Adjust your filters or click the "Create Job" button
           above to create a new job.
@@ -567,7 +567,7 @@ export const Jobs = () => {
                 ),
               },
             ].filter((c) => columnsToShow.includes(c.label))}
-            data={filteredJobs}
+            data={filteredJobs || []}
           />
           <Util.Spacer size={1} />
           <i className="text-secondary">

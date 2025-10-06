@@ -19,7 +19,7 @@ export const ShopUserPicker = ({ value, onChange, includeNone }) => {
         includeNone
           ? { id: null, label: "Select a user", dropdownText: "None" }
           : null,
-        ...users.map((user) => ({
+        ...(users || []).map((user) => ({
           id: user.id,
           label: `${user.name}${user.id === activeUser?.id ? " (You)" : ""}`,
         })),
