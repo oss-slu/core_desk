@@ -36,6 +36,7 @@ export const SchedulePage = () => {
   const { offcanvas, OffcanvasElement } = useOffcanvas({
     offcanvasProps: { position: "end", size: 500, zIndex: 1051 },
   });
+  // eslint-disable-next-line no-unused-vars
   const [activeEvent, setActiveEvent] = React.useState(null);
 
   if (loading) {
