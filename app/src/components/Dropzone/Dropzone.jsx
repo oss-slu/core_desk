@@ -12,7 +12,7 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
     console.log(files);
   }, [files]);
 
-  const { loading, upload, progress } = useFileUploader(endpoint, {
+  const { loading, upload, progress, deleteAllKeys } = useFileUploader(endpoint, {
     onSuccessfulUpload,
   });
 
@@ -54,6 +54,7 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
         files={files}
         setFiles={setFiles}
         progress={progress}
+        deleteAllKeys = {deleteAllKeys}
       />
     </>
   );

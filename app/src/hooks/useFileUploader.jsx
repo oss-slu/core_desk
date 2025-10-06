@@ -10,7 +10,6 @@ const uploadFiles = async (url, { arg, addOrUpdateKey, deleteAllKeys }) => {
   if (!files || files.length === 0) {
     return [];
   }
-  deleteAllKeys(); //reset the keys 
   const results = [];
 
   for (let i = 0; i < files.length; i++) { //use a for loop 
@@ -50,7 +49,7 @@ export const useProgressMap = () => { //we could have this as its own file?
   const [progress, setProgress] = useState({});
 
   // Add or update a key
-  const addOrUpdateKey = (key, value) => {
+  const addOrUpdateKey = (key, value) => { //file.name : progress
     setProgress(prev => ({
       ...prev,
       [key]: value,
@@ -100,5 +99,6 @@ export const useFileUploader = (endpoint, options) => {
     progress, //return 
     loading: isMutating,
     error,
+    deleteAllKeys
   };
 };
