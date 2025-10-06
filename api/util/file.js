@@ -93,8 +93,9 @@ export const upload =
     });
 
     dynamicUpload.single(fieldName)(req, res, async (err) => {
-      if (err)
+      if (err){
         return res.status(400).json({ success: false, message: err.message });
+      }
       if (!req.file)
         return res
           .status(400)

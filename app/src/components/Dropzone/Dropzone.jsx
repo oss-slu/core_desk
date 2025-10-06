@@ -1,28 +1,33 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Input, Button } from "tabler-react-2";
-import { useState } from "react";
 import { Row } from "../../util/Flex";
 import { useFileUploader } from "../../hooks/useFileUploader";
+import { ImageUploadProgress } from "../imageUploadProgress/ImageUploadProgress";
 
 export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
   const [files, setFiles] = useState([]);
+  const [inputKey, setInputKey] = useState(Date.now()); // state
+
   useEffect(() => {
     console.log(files);
   }, [files]);
 
-  const { loading, upload } = useFileUploader(endpoint, {
+  const { loading, upload, progress } = useFileUploader(endpoint, {
     onSuccessfulUpload,
   });
 
+  useEffect(() => {
+    const allComplete = Object.values(progress).every((value) => value === 100); //uf they are all 100
+    if (allComplete) {
+      setInputKey(Date.now()); //update the input 
+    }
+  }, [progress]);
+
   return (
     <>
-      {/* {error && (
-        <Alert variant="danger" className="mb-3" title="Error">
-          {error}
-        </Alert>
-      )} */}
       <Row gap={1}>
         <Input
+          key={inputKey} // creates a new input when the files progress is 100, this is the only way to update or remove the text / clear 
           style={{ flex: 1 }}
           type="file"
           name="file"
@@ -45,6 +50,11 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
           </Button>
         )}
       </Row>
+      <ImageUploadProgress
+        files={files}
+        setFiles={setFiles}
+        progress={progress}
+      />
     </>
   );
 };

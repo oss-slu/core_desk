@@ -1,65 +1,95 @@
 import useSWRMutation from "swr/mutation";
 import { authFetchWithoutContentType } from "../util/url";
 import toast from "react-hot-toast";
+import { useState } from "react";
 
-const uploadFiles = async (url, { arg }) => {
-  const formData = new FormData();
 
-  Array.from(arg).forEach((file) => {
+const uploadFiles = async (url, { arg, addOrUpdateKey, deleteAllKeys }) => {
+  const { files } = arg;
+
+  if (!files || files.length === 0) {
+    return [];
+  }
+  deleteAllKeys(); //reset the keys 
+  const results = [];
+
+  for (let i = 0; i < files.length; i++) { //use a for loop 
+    const file = files[i];
+    const formData = new FormData();
     formData.append("files", file);
-  });
 
-  const response = await authFetchWithoutContentType(url, {
-    method: "POST",
-    body: formData,
-  });
+    addOrUpdateKey(file.name, 0) //set progress to zero
 
-  if (!response.ok) {
-    let errorMessage = "File upload failed";
     try {
-      const errorData = await response.json();
-      errorMessage = errorData?.message || response.statusText;
-    } catch (parseError) {
-      errorMessage = response.statusText || "Unknown error";
-      console.log(parseError);
+      const response = await authFetchWithoutContentType(url, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.text();
+
+      if (!response.ok) {
+        toast.error(`Error uploading ${file.name}`);
+        console.error(`Upload error for file ${file.name}:`, data);
+        continue;
+      }
+      else{
+        results.push(data);
+        addOrUpdateKey(file.name, 100); //set to 100
+        
+      }
+    } catch (err) {
+      console.error(`Unexpected error uploading file ${file.name}:`, err);
     }
-    console.error("Upload error:", errorMessage);
-    throw errorMessage;
   }
 
-  return await response.json();
+  return results;
+};
+
+export const useProgressMap = () => { //we could have this as its own file?
+  const [progress, setProgress] = useState({});
+
+  // Add or update a key
+  const addOrUpdateKey = (key, value) => {
+    setProgress(prev => ({
+      ...prev,
+      [key]: value,
+    }));
+  };
+
+  // Reset all keys
+  const deleteAllKeys = () => {
+    setProgress({});
+  };
+
+  return { progress, addOrUpdateKey, deleteAllKeys };
 };
 
 export const useFileUploader = (endpoint, options) => {
   const { onSuccessfulUpload } = options || {};
+   const { progress, addOrUpdateKey, deleteAllKeys } = useProgressMap();
 
   const { trigger, data, error, isMutating } = useSWRMutation(
     endpoint,
-    uploadFiles,
-    {
-      throwOnError: false,
-    }
+    (url, args) => uploadFiles(url, { ...args, addOrUpdateKey, deleteAllKeys}), // pass it here
+    { throwOnError: false }
   );
 
-  const upload = async (fileOrFiles) => {
-    if (
-      !fileOrFiles ||
-      (Array.isArray(fileOrFiles) && fileOrFiles.length === 0)
-    ) {
+  const upload = async (files) => {
+    if (!files || (Array.isArray(files) && files.length === 0)) {
       throw { message: "No files provided", status: 400 };
     }
 
-    return trigger(fileOrFiles)
+
+    return trigger({ files })
       .catch((err) => {
         console.error("Upload failed in hook:", err);
-        throw err; // Ensure error propagates correctly
+        throw err;
       })
       .finally(() => {
         if (!error) {
           toast.success("File uploaded successfully");
-          if (onSuccessfulUpload) {
-            onSuccessfulUpload(data);
-          }
+          if (onSuccessfulUpload) onSuccessfulUpload(data);
         }
       });
   };
@@ -67,6 +97,7 @@ export const useFileUploader = (endpoint, options) => {
   return {
     upload,
     data,
+    progress, //return 
     loading: isMutating,
     error,
   };
