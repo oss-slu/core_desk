@@ -24,26 +24,15 @@ export const useUserShop = (shopId, userId) => {
     }
   };
 
-  const setSimple = async (simple) => {
-    try {
-      setLoading(true);
-      const r = await authFetch(`/api/shop/${shopId}/user/${userId}/simple`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId, simple }),
-      });
-
-    } catch (error) {
-      setError(error);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+  // Only fetch if both shopId and userId are valid, non-empty strings.
+  if (shopId && userId) {
     fetchUserShop();
-  }, [shopId, userId]);
+  } else {
+    // If IDs are missing, we're not loading anything.
+    setLoading(false); 
+  }
+}, [shopId, userId]);
 
-  return { userShop, loading, error, refetch: fetchUserShop, setSimple };
+  return { userShop, loading, error, refetch: fetchUserShop };
 };

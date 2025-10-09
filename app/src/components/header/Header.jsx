@@ -11,7 +11,7 @@ const IconLogin2 = () => <Icon i={"login-2"} size={18} />;
 import classNames from "classnames";
 
 export const Header = () => {
-  const { user: activeUser, loggedIn, login, logout } = useAuth();
+  const { user, loggedIn, login, logout } = useAuth();
   const [shopId, setShopId ] = useState("");
 
   useEffect(() => {
@@ -39,7 +39,16 @@ export const Header = () => {
           )}
         </h1>
       </div>
-      <UserShopToggle shopId={shop?.id} userId={activeUser?.id} />
+      {user?.id && (
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+        }}>
+          <UserShopToggle userId={user.id} />
+        </div>
+      )}
       <div className={styles.headerGroup}>
         <a
           className="btn"
