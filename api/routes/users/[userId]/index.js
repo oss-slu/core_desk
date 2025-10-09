@@ -192,3 +192,65 @@ export const put = [
     }
   },
 ];
+
+export const updateSimple = [
+  verifyAuth,
+  async (req, res) => {
+    try {
+      const { userId, simple } = req.body;
+      const updatedUser = await prisma.user.update({
+        // 'where' specifies which record to update.
+        where: {
+          id: userId,
+        },
+        // 'data' specifies the fields to change.
+        data: {
+          simple: true,
+        },
+      });
+
+      res.json({ user: updatedUser });
+    } catch (error) {
+      // Handle cases where the user is not found
+      if (error instanceof Error && 'code' in error && error.code === 'P2025') {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      console.error('Request error', error);
+      res
+        .status(500)
+        .json({ error: "Error with updating user's simple preference." });
+    }
+  }
+];
+
+export const updateStandard = [
+  verifyAuth,
+  async (req, res) => {
+    try {
+      const { userId, simple } = req.body;
+      const updatedUser = await prisma.user.update({
+        // 'where' specifies which record to update.
+        where: {
+          id: userId,
+        },
+        // 'data' specifies the fields to change.
+        data: {
+          simple: false,
+        },
+      });
+
+      res.json({ user: updatedUser });
+    } catch (error) {
+      // Handle cases where the user is not found
+      if (error instanceof Error && 'code' in error && error.code === 'P2025') {
+        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      }
+
+      console.error('Request error', error);
+      res
+        .status(500)
+        .json({ error: "Error with updating user's simple preference." });
+    }
+  }
+];

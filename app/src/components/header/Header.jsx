@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "#useAuth";
+import { useUsers } from "#hooks";
 import styles from "./Header.module.css";
 import logo from "#sluopLogo";
 import { Dropdown } from "tabler-react-2";
@@ -12,6 +13,8 @@ import classNames from "classnames";
 export const Header = () => {
   const { user, loggedIn, login, logout } = useAuth();
   const [shopId, setShopId] = useState("");
+  const { users, loading } = useUsers(shopId);
+  const { user: activeUser, loading: authLoading } = useAuth();
 
   useEffect(() => {
     setInterval(() => {
@@ -37,6 +40,48 @@ export const Header = () => {
             shop?.name
           )}
         </h1>
+      </div>
+      <div className={styles.headerGroup}
+        style={{
+          marginLeft: "auto",
+          marginRight: "24px",
+          display: "flex",
+          alignItems: "center",
+          gap: 0,
+        }}
+      >
+          <a 
+            className="toggle btn"
+            role="button"
+            // onClick={() => {
+            //   users.map((user) => ({
+            //     simple: user.simple,
+            //   })),
+            // }}
+            style={{
+              height: 36,
+              marginRight: 0,
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+            }}>
+            Simplified
+          </a>
+          <a 
+            className="toggle btn active"
+            role="button"
+            // onClick={() => {
+            //   users.map((user) => ({
+            //     simple: !user.simple,
+            //   })),
+            // }}
+            style={{
+            height: 36,
+            marginLeft: 0,
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+          }}>
+            Standard
+          </a>
       </div>
       <div className={styles.headerGroup}>
         <a

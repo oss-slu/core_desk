@@ -108,6 +108,7 @@ model UserShop {
   updatedAt    DateTime    @updatedAt
   shop         Shop        @relation(fields: [shopId], references: [id], onDelete: Cascade)
   user         user        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  simple       Boolean     @default(true)
 }
 
 model Shop {
