@@ -35,9 +35,9 @@ export function UserShopToggle({ userId }) {
           setSimple(true); // This also correctly calls the function from useUser
         }}
         style={{
-          backgroundColor: user?.simple ? "lightgray" : "white",
           height: 36,
           marginRight: 0,
+          borderColor: user?.simple ? "black" : "lightgray",
           borderTopRightRadius: 0,
           borderBottomRightRadius: 0,
         }}
@@ -53,9 +53,9 @@ export function UserShopToggle({ userId }) {
           setSimple(false); // This also correctly calls the function from useUser
         }}
         style={{
-          backgroundColor: user?.simple ? "white" : "lightgray",
           height: 36,
           marginLeft: 0,
+          borderColor: user?.simple ? "lightgray" : "black",
           borderTopLeftRadius: 0,
           borderBottomLeftRadius: 0,
         }}

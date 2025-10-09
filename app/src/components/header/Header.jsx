@@ -41,10 +41,11 @@ export const Header = () => {
       </div>
       {user?.id && (
         <div style={{
+          marginLeft: "auto",
+          marginRight: "25px",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
-          gap: 10,
+          gap: 0,
         }}>
           <UserShopToggle userId={user.id} />
         </div>
