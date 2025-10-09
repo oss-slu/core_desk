@@ -24,9 +24,26 @@ export const useUserShop = (shopId, userId) => {
     }
   };
 
+  const setSimple = async (simple) => {
+    try {
+      setLoading(true);
+      const r = await authFetch(`/api/shop/${shopId}/user/${userId}/simple`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ userId, simple }),
+      });
+
+    } catch (error) {
+      setError(error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchUserShop();
   }, [shopId, userId]);
 
-  return { userShop, loading, error, refetch: fetchUserShop };
+  return { userShop, loading, error, refetch: fetchUserShop, setSimple };
 };
