@@ -8,6 +8,7 @@ import { useUserShop } from "./useUserShop";
 import { useAuth } from "#useAuth";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
+import { SimpleJobPipeline } from "../components/simpleJobPipeline/SimpleJobPipeline";
 
 const CreateJobModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
@@ -40,132 +41,136 @@ const CreateJobModalContent = ({ onSubmit }) => {
   const { user } = useAuth();
   const { loading: userShopLoading, userShop } = useUserShop(shopId, user?.id);
 
-  return (
-    <div>
-      <Input
-        value={title}
-        onChange={(e) => setTitle(e)}
-        label="Job title"
-        placeholder="e.g. Wind Mill Assembly"
-      />
-      <Input
-        value={description}
-        onChange={(e) => setDescription(e)}
-        label="Job description (optional)"
-        placeholder="e.g. Parts for version 2 of the wind mill design project"
-      />
-      <Input
-        type="date"
-        label="Due Date"
-        onChange={(e) => setDueDate(e + "T00:00:00")}
-        value={dueDate?.split("T")[0]}
-      />
-      {userShopLoading ? (
-        <>
-          <Spinner />
-          <br />
-        </>
-      ) : (
-        (userShop.accountType === "OPERATOR" ||
-          userShop.accountType === "ADMIN") && (
+  if (user?.simple === false) {
+    return (
+      <div>
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e)}
+          label="Job title"
+          placeholder="e.g. Wind Mill Assembly"
+        />
+        <Input
+          value={description}
+          onChange={(e) => setDescription(e)}
+          label="Job description (optional)"
+          placeholder="e.g. Parts for version 2 of the wind mill design project"
+        />
+        <Input
+          type="date"
+          label="Due Date"
+          onChange={(e) => setDueDate(e + "T00:00:00")}
+          value={dueDate?.split("T")[0]}
+        />
+        {userShopLoading ? (
           <>
-            <Switch
-              label="Create on behalf of another user"
-              value={onBehalfOf}
-              onChange={setOnBehalfOf}
-            />
-            {onBehalfOf && (
-              <Card
-                size="md"
-                variantPos="top"
-                tabs={[
-                  {
-                    title: "Select an existing user",
-                    content: (
-                      <ShopUserPicker
-                        value={onBehalfOfUserId}
-                        onChange={setOnBehalfOfUserId}
-                        includeNone={false}
-                      />
-                    ),
-                  },
-                  {
-                    title: "Create a new user",
-                    content: (
-                      <>
-                        <Input
-                          value={onBehalfOfUserEmail}
-                          onChange={setOnBehalfOfUserEmail}
-                          label="Email"
-                          placeholder="first.last@slu.edu"
-                        />
-                        <Input
-                          value={onBehalfOfUserFirstName}
-                          onChange={setOnBehalfOfUserFirstName}
-                          label="First Name"
-                        />
-                        <Input
-                          value={onBehalfOfUserLastName}
-                          onChange={setOnBehalfOfUserLastName}
-                          label="Last Name"
-                        />
-                      </>
-                    ),
-                  },
-                ]}
-              />
-            )}
-            <Util.Spacer size={2} />
+            <Spinner />
+            <br />
           </>
-        )
-      )}
-      {!onBehalfOf ? (
-        <>
-          <label className="form-label">Billing Group</label>
-          <Switch
-            label="Create this job on a billing group"
-            value={onBehalfOfBillingGroup}
-            onChange={setOnBehalfOfBillingGroup}
-          />
-          {onBehalfOfBillingGroup && (
+        ) : (
+          (userShop.accountType === "OPERATOR" ||
+            userShop.accountType === "ADMIN") && (
             <>
-              <BillingGroupPicker
-                value={onBehalfOfBillingGroupId}
-                onChange={setOnBehalfOfBillingGroupId}
-                includeNone={false}
+              <Switch
+                label="Create on behalf of another user"
+                value={onBehalfOf}
+                onChange={setOnBehalfOf}
               />
+              {onBehalfOf && (
+                <Card
+                  size="md"
+                  variantPos="top"
+                  tabs={[
+                    {
+                      title: "Select an existing user",
+                      content: (
+                        <ShopUserPicker
+                          value={onBehalfOfUserId}
+                          onChange={setOnBehalfOfUserId}
+                          includeNone={false}
+                        />
+                      ),
+                    },
+                    {
+                      title: "Create a new user",
+                      content: (
+                        <>
+                          <Input
+                            value={onBehalfOfUserEmail}
+                            onChange={setOnBehalfOfUserEmail}
+                            label="Email"
+                            placeholder="first.last@slu.edu"
+                          />
+                          <Input
+                            value={onBehalfOfUserFirstName}
+                            onChange={setOnBehalfOfUserFirstName}
+                            label="First Name"
+                          />
+                          <Input
+                            value={onBehalfOfUserLastName}
+                            onChange={setOnBehalfOfUserLastName}
+                            label="Last Name"
+                          />
+                        </>
+                      ),
+                    },
+                  ]}
+                />
+              )}
+              <Util.Spacer size={2} />
             </>
-          )}
-        </>
-      ) : null}
-      <Util.Spacer size={2} />
-      {title.length > 0 && dueDate.length > 0 ? (
-        <Button
-          variant="primary"
-          loading={loading}
-          onClick={() => {
-            setLoading(true);
-            onSubmit(
-              title,
-              description,
-              dueDate,
-              onBehalfOf,
-              onBehalfOfUserId,
-              onBehalfOfUserEmail,
-              onBehalfOfUserFirstName,
-              onBehalfOfUserLastName,
-              onBehalfOfBillingGroup,
-              onBehalfOfBillingGroupId
-            );
-          }}
-        >
-          Submit
-        </Button>
-      ) : (
-        <Button disabled>Submit</Button>
-      )}
-    </div>
-  );
+          )
+        )}
+        {!onBehalfOf ? (
+          <>
+            <label className="form-label">Billing Group</label>
+            <Switch
+              label="Create this job on a billing group"
+              value={onBehalfOfBillingGroup}
+              onChange={setOnBehalfOfBillingGroup}
+            />
+            {onBehalfOfBillingGroup && (
+              <>
+                <BillingGroupPicker
+                  value={onBehalfOfBillingGroupId}
+                  onChange={setOnBehalfOfBillingGroupId}
+                  includeNone={false}
+                />
+              </>
+            )}
+          </>
+        ) : null}
+        <Util.Spacer size={2} />
+        {title.length > 0 && dueDate.length > 0 ? (
+          <Button
+            variant="primary"
+            loading={loading}
+            onClick={() => {
+              setLoading(true);
+              onSubmit(
+                title,
+                description,
+                dueDate,
+                onBehalfOf,
+                onBehalfOfUserId,
+                onBehalfOfUserEmail,
+                onBehalfOfUserFirstName,
+                onBehalfOfUserLastName,
+                onBehalfOfBillingGroup,
+                onBehalfOfBillingGroupId
+              );
+            }}
+          >
+            Submit
+          </Button>
+        ) : (
+          <Button disabled>Submit</Button>
+        )}
+      </div>
+    );
+  } else {
+    return <SimpleJobPipeline/>;
+  }
 };
 
 export const useJobs = (shopId) => {
