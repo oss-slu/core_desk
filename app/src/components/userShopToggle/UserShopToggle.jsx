@@ -1,7 +1,6 @@
 import React from 'react';
 import { useUser } from '#hooks';
 
-// Let's assume this component receives shopId and userId as props
 export function UserShopToggle({ userId }) {
 
   // 1. Call the hook at the top level of the component.

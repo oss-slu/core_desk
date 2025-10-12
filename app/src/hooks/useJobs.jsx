@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, act } from "react";
 import { authFetch } from "#url";
 import { useModal } from "#modal";
 import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
 import { Button } from "#button";
 import { useParams } from "react-router-dom";
+import { useUser } from "./useUser";
 import { useUserShop } from "./useUserShop";
 import { useAuth } from "#useAuth";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
-import { SimpleJobPipeline } from "../components/simpleJobPipeline/SimpleJobPipeline";
 
 const CreateJobModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
@@ -21,8 +21,7 @@ const CreateJobModalContent = ({ onSubmit }) => {
   const [onBehalfOfUserFirstName, setOnBehalfOfUserFirstName] = useState("");
   const [onBehalfOfUserLastName, setOnBehalfOfUserLastName] = useState("");
   const [onBehalfOfBillingGroup, setOnBehalfOfBillingGroup] = useState(false);
-  const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] =
-    useState(null);
+  const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] = useState(null);
 
   const capitalize = (s) => {
     if (typeof s !== "string") return "";
@@ -38,8 +37,9 @@ const CreateJobModalContent = ({ onSubmit }) => {
   }, [onBehalfOfUserEmail]);
 
   const { shopId } = useParams();
-  const { user } = useAuth();
-  const { loading: userShopLoading, userShop } = useUserShop(shopId, user?.id);
+  const { user: activeUser } = useAuth();
+  const { user } = useUser(activeUser?.id);
+  const { loading: userShopLoading, userShop } = useUserShop(shopId, activeUser?.id);
 
   if (user?.simple === false) {
     return (
@@ -169,7 +169,55 @@ const CreateJobModalContent = ({ onSubmit }) => {
       </div>
     );
   } else {
-    return <SimpleJobPipeline/>;
+    return (
+    <div style={{ 
+      textAlign: 'center', 
+      padding: '20px', 
+      border: '1px solid #ccc', 
+      borderRadius: '8px' }}>
+      <div>
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e)}
+          label="Job Name"
+          placeholder="e.g. Wind Mill Assembly"
+          required
+        />
+        <Input
+          value={description}
+          onChange={(e) => setDescription(e)}
+          label="Job Description (optional)"
+          placeholder="e.g. Parts for version 2 of the wind mill design project"
+          optional
+        />
+        <Input
+          type="date"
+          label="Due Date"
+          onChange={(e) => setDueDate(e + "T00:00:00")}
+          value={dueDate?.split("T")[0]}
+          required
+        />
+      </div>
+
+      <Button onClick={() => {
+        setLoading(true);
+        onSubmit(
+          title,
+          description,
+          dueDate,
+          onBehalfOf,
+          onBehalfOfUserId,
+          onBehalfOfUserEmail,
+          onBehalfOfUserFirstName,
+          onBehalfOfUserLastName,
+          onBehalfOfBillingGroup,
+          onBehalfOfBillingGroupId
+        );
+      }}>
+        Next
+      </Button>
+    </div>
+    );
   }
 };
 
@@ -191,7 +239,7 @@ export const useJobs = (shopId) => {
     onBehalfOfUserFirstName,
     onBehalfOfUserLastName,
     onBehalfOfBillingGroup,
-    onBehalfOfBillingGroupId
+    onBehalfOfBillingGroupId,
   ) => {
     try {
       setOpLoading(true);
@@ -213,6 +261,7 @@ export const useJobs = (shopId) => {
       });
       const data = await r.json();
       document.location.href = `/shops/${shopId}/jobs/${data.job.id}`;
+      console.log(data);
 
       setOpLoading(false);
     } catch (error) {
