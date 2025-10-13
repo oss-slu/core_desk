@@ -39,7 +39,7 @@ export const Header = () => {
           )}
         </h1>
       </div>
-      {user?.id && !user?.admin && (
+      {user?.id && (
         <div style={{
           marginLeft: "auto",
           marginRight: "25px",

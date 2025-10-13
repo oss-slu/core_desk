@@ -24,6 +24,7 @@ import { BillingGroupPage } from "#billingGroupPage";
 import { BillingGroupInvitationPage } from "#billingGroupInvitationPage";
 import { BillingGroupPortal } from "#billingGroupsPortal";
 import { SchedulePage } from "./routes/shops/[shopId]/schedule";
+import { ShopChooser } from "./components/shopChooser/ShopChooser";
 
 // eslint-disable-next-line
 export default () => {
@@ -47,93 +48,101 @@ export default () => {
     <div>
       <Toaster />
       <Header />
-      <div
-        style={{
-          paddingLeft: "20px",
-          paddingRight: "20px",
-          paddingTop: "10px",
-          maxWidth: 1400,
-          margin: "auto",
-        }}
-      >
-        <Router>
-          <Routes>
-            <Route
-              path="/shops/:shopId/billing-groups/:groupId/invitations/:inviteId"
-              element={<BillingGroupInvitationPage />}
-            />
-            {loggedIn ? (
-              <>
-                <Route path="/" element={<Home />} />
-                <Route path="/users" element={<UsersPage />} />
-                <Route path="/users/:userId" element={<UserPage />} />
-                <Route path="/shops" element={<Shops />} />
-                <Route path="/shops/:shopId" element={<ShopPage />} />
-                <Route path="/shops/:shopId/billing" element={<Billing />} />
-                <Route
-                  path="/shops/:shopId/users"
-                  element={<ShopUsersPage />}
-                />
-                <Route
-                  path="/shops/:shopId/users/:userId"
-                  element={<ShopUserPage />}
-                />
-                <Route path="/shops/:shopId/jobs" element={<Jobs />} />
-                <Route
-                  path="/shops/:shopId/jobs/:jobId"
-                  element={<JobPage />}
-                />
-                <Route
-                  path="/shops/:shopId/jobs/:jobId/costing"
-                  element={<JobCostingPage />}
-                />
-                <Route 
-                  path="/shops/:shopId/schedule" 
-                  element={<SchedulePage />} />
-                <Route
-                  path="/shops/:shopId/resources"
-                  element={<ResourcesPage />}
-                />
-                <Route
-                  path="/shops/:shopId/resources/:resourceId"
-                  element={<ResourcePage />}
-                />
-                <Route
-                  path="/shops/:shopId/resources/type/:resourceTypeId/materials/:materialId"
-                  element={<MaterialPage />}
-                />
-                <Route
-                  path="/shops/:shopId/billing-groups"
-                  element={<BillingGroupsPage />}
-                />
-                <Route
-                  path="/shops/:shopId/billing-groups/:groupId"
-                  element={<BillingGroupPage />}
-                />
-                <Route
-                  path="/shops/:shopId/billing-groups/:groupId/portal"
-                  element={<BillingGroupPortal />}
-                />
-
-                <Route path="*" element={<NotFound />} />
-              </>
-            ) : (
+      {!user?.simple ? (
+        <div
+          style={{
+            paddingLeft: "20px",
+            paddingRight: "20px",
+            paddingTop: "10px",
+            maxWidth: 1400,
+            margin: "auto",
+          }}
+        >
+          <Router>
+            <Routes>
               <Route
-                path="*"
-                element={
-                  <div>
-                    <h1>Welcome to SLU Open Project</h1>
-                    <p>Please log in to continue</p>
-                    <Button variant="primary" onClick={login}>
-                      Login
-                    </Button>
-                  </div>
-                }
+                path="/shops/:shopId/billing-groups/:groupId/invitations/:inviteId"
+                element={<BillingGroupInvitationPage />}
               />
-            )}
-          </Routes>
-        </Router>
-      </div>
+              {loggedIn ? (
+                <>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/users" element={<UsersPage />} />
+                  <Route path="/users/:userId" element={<UserPage />} />
+                  <Route path="/shops" element={<Shops />} />
+                  <Route path="/shops/:shopId" element={<ShopPage />} />
+                  <Route path="/shops/:shopId/billing" element={<Billing />} />
+                  <Route
+                    path="/shops/:shopId/users"
+                    element={<ShopUsersPage />}
+                  />
+                  <Route
+                    path="/shops/:shopId/users/:userId"
+                    element={<ShopUserPage />}
+                  />
+                  <Route path="/shops/:shopId/jobs" element={<Jobs />} />
+                  <Route
+                    path="/shops/:shopId/jobs/:jobId"
+                    element={<JobPage />}
+                  />
+                  <Route
+                    path="/shops/:shopId/jobs/:jobId/costing"
+                    element={<JobCostingPage />}
+                  />
+                  <Route 
+                    path="/shops/:shopId/schedule" 
+                    element={<SchedulePage />} />
+                  <Route
+                    path="/shops/:shopId/resources"
+                    element={<ResourcesPage />}
+                  />
+                  <Route
+                    path="/shops/:shopId/resources/:resourceId"
+                    element={<ResourcePage />}
+                  />
+                  <Route
+                    path="/shops/:shopId/resources/type/:resourceTypeId/materials/:materialId"
+                    element={<MaterialPage />}
+                  />
+                  <Route
+                    path="/shops/:shopId/billing-groups"
+                    element={<BillingGroupsPage />}
+                  />
+                  <Route
+                    path="/shops/:shopId/billing-groups/:groupId"
+                    element={<BillingGroupPage />}
+                  />
+                  <Route
+                    path="/shops/:shopId/billing-groups/:groupId/portal"
+                    element={<BillingGroupPortal />}
+                  />
+
+                  <Route path="*" element={<NotFound />} />
+                </>
+              ) : (
+                <Route
+                  path="*"
+                  element={
+                    <div>
+                      <h1>Welcome to SLU Open Project</h1>
+                      <p>Please log in to continue</p>
+                      <Button variant="primary" onClick={login}>
+                        Login
+                      </Button>
+                    </div>
+                  }
+                />
+              )}
+            </Routes>
+          </Router>
+        </div>
+      ) : (
+        <div>
+          <p>Step 1</p>
+          <h1>Select a shop</h1>
+          <ShopChooser/>
+        </div>
+      )}
     </div>
   );
 };

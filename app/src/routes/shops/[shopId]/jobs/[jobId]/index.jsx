@@ -60,7 +60,7 @@ export const JobPage = () => {
 
   const index = 0;
   const [currentIndex, setCurrentIndex] = useState(index); // Start at the first page
-  const [inProgress, setInProgress] = useState(false);
+  const [setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [job, setJob] = useState(uncontrolledJob);
 
@@ -70,6 +70,54 @@ export const JobPage = () => {
     userShop.accountType === "OPERATOR";
 
   const pages = [
+    <div style={{ 
+      textAlign: 'center', 
+      padding: '20px', 
+      border: '1px solid #ccc', 
+      borderRadius: '8px' }}>
+      <div>
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e)}
+          label="Job Name"
+          placeholder="e.g. Wind Mill Assembly"
+          required
+        />
+        <Input
+          value={description}
+          onChange={(e) => setDescription(e)}
+          label="Job Description (optional)"
+          placeholder="e.g. Parts for version 2 of the wind mill design project"
+          optional
+        />
+        <Input
+          type="date"
+          label="Due Date"
+          onChange={(e) => setDueDate(e + "T00:00:00")}
+          value={dueDate?.split("T")[0]}
+          required
+        />
+      </div>
+
+      <Button onClick={() => {
+        setLoading(true);
+        onSubmit(
+          title,
+          description,
+          dueDate,
+          onBehalfOf,
+          onBehalfOfUserId,
+          onBehalfOfUserEmail,
+          onBehalfOfUserFirstName,
+          onBehalfOfUserLastName,
+          onBehalfOfBillingGroup,
+          onBehalfOfBillingGroupId
+        );
+      }}>
+        Next
+      </Button>
+    </div>,
+
     <div>
       <ResourceTypePicker
         loading={opLoading}
