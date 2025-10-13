@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { useResourceTypes } from "#hooks";
 import { useParams } from "react-router-dom";
 import { LoadableDropdownInput } from "#loadableDropdown";
+import * as Sentry from "@sentry/react";
 
 export const ResourceTypePicker = ({
   value,

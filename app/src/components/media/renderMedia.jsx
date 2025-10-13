@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import styles from "./renderMedia.module.css";
 import { StlViewer } from "react-stl-viewer";
 import classNames from "classnames";
-
+import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import * as Sentry from "@sentry/react";
 export const RenderMedia = ({
   mediaUrl,
   thumbnailUrl,
@@ -134,6 +135,10 @@ export const RenderMedia = ({
     fileType === "webp"
   ) {
     return (
+      <>
+      <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+
+    
       <img
         src={mediaUrl}
         className={classNames(
@@ -143,12 +148,20 @@ export const RenderMedia = ({
         )}
         alt="media"
       />
+      </Sentry.ErrorBoundary>
+            
+            
+      </>
     );
   }
 
   if (fileType === "stl") {
     if (preview && thumbnailUrl && !big) {
       return (
+        <>
+        <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+
+    
         <img
           src={thumbnailUrl}
           className={classNames(
@@ -159,6 +172,8 @@ export const RenderMedia = ({
           alt="media"
           onClick={() => setPreview(false)}
         />
+        </Sentry.ErrorBoundary>
+        </>
       );
     }
 
@@ -168,7 +183,7 @@ export const RenderMedia = ({
       small ? styles.small : ""
     );
 
-    if (stlError) {
+    if (stlError) { //no need to wrap an error?
       return (
         <div className={classNames(stlClasses, styles.unsupported)}>
           STL preview unavailable
@@ -176,7 +191,7 @@ export const RenderMedia = ({
       );
     }
 
-    if (!stlReadyUrl) {
+    if (!stlReadyUrl) { //no need to wrap in sentry?
       return (
         <div className={stlClasses}>
           {stlLoading ? "Loading model…" : "Preparing model…"}
@@ -185,6 +200,13 @@ export const RenderMedia = ({
     }
 
     return (
+      <>
+      <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+      
+    
+      
+      
+
       <StlViewer
         className={stlClasses}
         orbitControls
@@ -201,11 +223,16 @@ export const RenderMedia = ({
           },
         }}
       />
+      </Sentry.ErrorBoundary>
+            </>
     );
   }
 
   if (fileType === "pdf") {
     return (
+      <>
+      <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+      
       <iframe
         src={mediaUrl}
         className={classNames(
@@ -215,6 +242,8 @@ export const RenderMedia = ({
         )}
         title="PDF"
       />
+      </Sentry.ErrorBoundary>
+      </>
     );
   }
 

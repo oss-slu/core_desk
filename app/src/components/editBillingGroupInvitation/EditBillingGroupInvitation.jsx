@@ -6,7 +6,8 @@ import { Input, Switch } from "tabler-react-2";
 import { useModal } from "#modal";
 import { Spinner } from "#spinner";
 import { useParams } from "react-router-dom";
-
+import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import * as Sentry from "@sentry/react";
 const EditBillingGroupInvitationModalContent = ({ invitationId, refetch }) => {
   const { shopId, groupId } = useParams();
 
@@ -21,6 +22,8 @@ const EditBillingGroupInvitationModalContent = ({ invitationId, refetch }) => {
   if (!newInvitation?.id) return <Spinner />;
 
   return (
+    <>
+    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
     <div>
       <Input
         label="Expiration Date"
@@ -45,6 +48,9 @@ const EditBillingGroupInvitationModalContent = ({ invitationId, refetch }) => {
         Save
       </Button>
     </div>
+    </Sentry.ErrorBoundary>
+    
+    </>
   );
 };
 
@@ -61,10 +67,14 @@ export const EditBillingGroupInvitation = ({ invitationId, refetch }) => {
 
   return (
     <>
+    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
       {ModalElement}
       <Button size="sm" onClick={modal}>
         <Icon i="pencil" /> Edit
       </Button>
+    
+    </Sentry.ErrorBoundary>
     </>
+
   );
 };

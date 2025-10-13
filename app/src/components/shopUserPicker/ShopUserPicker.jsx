@@ -2,6 +2,8 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { useAuth, useUsers } from "#hooks";
 import { LoadableDropdownInput } from "#loadableDropdown";
+import * as Sentry from "@sentry/react";
+import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
 export const ShopUserPicker = ({ value, onChange, includeNone }) => {
   const { shopId } = useParams();
@@ -9,6 +11,9 @@ export const ShopUserPicker = ({ value, onChange, includeNone }) => {
   const { user: activeUser, loading: authLoading } = useAuth();
 
   return (
+    <>
+    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+  
     <LoadableDropdownInput
       loading={loading || authLoading}
       prompt={"Select a user"}
@@ -25,5 +30,7 @@ export const ShopUserPicker = ({ value, onChange, includeNone }) => {
         })),
       ].filter((v) => v)}
     />
+    </Sentry.ErrorBoundary>
+  </>
   );
 };
