@@ -3,8 +3,6 @@ import { Page } from "#page";
 import { Icon } from "#icon";
 import { Link, useParams } from "react-router-dom";
 import { Typography, Util, Input, Card, Button, Badge } from "tabler-react-2";
-import { useJob } from "../../../../../hooks/useJob";
-import { useUser } from "../../../../../hooks/useUser";
 import { Loading } from "#loading";
 import { UploadDropzone } from "../../../../../components/upload/uploader";
 import {
@@ -15,7 +13,7 @@ const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import { NotFound } from "#notFound";
 import { LoadableDropdownInput } from "../../../../../components/loadableDropdown/LoadableDropdown";
-import { useAuth, useShop } from "#hooks";
+import { useAuth, useShop, useJobItem, useJob, useUser } from "#hooks";
 import { ResourceTypePicker } from "../../../../../components/resourceTypePicker/ResourceTypePicker";
 import { MaterialPicker } from "../../../../../components/materialPicker/MaterialPicker";
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
@@ -73,6 +71,52 @@ export const JobPage = () => {
 
   const pages = [
     <div>
+      <ResourceTypePicker
+        loading={opLoading}
+        value={job.resourceTypeId}
+        onChange={(value) => {
+          updateJob({ resourceTypeId: value });
+        }}
+        shopId={shopId}
+        opLoading={opLoading}
+        includeNone={true}
+      />
+    {job.resourceTypeId && (
+      <div>
+        <ResourcePicker
+          value={job.resourceId}
+          onChange={(value) => {
+            updateJob({ resourceId: value });
+          }}
+          resourceTypeId={job.resourceTypeId}
+          opLoading={opLoading}
+          includeNone={true}
+        />
+          <MaterialPicker
+            value={job.materialId}
+            onChange={(value) => {
+              updateJob({ materialId: value });
+            }}
+            resourceTypeId={job.resourceTypeId}
+            opLoading={opLoading}
+            includeNone={true}
+            materialType={"Primary"}
+          />
+          <MaterialPicker
+            value={job.secondaryMaterialId}
+            onChange={(value) => {
+              updateJob({ secondaryMaterialId: value });
+            }}
+            resourceTypeId={job.resourceTypeId}
+            opLoading={opLoading}
+            includeNone={true}
+            materialType={"Secondary"}
+          />
+        </div>
+      )}
+    </div>,
+
+    <div>
       <UploadDropzone
         scope={"job.fileupload"}
         metadata={{
@@ -103,11 +147,9 @@ export const JobPage = () => {
     </div>,
 
     <div>
-      
-    </div>,
-
-    <div>
-      <h1>Thank you for your submission.</h1>
+      <h1>We have received your request.</h1>
+      <h3>Confirmation Number: {jobId}</h3>
+      <p>Thank you for your submission. We will contact you when it is finished.</p>
     </div>,
 
   ];

@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { authFetch } from "#url";
 import { Input, Button } from "tabler-react-2";
 import { useModal } from "#modal";
+import { useParams } from "react-router-dom";
 
 const CreateResourceModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
@@ -74,7 +75,7 @@ export const useResourceTypes = (shopId) => {
       setOpLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/resources/type`, {
         method: "POST",
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({ title, shopId }),
       });
       const data = await r.json();
       if (data.resourceType) {
