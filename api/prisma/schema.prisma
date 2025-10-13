@@ -27,7 +27,7 @@ model user {
   logs             logs[]
   navigation       Navigation[]
   files            File[]
-  simple           Boolean            @default(true)
+  simple           Boolean            @default(false)
 }
 
 model File {
