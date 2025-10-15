@@ -60,7 +60,6 @@ export const JobPage = () => {
 
   const index = 0;
   const [currentIndex, setCurrentIndex] = useState(index); // Start at the first page
-  const [setLoading] = useState(false);
   const [editing, setEditing] = useState(false);
   const [job, setJob] = useState(uncontrolledJob);
 
@@ -70,55 +69,9 @@ export const JobPage = () => {
     userShop.accountType === "OPERATOR";
 
   const pages = [
-    <div style={{ 
-      textAlign: 'center', 
-      padding: '20px', 
-      border: '1px solid #ccc', 
-      borderRadius: '8px' }}>
-      <div>
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e)}
-          label="Job Name"
-          placeholder="e.g. Wind Mill Assembly"
-          required
-        />
-        <Input
-          value={description}
-          onChange={(e) => setDescription(e)}
-          label="Job Description (optional)"
-          placeholder="e.g. Parts for version 2 of the wind mill design project"
-          optional
-        />
-        <Input
-          type="date"
-          label="Due Date"
-          onChange={(e) => setDueDate(e + "T00:00:00")}
-          value={dueDate?.split("T")[0]}
-          required
-        />
-      </div>
-
-      <Button onClick={() => {
-        setLoading(true);
-        onSubmit(
-          title,
-          description,
-          dueDate,
-          onBehalfOf,
-          onBehalfOfUserId,
-          onBehalfOfUserEmail,
-          onBehalfOfUserFirstName,
-          onBehalfOfUserLastName,
-          onBehalfOfBillingGroup,
-          onBehalfOfBillingGroupId
-        );
-      }}>
-        Next
-      </Button>
-    </div>,
-
     <div>
+      <p>Step 3</p>
+      <h1>Continue set-up</h1>
       <ResourceTypePicker
         loading={opLoading}
         value={job.resourceTypeId}
@@ -140,31 +93,33 @@ export const JobPage = () => {
           opLoading={opLoading}
           includeNone={true}
         />
-          <MaterialPicker
-            value={job.materialId}
-            onChange={(value) => {
-              updateJob({ materialId: value });
-            }}
-            resourceTypeId={job.resourceTypeId}
-            opLoading={opLoading}
-            includeNone={true}
-            materialType={"Primary"}
-          />
-          <MaterialPicker
-            value={job.secondaryMaterialId}
-            onChange={(value) => {
-              updateJob({ secondaryMaterialId: value });
-            }}
-            resourceTypeId={job.resourceTypeId}
-            opLoading={opLoading}
-            includeNone={true}
-            materialType={"Secondary"}
-          />
-        </div>
+        <MaterialPicker
+          value={job.materialId}
+          onChange={(value) => {
+            updateJob({ materialId: value });
+          }}
+          resourceTypeId={job.resourceTypeId}
+          opLoading={opLoading}
+          includeNone={true}
+          materialType={"Primary"}
+        />
+        <MaterialPicker
+          value={job.secondaryMaterialId}
+          onChange={(value) => {
+            updateJob({ secondaryMaterialId: value });
+          }}
+          resourceTypeId={job.resourceTypeId}
+          opLoading={opLoading}
+          includeNone={true}
+          materialType={"Secondary"}
+        />
+      </div>
       )}
     </div>,
 
     <div>
+      <p>Step 4</p>
+      <h1>Upload files</h1>
       <UploadDropzone
         scope={"job.fileupload"}
         metadata={{
@@ -198,8 +153,7 @@ export const JobPage = () => {
       <h1>We have received your request.</h1>
       <h3>Confirmation Number: {jobId}</h3>
       <p>Thank you for your submission. We will contact you when it is finished.</p>
-    </div>,
-
+    </div>
   ];
 
   const handleNext = () => {
@@ -225,11 +179,8 @@ export const JobPage = () => {
 
   if (user?.simple === true) {
     return (
-      <Page sidenavItems={sidenavItems("jobs", shopId, jobId)}>
+      <div>
         <div>{pages[currentIndex]}</div>
-        <a className="btn" href={`/shops/${shopId}/jobs`}>
-          Save and Exit
-        </a>
         {(currentIndex > 0 && currentIndex < pages.length - 1) && (
           <Button onClick={handlePrevious}>
             Previous
@@ -237,12 +188,17 @@ export const JobPage = () => {
         )}
         {currentIndex <= pages.length - 2 && (
           <Button onClick={handleNext}>
-            {currentIndex === pages.length - 2 ? "Submit" : "Next"}
+            Next
           </Button>
         )}
-      </Page>
+        {currentIndex === pages.length -1 && (
+          <Button className="btn" href="../../../">
+            Submit another job
+          </Button>
+        )}
+      </div>
     );
-  } else if (user?.simple === false) {
+  } else {
     return (
       <Page sidenavItems={sidenavItems("jobs", shopId, jobId)}>
         {ConfirmModal}

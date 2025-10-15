@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { act, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
@@ -7,6 +7,7 @@ import { useAuth } from "#useAuth";
 import { Typography, Util, Input, Badge, Avatar } from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
+import { useUser } from "../../../../hooks/useUser";
 import { Button } from "#button";
 import { Table } from "#table";
 import moment from "moment";
@@ -81,15 +82,17 @@ export const switchStatusForBadge = (status) => {
 */
 
 export const Jobs = () => {
-  const { user } = useAuth();
+  const { user: activeUser } = useAuth();
   const { shopId } = useParams();
   const { userShop } = useShop(shopId);
   const {
     jobs,
     loading: jobsLoading,
     ModalElement,
+    CreateSimpleSubPage,
     createJob,
   } = useJobs(shopId);
+  const { user } = useUser(activeUser.id);
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
@@ -192,7 +195,7 @@ export const Jobs = () => {
         sidenavItems={shopSidenavItems(
           "Jobs",
           shopId,
-          user.admin,
+          activeUser?.admin,
           userShop.accountType,
           userShop.balance < 0
         )}
@@ -284,7 +287,7 @@ export const Jobs = () => {
           {/* Render date pickers for start and end dates */}
           {/* </Util.Col>
         <Util.Col gap={0}> */}
-          {(user.admin ||
+          {(activeUser?.admin ||
             userShop.accountType === "ADMIN" ||
             userShop.accountType === "OPERATOR") && (
             <>
@@ -347,237 +350,241 @@ export const Jobs = () => {
     </Util.Row>
   );
 
-  return (
-    <Page
-      sidenavItems={shopSidenavItems(
-        "Jobs",
-        shopId,
-        user.admin,
-        userShop.accountType,
-        userShop.balance < 0
-      )}
-    >
-      <Util.Row justify="between" align="center">
-        <div>
-          <H1>Jobs</H1>
-        </div>
-        <Button onClick={createJob}>Create Job</Button>
-      </Util.Row>
-      <Util.Spacer size={1} />
+  if (user?.simple === false) {
+    return (
+      <Page
+        sidenavItems={shopSidenavItems(
+          "Jobs",
+          shopId,
+          activeUser?.admin,
+          userShop.accountType,
+          userShop.balance < 0
+        )}
+      >
+        <Util.Row justify="between" align="center">
+          <div>
+            <H1>Jobs</H1>
+          </div>
+          <Button onClick={createJob}>Create Job</Button>
+        </Util.Row>
+        <Util.Spacer size={1} />
 
-      <H3>Filters</H3>
-      <Filters />
-      <Util.Spacer size={2} />
+        <H3>Filters</H3>
+        <Filters />
+        <Util.Spacer size={2} />
 
-      {/* Jobs Table */}
-      {filteredJobs.length === 0 ? (
-        <i>
-          No jobs found. Adjust your filters or click the "Create Job" button
-          above to create a new job.
-        </i>
-      ) : (
-        <>
-          <Table
-            columns={[
-              {
-                label: "Title",
-                accessor: "title",
-                render: (title, context) => (
-                  <Link to={`/shops/${shopId}/jobs/${context.id}`}>
-                    {title}
-                  </Link>
-                ),
-                sortable: true,
-              },
-              {
-                label: "Submitter",
-                accessor: "user.name",
-                render: (name, context) => (
-                  <Util.Row gap={0.5} align="center">
-                    <Avatar size="sm" dicebear initials={context.user.id} />
-                    <Util.Col align="start">
-                      {name}
-                      {context.user.id === user.id && (
-                        <Badge color="green" soft>
-                          You
-                        </Badge>
-                      )}
-                    </Util.Col>
-                  </Util.Row>
-                ),
-              },
-              {
-                label: "Description",
-                accessor: "description",
-                render: (d) =>
-                  d.slice(0, 35).concat(d.length > 35 ? "..." : ""),
-              },
-              {
-                label: "Total Cost",
-                accessor: "totalCost",
-                render: (d, context) => (
-                  <Util.Row gap={0.25}>
-                    <Price value={d} icon />
-                    {!context.finalized && "*"}
-                  </Util.Row>
-                ),
-                sortable: true,
-              },
-              {
-                label: "Affordability",
-                accessor: "totalCost",
-                render: (d) =>
-                  d > userShop.balance ? (
-                    <Badge color="red" soft>
-                      Insufficient Funds
-                    </Badge>
-                  ) : (
-                    <Badge color="green" soft>
-                      Sufficient Funds
-                    </Badge>
-                  ),
-              },
-              {
-                label: "Items",
-                accessor: "itemsCount",
-                sortable: true,
-              },
-              {
-                label: "Progress",
-                accessor: "progress",
-                render: (d, _) => (
-                  <Util.Row gap={1} align="center">
-                    <Util.Col justify="between" gap={1}>
-                      {/* Prevent line break at all */}
-                      <span
-                        style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
-                        }}
-                      >
-                        <Icon i="sum" size={14} />
-                        {_.itemsCount}
-                      </span>
-                      {_.itemsCount === 0 ? (
-                        <PieProgressChart
-                          complete={0}
-                          inProgress={0}
-                          notStarted={0}
-                          exclude={1}
-                        />
-                      ) : (
-                        <PieProgressChart
-                          complete={d.completedCount / _.itemsCount}
-                          inProgress={d.inProgressCount / _.itemsCount}
-                          notStarted={d.notStartedCount / _.itemsCount}
-                          exclude={d.excludedCount / _.itemsCount}
-                        />
-                      )}
-                      <div className="sos-600">
-                        <span className="text-success">{d.completedCount}</span>
-                        <span className="text-yellow">{d.inProgressCount}</span>
-                        <span className="text-danger">{d.notStartedCount}</span>
-                        <span className="text-gray-400">{d.excludedCount}</span>
-                      </div>
-                    </Util.Col>
-                    <div style={{ fontSize: 10 }} className="hos-600">
-                      <span className="text-success">
-                        <Icon i="circle-check" size={10} /> {d.completedCount} /{" "}
-                        {_.itemsCount}
-                        <span className="hos-900"> Completed</span>
-                      </span>
-                      <br />
-                      <span className="text-yellow">
-                        <Icon i="progress" size={10} /> {d.inProgressCount} /{" "}
-                        {_.itemsCount}
-                        <span className="hos-900"> In Progress</span>
-                      </span>
-                      <br />
-                      <span className="text-danger">
-                        <Icon i="minus" size={10} /> {d.notStartedCount} /{" "}
-                        {_.itemsCount}
-                        <span className="hos-900"> Not Started</span>
-                      </span>
-                      <br />
-                      <span className="text-gray-400">
-                        <Icon i="x" size={10} /> {d.excludedCount} /{" "}
-                        {_.itemsCount}
-                        <span className="hos-900"> Excluded</span>
-                      </span>
-                    </div>
-                  </Util.Row>
-                ),
-              },
-              {
-                label: "Status",
-                accessor: "status",
-                render: (d) => switchStatusForBadge(d),
-                sortable: true,
-              },
-              {
-                label: "Finalized",
-                accessor: "finalized",
-                render: (d) =>
-                  d ? (
-                    <Badge color="green" soft>
-                      Yes
-                    </Badge>
-                  ) : (
-                    <Badge color="red" soft>
-                      No
-                    </Badge>
-                  ),
-                sortable: true,
-              },
-              {
-                label: "Finalized At",
-                accessor: "finalizedAt",
-                render: (d) => <>{d ? moment(d).format("MM/DD/YY") : "N/A"}</>,
-                sortable: true,
-              },
-              {
-                label: "Due Date",
-                accessor: "dueDate",
-                render: (d, context) => (
-                  <>
-                    {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()}){" "}
-                    {/* Overdue warning */}
-                    {new Date(d) < new Date() &&
-                      !(
-                        new Date(d).toDateString() === new Date().toDateString()
-                      ) &&
-                      !context.finalized && <Badge color="red">Overdue</Badge>}
-                    {/* Today warning */}{" "}
-                    {new Date(d).toDateString() ===
-                      new Date().toDateString() && (
-                      <Badge color="yellow">Due Today</Badge>
-                    )}
-                  </>
-                ),
-                sortable: true,
-              },
-              {
-                label: "Created At",
-                accessor: "createdAt",
-                render: (d) => (
-                  <>
-                    {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()})
-                  </>
-                ),
-              },
-            ].filter((c) => columnsToShow.includes(c.label))}
-            data={filteredJobs}
-          />
-          <Util.Spacer size={1} />
-          <i className="text-secondary">
-            * Total cost is an estimate reflecting the current state of the job.
-            Because the job is not finalized, the cost may change as the job
-            progresses.
+        {/* Jobs Table */}
+        {filteredJobs.length === 0 ? (
+          <i>
+            No jobs found. Adjust your filters or click the "Create Job" button
+            above to create a new job.
           </i>
-        </>
-      )}
-      {ModalElement}
-    </Page>
-  );
+        ) : (
+          <>
+            <Table
+              columns={[
+                {
+                  label: "Title",
+                  accessor: "title",
+                  render: (title, context) => (
+                    <Link to={`/shops/${shopId}/jobs/${context.id}`}>
+                      {title}
+                    </Link>
+                  ),
+                  sortable: true,
+                },
+                {
+                  label: "Submitter",
+                  accessor: "user.name",
+                  render: (name, context) => (
+                    <Util.Row gap={0.5} align="center">
+                      <Avatar size="sm" dicebear initials={context.user.id} />
+                      <Util.Col align="start">
+                        {name}
+                        {context.user.id === activeUser?.id && (
+                          <Badge color="green" soft>
+                            You
+                          </Badge>
+                        )}
+                      </Util.Col>
+                    </Util.Row>
+                  ),
+                },
+                {
+                  label: "Description",
+                  accessor: "description",
+                  render: (d) =>
+                    d.slice(0, 35).concat(d.length > 35 ? "..." : ""),
+                },
+                {
+                  label: "Total Cost",
+                  accessor: "totalCost",
+                  render: (d, context) => (
+                    <Util.Row gap={0.25}>
+                      <Price value={d} icon />
+                      {!context.finalized && "*"}
+                    </Util.Row>
+                  ),
+                  sortable: true,
+                },
+                {
+                  label: "Affordability",
+                  accessor: "totalCost",
+                  render: (d) =>
+                    d > userShop.balance ? (
+                      <Badge color="red" soft>
+                        Insufficient Funds
+                      </Badge>
+                    ) : (
+                      <Badge color="green" soft>
+                        Sufficient Funds
+                      </Badge>
+                    ),
+                },
+                {
+                  label: "Items",
+                  accessor: "itemsCount",
+                  sortable: true,
+                },
+                {
+                  label: "Progress",
+                  accessor: "progress",
+                  render: (d, _) => (
+                    <Util.Row gap={1} align="center">
+                      <Util.Col justify="between" gap={1}>
+                        {/* Prevent line break at all */}
+                        <span
+                          style={{
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                          }}
+                        >
+                          <Icon i="sum" size={14} />
+                          {_.itemsCount}
+                        </span>
+                        {_.itemsCount === 0 ? (
+                          <PieProgressChart
+                            complete={0}
+                            inProgress={0}
+                            notStarted={0}
+                            exclude={1}
+                          />
+                        ) : (
+                          <PieProgressChart
+                            complete={d.completedCount / _.itemsCount}
+                            inProgress={d.inProgressCount / _.itemsCount}
+                            notStarted={d.notStartedCount / _.itemsCount}
+                            exclude={d.excludedCount / _.itemsCount}
+                          />
+                        )}
+                        <div className="sos-600">
+                          <span className="text-success">{d.completedCount}</span>
+                          <span className="text-yellow">{d.inProgressCount}</span>
+                          <span className="text-danger">{d.notStartedCount}</span>
+                          <span className="text-gray-400">{d.excludedCount}</span>
+                        </div>
+                      </Util.Col>
+                      <div style={{ fontSize: 10 }} className="hos-600">
+                        <span className="text-success">
+                          <Icon i="circle-check" size={10} /> {d.completedCount} /{" "}
+                          {_.itemsCount}
+                          <span className="hos-900"> Completed</span>
+                        </span>
+                        <br />
+                        <span className="text-yellow">
+                          <Icon i="progress" size={10} /> {d.inProgressCount} /{" "}
+                          {_.itemsCount}
+                          <span className="hos-900"> In Progress</span>
+                        </span>
+                        <br />
+                        <span className="text-danger">
+                          <Icon i="minus" size={10} /> {d.notStartedCount} /{" "}
+                          {_.itemsCount}
+                          <span className="hos-900"> Not Started</span>
+                        </span>
+                        <br />
+                        <span className="text-gray-400">
+                          <Icon i="x" size={10} /> {d.excludedCount} /{" "}
+                          {_.itemsCount}
+                          <span className="hos-900"> Excluded</span>
+                        </span>
+                      </div>
+                    </Util.Row>
+                  ),
+                },
+                {
+                  label: "Status",
+                  accessor: "status",
+                  render: (d) => switchStatusForBadge(d),
+                  sortable: true,
+                },
+                {
+                  label: "Finalized",
+                  accessor: "finalized",
+                  render: (d) =>
+                    d ? (
+                      <Badge color="green" soft>
+                        Yes
+                      </Badge>
+                    ) : (
+                      <Badge color="red" soft>
+                        No
+                      </Badge>
+                    ),
+                  sortable: true,
+                },
+                {
+                  label: "Finalized At",
+                  accessor: "finalizedAt",
+                  render: (d) => <>{d ? moment(d).format("MM/DD/YY") : "N/A"}</>,
+                  sortable: true,
+                },
+                {
+                  label: "Due Date",
+                  accessor: "dueDate",
+                  render: (d, context) => (
+                    <>
+                      {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()}){" "}
+                      {/* Overdue warning */}
+                      {new Date(d) < new Date() &&
+                        !(
+                          new Date(d).toDateString() === new Date().toDateString()
+                        ) &&
+                        !context.finalized && <Badge color="red">Overdue</Badge>}
+                      {/* Today warning */}{" "}
+                      {new Date(d).toDateString() ===
+                        new Date().toDateString() && (
+                        <Badge color="yellow">Due Today</Badge>
+                      )}
+                    </>
+                  ),
+                  sortable: true,
+                },
+                {
+                  label: "Created At",
+                  accessor: "createdAt",
+                  render: (d) => (
+                    <>
+                      {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()})
+                    </>
+                  ),
+                },
+              ].filter((c) => columnsToShow.includes(c.label))}
+              data={filteredJobs}
+            />
+            <Util.Spacer size={1} />
+            <i className="text-secondary">
+              * Total cost is an estimate reflecting the current state of the job.
+              Because the job is not finalized, the cost may change as the job
+              progresses.
+            </i>
+          </>
+        )}
+        {ModalElement}
+      </Page>
+    );
+  } else {
+    return <CreateSimpleSubPage/>;
+  }
 };

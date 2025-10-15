@@ -1,21 +1,20 @@
 import React from "react";
 import { useShops } from "../../hooks/useShops";
 import { Util } from "tabler-react-2";
-import { ShopCard } from "../../components/shopcard/ShopCard";
+import { SimpleShopCard } from "../../components/shopcard/SimpleShopCard";
 import { Page } from "#page";
 
 export const ShopChooser = () => {
     const {
     shops,
-    createModalElement
     } = useShops();
 
     return (
-        <Page>
+        <div>
             <Util.Spacer size={1} />
             {shops.map((shop) => (
-                <ShopCard key={shop.id} shop={shop} />
+                <SimpleShopCard key={shop.id} shop={shop}/>
             ))}
-        </Page>
+        </div>
     );
 }
