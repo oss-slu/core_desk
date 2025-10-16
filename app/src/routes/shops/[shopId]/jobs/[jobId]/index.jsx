@@ -115,6 +115,15 @@ export const JobPage = () => {
         />
       </div>
       )}
+      {job.resourceId ? (
+        <Button onClick={handleNext}>
+          Next
+        </Button>
+      ) : (
+        <Button disabled>
+          Next
+        </Button>
+      )}
     </div>,
 
     <div>
@@ -147,12 +156,24 @@ export const JobPage = () => {
           ))}
         </Util.Col>
       )}
+      {job.items?.length !== 0 ? (
+        <Button onClick={handleNext}>
+          Next
+        </Button>
+      ) : (
+        <Button disabled>
+          Next
+        </Button>
+      )}
     </div>,
 
     <div>
       <h1>We have received your request.</h1>
       <h3>Confirmation Number: {jobId}</h3>
       <p>Thank you for your submission. We will contact you when it is finished.</p>
+      <Button className="btn" href="../../../">
+        Submit another job
+      </Button>
     </div>
   ];
 
@@ -184,16 +205,6 @@ export const JobPage = () => {
         {(currentIndex > 0 && currentIndex < pages.length - 1) && (
           <Button onClick={handlePrevious}>
             Previous
-          </Button>
-        )}
-        {currentIndex <= pages.length - 2 && (
-          <Button onClick={handleNext}>
-            Next
-          </Button>
-        )}
-        {currentIndex === pages.length -1 && (
-          <Button className="btn" href="../../../">
-            Submit another job
           </Button>
         )}
       </div>
