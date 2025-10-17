@@ -480,6 +480,9 @@ enum LogType {
   JOB_ADDED_TO_BILLING_GROUP
   FORBIDDEN_ACTION
   SHOP_MODIFIED
+  APPOINTMENT_CREATED
+  APPOINTMENT_MODIFIED
+  APPOINTMENT_DELETED
 }
 
 enum AccountType {
@@ -557,6 +560,7 @@ model Appointment {
   userId     String
   shopId     String
   resourceId String
+  active     Boolean @default(true)
 
   user     user     @relation(fields: [userId], references: [id], onDelete: Cascade)
   shop     Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
