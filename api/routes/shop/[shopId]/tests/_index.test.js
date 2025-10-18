@@ -43,7 +43,6 @@ describe("/shop/[shopId]", () => {
           createdAt: expect.any(String),
           id: expect.any(String),
           updatedAt: expect.any(String),
-          simple: expect.any(Boolean),
         },
       });
     });
@@ -83,7 +82,6 @@ describe("/shop/[shopId]", () => {
           id: expect.any(String),
           createdAt: expect.any(String),
           updatedAt: expect.any(String),
-          simple: expect.any(Boolean),
         },
       });
     });
@@ -123,7 +121,6 @@ describe("/shop/[shopId]", () => {
           createdAt: expect.any(String),
           id: expect.any(String),
           updatedAt: expect.any(String),
-          simple: expect.any(Boolean),
         },
       });
     });
