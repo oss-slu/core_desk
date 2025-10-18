@@ -100,6 +100,7 @@ describe("/[userId]", () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         shops: expect.any(Array),
+        simple: expect.any(Boolean),
       });
 
       expect(res.body.user.shopCount).toBe(1);
@@ -152,6 +153,7 @@ describe("/[userId]", () => {
         createdAt: expect.any(String),
         updatedAt: expect.any(String),
         logs: expect.any(Array),
+        simple: expect.any(Boolean),
       });
 
       expect(res.body.user.logs.length).toBe(1);

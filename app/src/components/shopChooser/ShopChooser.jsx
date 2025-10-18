@@ -2,7 +2,6 @@ import React from "react";
 import { useShops } from "../../hooks/useShops";
 import { Util } from "tabler-react-2";
 import { SimpleShopCard } from "../../components/shopcard/SimpleShopCard";
-import { Page } from "#page";
 
 export const ShopChooser = () => {
     const {

@@ -13,7 +13,7 @@ const { H1, H2, H3 } = Typography;
 import moment from "moment";
 import { NotFound } from "#notFound";
 import { LoadableDropdownInput } from "../../../../../components/loadableDropdown/LoadableDropdown";
-import { useAuth, useShop, useJobItem, useJob, useUser } from "#hooks";
+import { useAuth, useShop, useJob, useUser } from "#hooks";
 import { ResourceTypePicker } from "../../../../../components/resourceTypePicker/ResourceTypePicker";
 import { MaterialPicker } from "../../../../../components/materialPicker/MaterialPicker";
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
@@ -69,7 +69,7 @@ export const JobPage = () => {
     userShop.accountType === "OPERATOR";
 
   const pages = [
-    <div>
+    <div key={"step3"}>
       <p>Step 3</p>
       <h1>Continue set-up</h1>
       <ResourceTypePicker
@@ -126,7 +126,7 @@ export const JobPage = () => {
       )}
     </div>,
 
-    <div>
+    <div key={"step4"}>
       <p>Step 4</p>
       <h1>Upload files</h1>
       <UploadDropzone
@@ -167,7 +167,7 @@ export const JobPage = () => {
       )}
     </div>,
 
-    <div>
+    <div key={"receipt"}>
       <h1>We have received your request.</h1>
       <h3>Confirmation Number: {jobId}</h3>
       <p>Thank you for your submission. We will contact you when it is finished.</p>

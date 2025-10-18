@@ -1,10 +1,9 @@
-import React, { useState, useEffect, act } from "react";
+import React, { useState, useEffect } from "react";
 import { authFetch } from "#url";
 import { useModal } from "#modal";
 import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
 import { Button } from "#button";
 import { useParams } from "react-router-dom";
-import { useUser } from "./useUser";
 import { useUserShop } from "./useUserShop";
 import { useAuth } from "#useAuth";
 import { ShopUserPicker } from "#shopUserPicker";
@@ -225,13 +224,13 @@ export const useJobs = (shopId) => {
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
     const [loading, setLoading] = useState(false);
-    const [onBehalfOf, setOnBehalfOf] = useState(false);
-    const [onBehalfOfUserId, setOnBehalfOfUserId] = useState(null);
-    const [onBehalfOfUserEmail, setOnBehalfOfUserEmail] = useState("");
+    const [onBehalfOf] = useState(false);
+    const [onBehalfOfUserId] = useState(null);
+    const [onBehalfOfUserEmail] = useState("");
     const [onBehalfOfUserFirstName, setOnBehalfOfUserFirstName] = useState("");
     const [onBehalfOfUserLastName, setOnBehalfOfUserLastName] = useState("");
-    const [onBehalfOfBillingGroup, setOnBehalfOfBillingGroup] = useState(false);
-    const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] = useState(null);
+    const [onBehalfOfBillingGroup] = useState(false);
+    const [onBehalfOfBillingGroupId] = useState(null);
 
     const capitalize = (s) => {
       if (typeof s !== "string") return "";

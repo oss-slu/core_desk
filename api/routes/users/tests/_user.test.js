@@ -63,6 +63,7 @@ describe("/users", () => {
         lastName: expect.any(String),
         name: expect.any(String),
         shopCount: expect.any(Number),
+        simple: expect.any(Boolean),
         suspended: expect.any(Boolean),
         updatedAt: expect.any(String),
       });

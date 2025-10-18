@@ -24,7 +24,6 @@ import { BillingGroupPage } from "#billingGroupPage";
 import { BillingGroupInvitationPage } from "#billingGroupInvitationPage";
 import { BillingGroupPortal } from "#billingGroupsPortal";
 import { SchedulePage } from "./routes/shops/[shopId]/schedule";
-import { ShopChooser } from "./components/shopChooser/ShopChooser";
 
 // eslint-disable-next-line
 export default () => {

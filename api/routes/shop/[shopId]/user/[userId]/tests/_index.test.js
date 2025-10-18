@@ -28,6 +28,7 @@ describe("/shop/[shopId]/user/[userId]", () => {
           createdAt: expect.any(String),
           updatedAt: expect.any(String),
           isMe: true,
+          simple: expect.any(Boolean),
         },
       });
     });
@@ -264,6 +265,7 @@ describe("/shop/[shopId]/user/[userId]", () => {
           id: expect.any(String),
           createdAt: expect.any(String),
           updatedAt: expect.any(String),
+          simple: expect.any(Boolean),
         },
       });
     });
@@ -301,6 +303,7 @@ describe("/shop/[shopId]/user/[userId]", () => {
           id: expect.any(String),
           createdAt: expect.any(String),
           updatedAt: expect.any(String),
+          simple: expect.any(Boolean),
         },
       });
     });

@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { authFetch } from "#url";
 import { Input, Button } from "tabler-react-2";
 import { useModal } from "#modal";
-import { useParams } from "react-router-dom";
 
 const CreateResourceModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");

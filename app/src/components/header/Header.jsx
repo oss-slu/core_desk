@@ -1,4 +1,4 @@
-import React, { act, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "#useAuth";
 import styles from "./Header.module.css";
 import logo from "#sluopLogo";
