@@ -20,7 +20,7 @@ exports[`/[userId] > Fetch user profile > should return a full profile if the us
   "name": "Test User",
   "shopCount": 1,
   "shops": Any<Array>,
-    "simple": false,
+  "simple": false,
   "suspended": false,
   "suspensionReason": null,
   "updatedAt": Any<String>,

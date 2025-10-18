@@ -80,6 +80,7 @@ describe("/users", () => {
         "lastName",
         "name",
         "shopCount",
+        "simple",
         "suspended",
         "suspensionReason",
         "updatedAt",
