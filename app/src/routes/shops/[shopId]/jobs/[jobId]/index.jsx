@@ -68,6 +68,14 @@ export const JobPage = () => {
     userShop.accountType === "ADMIN" ||
     userShop.accountType === "OPERATOR";
 
+  const handleNext = () => {
+    setCurrentIndex((currentIndex + 1) % (pages.length + 1));
+  };
+
+  const handlePrevious = () => {
+    setCurrentIndex((currentIndex - 1) % (pages.length + 1));
+  };
+
   const pages = [
     <div key={"step3"}>
       <p>Step 3</p>
@@ -176,14 +184,6 @@ export const JobPage = () => {
       </Button>
     </div>
   ];
-
-  const handleNext = () => {
-    setCurrentIndex((currentIndex + 1) % (pages.length + 1));
-  };
-
-  const handlePrevious = () => {
-    setCurrentIndex((currentIndex - 1) % (pages.length + 1));
-  };
 
   useEffect(() => {
     setJob(uncontrolledJob);
