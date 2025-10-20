@@ -19,7 +19,6 @@ import { MaterialPicker } from "../../../../../components/materialPicker/Materia
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
 import { Comments } from "../../../../../components/comments/Comments";
 import { Alert } from "#alert";
-import { Row } from "../../../../../util/Flex";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {
