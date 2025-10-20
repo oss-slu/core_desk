@@ -3,6 +3,8 @@ import { useResources } from "#hooks";
 import { useParams } from "react-router-dom";
 import { LoadableDropdownInput } from "#loadableDropdown";
 import { Util } from "tabler-react-2";
+import * as Sentry from "@sentry/react";
+import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
 export const ResourcePicker = ({
   value,
@@ -15,7 +17,15 @@ export const ResourcePicker = ({
   const { resources, loading } = useResources(shopId, resourceTypeId);
 
   return (
-    <Util.Col>
+    <>
+    <Sentry.ErrorBoundary
+      fallback={({ error }) => (
+        <ErrorBoundaries
+          error={error}
+        />
+      )}
+    >
+    <Util.Col>  
       <LoadableDropdownInput
         loading={loading || opLoading}
         value={value}
@@ -37,5 +47,7 @@ export const ResourcePicker = ({
         label="Resource"
       />
     </Util.Col>
+    </Sentry.ErrorBoundary>
+    </>
   );
 };

@@ -3,6 +3,8 @@ import { useMaterials } from "#hooks";
 import { useParams } from "react-router-dom";
 import { LoadableDropdownInput } from "#loadableDropdown";
 import { Util } from "tabler-react-2";
+import * as Sentry from "@sentry/react";
+import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
 export const MaterialPicker = ({
   value,
@@ -16,6 +18,13 @@ export const MaterialPicker = ({
   const { materials, loading } = useMaterials(shopId, resourceTypeId);
 
   return (
+    <Sentry.ErrorBoundary
+      fallback={({ error }) => (
+        <ErrorBoundaries
+          error={error}
+        />
+      )}
+    >
     <Util.Col>
       <LoadableDropdownInput
         loading={loading || opLoading}
@@ -38,5 +47,6 @@ export const MaterialPicker = ({
         label={`${materialType} Material`}
       />
     </Util.Col>
+    </Sentry.ErrorBoundary>
   );
 };
