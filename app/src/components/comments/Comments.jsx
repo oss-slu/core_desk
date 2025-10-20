@@ -7,6 +7,10 @@ import { Avatar } from "#avatar";
 import moment from "moment";
 import { useAuth } from "#hooks";
 const { H4 } = Typography;
+import * as Sentry from "@sentry/react";
+import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+
+
 
 export const Comments = ({ jobId, shopId }) => {
   const { comments, postComment, opLoading, loading } = useComments(
@@ -21,6 +25,16 @@ export const Comments = ({ jobId, shopId }) => {
   }
 
   return (
+    <>
+    <Sentry.ErrorBoundary
+      fallback={({ error }) => (
+        <ErrorBoundaries
+          error={error}
+        />
+      )}
+    >
+    
+  
     <div>
       <Util.Col gap={1} style={{ maxHeight: 600, overflowY: "auto" }}>
         <div>
@@ -43,6 +57,8 @@ export const Comments = ({ jobId, shopId }) => {
         ))}
       </Util.Col>
     </div>
+    </Sentry.ErrorBoundary>
+  </>
   );
 };
 
@@ -53,6 +69,14 @@ String.prototype.capitalize = function () {
 const Comment = ({ comment }) => {
   const { user } = useAuth();
   return (
+    <>
+    <Sentry.ErrorBoundary fallback={({error}) => {
+      <ErrorBoundaries
+      error = {error}
+      />
+
+    }}>
+
     <Card
       title={
         <Util.Row
@@ -93,5 +117,7 @@ const Comment = ({ comment }) => {
     >
       {comment.message}
     </Card>
+   </Sentry.ErrorBoundary>
+    </>
   );
 };
