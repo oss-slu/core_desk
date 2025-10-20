@@ -272,6 +272,7 @@ export const useJobs = (shopId) => {
             required
           />
         </div>
+        <br></br>
         {title.length > 0 && dueDate.length > 0 ? (
         <Button
           variant="primary"

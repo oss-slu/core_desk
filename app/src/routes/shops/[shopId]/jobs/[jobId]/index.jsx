@@ -19,6 +19,7 @@ import { MaterialPicker } from "../../../../../components/materialPicker/Materia
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
 import { Comments } from "../../../../../components/comments/Comments";
 import { Alert } from "#alert";
+import { Row } from "../../../../../util/Flex";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {
@@ -123,6 +124,7 @@ export const JobPage = () => {
         />
       </div>
       )}
+      <br></br>
       {job.resourceId ? (
         <Button onClick={handleNext}>
           Next
@@ -164,20 +166,26 @@ export const JobPage = () => {
           ))}
         </Util.Col>
       )}
-      {job.items?.length !== 0 ? (
-        <Button onClick={handleNext}>
-          Next
+      <br />
+      <br />
+      <Util.Row align="left" gap={1}>
+        <Button onClick={handlePrevious}>
+          Previous
         </Button>
-      ) : (
-        <Button disabled>
-          Next
-        </Button>
-      )}
+        {job.items?.length !== 0 ? (
+          <Button onClick={handleNext}>
+            Next
+          </Button>
+        ) : (
+          <Button disabled>
+            Next
+          </Button>
+        )}
+      </Util.Row>
     </div>,
 
     <div key={"receipt"}>
       <h1>We have received your request.</h1>
-      <h3>Confirmation Number: {jobId}</h3>
       <p>Thank you for your submission. We will contact you when it is finished.</p>
       <Button className="btn" href="../../../">
         Submit another job
@@ -202,11 +210,6 @@ export const JobPage = () => {
     return (
       <div>
         <div>{pages[currentIndex]}</div>
-        {(currentIndex > 0 && currentIndex < pages.length - 1) && (
-          <Button onClick={handlePrevious}>
-            Previous
-          </Button>
-        )}
       </div>
     );
   } else {
