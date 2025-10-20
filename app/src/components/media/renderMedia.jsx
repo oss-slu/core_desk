@@ -137,10 +137,9 @@ export const RenderMedia = ({
     return (
       <>
     <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error }) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >
@@ -167,10 +166,9 @@ export const RenderMedia = ({
       return (
         <>
       <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error }) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >
@@ -216,10 +214,9 @@ export const RenderMedia = ({
     return (
       <>
           <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error }) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >
@@ -253,10 +250,9 @@ export const RenderMedia = ({
     return (
       <>
           <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error }) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >

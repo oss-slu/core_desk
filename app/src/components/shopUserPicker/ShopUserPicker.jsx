@@ -13,10 +13,9 @@ export const ShopUserPicker = ({ value, onChange, includeNone }) => {
   return (
     <>
     <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error }) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >

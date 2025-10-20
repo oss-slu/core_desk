@@ -24,10 +24,9 @@ const EditBillingGroupInvitationModalContent = ({ invitationId, refetch }) => {
   return (
     <>
     <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error }) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >
@@ -75,10 +74,9 @@ export const EditBillingGroupInvitation = ({ invitationId, refetch }) => {
   return (
     <>
     <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error}) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >

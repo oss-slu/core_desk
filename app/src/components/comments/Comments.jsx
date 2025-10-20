@@ -27,10 +27,9 @@ export const Comments = ({ jobId, shopId }) => {
   return (
     <>
     <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error }) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >
@@ -71,10 +70,9 @@ const Comment = ({ comment }) => {
   const { user } = useAuth();
   return (
     <>
-    <Sentry.ErrorBoundary fallback={({error, componentStack}) => {
+    <Sentry.ErrorBoundary fallback={({error}) => {
       <ErrorBoundaries
       error = {error}
-      stackTrace = {componentStack}
       />
 
     }}>

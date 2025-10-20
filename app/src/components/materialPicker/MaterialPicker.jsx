@@ -19,10 +19,9 @@ export const MaterialPicker = ({
 
   return (
     <Sentry.ErrorBoundary
-      fallback={({ error, componentStack }) => (
+      fallback={({ error }) => (
         <ErrorBoundaries
           error={error}
-          stackTrace={componentStack}
         />
       )}
     >
