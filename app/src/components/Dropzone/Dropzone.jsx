@@ -3,6 +3,8 @@ import { Input, Button } from "tabler-react-2";
 import { Row } from "../../util/Flex";
 import { useFileUploader } from "../../hooks/useFileUploader";
 import { ImageUploadProgress } from "../imageUploadProgress/ImageUploadProgress";
+import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import * as Sentry from "@sentry/react";
 
 export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
   const [files, setFiles] = useState([]);
@@ -12,7 +14,7 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
     console.log(files);
   }, [files]);
 
-  const { loading, upload, progress } = useFileUploader(endpoint, {
+  const { loading, upload, progress, deleteAllKeys } = useFileUploader(endpoint, {
     onSuccessfulUpload,
   });
 
@@ -25,6 +27,13 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
 
   return (
     <>
+    <Sentry.ErrorBoundary
+      fallback={({ error }) => (
+        <ErrorBoundaries
+          error={error}
+        />
+      )}
+    >
       <Row gap={1}>
         <Input
           key={inputKey} // creates a new input when the files progress is 100, this is the only way to update or remove the text / clear 
@@ -54,7 +63,9 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
         files={files}
         setFiles={setFiles}
         progress={progress}
+        deleteAllKeys = {deleteAllKeys}
       />
+    </Sentry.ErrorBoundary>
     </>
   );
 };

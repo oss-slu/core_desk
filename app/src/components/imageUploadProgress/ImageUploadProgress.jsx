@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";;
 
 
-export const ImageUploadProgress = ({ files, setFiles, progress}) => {
+export const ImageUploadProgress = ({ files, setFiles, progress, deleteAllKeys}) => {
   const [previews, setPreviews] = useState([]);
 
   useEffect(() => { //anytime new files are added display them
@@ -31,6 +31,9 @@ useEffect(() => {
 
     if (allComplete) {
         setFiles([]); //clear the files
+        setTimeout(() => {
+        deleteAllKeys(); //gives time for the ui to render the bar
+        }, 2000);
 
     }
     }, [progress, setFiles ]);
