@@ -74,7 +74,7 @@ export const useResourceTypes = (shopId) => {
       setOpLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/resources/type`, {
         method: "POST",
-        body: JSON.stringify({ title }),
+        body: JSON.stringify({ title, shopId }),
       });
       const data = await r.json();
       if (data.resourceType) {

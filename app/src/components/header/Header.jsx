@@ -3,6 +3,7 @@ import { useAuth } from "#useAuth";
 import styles from "./Header.module.css";
 import logo from "#sluopLogo";
 import { Dropdown } from "tabler-react-2";
+import { UserShopToggle } from "../userShopToggle/UserShopToggle";
 import { Icon } from "#icon";
 import { useShop } from "#index";
 const IconLogout = () => <Icon i={"logout"} size={18} />;
@@ -11,7 +12,7 @@ import classNames from "classnames";
 
 export const Header = () => {
   const { user, loggedIn, login, logout } = useAuth();
-  const [shopId, setShopId] = useState("");
+  const [shopId, setShopId ] = useState("");
 
   useEffect(() => {
     setInterval(() => {
@@ -38,6 +39,17 @@ export const Header = () => {
           )}
         </h1>
       </div>
+      {user?.id && (
+        <div style={{
+          marginLeft: "auto",
+          marginRight: "25px",
+          display: "flex",
+          alignItems: "center",
+          gap: 0,
+        }}>
+          <UserShopToggle userId={user.id} />
+        </div>
+      )}
       <div className={styles.headerGroup}>
         <a
           className="btn"

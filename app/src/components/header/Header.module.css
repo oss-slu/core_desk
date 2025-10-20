@@ -37,3 +37,15 @@
   color: var(--tblr-text-color);
   margin: 0;
 }
+
+.toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background-color: var(--tblr-border-color);
+}

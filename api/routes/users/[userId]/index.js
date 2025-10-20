@@ -176,6 +176,7 @@ export const put = [
         data: {
           firstName: firstName,
           lastName: lastName,
+          simple: req.body.simple !== undefined ? req.body.simple : undefined,
         },
       });
 

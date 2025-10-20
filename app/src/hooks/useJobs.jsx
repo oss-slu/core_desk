@@ -20,8 +20,7 @@ const CreateJobModalContent = ({ onSubmit }) => {
   const [onBehalfOfUserFirstName, setOnBehalfOfUserFirstName] = useState("");
   const [onBehalfOfUserLastName, setOnBehalfOfUserLastName] = useState("");
   const [onBehalfOfBillingGroup, setOnBehalfOfBillingGroup] = useState(false);
-  const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] =
-    useState(null);
+  const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] = useState(null);
 
   const capitalize = (s) => {
     if (typeof s !== "string") return "";
@@ -186,7 +185,7 @@ export const useJobs = (shopId) => {
     onBehalfOfUserFirstName,
     onBehalfOfUserLastName,
     onBehalfOfBillingGroup,
-    onBehalfOfBillingGroupId
+    onBehalfOfBillingGroupId,
   ) => {
     try {
       setOpLoading(true);
@@ -219,6 +218,89 @@ export const useJobs = (shopId) => {
     title: "Create a new Job",
     text: <CreateJobModalContent onSubmit={_createJob} />,
   });
+
+  const CreateSimpleSubPage = () => {
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [dueDate, setDueDate] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [onBehalfOf] = useState(false);
+    const [onBehalfOfUserId] = useState(null);
+    const [onBehalfOfUserEmail] = useState("");
+    const [onBehalfOfUserFirstName, setOnBehalfOfUserFirstName] = useState("");
+    const [onBehalfOfUserLastName, setOnBehalfOfUserLastName] = useState("");
+    const [onBehalfOfBillingGroup] = useState(false);
+    const [onBehalfOfBillingGroupId] = useState(null);
+
+    const capitalize = (s) => {
+      if (typeof s !== "string") return "";
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    };
+
+    useEffect(() => {
+      let [name] = onBehalfOfUserEmail.split("@");
+      name = name.replace(/\d/g, "");
+
+      setOnBehalfOfUserFirstName(capitalize(name.split(".")[0]) || "");
+      setOnBehalfOfUserLastName(capitalize(name.split(".")[1]) || "");
+    }, [onBehalfOfUserEmail]);
+
+    return (
+      <div>
+        <p>Step 2</p>
+        <h1>Set up your job</h1>
+        <div>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e)}
+            label="Job Name"
+            placeholder="e.g. Wind Mill Assembly"
+            required
+          />
+          <Input
+            value={description}
+            onChange={(e) => setDescription(e)}
+            label="Job Description (optional)"
+            placeholder="e.g. Parts for version 2 of the wind mill design project"
+            optional
+          />
+          <Input
+            type="date"
+            label="Due Date"
+            onChange={(e) => setDueDate(e + "T00:00:00")}
+            value={dueDate?.split("T")[0]}
+            required
+          />
+        </div>
+        <br></br>
+        {title.length > 0 && dueDate.length > 0 ? (
+        <Button
+          variant="primary"
+          loading={loading}
+          onClick={() => {
+            setLoading(true);
+            _createJob(
+              title,
+              description,
+              dueDate,
+              onBehalfOf,
+              onBehalfOfUserId,
+              onBehalfOfUserEmail,
+              onBehalfOfUserFirstName,
+              onBehalfOfUserLastName,
+              onBehalfOfBillingGroup,
+              onBehalfOfBillingGroupId
+            );
+          }}
+        >
+          Next
+        </Button>
+      ) : (
+        <Button disabled>Next</Button>
+      )}
+      </div>
+    );
+  }
 
   const fetchJobs = async (shouldSetLoading = true) => {
     try {
@@ -284,6 +366,7 @@ export const useJobs = (shopId) => {
     error,
     meta,
     refetch: fetchJobs,
+    CreateSimpleSubPage,
     ModalElement,
     createJob,
     opLoading,

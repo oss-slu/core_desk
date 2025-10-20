@@ -25,8 +25,14 @@ export const useUserShop = (shopId, userId) => {
   };
 
   useEffect(() => {
+  // Only fetch if both shopId and userId are valid, non-empty strings.
+  if (shopId && userId) {
     fetchUserShop();
-  }, [shopId, userId]);
+  } else {
+    // If IDs are missing, we're not loading anything.
+    setLoading(false); 
+  }
+}, [shopId, userId]);
 
   return { userShop, loading, error, refetch: fetchUserShop };
 };
