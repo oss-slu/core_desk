@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import { useResourceTypes } from "#hooks";
 import { useParams } from "react-router-dom";
 import { LoadableDropdownInput } from "#loadableDropdown";
+import * as Sentry from "@sentry/react";
+import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
 export const ResourceTypePicker = ({
   value,
@@ -14,6 +16,17 @@ export const ResourceTypePicker = ({
   const { loading, resourceTypes } = useResourceTypes(shopId);
 
   return (
+    <>
+    
+  
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
     <LoadableDropdownInput
       loading={loading || providedLoading}
       prompt={"Select a resource type"}
@@ -30,6 +43,9 @@ export const ResourceTypePicker = ({
           : null,
       ].filter((v) => v)}
     />
+    </Sentry.ErrorBoundary>
+
+  </>
   );
 };
 

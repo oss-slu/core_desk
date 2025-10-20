@@ -23,7 +23,14 @@ const EditBillingGroupInvitationModalContent = ({ invitationId, refetch }) => {
 
   return (
     <>
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
     <div>
       <Input
         label="Expiration Date"
@@ -67,7 +74,14 @@ export const EditBillingGroupInvitation = ({ invitationId, refetch }) => {
 
   return (
     <>
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
       {ModalElement}
       <Button size="sm" onClick={modal}>
         <Icon i="pencil" /> Edit

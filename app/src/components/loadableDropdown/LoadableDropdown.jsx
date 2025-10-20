@@ -20,7 +20,14 @@ export const LoadableDropdownInput = ({
   if (loading)
     return (
     <>
-        <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>} >
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
         
         
         <Util.Col>
@@ -36,7 +43,14 @@ export const LoadableDropdownInput = ({
   if (disabled)
     return (
     <>
-      <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
       
         <Util.Col>
         {showLabel && <label className="form-label">{label}</label>}
@@ -51,7 +65,14 @@ export const LoadableDropdownInput = ({
 
   return (
     <>
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
         <Util.Col>
           {showLabel && <label className="form-label">{label}</label>}
           <DropdownInput

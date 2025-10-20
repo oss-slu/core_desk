@@ -27,7 +27,14 @@ export const Dropzone = ({ onSuccessfulUpload = () => {}, endpoint }) => {
 
   return (
     <>
-      <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
       <Row gap={1}>
         <Input
           key={inputKey} // creates a new input when the files progress is 100, this is the only way to update or remove the text / clear 

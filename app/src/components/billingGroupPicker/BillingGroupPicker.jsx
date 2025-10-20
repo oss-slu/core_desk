@@ -19,7 +19,14 @@ export const BillingGroupPicker = ({ value, onChange, includeNone }) => {
     }
   }, [loading, billingGroups]);
   return (
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>  
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
 
       <LoadableDropdownInput
         loading={loading}

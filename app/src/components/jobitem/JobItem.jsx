@@ -99,7 +99,14 @@ export const JobItem = ({
   if (!item) return null;
 
   return (
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
       <Card>
         <Util.Responsive gap={1} align="start" threshold={1100}>
           <div className={styles.modal}>{ModalElement}</div>

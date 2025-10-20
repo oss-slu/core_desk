@@ -12,7 +12,14 @@ export const ShopUserPicker = ({ value, onChange, includeNone }) => {
 
   return (
     <>
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
   
     <LoadableDropdownInput
       loading={loading || authLoading}

@@ -18,7 +18,14 @@ export const ResourcePicker = ({
 
   return (
     <>
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
     <Util.Col>  
       <LoadableDropdownInput
         loading={loading || opLoading}

@@ -23,7 +23,14 @@ export const Comments = ({ jobId, shopId }) => {
 
   return (
     <>
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
     
   
     <div>
@@ -61,7 +68,13 @@ const Comment = ({ comment }) => {
   const { user } = useAuth();
   return (
     <>
-    <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary fallback={({error, componentStack}) => {
+      <ErrorBoundaries
+      error = {error}
+      stackTrace = {componentStack}
+      />
+
+    }}>
 
     <Card
       title={

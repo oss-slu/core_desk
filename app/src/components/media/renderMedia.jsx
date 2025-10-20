@@ -136,7 +136,14 @@ export const RenderMedia = ({
   ) {
     return (
       <>
-      <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+    <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
 
     
       <img
@@ -159,7 +166,14 @@ export const RenderMedia = ({
     if (preview && thumbnailUrl && !big) {
       return (
         <>
-        <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+      <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
 
     
         <img
@@ -201,7 +215,14 @@ export const RenderMedia = ({
 
     return (
       <>
-      <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+          <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
       
     
       
@@ -231,7 +252,14 @@ export const RenderMedia = ({
   if (fileType === "pdf") {
     return (
       <>
-      <Sentry.ErrorBoundary fallback={<ErrorBoundaries></ErrorBoundaries>}>
+          <Sentry.ErrorBoundary
+      fallback={({ error, componentStack }) => (
+        <ErrorBoundaries
+          error={error}
+          stackTrace={componentStack}
+        />
+      )}
+    >
       
       <iframe
         src={mediaUrl}
