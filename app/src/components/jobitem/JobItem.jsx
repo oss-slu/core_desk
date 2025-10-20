@@ -99,85 +99,6 @@ export const JobItem = ({
   if (!item) return null;
 
   return (
-    <Card>
-      <Util.Responsive gap={1} align="start" threshold={1100}>
-        <div className={styles.modal}>{ModalElement}</div>
-        <Util.Responsive
-          gap={1}
-          align="start"
-          threshold={800}
-          style={{ flex: 1 }}
-        >
-          <RenderMedia
-            mediaUrl={item.file?.location}
-            fileType={item.file?.originalname?.split(".")?.pop()}
-            thumbnailUrl={item.fileThumbnail?.location || item.fileThumbnailUrl}
-          />
-          <Util.Row gap={2} align="start" threshold={1200} style={{ flex: 1 }}>
-            <div style={{ maxWidth: 280 }}>
-              <Util.Row gap={1}>
-                <H3 className="mb-0" style={{ wordBreak: "break-all" }}>
-                  {item.title}
-                </H3>
-              </Util.Row>
-              {item.activeUser?.id && (
-                <span>
-                  <Icon i="user" />
-                  <Link to={`/shops/${shopId}/users/${item.activeUser.id}`}>
-                    {item.activeUser.firstName} {item.activeUser.lastName}
-                  </Link>
-                </span>
-              )}
-              {item.stlBoundingBoxX ? (
-                <>
-                  <Util.Row gap={1}>
-                    <span>
-                      <Icon i="cube-3d-sphere" />
-                      {item.stlBoundingBoxX.toFixed(2)} x{" "}
-                      {item.stlBoundingBoxY.toFixed(2)} x{" "}
-                      {item.stlBoundingBoxZ.toFixed(2)} cm
-                    </span>
-                    <span>
-                      {item.stlIsWatertight ? (
-                        <>
-                          <Icon i="droplet" color="green" />
-                          Watertight
-                        </>
-                      ) : (
-                        <>
-                          <Icon i="droplet-off" color="red" />
-                          Not Watertight
-                        </>
-                      )}
-                    </span>
-                  </Util.Row>
-                  <Util.Spacer size={0.5} />
-                </>
-              ) : (
-                <Util.Spacer size={1} />
-              )}
-              <Util.Row gap={1} align="center">
-                <>
-                  <Button
-                    onClick={modal}
-                    style={{
-                      padding: "0.4375rem",
-                    }}
-                  >
-                    <Icon i="cube" size={16} />
-                  </Button>
-                  <Button
-                    onClick={() => {
-                      downloadFile(item.fileUrl, item.title);
-                    }}
-                    style={{
-                      padding: "0.4375rem",
-                    }}
-                    download
-                  >
-                    <Icon i="download" size={16} />
-                  </Button>
-                  {userIsPrivileged && (
     <Sentry.ErrorBoundary
       fallback={({ error }) => (
         <ErrorBoundaries
@@ -206,11 +127,11 @@ export const JobItem = ({
                     {item.title}
                   </H3>
                 </Util.Row>
-                {item.user?.id && (
+                {item.activeUser?.id && (
                   <span>
                     <Icon i="user" />
-                    <Link to={`/shops/${shopId}/users/${item.user.id}`}>
-                      {item.user.firstName} {item.user.lastName}
+                    <Link to={`/shops/${shopId}/users/${item.activeUser.id}`}>
+                      {item.activeUser.firstName} {item.activeUser.lastName}
                     </Link>
                   </span>
                 )}
@@ -278,14 +199,6 @@ export const JobItem = ({
                       </Button>
                     )}
                   </>
-                ) : (
-                  <></>
-                )}
-              </Util.Row>
-            </div>
-          </Util.Row>
-        </Util.Responsive>
-        {user?.simple === false && (
                   {userIsPrivileged ? (
                     opLoading ? (
                       <Spinner />
@@ -399,97 +312,98 @@ export const JobItem = ({
               </div>
             </Util.Row>
           </Util.Responsive>
-
-          <Card
-            className={styles.tabcard}
-            tabs={[
-              {
-                title: "Resource Configuration",
-                content: (
-                  <div>
-                    <H4>Resource Configuration</H4>
-                    <Util.Row gap={1} align="start" wrap>
-                      <ResourceTypePicker
-                        value={item.resourceTypeId}
-                        loading={opLoading}
-                        onChange={(value) =>
-                          updateJobItem({ resourceTypeId: value })
-                        }
-                        includeNone={true}
-                      />
-                      {item.resourceTypeId ? (
-                        <>
-                          <MaterialPicker
-                            value={item.materialId}
-                            onChange={(value) =>
-                              updateJobItem({ materialId: value })
-                            }
-                            resourceTypeId={item.resourceTypeId}
-                            opLoading={opLoading}
-                            includeNone={true}
-                            materialType={"Primary"}
-                          />
-                          <MaterialPicker
-                            value={item.secondaryMaterialId}
-                            onChange={(value) =>
-                              updateJobItem({ secondaryMaterialId: value })
-                            }
-                            resourceTypeId={item.resourceTypeId}
-                            opLoading={opLoading}
-                            includeNone={true}
-                            materialType={"Secondary"}
-                          />
-                          {userIsPrivileged ? (
-                            <ResourcePicker
-                              value={item.resourceId}
+          {user?.simple === false && (
+            <Card
+              className={styles.tabcard}
+              tabs={[
+                {
+                  title: "Resource Configuration",
+                  content: (
+                    <div>
+                      <H4>Resource Configuration</H4>
+                      <Util.Row gap={1} align="start" wrap>
+                        <ResourceTypePicker
+                          value={item.resourceTypeId}
+                          loading={opLoading}
+                          onChange={(value) =>
+                            updateJobItem({ resourceTypeId: value })
+                          }
+                          includeNone={true}
+                        />
+                        {item.resourceTypeId ? (
+                          <>
+                            <MaterialPicker
+                              value={item.materialId}
                               onChange={(value) =>
-                                updateJobItem({ resourceId: value })
+                                updateJobItem({ materialId: value })
                               }
                               resourceTypeId={item.resourceTypeId}
                               opLoading={opLoading}
                               includeNone={true}
+                              materialType={"Primary"}
                             />
-                          ) : (
-                            <Util.Col gap={1}>
-                              <label className="form-label mb-0">Resource</label>
-                              <Badge color="blue" soft>
-                                {item.resource?.title || "None"}
-                              </Badge>
-                            </Util.Col>
-                          )}
-                        </>
+                            <MaterialPicker
+                              value={item.secondaryMaterialId}
+                              onChange={(value) =>
+                                updateJobItem({ secondaryMaterialId: value })
+                              }
+                              resourceTypeId={item.resourceTypeId}
+                              opLoading={opLoading}
+                              includeNone={true}
+                              materialType={"Secondary"}
+                            />
+                            {userIsPrivileged ? (
+                              <ResourcePicker
+                                value={item.resourceId}
+                                onChange={(value) =>
+                                  updateJobItem({ resourceId: value })
+                                }
+                                resourceTypeId={item.resourceTypeId}
+                                opLoading={opLoading}
+                                includeNone={true}
+                              />
+                            ) : (
+                              <Util.Col gap={1}>
+                                <label className="form-label mb-0">Resource</label>
+                                <Badge color="blue" soft>
+                                  {item.resource?.title || "None"}
+                                </Badge>
+                              </Util.Col>
+                            )}
+                          </>
+                        ) : (
+                          <i>Select a resource type to see more options</i>
+                        )}
+                      </Util.Row>
+                    </div>
+                  ),
+                },
+                {
+                  title: "Costing",
+                  content: (
+                    <>
+                      {item.materialId &&
+                      item.resourceId &&
+                      item.secondaryMaterialId ? (
+                        <EditCosting
+                          item={item}
+                          onChange={(value) => updateJobItem(value)}
+                          loading={opLoading}
+                          userIsPrivileged={userIsPrivileged}
+                        />
                       ) : (
-                        <i>Select a resource type to see more options</i>
+                        <Badge color="red" soft>
+                          <Icon i="coin-off" />
+                          Costing unavailable without material, secondaryMaterial
+                          and resource
+                        </Badge>
                       )}
-                    </Util.Row>
-                  </div>
-                ),
-              },
-              {
-                title: "Costing",
-                content: (
-                  <>
-                    {item.materialId &&
-                    item.resourceId &&
-                    item.secondaryMaterialId ? (
-                      <EditCosting
-                        item={item}
-                        onChange={(value) => updateJobItem(value)}
-                        loading={opLoading}
-                        userIsPrivileged={userIsPrivileged}
-                      />
-                    ) : (
-                      <Badge color="red" soft>
-                        <Icon i="coin-off" />
-                        Costing unavailable without material, secondaryMaterial
-                        and resource
-                      </Badge>
-                    )}
-                  </>
-                ),
-              },
-            ]}
-          />
+                    </>
+                  ),
+                },
+              ]}
+            />
+          )}
         </Util.Responsive>
       </Card>
     </Sentry.ErrorBoundary>
