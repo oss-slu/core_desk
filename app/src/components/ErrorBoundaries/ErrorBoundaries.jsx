@@ -1,6 +1,6 @@
 import React from "react";
 
-function ErrorBoundaries({ error}) {
+function ErrorBoundaries({ error }) {
   const message =
     typeof error?.message === "string"
       ? error.message
