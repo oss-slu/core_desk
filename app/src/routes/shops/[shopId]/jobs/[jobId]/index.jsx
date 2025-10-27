@@ -81,13 +81,13 @@ export const JobPage = () => {
       <p>Step 3</p>
       <h1>Continue set-up</h1>
       <ResourceTypePicker
-        loading={opLoading}
+        // loading={opLoading}
         value={job.resourceTypeId}
         onChange={(value) => {
           updateJob({ resourceTypeId: value });
         }}
         shopId={shopId}
-        opLoading={opLoading}
+        // opLoading={opLoading}
         includeNone={true}
       />
     {job.resourceTypeId && (
@@ -98,7 +98,7 @@ export const JobPage = () => {
             updateJob({ resourceId: value });
           }}
           resourceTypeId={job.resourceTypeId}
-          opLoading={opLoading}
+          // opLoading={opLoading}
           includeNone={true}
         />
         <MaterialPicker
@@ -107,7 +107,7 @@ export const JobPage = () => {
             updateJob({ materialId: value });
           }}
           resourceTypeId={job.resourceTypeId}
-          opLoading={opLoading}
+          // opLoading={opLoading}
           includeNone={true}
           materialType={"Primary"}
         />
@@ -117,7 +117,7 @@ export const JobPage = () => {
             updateJob({ secondaryMaterialId: value });
           }}
           resourceTypeId={job.resourceTypeId}
-          opLoading={opLoading}
+          // opLoading={opLoading}
           includeNone={true}
           materialType={"Secondary"}
         />
