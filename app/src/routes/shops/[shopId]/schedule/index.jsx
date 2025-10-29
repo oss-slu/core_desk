@@ -1,9 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Page } from "#page";
-import { Typography, Util, useOffcanvas, Input } from "tabler-react-2";
+import { Typography, Util, Input, Button, useOffcanvas } from "tabler-react-2";
 import { useAuth } from "#useAuth";
 import { sidenavItems } from "#page";
+import { useAppointments } from "#useAppointments";
 import styles from "./SchedulePage.module.css";
+import toast from "react-hot-toast";
 
 const { H1 } = Typography;
 
@@ -31,117 +33,153 @@ const hexToRgba = (hex, alpha = 0.2) => {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 };
 
-export const SchedulePage = () => {
-  const { user, loading } = useAuth();
+export const SchedulePage = ({ shopId }) => {
+  const { user, loading: authLoading } = useAuth();
   const { offcanvas, OffcanvasElement } = useOffcanvas({
     offcanvasProps: { position: "end", size: 500, zIndex: 1051 },
   });
-  // eslint-disable-next-line no-unused-vars
-  const [activeEvent, setActiveEvent] = React.useState(null);
 
-  if (loading) {
-    return <Page sidenavItems={sidenavItems("Shops", user?.admin)}>Loading...</Page>;
+  const {
+    appointments,
+    loading,
+    error,
+    createAppointment,
+    updateAppointment,
+    deleteAppointment,
+  } = useAppointments(shopId);
+
+  const [newAppointment, setNewAppointment] = useState({
+    resourceId: "",
+    startTime: "",
+    endTime: "",
+    notes: "",
+  });
+
+  if (authLoading || loading) {
+    return (
+      <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
+        Loading schedule...
+      </Page>
+    );
   }
 
-  const mockEvents = [
-    {
-      id: "evt1",
-      startTime: "2025-09-27T09:30:00Z",
-      endTime: "2025-09-27T10:30:00Z",
-      userId: "user1",
-      user: {
-        id: "user1",
-        email: "bellaOtt@notSlu.edu",
-        firstName: "Bella",
-        lastName: "Ott",
-      },
-      resourceId: "res1",
-      resource: {
-        title: "Test 1",
-        description: "TestResourceDescription",
-      },
-      color: "#4e73df",
-    },
-    {
-      id: "evt2",
-      startTime: "2025-09-27T11:00:00Z",
-      endTime: "2025-09-27T12:00:00Z",
-      userId: "user2",
-      user: {
-        id: "user2",
-        email: "jack.crane@notSlu.edu",
-        firstName: "Jack",
-        lastName: "Crane",
-      },
-      resourceId: "res1",
-      resource: {
-        title: "Test 2",
-        description: "TestResourceDescription",
-      },
-      color: "#1cc88a",
-    },
-    {
-      id: "evt3",
-      startTime: "2025-09-27T13:00:00Z",
-      endTime: "2025-09-27T14:30:00Z",
-      userId: "user3",
-      user: {
-        id: "user3",
-        email: "plsdontsendmeemails@notslu.edu",
-        firstName: "Paul",
-        lastName: "Ongkiko",
-      },
-      resourceId: "res2",
-      resource: {
-        title: "Test 1",
-        description: "TestResourceDescription",
-      },
-      color: "#f6c23e",
-    },
-  ];
+  if (error) {
+    return (
+      <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
+        <div className="text-danger">
+          Error loading appointments: {error.message || error}
+        </div>
+      </Page>
+    );
+  }
 
-  const resources = Array.from(new Set(mockEvents.map((evt) => evt.resource.title)));
+  const resources = Array.from(new Set(appointments.map((evt) => evt.resource.title)));
   const timeSlots = generateTimeSlots();
 
   const openEvent = (evt) => {
-    setActiveEvent(evt);
-
-    const startDate = new Date(evt.startTime);
-    const localDatetime = new Date(startDate.getTime() - startDate.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16);
+    const startLocal = new Date(evt.startTime).toISOString().slice(0, 16);
+    const endLocal = new Date(evt.endTime).toISOString().slice(0, 16);
 
     offcanvas({
       content: (
         <div style={{ padding: 24 }}>
           <h2 style={{ color: evt.color }}>{evt.user.firstName} {evt.user.lastName}</h2>
           <h3>{evt.user.email}</h3>
-          <p>
-            {/*update with link to resource*/}
-            <strong>Resource:</strong> {evt.resource.title} {evt.resourceId}
-          </p>
-
-          <p>
-            <strong>Description:</strong> {evt.resource.description}
-          </p>
+          <p><strong>Resource:</strong> {evt.resource.title}</p>
+          <p><strong>Description:</strong> {evt.resource.description}</p>
 
           <div style={{ marginTop: 10 }}>
             <Input
               type="datetime-local"
-              label="Booking Time"
-              value={localDatetime}
-              onChange={() => {}}
+              label="Start Time"
+              value={startLocal}
+              onChange={(e) => evt.startTime = new Date(e.target.value).toISOString()}
             />
+            <Input
+              type="datetime-local"
+              label="End Time"
+              value={endLocal}
+              onChange={(e) => evt.endTime = new Date(e.target.value).toISOString()}
+            />
+            <Input
+              type="text"
+              label="Notes"
+              value={evt.notes || ""}
+              onChange={(e) => evt.notes = e.target.value}
+            />
+          </div>
+
+          <div style={{ marginTop: 10 }}>
+            <Button
+              color="primary"
+              onClick={async () => {
+                await updateAppointment(evt.id, {
+                  resourceId: evt.resourceId,
+                  startTime: evt.startTime,
+                  endTime: evt.endTime,
+                  notes: evt.notes,
+                });
+                toast.success("Appointment updated");
+              }}
+            >
+              Save
+            </Button>
+            <Button
+              color="danger"
+              style={{ marginLeft: 8 }}
+              onClick={async () => {
+                await deleteAppointment(evt.id);
+                toast.success("Appointment deleted");
+              }}
+            >
+              Delete
+            </Button>
           </div>
         </div>
       ),
     });
   };
 
+  const handleCreate = async () => {
+    if (!newAppointment.resourceId || !newAppointment.startTime || !newAppointment.endTime) {
+      toast.error("Please fill out all fields");
+      return;
+    }
+    await createAppointment(newAppointment);
+    setNewAppointment({ resourceId: "", startTime: "", endTime: "", notes: "" });
+  };
+
   return (
-    <Page sidenavItems={sidenavItems("Shops", user.admin)}>
+    <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
       <Util.Col gap={3}>
         <H1>Resource Availability</H1>
+
+        <div style={{ marginBottom: 16 }}>
+          <Input
+            placeholder="Resource ID"
+            value={newAppointment.resourceId}
+            onChange={(e) => setNewAppointment({ ...newAppointment, resourceId: e.target.value })}
+          />
+          <Input
+            type="datetime-local"
+            value={newAppointment.startTime}
+            onChange={(e) => setNewAppointment({ ...newAppointment, startTime: e.target.value })}
+          />
+          <Input
+            type="datetime-local"
+            value={newAppointment.endTime}
+            onChange={(e) => setNewAppointment({ ...newAppointment, endTime: e.target.value })}
+          />
+          <Input
+            placeholder="Notes"
+            value={newAppointment.notes}
+            onChange={(e) => setNewAppointment({ ...newAppointment, notes: e.target.value })}
+          />
+          <Button color="primary" onClick={handleCreate} style={{ marginTop: 8 }}>
+            Add Appointment
+          </Button>
+        </div>
+
         <div className={styles.gridWrapper}>
           <div
             className={styles.calendarGrid}
@@ -152,9 +190,7 @@ export const SchedulePage = () => {
           >
             <div className={styles.headerCell} />
             {timeSlots.map((slot, idx) => (
-              <div key={idx} className={styles.headerCell}>
-                {slot}
-              </div>
+              <div key={idx} className={styles.headerCell}>{slot}</div>
             ))}
 
             {resources.map((res, rowIdx) => {
@@ -183,7 +219,7 @@ export const SchedulePage = () => {
               );
             })}
 
-            {mockEvents.map((evt) => {
+            {appointments.map((evt) => {
               const rowIndex = resources.indexOf(evt.resource.title) + 2;
               const startCol = timeToSlotIndex(evt.startTime) + 2;
               const endCol = timeToSlotIndex(evt.endTime) + 2;
@@ -209,6 +245,7 @@ export const SchedulePage = () => {
             })}
           </div>
         </div>
+
         {OffcanvasElement}
       </Util.Col>
     </Page>
