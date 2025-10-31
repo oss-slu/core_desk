@@ -92,7 +92,7 @@ export const Jobs = () => {
     CreateSimpleSubPage,
     createJob,
   } = useJobs(shopId);
-  const { user } = useUser(activeUser.id);
+  const { user, loading: userLoading } = useUser(activeUser.id);
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
@@ -190,19 +190,7 @@ export const Jobs = () => {
   };
 
   if (jobsLoading) {
-    return (
-      <Page
-        sidenavItems={shopSidenavItems(
-          "Jobs",
-          shopId,
-          activeUser?.admin,
-          userShop.accountType,
-          userShop.balance < 0
-        )}
-      >
-        <Loading />
-      </Page>
-    );
+    return <Loading />;
   }
 
   // Apply filters to jobs
@@ -585,6 +573,10 @@ export const Jobs = () => {
       </Page>
     );
   } else {
-    return <CreateSimpleSubPage/>;
+    return (
+      <div>
+        <CreateSimpleSubPage/>
+      </div>
+    );
   }
 };
