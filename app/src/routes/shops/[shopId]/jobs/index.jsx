@@ -92,7 +92,7 @@ export const Jobs = () => {
     CreateSimpleSubPage,
     createJob,
   } = useJobs(shopId);
-  const { user, loading: userLoading } = useUser(activeUser.id);
+  const { user } = useUser(activeUser.id);
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
