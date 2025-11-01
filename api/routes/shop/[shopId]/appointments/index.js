@@ -16,6 +16,7 @@ async function hasConflict(resourceId, startTime, endTime, excludeId = null) {
   return conflicts.length > 0;
 }
 
+// ---------------------- CREATE APPOINTMENT ----------------------
 export const post = [
   verifyAuth,
   async (req, res) => {
@@ -23,37 +24,40 @@ export const post = [
       const { shopId } = req.params;
       const userId = req.user.id;
 
+      // Verify user belongs to this shop
       const userShop = await prisma.userShop.findFirst({
         where: { userId, shopId, active: true },
       });
-
       if (!userShop) return res.status(403).json({ error: "Unauthorized" });
 
-      const { resourceId, jobId, startTime, endTime, notes } = req.body;
+      const { resourceId, startTime, endTime } = req.body;
 
       const resource = await prisma.resource.findFirst({
         where: { id: resourceId, shopId, active: true },
       });
-
       if (!resource) return res.status(404).json({ error: "Resource not found" });
 
       if (await hasConflict(resourceId, startTime, endTime)) {
         return res.status(400).json({ error: "Time slot conflicts with another appointment" });
       }
 
+      // Fetch user info for title
+      const user = await prisma.user.findUnique({ where: { id: userId } });
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      const title = `${user.firstName} ${user.lastName}`;
+
       const appointment = await prisma.appointment.create({
         data: {
           startTime: new Date(startTime),
           endTime: new Date(endTime),
-          notes,
+          title,
           resource: { connect: { id: resourceId } },
-          job: jobId ? { connect: { id: jobId } } : undefined,
           user: { connect: { id: userId } },
           shop: { connect: { id: shopId } },
         },
         include: {
           resource: true,
-          job: true,
           user: { select: { id: true, firstName: true, lastName: true } },
         },
       });
@@ -75,6 +79,7 @@ export const post = [
   },
 ];
 
+// ---------------------- GET APPOINTMENTS ----------------------
 export const get = [
   verifyAuth,
   async (req, res) => {
@@ -85,7 +90,6 @@ export const get = [
       const userShop = await prisma.userShop.findFirst({
         where: { userId, shopId, active: true },
       });
-
       if (!userShop) return res.status(403).json({ error: "Unauthorized" });
 
       const isAdminOrOperator =
@@ -98,7 +102,6 @@ export const get = [
         },
         include: {
           resource: true,
-          job: true,
           user: { select: { id: true, firstName: true, lastName: true } },
         },
         orderBy: { startTime: "asc" },
@@ -112,6 +115,7 @@ export const get = [
   },
 ];
 
+// ---------------------- UPDATE APPOINTMENT ----------------------
 export const put = [
   verifyAuth,
   async (req, res) => {
@@ -123,7 +127,6 @@ export const put = [
       const appointment = await prisma.appointment.findFirst({
         where: { id: appointmentId, shopId },
       });
-
       if (!appointment) return res.status(404).json({ error: "Appointment not found" });
 
       const userShop = await prisma.userShop.findFirst({
@@ -147,12 +150,11 @@ export const put = [
         data: {
           startTime: new Date(data.startTime),
           endTime: new Date(data.endTime),
-          notes: data.notes,
           resourceId: data.resourceId,
+          title: `${appointment.user.firstName} ${appointment.user.lastName}`,
         },
         include: {
           resource: true,
-          job: true,
           user: { select: { id: true, firstName: true, lastName: true } },
         },
       });
@@ -175,6 +177,7 @@ export const put = [
   },
 ];
 
+// ---------------------- DELETE APPOINTMENT ----------------------
 export const del = [
   verifyAuth,
   async (req, res) => {
@@ -185,7 +188,6 @@ export const del = [
       const appointment = await prisma.appointment.findFirst({
         where: { id: appointmentId, shopId },
       });
-
       if (!appointment) return res.status(404).json({ error: "Appointment not found" });
 
       const userShop = await prisma.userShop.findFirst({

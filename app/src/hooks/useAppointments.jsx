@@ -11,7 +11,7 @@ export const useAppointments = (shopId) => {
   const fetchAppointments = async () => {
     try {
       setLoading(true);
-      const r = await authFetch(`/api/shops/${shopId}/appointments`);
+      const r = await authFetch(`/api/shop/${shopId}/appointments`);
       const data = await r.json();
       if (data.appointments) {
         setAppointments(data.appointments);
@@ -34,7 +34,7 @@ export const useAppointments = (shopId) => {
   const createAppointment = async (data) => {
     try {
       setOpLoading(true);
-      const r = await authFetch(`/api/shops/${shopId}/appointments`, {
+      const r = await authFetch(`/api/shop/${shopId}/appointments`, {
         method: "POST",
         body: JSON.stringify(data),
       });
@@ -59,7 +59,7 @@ export const useAppointments = (shopId) => {
     try {
       setOpLoading(true);
       const r = await authFetch(
-        `/api/shops/${shopId}/appointments/${appointmentId}`,
+        `/api/shop/${shopId}/appointments/${appointmentId}`,
         {
           method: "PUT",
           body: JSON.stringify(data),
@@ -89,7 +89,7 @@ export const useAppointments = (shopId) => {
     try {
       setOpLoading(true);
       const r = await authFetch(
-        `/api/shops/${shopId}/appointments/${appointmentId}`,
+        `/api/shop/${shopId}/appointments/${appointmentId}`,
         { method: "DELETE" }
       );
       const res = await r.json();
