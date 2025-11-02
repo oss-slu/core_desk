@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { authFetch } from "#url";
 import toast from "react-hot-toast";
 
@@ -8,103 +8,106 @@ export const useAppointments = (shopId) => {
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchAppointments = async () => {
+  const fetchAppointments = useCallback(async () => {
+    if (!shopId) return;
+    setLoading(true);
+    setError(null);
     try {
-      setLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/appointments`);
-      const data = await r.json();
-      if (data.appointments) {
+      const data = await r.json().catch(() => null);
+      if (data?.appointments) {
         setAppointments(data.appointments);
-        setLoading(false);
       } else {
-        setError(data.error);
-        setLoading(false);
+        setError(data?.error || "Failed to fetch appointments");
+        toast.error(data?.error || "Failed to fetch appointments");
       }
-    } catch (error) {
-      console.error(error);
-      setError(error);
+    } catch (err) {
+      console.error(err);
+      setError(err);
+      toast.error("Failed to fetch appointments");
+    } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    if (shopId) fetchAppointments();
   }, [shopId]);
 
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
+
   const createAppointment = async (data) => {
+    setOpLoading(true);
+    setError(null);
     try {
-      setOpLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/appointments`, {
         method: "POST",
         body: JSON.stringify(data),
       });
-      const res = await r.json();
-      if (res.appointment) {
-        setAppointments((prev) => [...prev, res.appointment]);
+      const res = await r.json().catch(() => null);
+      if (res?.appointment) {
         toast.success("Appointment created");
-        setOpLoading(false);
+        await fetchAppointments();
       } else {
-        toast.error(res.error);
-        setError(res.error);
-        setOpLoading(false);
+        setError(res?.error || "Failed to create appointment");
+        toast.error(res?.error || "Failed to create appointment");
       }
-    } catch (error) {
-      console.error(error);
-      setError(error);
+    } catch (err) {
+      console.error(err);
+      setError(err);
+      toast.error("Failed to create appointment");
+    } finally {
       setOpLoading(false);
     }
   };
 
   const updateAppointment = async (appointmentId, data) => {
+    if (!appointmentId) return;
+    setOpLoading(true);
+    setError(null);
     try {
-      setOpLoading(true);
-      const r = await authFetch(
-        `/api/shop/${shopId}/appointments/${appointmentId}`,
-        {
-          method: "PUT",
-          body: JSON.stringify(data),
-        }
-      );
-      const res = await r.json();
-      if (res.appointment) {
-        setAppointments((prev) =>
-          prev.map((a) => (a.id === appointmentId ? res.appointment : a))
-        );
+      const r = await authFetch(`/api/shop/${shopId}/appointments/${appointmentId}`, {
+        method: "PUT",
+        body: JSON.stringify(data),
+      });
+      const res = await r.json().catch(() => null);
+      if (res?.appointment) {
         toast.success("Appointment updated");
-        setOpLoading(false);
+        await fetchAppointments();
       } else {
-        toast.error(res.error);
-        setError(res.error);
-        setOpLoading(false);
+        setError(res?.error || "Failed to update appointment");
+        toast.error(res?.error || "Failed to update appointment");
       }
-    } catch (error) {
-      console.error(error);
-      setError(error);
+    } catch (err) {
+      console.error(err);
+      setError(err);
+      toast.error("Failed to update appointment");
+    } finally {
       setOpLoading(false);
     }
   };
 
   const deleteAppointment = async (appointmentId) => {
-    if (!confirm("Delete appointment?")) return;
+    if (!appointmentId) return;
+    if (!window.confirm("Delete appointment?")) return;
+
+    setOpLoading(true);
+    setError(null);
     try {
-      setOpLoading(true);
-      const r = await authFetch(
-        `/api/shop/${shopId}/appointments/${appointmentId}`,
-        { method: "DELETE" }
-      );
-      const res = await r.json();
-      if (res.success) {
-        setAppointments((prev) => prev.filter((a) => a.id !== appointmentId));
+      const r = await authFetch(`/api/shop/${shopId}/appointments/${appointmentId}`, {
+        method: "DELETE",
+      });
+      const res = await r.json().catch(() => null);
+      if (res?.success) {
         toast.success("Appointment deleted");
-        setOpLoading(false);
+        await fetchAppointments();
       } else {
-        toast.error(res.error);
-        setError(res.error);
-        setOpLoading(false);
+        setError(res?.error || "Failed to delete appointment");
+        toast.error(res?.error || "Failed to delete appointment");
       }
-    } catch (error) {
-      console.error(error);
-      setError(error);
+    } catch (err) {
+      console.error(err);
+      setError(err);
+      toast.error("Failed to delete appointment");
+    } finally {
       setOpLoading(false);
     }
   };
