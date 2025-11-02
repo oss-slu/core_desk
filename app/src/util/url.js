@@ -33,7 +33,6 @@ export const authFetch = async (url, options = {}, retries = 3) => {
 
 export const authFetchWithoutContentType = async (url, options) => {
   const token = localStorage.getItem("token");
-  console.log("url without content type", url);
   const res = await fetch(u(url), {
     ...options,
     headers: {
