@@ -43,7 +43,7 @@ const timeToSlotIndex = (isoStr) => {
   return d.getHours() * 2 + (d.getMinutes() >= 30 ? 1 : 0);
 };
 
-const AppointmentForm = ({ mode, appointment, resources, onSave, onDelete }) => {
+const AppointmentForm = ({ mode, appointment, onSave, onDelete }) => {
   const [formData, setFormData] = React.useState({
     resourceId: appointment?.resource?.id || "",
     startTime: isoToLocalDatetime(appointment?.startTime),

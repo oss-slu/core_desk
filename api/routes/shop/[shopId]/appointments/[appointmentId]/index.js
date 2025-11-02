@@ -41,7 +41,14 @@ export const put = [
         return res.status(403).json({ error: "Unauthorized" });
       }
 
-      if (await hasConflict(appointment.resourceId, data.startTime, data.endTime, appointmentId)) {
+      const conflict = await hasConflict(
+        appointment.resourceId,
+        data.startTime,
+        data.endTime,
+        appointmentId
+      )
+      
+      if (conflict) {
         return res.status(400).json({ error: "Time slot conflicts with another appointment" });
       }
 
