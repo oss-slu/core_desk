@@ -90,7 +90,7 @@ if (process.env.JACK == "true") {
           where: { email: userEmail },
         });
         if (!user) {
-          user = createUser(profile); // call the createUser function and pass the profile
+          user = await createUser(profile); // call the createUser function and pass the profile
         }
 
         return done(null, user);
