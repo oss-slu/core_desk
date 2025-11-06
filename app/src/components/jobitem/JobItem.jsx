@@ -100,11 +100,7 @@ export const JobItem = ({
 
   return (
     <Sentry.ErrorBoundary
-      fallback={({ error }) => (
-        <ErrorBoundaries
-          error={error}
-        />
-      )}
+      fallback={({ error }) => <ErrorBoundaries error={error} />}
     >
       <Card>
         <Util.Responsive gap={1} align="start" threshold={1100}>
@@ -118,9 +114,16 @@ export const JobItem = ({
             <RenderMedia
               mediaUrl={item.file?.location}
               fileType={item.file?.originalname?.split(".")?.pop()}
-              thumbnailUrl={item.fileThumbnail?.location || item.fileThumbnailUrl}
+              thumbnailUrl={
+                item.fileThumbnail?.location || item.fileThumbnailUrl
+              }
             />
-            <Util.Row gap={2} align="start" threshold={1200} style={{ flex: 1 }}>
+            <Util.Row
+              gap={2}
+              align="start"
+              threshold={1200}
+              style={{ flex: 1 }}
+            >
               <div style={{ maxWidth: 280 }}>
                 <Util.Row gap={1}>
                   <H3 className="mb-0" style={{ wordBreak: "break-all" }}>
@@ -175,7 +178,10 @@ export const JobItem = ({
                     </Button>
                     <Button
                       onClick={() => {
-                        downloadFile(item.fileUrl, item.title);
+                        downloadFile(
+                          item.fileUrl || item.file?.location,
+                          item.title
+                        );
                       }}
                       style={{
                         padding: "0.4375rem",
@@ -364,7 +370,9 @@ export const JobItem = ({
                               />
                             ) : (
                               <Util.Col gap={1}>
-                                <label className="form-label mb-0">Resource</label>
+                                <label className="form-label mb-0">
+                                  Resource
+                                </label>
                                 <Badge color="blue" soft>
                                   {item.resource?.title || "None"}
                                 </Badge>
@@ -394,8 +402,8 @@ export const JobItem = ({
                       ) : (
                         <Badge color="red" soft>
                           <Icon i="coin-off" />
-                          Costing unavailable without material, secondaryMaterial
-                          and resource
+                          Costing unavailable without material,
+                          secondaryMaterial and resource
                         </Badge>
                       )}
                     </>
