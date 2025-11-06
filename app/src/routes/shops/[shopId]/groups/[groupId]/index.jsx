@@ -22,22 +22,41 @@ import { EditBillingGroupInvitation } from "../../../../../components/editBillin
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { Icon } from "#icon";
 import { MarkdownRender } from "#markdownRender";
-import { ShopUserPicker } from "#shopUserPicker";
+import {
+  UserSelectorCard,
+  USER_SELECTOR_MODE,
+  createDefaultUserSelection,
+} from "#userSelectorCard";
 
 const AddUserToBillingGroupModal = () => {
   const navigate = useNavigate();
 
-  const [user, setUser] = useState(null);
-  const [role, setRole] = useState("member");
+  const [userSelection, setUserSelection] = useState(
+    createDefaultUserSelection()
+  );
+  const [role, setRole] = useState({
+    id: "MEMBER",
+    label: "Member",
+  });
   const { shopId, groupId } = useParams();
   const { opLoading, addUserToGroup } = useBillingGroup(shopId, groupId);
+
+  const isExistingSelection =
+    userSelection.mode === USER_SELECTOR_MODE.EXISTING;
+  const canSubmit =
+    role &&
+    ((isExistingSelection && !!userSelection.userId) ||
+      (!isExistingSelection &&
+        userSelection.email.trim() &&
+        userSelection.firstName.trim() &&
+        userSelection.lastName.trim()));
 
   return (
     <div>
       <label className="form-label">
         Choose a user to add to the billing group
       </label>
-      <ShopUserPicker value={user} onChange={setUser} />
+      <UserSelectorCard value={userSelection} onChange={setUserSelection} />
       <label className="form-label mt-2">Role</label>
       <DropdownInput
         value={role}
@@ -58,10 +77,11 @@ const AddUserToBillingGroupModal = () => {
         className="mt-2"
         variant="primary"
         onClick={async () => {
-          await addUserToGroup(user, role.id);
+          await addUserToGroup(userSelection, role.id);
+          setUserSelection(createDefaultUserSelection());
           navigate(0);
         }}
-        disabled={!user || !role}
+        disabled={!canSubmit}
         loading={opLoading}
       >
         Add User

@@ -69,6 +69,7 @@
     "#index": "./index.js",
     "#setup": "./util/tests/setup.js",
     "#forceError": "./util/tests/forceError.js",
-    "#upload": "./util/file.js"
+    "#upload": "./util/file.js",
+    "#createUser": "./util/createUser.js"
   }
 }

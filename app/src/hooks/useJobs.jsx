@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { authFetch } from "#url";
 import { useModal } from "#modal";
-import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
+import { Input, Spinner, Util, Switch } from "tabler-react-2";
 import { Button } from "#button";
 import { useParams } from "react-router-dom";
 import { useUserShop } from "./useUserShop";
 import { useAuth } from "#useAuth";
-import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
+import {
+  UserSelectorCard,
+  USER_SELECTOR_MODE,
+  createDefaultUserSelection,
+} from "#userSelectorCard";
 
 const CreateJobModalContent = ({ onSubmit }) => {
   const [title, setTitle] = useState("");
@@ -15,25 +19,11 @@ const CreateJobModalContent = ({ onSubmit }) => {
   const [dueDate, setDueDate] = useState("");
   const [loading, setLoading] = useState(false);
   const [onBehalfOf, setOnBehalfOf] = useState(false);
-  const [onBehalfOfUserId, setOnBehalfOfUserId] = useState(null);
-  const [onBehalfOfUserEmail, setOnBehalfOfUserEmail] = useState("");
-  const [onBehalfOfUserFirstName, setOnBehalfOfUserFirstName] = useState("");
-  const [onBehalfOfUserLastName, setOnBehalfOfUserLastName] = useState("");
+  const [onBehalfOfUser, setOnBehalfOfUser] = useState(
+    createDefaultUserSelection()
+  );
   const [onBehalfOfBillingGroup, setOnBehalfOfBillingGroup] = useState(false);
   const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] = useState(null);
-
-  const capitalize = (s) => {
-    if (typeof s !== "string") return "";
-    return s.charAt(0).toUpperCase() + s.slice(1);
-  };
-
-  useEffect(() => {
-    let [name] = onBehalfOfUserEmail.split("@");
-    name = name.replace(/\d/g, "");
-
-    setOnBehalfOfUserFirstName(capitalize(name.split(".")[0]) || "");
-    setOnBehalfOfUserLastName(capitalize(name.split(".")[1]) || "");
-  }, [onBehalfOfUserEmail]);
 
   const { shopId } = useParams();
   const { user } = useAuth();
@@ -71,50 +61,22 @@ const CreateJobModalContent = ({ onSubmit }) => {
             <Switch
               label="Create on behalf of another user"
               value={onBehalfOf}
-              onChange={setOnBehalfOf}
+              onChange={(value) => {
+                setOnBehalfOf(value);
+                if (!value) {
+                  setOnBehalfOfUser(createDefaultUserSelection());
+                }
+              }}
             />
             {onBehalfOf && (
-              <Card
-                size="md"
-                variantPos="top"
-                tabs={[
-                  {
-                    title: "Select an existing user",
-                    content: (
-                      <ShopUserPicker
-                        value={onBehalfOfUserId}
-                        onChange={setOnBehalfOfUserId}
-                        includeNone={false}
-                      />
-                    ),
-                  },
-                  {
-                    title: "Create a new user",
-                    content: (
-                      <>
-                        <Input
-                          value={onBehalfOfUserEmail}
-                          onChange={setOnBehalfOfUserEmail}
-                          label="Email"
-                          placeholder="first.last@slu.edu"
-                        />
-                        <Input
-                          value={onBehalfOfUserFirstName}
-                          onChange={setOnBehalfOfUserFirstName}
-                          label="First Name"
-                        />
-                        <Input
-                          value={onBehalfOfUserLastName}
-                          onChange={setOnBehalfOfUserLastName}
-                          label="Last Name"
-                        />
-                      </>
-                    ),
-                  },
-                ]}
-              />
+              <>
+                <UserSelectorCard
+                  value={onBehalfOfUser}
+                  onChange={setOnBehalfOfUser}
+                />
+                <Util.Spacer size={2} />
+              </>
             )}
-            <Util.Spacer size={2} />
           </>
         )
       )}
@@ -149,10 +111,18 @@ const CreateJobModalContent = ({ onSubmit }) => {
               description,
               dueDate,
               onBehalfOf,
-              onBehalfOfUserId,
-              onBehalfOfUserEmail,
-              onBehalfOfUserFirstName,
-              onBehalfOfUserLastName,
+              onBehalfOfUser.mode === USER_SELECTOR_MODE.EXISTING
+                ? onBehalfOfUser.userId
+                : null,
+              onBehalfOfUser.mode === USER_SELECTOR_MODE.NEW
+                ? onBehalfOfUser.email
+                : "",
+              onBehalfOfUser.mode === USER_SELECTOR_MODE.NEW
+                ? onBehalfOfUser.firstName
+                : "",
+              onBehalfOfUser.mode === USER_SELECTOR_MODE.NEW
+                ? onBehalfOfUser.lastName
+                : "",
               onBehalfOfBillingGroup,
               onBehalfOfBillingGroupId
             );
@@ -225,10 +195,6 @@ export const useJobs = (shopId) => {
     const [dueDate, setDueDate] = useState("");
     const [loading, setLoading] = useState(false);
     const [onBehalfOf] = useState(false);
-    const [onBehalfOfUserId] = useState(null);
-    const [onBehalfOfUserEmail] = useState("");
-    const [onBehalfOfUserFirstName] = useState("");
-    const [onBehalfOfUserLastName] = useState("");
     const [onBehalfOfBillingGroup] = useState(false);
     const [onBehalfOfBillingGroupId] = useState(null);
 
@@ -275,10 +241,10 @@ export const useJobs = (shopId) => {
                   description,
                   dueDate,
                   onBehalfOf,
-                  onBehalfOfUserId,
-                  onBehalfOfUserEmail,
-                  onBehalfOfUserFirstName,
-                  onBehalfOfUserLastName,
+                  null,
+                  "",
+                  "",
+                  "",
                   onBehalfOfBillingGroup,
                   onBehalfOfBillingGroupId
                 );

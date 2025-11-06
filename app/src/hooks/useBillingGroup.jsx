@@ -70,16 +70,32 @@ export const useBillingGroup = (shopId, billingGroupId) => {
     }
   };
 
-  const addUserToGroup = async (userId, role) => {
+  const addUserToGroup = async (userSelection, role) => {
     setOpLoading(true);
     try {
-      const r = await authFetch(
-        `/api/shop/${shopId}/groups/${billingGroupId}/users/${userId}`,
-        {
-          method: "POST",
-          body: JSON.stringify({ role }),
+      if (!userSelection) {
+        throw new Error("No user selection provided");
+      }
+
+      let endpoint = `/api/shop/${shopId}/groups/${billingGroupId}/users`;
+      let payload = { role };
+      if (userSelection.mode === "existing") {
+        if (!userSelection.userId) {
+          throw new Error("A user must be selected");
         }
-      );
+        endpoint = `${endpoint}/${userSelection.userId}`;
+      } else {
+        payload.newUser = {
+          email: userSelection.email,
+          firstName: userSelection.firstName,
+          lastName: userSelection.lastName,
+        };
+      }
+
+      const r = await authFetch(endpoint, {
+        method: "POST",
+        body: JSON.stringify(payload),
+      });
       const res = await r.json();
       if (res.success) {
         toast.success("User added to billing group");

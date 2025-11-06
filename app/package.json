@@ -85,6 +85,7 @@
     "#header": "./src/components/header/Header",
     "#confirm": "tabler-react-2/dist/modal/confirm",
     "#shopUserPicker": "./src/components/shopUserPicker/ShopUserPicker",
+    "#userSelectorCard": "./src/components/userSelectorCard/UserSelectorCard",
     "#flatten": "./src/util/flatten",
     "#hooks": "./src/hooks",
     "#constants": "./src/util/constants",
