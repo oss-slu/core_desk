@@ -19,6 +19,7 @@ export const post = [
         where: {
           id: groupId,
           shopId,
+          active: true,
           users: {
             some: {
               userId,

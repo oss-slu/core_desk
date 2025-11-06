@@ -5,8 +5,8 @@ import { z } from "zod";
 
 const billingGroupSchema = z.object({
   title: z.string().min(1, "Title is Required"),
-  description: z.string().optional(),
-  membersCanCreateJobs: z.boolean().optional()
+  description: z.string().optional().nullable(),
+  membersCanCreateJobs: z.boolean().optional().default(false),
 });
 
 export const put = [
@@ -45,8 +45,14 @@ export const put = [
       const originalGroup = await prisma.billingGroup.findFirst({
         where: {
           id: groupId,
+          shopId,
+          active: true,
         },
       });
+
+      if (!originalGroup) {
+        return res.status(404).send({ error: "Group not found" });
+      }
 
       const validationResult = billingGroupSchema.safeParse(req.body);
       if (!validationResult.success) {
@@ -66,7 +72,7 @@ export const put = [
           title: validatedData.title,
           description: validatedData.description,
           membersCanCreateJobs: validatedData.membersCanCreateJobs,
-        }
+        },
       });
 
       await prisma.logs.create({
@@ -125,6 +131,7 @@ export const get = [
         where: {
           id: groupId,
           shopId,
+          active: true,
           users: userIsPrivileged
             ? undefined
             : {
@@ -181,6 +188,10 @@ export const get = [
           },
         },
       });
+
+      if (!group) {
+        return res.status(404).send({ error: "Group not found" });
+      }
 
       if (group.jobs) {
         group.jobs = group.jobs.map((job) => {
@@ -248,6 +259,108 @@ export const get = [
           userHasPermissionToCreateJobsOnBillingGroup,
         },
       });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send({ error: "Internal server error" });
+    }
+  },
+];
+
+export const del = [
+  verifyAuth,
+  async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const { shopId, groupId } = req.params;
+
+      if (!shopId) {
+        return res.status(400).send({ error: "Shop ID is required" });
+      }
+
+      if (!groupId) {
+        return res.status(400).send({ error: "Group ID is required" });
+      }
+
+      const userShop = await prisma.userShop.findFirst({
+        where: {
+          userId,
+          shopId,
+          active: true,
+        },
+      });
+
+      if (!userShop) {
+        return res.status(400).send({ error: "Forbidden" });
+      }
+
+      const userIsPrivileged =
+        req.user.admin ||
+        userShop.accountType === "ADMIN" ||
+        userShop.accountType === "OPERATOR" ||
+        userShop.accountType === "GROUP_ADMIN";
+
+      if (!userIsPrivileged) {
+        return res.status(400).send({ error: "Forbidden" });
+      }
+
+      const group = await prisma.billingGroup.findFirst({
+        where: {
+          id: groupId,
+          shopId,
+          active: true,
+        },
+        include: {
+          invitationLinks: true,
+          users: true,
+        },
+      });
+
+      if (!group) {
+        return res.status(404).send({ error: "Group not found" });
+      }
+
+      await prisma.$transaction(async (tx) => {
+        await tx.billingGroupInvitationLink.updateMany({
+          where: {
+            billingGroupId: groupId,
+            active: true,
+          },
+          data: {
+            active: false,
+          },
+        });
+
+        await tx.userBillingGroup.updateMany({
+          where: {
+            billingGroupId: groupId,
+            active: true,
+          },
+          data: {
+            active: false,
+          },
+        });
+
+        await tx.billingGroup.update({
+          where: {
+            id: groupId,
+          },
+          data: {
+            active: false,
+          },
+        });
+
+        await tx.logs.create({
+          data: {
+            userId,
+            shopId,
+            billingGroupId: groupId,
+            type: LogType.BILLING_GROUP_DELETED,
+            from: JSON.stringify({ group }),
+          },
+        });
+      });
+
+      res.json({ success: true });
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: "Internal server error" });

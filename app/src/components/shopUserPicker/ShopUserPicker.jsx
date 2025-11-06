@@ -12,31 +12,29 @@ export const ShopUserPicker = ({ value, onChange, includeNone }) => {
 
   return (
     <>
-    <Sentry.ErrorBoundary
-      fallback={({ error }) => (
-        <ErrorBoundaries
-          error={error}
+      <Sentry.ErrorBoundary
+        fallback={({ error }) => <ErrorBoundaries error={error} />}
+      >
+        <LoadableDropdownInput
+          loading={loading || authLoading}
+          prompt={"Select a user"}
+          showLabel={false}
+          value={value}
+          onChange={(v) => onChange(v.id)}
+          values={[
+            includeNone
+              ? { id: null, label: "Select a user", dropdownText: "None" }
+              : null,
+            ...users.map((user) => ({
+              id: user.id,
+              label: `${user.name}${
+                user.id === activeUser?.id ? " (You)" : ""
+              }`,
+              searchIndex: user.email,
+            })),
+          ].filter((v) => v)}
         />
-      )}
-    >
-  
-    <LoadableDropdownInput
-      loading={loading || authLoading}
-      prompt={"Select a user"}
-      showLabel={false}
-      value={value}
-      onChange={(v) => onChange(v.id)}
-      values={[
-        includeNone
-          ? { id: null, label: "Select a user", dropdownText: "None" }
-          : null,
-        ...users.map((user) => ({
-          id: user.id,
-          label: `${user.name}${user.id === activeUser?.id ? " (You)" : ""}`,
-        })),
-      ].filter((v) => v)}
-    />
-    </Sentry.ErrorBoundary>
-  </>
+      </Sentry.ErrorBoundary>
+    </>
   );
 };

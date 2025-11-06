@@ -90,6 +90,7 @@ export const post = [
       const groups = await prisma.billingGroup.findMany({
         where: {
           shopId,
+          active: true,
           users: userIsPrivileged
             ? undefined
             : {
@@ -179,6 +180,7 @@ export const get = [
       const groups = await prisma.billingGroup.findMany({
         where: {
           shopId,
+          active: true,
           users: userIsPrivileged
             ? undefined
             : {

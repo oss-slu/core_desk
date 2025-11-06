@@ -72,6 +72,7 @@ export const post = [
       const group = await prisma.billingGroup.findFirst({
         where: {
           id: invite.groupId,
+          active: true,
         },
       });
 

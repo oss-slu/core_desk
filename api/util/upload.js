@@ -111,6 +111,7 @@ export const handleUpload = async (data) => {
       where: {
         id: groupId,
         shopId,
+        active: true,
       },
     });
 
