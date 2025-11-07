@@ -14,6 +14,7 @@ import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";
 import { createProxyMiddleware } from "http-proxy-middleware";
 // import client from "#postmark";
+import { Sentry, sentryEnabled } from "./util/sentry.js";
 
 // Define __dirname for ES modules
 import { createUser } from "./util/createUser.js"; //import the createUser function
@@ -21,6 +22,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+if (sentryEnabled) {
+  app.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.tracingHandler());
+}
 let server;
 
 app.get("/digitalocean-health-check", (_, res) => res.send("OK"));
@@ -365,6 +371,31 @@ if (process.env.JACK == "true") {
   // Error Route
   app.get("/error", (req, res) => {
     res.send("Login Failed");
+  });
+
+  if (sentryEnabled) {
+    app.use(Sentry.Handlers.errorHandler());
+  }
+
+  app.use((err, req, res, next) => {
+    if (res.headersSent) {
+      return next(err);
+    }
+
+    const statusCode = err.status || err.statusCode || 500;
+    const responseBody = {
+      message:
+        process.env.NODE_ENV === "production"
+          ? "Internal Server Error"
+          : err.message || "Internal Server Error",
+    };
+
+    if (sentryEnabled && res.sentry) {
+      responseBody.errorId = res.sentry;
+    }
+
+    console.error(err);
+    res.status(statusCode).json(responseBody);
   });
 
   // Server Setup
