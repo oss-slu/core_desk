@@ -13,12 +13,15 @@ import styles from "./SchedulePage.module.css";
 
 const { H1 } = Typography;
 
-const generateTimeSlots = (startHour = 6, endHour = 22) => {
+const generateTimeSlots = (startHour = 6, endHour = 24, incrementMinutes = 30) => {
   const slots = [];
   for (let h = startHour; h < endHour; h++) {
-    const hour12 = h % 12 === 0 ? 12 : h % 12;
-    const ampm = h < 12 ? "AM" : "PM";
-    slots.push(`${hour12}:00 ${ampm}`, `${hour12}:30 ${ampm}`);
+    for (let m = 0; m < 60; m += incrementMinutes) {
+      const hour12 = h % 12 === 0 ? 12 : h % 12;
+      const ampm = h < 12 ? "AM" : "PM";
+      const minutes = m.toString().padStart(2, "0");
+      slots.push(`${hour12}:${minutes} ${ampm}`);
+    }
   }
   return slots;
 };
@@ -38,9 +41,10 @@ const localToUtcIso = (localStr) => {
   return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString();
 };
 
-const timeToSlotIndex = (isoStr) => {
+const timeToSlotIndex = (isoStr, incrementMinutes) => {
   const d = new Date(isoStr);
-  return d.getHours() * 2 + (d.getMinutes() >= 30 ? 1 : 0);
+  const totalMinutes = d.getHours() * 60 + d.getMinutes();
+  return Math.floor(totalMinutes / incrementMinutes);
 };
 
 const AppointmentForm = ({ mode, appointment, onSave, onDelete }) => {
@@ -111,6 +115,9 @@ export const SchedulePage = () => {
   } = useAppointments(shopId);
   const { resources, loading: resourcesLoading, error: resourcesError } = useResources(shopId);
 
+  const [incrementMinutes, setIncrementMinutes] = React.useState(30);
+  const [columnWidth, setColumnWidth] = React.useState(80);
+
   const { modal: openCreateModal, ModalElement: CreateModal } = useModal({
     title: "Create Appointment",
     text: (
@@ -138,23 +145,45 @@ export const SchedulePage = () => {
       </Page>
     );
 
-  const timeSlots = generateTimeSlots();
+  const timeSlots = generateTimeSlots(6, 24, incrementMinutes);
+
+  const presetIncrements = [
+    { label: "15 min", value: 15, width: 60 },
+    { label: "30 min", value: 30, width: 80 },
+    { label: "1 hour", value: 60, width: 100 },
+    { label: "2 hours", value: 120, width: 120 },
+  ];
 
   return (
     <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
       <Util.Col gap={3}>
         <div className={styles.headerRow}>
           <H1>Resource Availability</H1>
-          <Button onClick={() => openCreateModal()}>
-            Create Appointment
-          </Button>
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <span style={{ fontSize: 20, fontWeight: 500, marginRight: 5}}>View:</span>
+              {presetIncrements.map((preset) => (
+                <Button
+                  key={preset.value}
+                  color={incrementMinutes === preset.value ? "primary" : ""}
+                  onClick={() => {
+                    setIncrementMinutes(preset.value);
+                    setColumnWidth(preset.width);
+                  }}
+                >
+                  {preset.label}
+                </Button>
+              ))}
+            </div>
+            <Button onClick={() => openCreateModal()}>Create Appointment</Button>
+          </div>
         </div>
 
         <div className={styles.gridWrapper}>
           <div
             className={styles.calendarGrid}
             style={{
-              "--grid-cols": `140px repeat(${timeSlots.length}, 80px)`,
+              "--grid-cols": `140px repeat(${timeSlots.length}, ${columnWidth}px)`,
               "--grid-rows": `40px repeat(${resources.length}, 40px)`,
             }}
           >
@@ -183,8 +212,8 @@ export const SchedulePage = () => {
                 const rowIdx = resources.findIndex((r) => r.id === evt.resource.id);
                 if (rowIdx === -1) return null;
 
-                const startCol = timeToSlotIndex(evt.startTime) + 2;
-                const endCol = timeToSlotIndex(evt.endTime) + 2;
+                const startCol = timeToSlotIndex(evt.startTime, incrementMinutes) + 2;
+                const endCol = timeToSlotIndex(evt.endTime, incrementMinutes) + 2;
 
                 return (
                   <div
