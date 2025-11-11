@@ -523,7 +523,7 @@ export const Jobs = () => {
                   accessor: "user.name",
                   render: (name, context) => (
                     <Util.Row gap={0.5} align="center">
-                      <Avatar size="sm" dicebear initials={context.user.id} />
+                      {/* <Avatar size="sm" dicebear initials={context.user.id} /> */}
                       <Util.Col align="start">
                         {name}
                         {context.user.id === activeUser?.id && (
