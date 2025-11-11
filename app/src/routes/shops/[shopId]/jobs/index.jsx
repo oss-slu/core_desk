@@ -4,7 +4,7 @@ import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
 import { shopSidenavItems } from "../../[shopId]/index";
 import { useAuth } from "#useAuth";
-import { Typography, Util, Input, Badge, Avatar, DropdownInput } from "tabler-react-2";
+import { Typography, Util, Input, Badge, Avatar, Dropdown, DropdownInput } from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { useUser } from "../../../../hooks/useUser";
@@ -400,6 +400,31 @@ export const Jobs = () => {
               appendedLinkOnClick={() => setEndDateFilter(null)}
             />
           </Util.Row>
+        </Util.Col>
+        <Util.Col gap={0}>
+          <h4>Columns</h4>
+          <Dropdown
+            prompt="Select Columns"
+            items={columnsOptions.map((id) => ({text:
+              <div
+                key={id}
+                soft={!columnsToShow.includes(id)}
+                onClick={() => handleColumnToggle(id)}
+              >
+                <Util.Row justify="between" gap={0.5}>
+                  {columnsToShow.includes(id) ? (
+                    <Icon i="square-check" />
+                  ) : (
+                    <Icon i="square" />
+                  )}
+                  {id}
+                </Util.Row>
+              </div>}))}
+            // onClick={(id) => handleColumnToggle(id)}
+            showSearch={false}
+            multiple={true}
+            selectedItems={columnsToShow.map((id) => ({ text: id, label: id }))}
+          />
         </Util.Col>
         {/* <Util.Col gap={0}>
           <H4>Columns</H4>
