@@ -24,16 +24,16 @@ export const PieProgressChart = ({
         backgroundImage: `radial-gradient(
           circle at 50% 50%,
           rgba(241,245,249,1) 0%,
-          rgba(241,245,249,1) 50%,
-          rgba(255,255,255,0) 50%
+          rgba(241,245,249,1) 40%,
+          rgba(255,255,255,0) 40%
         ), conic-gradient(
           var(--tblr-success) 0% ${hardStopComplete}%,
           var(--tblr-yellow) ${hardStopComplete}% ${hardStopInProgress}%,
           var(--tblr-danger) ${hardStopInProgress}% ${hardStopNotStarted}%,
           var(--tblr-gray-400) ${hardStopNotStarted}% ${hardStopExclude}%
         )`,
-        width: 24,
-        height: 24,
+        width: 35,
+        height: 35,
         borderRadius: "50%",
         flexShrink: 0,
       }}
