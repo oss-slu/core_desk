@@ -34,8 +34,8 @@ export const get = [
             take: 1,
           },
         },
-        take: req.query.limit ? parseInt(req.query.limit) : 20,
-        skip: req.query.offset ? parseInt(req.query.offset) : 0,
+        // take: req.query.limit ? parseInt(req.query.limit) : 20,
+        // skip: req.query.offset ? parseInt(req.query.offset) : 0,
       });
 
       fs.writeFileSync("users.json", JSON.stringify(users));

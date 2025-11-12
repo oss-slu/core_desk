@@ -74,6 +74,7 @@ export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
+  const navigate = useNavigate();
 
   const {
     billingGroup,
@@ -82,6 +83,7 @@ export const BillingGroupPage = () => {
     updateBillingGroup,
     refetch: refetchBillingGroup,
     removeUserFromGroup,
+    deleteBillingGroup,
   } = useBillingGroup(shopId, groupId);
 
   const {
@@ -159,13 +161,18 @@ export const BillingGroupPage = () => {
           >
             Portal
           </Button>
-          {userIsPrivileged && (
-            <>
-              {!editing && (
-                <Button onClick={() => setEditing(true)}>Edit</Button>
-              )}
-            </>
-          )}
+          {userIsPrivileged &&
+            (editing ? (
+              <Button
+                variant="secondary"
+                outline
+                onClick={() => setEditing(false)}
+              >
+                Cancel
+              </Button>
+            ) : (
+              <Button onClick={() => setEditing(true)}>Edit</Button>
+            ))}
         </Util.Row>
       </Util.Row>
       {billingGroup.adminUsers?.length == 0 &&
@@ -185,6 +192,18 @@ export const BillingGroupPage = () => {
             onFinish={async () => {
               await refetchBillingGroup(false);
               setEditing(false);
+            }}
+            onDelete={async () => {
+              if (
+                window.confirm(
+                  "Are you sure you want to delete this billing group?"
+                )
+              ) {
+                const success = await deleteBillingGroup();
+                if (success) {
+                  navigate(`/shops/${shopId}/billing-groups`);
+                }
+              }
             }}
             // updateBillingGroup={console.log}
           />
@@ -207,7 +226,7 @@ export const BillingGroupPage = () => {
             </Util.Row>
           </Util.Row>
           <Util.Spacer size={1} />
-          {billingGroupInvitations.length === 0 ? (
+          {billingGroupInvitations?.length === 0 ? (
             <i>
               You do not have any invitation links.{" "}
               <Link onClick={modal}>You can create one here.</Link>
@@ -284,7 +303,7 @@ export const BillingGroupPage = () => {
                   ),
                 },
               ]}
-              data={billingGroupInvitations}
+              data={billingGroupInvitations || []}
             />
           )}
           <Util.Spacer size={2} />
@@ -346,7 +365,7 @@ export const BillingGroupPage = () => {
                   ),
               },
             ]}
-            data={billingGroup.users}
+            data={billingGroup.users || []}
           />
           <Util.Spacer size={2} />
           <h2>Jobs</h2>
@@ -409,7 +428,7 @@ export const BillingGroupPage = () => {
                   ),
                 },
               ]}
-              data={billingGroup.jobs}
+              data={billingGroup.jobs || []}
             />
           )}
           <Util.Spacer size={2} />

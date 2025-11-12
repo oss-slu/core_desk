@@ -10,6 +10,7 @@ export const EditBillingGroup = ({
   opLoading,
   updateBillingGroup,
   onFinish,
+  onDelete,
 }) => {
   const [newBillingGroup, setNewBillingGroup] = useState(flatten(billingGroup));
   useEffect(() => {
@@ -45,16 +46,28 @@ export const EditBillingGroup = ({
       />
       <JobsTable />
       <Util.Spacer size={2} />
-      <Button
-        onClick={async () => {
-          await updateBillingGroup(newBillingGroup);
-          onFinish();
-        }}
-        loading={opLoading}
-        variant="primary"
-      >
-        Update Billing Group
-      </Button>
+      <Util.Row gap={1}>
+        <Button
+          onClick={async () => {
+            await updateBillingGroup(newBillingGroup);
+            onFinish();
+          }}
+          loading={opLoading}
+          variant="primary"
+        >
+          Update Billing Group
+        </Button>
+        {onDelete && (
+          <Button
+            variant="danger"
+            outline
+            loading={opLoading}
+            onClick={onDelete}
+          >
+            Delete Billing Group
+          </Button>
+        )}
+      </Util.Row>
     </>
   );
 };

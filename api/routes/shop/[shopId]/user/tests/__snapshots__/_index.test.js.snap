@@ -2,6 +2,7 @@
 
 exports[`/shop/[shopId]/user > GET > returns a list of users for global admins 1`] = `
 {
+  "email": "test@email.com",
   "firstName": "TestFirstName",
   "id": Any<String>,
   "lastName": "TestLastName",
@@ -11,6 +12,7 @@ exports[`/shop/[shopId]/user > GET > returns a list of users for global admins 1
 
 exports[`/shop/[shopId]/user > GET > returns a list of users for group admins 1`] = `
 {
+  "email": "test@email.com",
   "firstName": "TestFirstName",
   "id": Any<String>,
   "lastName": "TestLastName",
@@ -20,6 +22,7 @@ exports[`/shop/[shopId]/user > GET > returns a list of users for group admins 1`
 
 exports[`/shop/[shopId]/user > GET > returns a list of users for operators 1`] = `
 {
+  "email": "test@email.com",
   "firstName": "TestFirstName",
   "id": Any<String>,
   "lastName": "TestLastName",
@@ -29,6 +32,7 @@ exports[`/shop/[shopId]/user > GET > returns a list of users for operators 1`] =
 
 exports[`/shop/[shopId]/user > GET > returns a list of users for shop-level admins 1`] = `
 {
+  "email": "test@email.com",
   "firstName": "TestFirstName",
   "id": Any<String>,
   "lastName": "TestLastName",

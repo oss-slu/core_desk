@@ -39,6 +39,7 @@ export const get = [
             firstName: true,
             lastName: true,
             id: true,
+            email: true,
           },
         },
       },

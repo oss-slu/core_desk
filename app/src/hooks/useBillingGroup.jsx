@@ -94,6 +94,29 @@ export const useBillingGroup = (shopId, billingGroupId) => {
     }
   };
 
+  const deleteBillingGroup = async () => {
+    setOpLoading(true);
+    try {
+      const r = await authFetch(
+        `/api/shop/${shopId}/groups/${billingGroupId}`,
+        { method: "DELETE" }
+      );
+      const res = await r.json();
+      if (res.success) {
+        toast.success("Billing group deleted");
+        return true;
+      }
+      toast.error(res.error || "Failed to delete billing group");
+      return false;
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to delete billing group");
+      return false;
+    } finally {
+      setOpLoading(false);
+    }
+  };
+
   return {
     billingGroup,
     loading: isLoading,
@@ -102,6 +125,7 @@ export const useBillingGroup = (shopId, billingGroupId) => {
     updateBillingGroup,
     removeUserFromGroup,
     addUserToGroup,
+    deleteBillingGroup,
     opLoading,
   };
 };
