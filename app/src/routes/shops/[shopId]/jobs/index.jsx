@@ -359,7 +359,7 @@ export const Jobs = () => {
   // );
 
   const NEWFilters = () => (
-    <Util.Row justify="between" align="start">
+    <Util.Row justify="between" align="start" style={{ backgroundColor: "#D6D9DD" }}>
       <Util.Row gap={1}>
         <Util.Col gap={0}>
           <H4>Status</H4>
@@ -419,56 +419,29 @@ export const Jobs = () => {
                   {id}
                 </Util.Row>
               </div>}))}
-            // onClick={(id) => handleColumnToggle(id)}
             showSearch={false}
             multiple={true}
             selectedItems={columnsToShow.map((id) => ({ text: id, label: id }))}
           />
         </Util.Col>
-        {/* <Util.Col gap={0}>
-          <H4>Columns</H4>
-          {columnsOptions.map((id) => (
-            <Badge
-              key={id}
-              color="azure"
-              soft={!columnsToShow.includes(id)}
-              onClick={() => handleColumnToggle(id)}
-            >
-              <Util.Row justify="between" gap={0.5}>
-                {columnsToShow.includes(id) ? (
-                  <Icon i="square-check" />
-                ) : (
-                  <Icon i="square" />
-                )}
-                {id}
-              </Util.Row>
-            </Badge>
-          ))}
-        </Util.Col> */}
-        {/* <Util.Col>
-          <>
-            <H4>Finalized</H4>
-            <Util.Col gap={0.5}>
-              {finalizedOptions.map(({ id, label, color }) => (
-                <Badge
+        <Util.Col>
+          <H4>Finalized</H4>
+          <Util.Col gap={0.5}>
+            <Dropdown
+              prompt="Select Columns"
+              items={finalizedOptions.map(({ id, label, color }) => ({text:
+                <div
                   key={id}
-                  color={color}
-                  soft={!finalizedFilter.includes(id)}
                   onClick={() => handleFinalizedToggle(id)}
                 >
-                  <Util.Row justify="between" gap={0.5}>
-                    {finalizedFilter.includes(id) ? (
-                      <Icon i="square-check" />
-                    ) : (
-                      <Icon i="square" />
-                    )}
-                    {label}
-                  </Util.Row>
-                </Badge>
-              ))}
-            </Util.Col>
-          </>
-        </Util.Col> */}
+                {label}
+                </div>
+              }))}
+              showSearch={false}
+              // selectedItems={finalizedOptions.map((id) => ({ text: id, label: id }))}
+            />
+          </Util.Col>
+        </Util.Col>
       </Util.Row>
     </Util.Row>
   );
@@ -691,8 +664,7 @@ export const Jobs = () => {
                 {
                   label: "Due Date",
                   accessor: "dueDate",
-                  // render: (d, context) => (
-                  render: (d) => (
+                  render: (d, context) => (
                     <>
                       {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()}){" "}
                       {/* Overdue warning */}
