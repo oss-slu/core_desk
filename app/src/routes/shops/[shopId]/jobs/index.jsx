@@ -359,7 +359,7 @@ export const Jobs = () => {
   // );
 
   const NEWFilters = () => (
-    <Util.Row justify="between" align="start" style={{ backgroundColor: "#D6D9DD" }}>
+    <Util.Row justify="between" align="start">
       <Util.Row gap={1}>
         <Util.Col gap={0}>
           <H4>Status</H4>
@@ -465,7 +465,7 @@ export const Jobs = () => {
         </Util.Row>
         <Util.Spacer size={1} />
 
-        <div style={{ padding: 16, border: "1px solid rgb(218 223 228)" }}>
+        <div style={{ padding: 16, borderBottom: "1px solid rgb(218 223 228)", backgroundColor: "#F8FAFC" }}>
           <H3>Filters</H3>
           <NEWFilters />
         </div>
