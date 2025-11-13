@@ -363,7 +363,21 @@ export const Jobs = () => {
       <Util.Row gap={1}>
         <Util.Col gap={0}>
           <H4>Status</H4>
-          <DropdownInput prompt="Select Status" items={statusOptions.map(({ id, label }) => ({ id, label }))} onChange={(id) => handleStatusToggle(id)} showSearch={false}/>
+          <Dropdown prompt="Select Status" items={statusOptions.map(({id, label}) => ({text:
+              <div
+                key={id}
+                onClick={() => handleStatusToggle(id)}
+              >
+                <Util.Row justify="between" gap={0.5}>
+                    {statusFilter.includes(id) ? (
+                    <Icon i="square-check" />
+                  ) : (
+                    <Icon i="square" />
+                  )}
+                  {label}
+                </Util.Row>
+              </div>}))}
+            showSearch={false}/>
         </Util.Col>
         {(activeUser?.admin ||
             userShop.accountType === "ADMIN" ||
