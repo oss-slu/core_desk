@@ -10,6 +10,7 @@ import { Avatar } from "#avatar";
 import { Icon } from "#icon";
 import { Link } from "react-router-dom";
 import moment from "moment";
+import { SearchBar } from "../../components/searchBar/SearchBar";
 
 const { H1 } = Typography;
 
@@ -19,19 +20,31 @@ export const UsersPage = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const { modal, ModalElement } = useModal({
     title: "Admin Only page",
     text: "This page is only accessible by global admins. This means that typical users, professors, or even shop managers are not able to see this page.",
   });
 
-  const paginatedUsers = useMemo(() => { //given the current page and how many rows we want perpage calculate how many users can be on the page
+  // 🔍 Filter users based on search term
+  const filteredUsers = useMemo(() => {
+    if (!searchTerm) return users;
+    return users.filter(
+      (u) =>
+        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [users, searchTerm]);
+
+  // 📄 Paginate filtered users
+  const paginatedUsers = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    return users.slice(start, end);
-  }, [users, currentPage, rowsPerPage]);
+    return filteredUsers.slice(start, end);
+  }, [filteredUsers, currentPage, rowsPerPage]);
 
-  const totalPages = Math.ceil((users?.length || 0) / rowsPerPage);
+  const totalPages = Math.ceil((filteredUsers?.length || 0) / rowsPerPage);
 
   return (
     <Page sidenavItems={sidenavItems("Users", user.admin)}>
@@ -39,6 +52,15 @@ export const UsersPage = () => {
       <Badge color="red" onClick={modal}>
         Admin Only
       </Badge>
+
+      <Util.Spacer size={2} />
+      <SearchBar
+        placeholder="Search by name or email..."
+        onSearch={(value) => {
+          setSearchTerm(value);
+          setCurrentPage(1); // Reset pagination on search
+        }}
+      />
 
       <Util.Spacer size={2} />
 
@@ -78,7 +100,8 @@ export const UsersPage = () => {
                 label: "Last login",
                 accessor: "lastLogin",
                 sortable: true,
-                render: (v) => (v ? moment(v).format("MM/DD/YY, h:mm a") : "-"),
+                render: (v) =>
+                  v ? moment(v).format("MM/DD/YY, h:mm a") : "-",
               },
               { label: "Shops", accessor: "shopCount" },
               { label: "Jobs", accessor: "jobCount" },
@@ -122,6 +145,7 @@ export const UsersPage = () => {
             data={paginatedUsers}
           />
 
+          {/* 📄 Pagination controls */}
           <Util.Row
             justify="center"
             align="center"
