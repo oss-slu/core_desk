@@ -11,6 +11,8 @@ import { Icon } from "#icon";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { SearchBar } from "../../components/searchBar/SearchBar";
+import { Button } from "tabler-react-2";
+import { DropdownInput } from "tabler-react-2";
 
 const { H1 } = Typography;
 
@@ -27,17 +29,14 @@ export const UsersPage = () => {
     text: "This page is only accessible by global admins. This means that typical users, professors, or even shop managers are not able to see this page.",
   });
 
-  // 🔍 Filter users based on search term
   const filteredUsers = useMemo(() => {
     if (!searchTerm) return users;
     return users.filter(
       (u) =>
-        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
+        JSON.stringify(u).toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [users, searchTerm]);
 
-  // 📄 Paginate filtered users
   const paginatedUsers = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
@@ -55,10 +54,9 @@ export const UsersPage = () => {
 
       <Util.Spacer size={2} />
       <SearchBar
-        placeholder="Search by name or email..."
         onSearch={(value) => {
           setSearchTerm(value);
-          setCurrentPage(1); // Reset pagination on search
+          setCurrentPage(1); 
         }}
       />
 
@@ -145,45 +143,45 @@ export const UsersPage = () => {
             data={paginatedUsers}
           />
 
-          {/* 📄 Pagination controls */}
           <Util.Row
             justify="center"
             align="center"
             gap={1}
             style={{ marginTop: "1rem" }}
           >
-            <button
+            <Button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
             >
               Previous
-            </button>
+            </Button>
             <span>
               Page {currentPage} of {totalPages || 1}
             </span>
-            <button
+            <Button
               disabled={currentPage === totalPages || totalPages === 0}
               onClick={() =>
                 setCurrentPage((p) => Math.min(p + 1, totalPages))
               }
             >
               Next
-            </button>
-
-            <select
+            </Button>
+            <DropdownInput
               value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
+              onChange={(item) => {
+                setRowsPerPage(Number(item.id));
                 setCurrentPage(1);
               }}
+              items={[
+                { id: 10, label: "10 per page" },
+                { id: 25, label: "25 per page" },
+                { id: 50, label: "50 per page" },
+                { id: 100, label: "100 per page" },
+              ]}
+              prompt="Rows per page"
+              showSearch={false}            
               style={{ marginLeft: "1rem" }}
-            >
-              {[10, 25, 50, 100].map((n) => (
-                <option key={n} value={n}>
-                  {n} per page
-                </option>
-              ))}
-            </select>
+            />
           </Util.Row>
         </>
       )}
