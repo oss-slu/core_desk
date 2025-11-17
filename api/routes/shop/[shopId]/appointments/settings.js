@@ -37,13 +37,15 @@ export const put = [
     try {
       const { shopId } = req.params;
       const userId = req.user.id;
-      const { calendarStartHour, calendarEndHour, calendarIncrement } = req.body;
+      const { calendarStartHour, 
+              calendarEndHour, 
+              calendarIncrement
+            } = req.body;
 
       const userShop = await prisma.userShop.findFirst({
         where: { userId, shopId, active: true },
       });
 
-      // Only ADMIN and OPERATOR can modify settings
       if (
         !req.user.admin &&
         !["ADMIN", "OPERATOR"].includes(userShop?.accountType)
