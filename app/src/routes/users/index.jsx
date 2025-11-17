@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Page, sidenavItems } from "#page";
 import { useAuth } from "#useAuth";
-import { Typography, Util, Badge } from "tabler-react-2";
+import { Typography, Util, Badge, Button, DropdownInput } from "tabler-react-2";
 import { useModal } from "#modal";
 import { Table } from "#table";
 import { useUsers } from "../../hooks/useUsers";
@@ -11,8 +11,6 @@ import { Icon } from "#icon";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { SearchBar } from "../../components/searchBar/SearchBar";
-import { Button } from "tabler-react-2";
-import { DropdownInput } from "tabler-react-2";
 
 const { H1 } = Typography;
 
@@ -23,11 +21,14 @@ export const UsersPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(50);
   const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
   const { modal, ModalElement } = useModal({
     title: "Admin Only page",
     text: "This page is only accessible by global admins. This means that typical users, professors, or even shop managers are not able to see this page.",
   });
+
+  const sidenav = useMemo(() => sidenavItems("Users", user.admin), [user.admin]);
 
   const filteredUsers = useMemo(() => {
     if (!searchTerm) return users;
@@ -37,16 +38,82 @@ export const UsersPage = () => {
     );
   }, [users, searchTerm]);
 
+  const handleSort = (key) => {
+    setSortConfig((prev) =>
+      prev.key === key
+        ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
+        : { key, direction: "asc" }
+    );
+  };
+
+  const sortedUsers = useMemo(() => {
+    if (!filteredUsers) {
+      return [];
+    }
+    if (!sortConfig.key){
+      return filteredUsers;
+    }
+
+    const sorted = [...filteredUsers].sort((a, b) => {
+      const aVal = a[sortConfig.key];
+      const bVal = b[sortConfig.key];
+
+      if (aVal == null) {
+        return 1;
+      }
+      if (bVal == null) {
+        return -1;
+      }
+
+      //dates
+      if (sortConfig.key === "lastLogin" || sortConfig.key === "createdAt") {
+        const aTime = aVal ? new Date(aVal).getTime() : 0;
+        const bTime = bVal ? new Date(bVal).getTime() : 0;
+        return sortConfig.direction === "asc" ? aTime - bTime : bTime - aTime;
+      }
+
+      //numeric comparison
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+      }
+
+      //string comparison
+      return sortConfig.direction === "asc"
+        ? String(aVal).localeCompare(String(bVal))
+        : String(bVal).localeCompare(String(aVal));
+    });
+
+    return sorted;
+  }, [filteredUsers, sortConfig]);
+
   const paginatedUsers = useMemo(() => {
     const start = (currentPage - 1) * rowsPerPage;
     const end = start + rowsPerPage;
-    return filteredUsers.slice(start, end);
-  }, [filteredUsers, currentPage, rowsPerPage]);
+    return sortedUsers.slice(start, end);
+  }, [sortedUsers, currentPage, rowsPerPage]);
 
   const totalPages = Math.ceil((filteredUsers?.length || 0) / rowsPerPage);
 
+  const renderSortableHeader = (label, key) => (
+    <span
+      onClick={() => handleSort(key)}
+      style={{ cursor: "pointer", userSelect: "none" }}
+    >
+      {label}{" "}
+      {sortConfig.key === key ? (
+        sortConfig.direction === "asc" ? (
+          <span>▲</span>
+        ) : (
+          <span>▼</span>
+        )
+      ) : (
+        ""
+      )}
+    </span>
+  );
+
   return (
-    <Page sidenavItems={sidenavItems("Users", user.admin)}>
+    <Page sidenavItems={sidenav}>
       <H1>Users</H1>
       <Badge color="red" onClick={modal}>
         Admin Only
@@ -56,7 +123,7 @@ export const UsersPage = () => {
       <SearchBar
         onSearch={(value) => {
           setSearchTerm(value);
-          setCurrentPage(1); 
+          setCurrentPage(1);
         }}
       />
 
@@ -74,7 +141,7 @@ export const UsersPage = () => {
                 render: (id) => <Avatar size="xs" dicebear initials={id} />,
               },
               {
-                label: "Name",
+                label: renderSortableHeader("Name", "name"),
                 accessor: "name",
                 render: (name, context) => (
                   <>
@@ -91,44 +158,29 @@ export const UsersPage = () => {
                     )}
                   </>
                 ),
-                sortable: true,
               },
-              { label: "Email", accessor: "email", sortable: true },
               {
-                label: "Last login",
+                label: renderSortableHeader("Email", "email"),
+                accessor: "email",
+              },
+              {
+                label: renderSortableHeader("Last Login", "lastLogin"),
                 accessor: "lastLogin",
-                sortable: true,
                 render: (v) =>
                   v ? moment(v).format("MM/DD/YY, h:mm a") : "-",
               },
-              { label: "Shops", accessor: "shopCount" },
-              { label: "Jobs", accessor: "jobCount" },
               {
-                label: "Flags",
-                accessor: "admin",
-                render: (v, context) =>
-                  v ? (
-                    <Util.Row gap={0.5} wrap>
-                      {context.admin && (
-                        <Badge color="green" soft>
-                          Admin
-                        </Badge>
-                      )}
-                      {context.suspended && (
-                        <Badge color="red" soft>
-                          Suspended
-                        </Badge>
-                      )}
-                    </Util.Row>
-                  ) : (
-                    "No"
-                  ),
+                label: renderSortableHeader("Shops", "shopCount"),
+                accessor: "shopCount",
               },
               {
-                label: "Created at",
+                label: renderSortableHeader("Jobs", "jobCount"),
+                accessor: "jobCount",
+              },
+              {
+                label: renderSortableHeader("Created At", "createdAt"),
                 accessor: "createdAt",
                 render: (v) => moment(v).format("MM/DD/YY, h:mm a"),
-                sortable: true,
               },
               {
                 label: "Actions",
@@ -166,6 +218,7 @@ export const UsersPage = () => {
             >
               Next
             </Button>
+
             <DropdownInput
               value={rowsPerPage}
               onChange={(item) => {
@@ -179,7 +232,7 @@ export const UsersPage = () => {
                 { id: 100, label: "100 per page" },
               ]}
               prompt="Rows per page"
-              showSearch={false}            
+              showSearch={false}
               style={{ marginLeft: "1rem" }}
             />
           </Util.Row>
