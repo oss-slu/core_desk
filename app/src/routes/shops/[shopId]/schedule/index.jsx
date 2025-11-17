@@ -1,11 +1,12 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import { Page } from "#page";
-import { Typography, Util, Input, Button } from "tabler-react-2";
+import { Typography, Util, Input, Button, SegmentedControl } from "tabler-react-2";
 import { useAuth } from "#useAuth";
 import { sidenavItems } from "#page";
 import { useAppointments } from "#useAppointments";
 import { useResources } from "#useResources";
+import { useCalendarSettings } from "#useCalendarSettings";
 import { ResourcePicker } from "#resourcePicker";
 import { useModal } from "#modal";
 import toast from "react-hot-toast";
@@ -15,14 +16,19 @@ const { H1 } = Typography;
 
 const generateTimeSlots = (startHour = 6, endHour = 24, incrementMinutes = 30) => {
   const slots = [];
-  for (let h = startHour; h < endHour; h++) {
-    for (let m = 0; m < 60; m += incrementMinutes) {
-      const hour12 = h % 12 === 0 ? 12 : h % 12;
-      const ampm = h < 12 ? "AM" : "PM";
-      const minutes = m.toString().padStart(2, "0");
-      slots.push(`${hour12}:${minutes} ${ampm}`);
-    }
+  const totalMinutes = (endHour - startHour) * 60;
+  
+  for (let minutes = 0; minutes < totalMinutes; minutes += incrementMinutes) {
+    const totalMins = startHour * 60 + minutes;
+    const h = Math.floor(totalMins / 60);
+    const m = totalMins % 60;
+    
+    const hour12 = h % 12 === 0 ? 12 : h % 12;
+    const ampm = h < 12 ? "AM" : "PM";
+    const minutesStr = m.toString().padStart(2, "0");
+    slots.push(`${hour12}:${minutesStr} ${ampm}`);
   }
+  
   return slots;
 };
 
@@ -37,14 +43,14 @@ const isoToLocalDatetime = (iso) => {
 
 const localToUtcIso = (localStr) => {
   if (!localStr) return null;
-  const d = new Date(localStr);
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString();
+  return new Date(localStr).toISOString();
 };
 
-const timeToSlotIndex = (isoStr, incrementMinutes) => {
+const timeToSlotIndex = (isoStr, incrementMinutes, startHour = 0) => {
   const d = new Date(isoStr);
   const totalMinutes = d.getHours() * 60 + d.getMinutes();
-  return Math.floor(totalMinutes / incrementMinutes);
+  const minutesFromStart = totalMinutes - (startHour * 60);
+  return Math.floor(minutesFromStart / incrementMinutes);
 };
 
 const AppointmentForm = ({ mode, appointment, onSave, onDelete }) => {
@@ -114,9 +120,73 @@ export const SchedulePage = () => {
     deleteAppointment,
   } = useAppointments(shopId);
   const { resources, loading: resourcesLoading, error: resourcesError } = useResources(shopId);
+  const { settings, loading: settingsLoading, updateSettings } = useCalendarSettings(shopId);
 
   const [incrementMinutes, setIncrementMinutes] = React.useState(30);
-  const [columnWidth, setColumnWidth] = React.useState(80);
+
+  React.useEffect(() => {
+    if (settings.calendarDefaultIncrement) {
+      setIncrementMinutes(settings.calendarDefaultIncrement);
+    }
+  }, [settings.calendarDefaultIncrement]);
+
+  const presetIncrements = [
+    { id: "15", label: "15 min", value: 15 },
+    { id: "30", label: "30 min", value: 30 },
+    { id: "60", label: "1 hour", value: 60 },
+    { id: "120", label: "2 hours", value: 120 },
+  ];
+
+  const SettingsForm = () => {
+    const [formData, setFormData] = React.useState({
+      calendarStartHour: settings.calendarStartHour || 6,
+      calendarEndHour: settings.calendarEndHour || 24,
+      calendarDefaultIncrement: settings.calendarDefaultIncrement || 30,
+    });
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+        <Input
+          type="number"
+          label="Start Hour (24-hour format)"
+          value={formData.calendarStartHour}
+          onChange={(val) => setFormData(prev => ({ ...prev, calendarStartHour: parseInt(val) || 0 }))}
+          min={0}
+          max={23}
+        />
+        <Input
+          type="number"
+          label="End Hour (24-hour format)"
+          value={formData.calendarEndHour}
+          onChange={(val) => setFormData(prev => ({ ...prev, calendarEndHour: parseInt(val) || 24 }))}
+          min={1}
+          max={24}
+        />
+        <div>
+          <label style={{ fontSize: "0.875rem", fontWeight: 500, marginBottom: "0.5rem", display: "block" }}>
+            Default Time Increment
+          </label>
+          <SegmentedControl
+            value={formData.calendarDefaultIncrement.toString()}
+            onChange={(selected) => {
+              setFormData(prev => ({ ...prev, calendarDefaultIncrement: parseInt(selected.id) }));
+            }}
+            items={presetIncrements}
+          />
+        </div>
+        <Button 
+          onClick={async () => {
+            const success = await updateSettings(formData);
+            if (success) {
+              closeSettingsModal();
+            }
+          }}
+        >
+          Save Settings
+        </Button>
+      </div>
+    );
+  };
 
   const { modal: openCreateModal, ModalElement: CreateModal } = useModal({
     title: "Create Appointment",
@@ -135,7 +205,16 @@ export const SchedulePage = () => {
     text: <div>Loading...</div>,
   });
 
-  if (authLoading || appointmentsLoading || resourcesLoading)
+  const { 
+    modal: openSettingsModal, 
+    close: closeSettingsModal, 
+    ModalElement: SettingsModal 
+  } = useModal({
+    title: "Calendar Settings",
+    text: <SettingsForm />,
+  });
+
+  if (authLoading || appointmentsLoading || resourcesLoading || settingsLoading)
     return <Page sidenavItems={sidenavItems("Shops", user?.admin)}>Loading schedule...</Page>;
 
   if (appointmentsError || resourcesError)
@@ -145,14 +224,15 @@ export const SchedulePage = () => {
       </Page>
     );
 
-  const timeSlots = generateTimeSlots(6, 24, incrementMinutes);
+  const startHour = settings.calendarStartHour || 6;
+  const endHour = settings.calendarEndHour || 24;
 
-  const presetIncrements = [
-    { label: "15 min", value: 15, width: 60 },
-    { label: "30 min", value: 30, width: 80 },
-    { label: "1 hour", value: 60, width: 100 },
-    { label: "2 hours", value: 120, width: 120 },
-  ];
+  const timeSlots = generateTimeSlots(startHour, endHour, incrementMinutes);
+
+  const cellSize = 70;
+
+  const userShop = user?.shops?.find(s => s.shopId === shopId);
+  const canEditSettings = user?.admin || userShop?.accountType === "ADMIN" || userShop?.accountType === "OPERATOR";
 
   return (
     <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
@@ -160,21 +240,24 @@ export const SchedulePage = () => {
         <div className={styles.headerRow}>
           <H1>Resource Availability</H1>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <span style={{ fontSize: 20, fontWeight: 500, marginRight: 5}}>View:</span>
-              {presetIncrements.map((preset) => (
-                <Button
-                  key={preset.value}
-                  color={incrementMinutes === preset.value ? "primary" : ""}
-                  onClick={() => {
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>View:</span>
+              <SegmentedControl
+                value={incrementMinutes.toString()}
+                onChange={(selected) => {
+                  const preset = presetIncrements.find(p => p.id === selected.id);
+                  if (preset) {
                     setIncrementMinutes(preset.value);
-                    setColumnWidth(preset.width);
-                  }}
-                >
-                  {preset.label}
-                </Button>
-              ))}
+                  }
+                }}
+                items={presetIncrements}
+              />
             </div>
+            {canEditSettings && (
+              <Button variant="outline" onClick={() => openSettingsModal()}>
+                Settings
+              </Button>
+            )}
             <Button onClick={() => openCreateModal()}>Create Appointment</Button>
           </div>
         </div>
@@ -183,8 +266,8 @@ export const SchedulePage = () => {
           <div
             className={styles.calendarGrid}
             style={{
-              "--grid-cols": `140px repeat(${timeSlots.length}, ${columnWidth}px)`,
-              "--grid-rows": `40px repeat(${resources.length}, 40px)`,
+              "--grid-cols": `140px repeat(${timeSlots.length}, ${cellSize}px)`,
+              "--grid-rows": `${cellSize}px repeat(${resources.length}, ${cellSize}px)`,
             }}
           >
             <div className={styles.headerCell} style={{ gridRow: 1, gridColumn: 1 }} />
@@ -212,8 +295,8 @@ export const SchedulePage = () => {
                 const rowIdx = resources.findIndex((r) => r.id === evt.resource.id);
                 if (rowIdx === -1) return null;
 
-                const startCol = timeToSlotIndex(evt.startTime, incrementMinutes) + 2;
-                const endCol = timeToSlotIndex(evt.endTime, incrementMinutes) + 2;
+                const startCol = timeToSlotIndex(evt.startTime, incrementMinutes, startHour) + 2;
+                const endCol = timeToSlotIndex(evt.endTime, incrementMinutes, startHour) + 2;
 
                 return (
                   <div
@@ -248,6 +331,7 @@ export const SchedulePage = () => {
 
         {CreateModal}
         {EditModal}
+        {SettingsModal}
       </Util.Col>
     </Page>
   );
