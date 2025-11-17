@@ -15,13 +15,10 @@ export const SearchBar = ({ onSearch }) => {
     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
       <Input
         label="Search by name or email"
-        placeholder = "Ex: John Pork" //lol
+        placeholder = "Ex: Edward Fesser"
         value={query}
         onChange={handleChange}
         style={{
-          padding: "0.5rem 1rem",
-          borderRadius: "8px",
-          border: "1px solid #ccc",
           width: "100%",
           maxWidth: "300px",
           fontSize: "1rem",
