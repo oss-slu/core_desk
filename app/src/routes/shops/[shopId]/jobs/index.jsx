@@ -680,16 +680,16 @@ export const Jobs = () => {
                     <>
                       {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()}){" "}
                       {/* Overdue warning */}
-                      {/* new Date(d) < new Date() &&
+                      {new Date(d) < new Date() &&
                         !(
                           new Date(d).toDateString() === new Date().toDateString()
                         ) &&
-                        !context.finalized && <Badge color="red">Overdue</Badge> */}
+                        !context.finalized && <Badge color="red">Overdue</Badge>}
                       {/* Today warning */}{" "}
-                      {/* new Date(d).toDateString() ===
+                      {new Date(d).toDateString() ===
                         new Date().toDateString() && (
                         <Badge color="yellow">Due Today</Badge>
-                      ) */}
+                      )}
                     </>
                   ),
                   sortable: true,
