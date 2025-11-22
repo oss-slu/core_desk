@@ -4,7 +4,7 @@ import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
 import { shopSidenavItems } from "../../[shopId]/index";
 import { useAuth } from "#useAuth";
-import { Typography, Util, Input, Badge, Avatar, Dropdown, SegmentedControl } from "tabler-react-2";
+import { Typography, Util, Input, Badge, Dropdown, SegmentedControl } from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { useUser } from "../../../../hooks/useUser";
@@ -248,120 +248,6 @@ export const Jobs = () => {
     );
   });
 
-  // const Filters = () => (
-  //   <Util.Row justify="between" align="start">
-  //     <Util.Row gap={1}>
-  //       <Util.Col gap={0.5}>
-  //         <H4>Status</H4>
-  //         {/* Render status filter UI here, e.g., checkboxes for each status */}
-  //         {statusOptions.map(({ id, label, color }) => (
-  //           <Badge
-  //             key={id}
-  //             color={color}
-  //             soft={!statusFilter.includes(id)}
-  //             onClick={() => handleStatusToggle(id)}
-  //           >
-  //             <Util.Row justify="between" gap={0.5}>
-  //               {statusFilter.includes(id) ? (
-  //                 <Icon i="square-check" />
-  //               ) : (
-  //                 <Icon i="square" />
-  //               )}
-  //               {label}
-  //             </Util.Row>
-  //           </Badge>
-  //         ))}
-  //         {/* {JSON.stringify(statusFilter)} */}
-  //       </Util.Col>
-  //       <Util.Col gap={0}>
-  //         <H4>Due Date Range</H4>
-  //         <Input
-  //           type="date"
-  //           onChange={(e) => setStartDateFilter(e + "T00:00:00")}
-  //           value={startDateFilter?.split("T")[0]}
-  //           icon={startDateFilter && <Icon i="x" />}
-  //           iconPos="trailing"
-  //           separated={!!startDateFilter}
-  //           appendedLinkOnClick={() => setStartDateFilter(null)}
-  //         />
-  //         <Input
-  //           type="date"
-  //           onChange={(e) => setEndDateFilter(e + "T00:00:00")}
-  //           value={endDateFilter?.split("T")[0]}
-  //           icon={endDateFilter && <Icon i="x" />}
-  //           iconPos="trailing"
-  //           separated={!!endDateFilter}
-  //           appendedLinkOnClick={() => setEndDateFilter(null)}
-  //           style={{
-  //             marginTop: -12,
-  //           }}
-  //         />
-  //         {/* Render date pickers for start and end dates */}
-  //         {/* </Util.Col>
-  //       <Util.Col gap={0}> */}
-  //         {(activeUser?.admin ||
-  //           userShop.accountType === "ADMIN" ||
-  //           userShop.accountType === "OPERATOR") && (
-  //           <>
-  //             <H4>Submitter</H4>
-  //             <ShopUserPicker
-  //               value={submitterFilter}
-  //               onChange={setSubmitterFilter}
-  //               includeNone={true}
-  //             />
-  //           </>
-  //         )}
-  //         {/* Render input for submitter name */}
-  //       </Util.Col>
-  //       <Util.Col>
-  //         <>
-  //           <H4>Finalized</H4>
-  //           <Util.Col gap={0.5}>
-  //             {finalizedOptions.map(({ id, label, color }) => (
-  //               <Badge
-  //                 key={id}
-  //                 color={color}
-  //                 soft={!finalizedFilter.includes(id)}
-  //                 onClick={() => handleFinalizedToggle(id)}
-  //               >
-  //                 <Util.Row justify="between" gap={0.5}>
-  //                   {finalizedFilter.includes(id) ? (
-  //                     <Icon i="square-check" />
-  //                   ) : (
-  //                     <Icon i="square" />
-  //                   )}
-  //                   {label}
-  //                 </Util.Row>
-  //               </Badge>
-  //             ))}
-  //           </Util.Col>
-  //         </>
-  //       </Util.Col>
-  //     </Util.Row>
-
-  //     <Util.Col gap={0.5}>
-  //       <H4>Columns</H4>
-  //       {columnsOptions.map((id) => (
-  //         <Badge
-  //           key={id}
-  //           color="azure"
-  //           soft={!columnsToShow.includes(id)}
-  //           onClick={() => handleColumnToggle(id)}
-  //         >
-  //           <Util.Row justify="between" gap={0.5}>
-  //             {columnsToShow.includes(id) ? (
-  //               <Icon i="square-check" />
-  //             ) : (
-  //               <Icon i="square" />
-  //             )}
-  //             {id}
-  //           </Util.Row>
-  //         </Badge>
-  //       ))}
-  //     </Util.Col>
-  //   </Util.Row>
-  // );
-
   const NEWFilters = () => (
     <div>
       <Util.Row justify="between" align="start">
@@ -427,7 +313,7 @@ export const Jobs = () => {
               items={columnsOptions.map((id) => ({text:
                 <div
                   key={id}
-                  onClick={(e) => {e.stopPropagation(), handleColumnToggle(id)}}
+                  onClick={() => {handleColumnToggle(id);}}
                 >
                   <Util.Row justify="between" gap={0.5}>
                     {columnsToShow.includes(id) ? (
