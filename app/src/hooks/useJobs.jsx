@@ -188,8 +188,6 @@ export const useJobs = (shopId) => {
     onBehalfOfBillingGroupId,
   ) => {
     try {
-      setOpLoading(true);
-
       const r = await authFetch(`/api/shop/${shopId}/job`, {
         method: "POST",
         body: JSON.stringify({
@@ -267,7 +265,6 @@ export const useJobs = (shopId) => {
             {title.length > 0 && dueDate.length > 0 ? (
             <Button
               variant="primary"
-              loading={loading}
               onClick={() => {
                 setLoading(true);
                 _createJob(
