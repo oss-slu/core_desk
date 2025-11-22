@@ -4,7 +4,7 @@ import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
 import { shopSidenavItems } from "../../[shopId]/index";
 import { useAuth } from "#useAuth";
-import { Typography, Util, Input, Badge, Avatar, Dropdown, DropdownInput } from "tabler-react-2";
+import { Typography, Util, Input, Badge, Avatar, Dropdown, SegmentedControl } from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { useUser } from "../../../../hooks/useUser";
@@ -113,7 +113,7 @@ export const Jobs = () => {
   const [startDateFilter, setStartDateFilter] = useState(null);
   const [endDateFilter, setEndDateFilter] = useState(null);
   const [submitterFilter, setSubmitterFilter] = useState(null);
-  const [finalizedFilter, setFinalizedFilter] = useState([]);
+  const [finalizedFilter, setFinalizedFilter] = useState("false");
 
   const statusOptions = [
     {
@@ -158,8 +158,16 @@ export const Jobs = () => {
     },
   ];
   const finalizedOptions = [
-    { id: "true", label: "Finalized", color: "green" },
-    { id: "false", label: "Not Finalized", color: "red" },
+    { id: "true", 
+      label: "Finalized", 
+      style: { borderColor: finalizedFilter === "true" ? "black" : "lightgray", 
+        borderTopLeftRadius: 4,
+        borderBottom: finalizedFilter === "true" ? "#F8FAFC" : "lightgray" } },
+    { id: "false", 
+      label: "Not Finalized", 
+      style: { borderColor: finalizedFilter === "false" ? "black" : "lightgray", 
+        borderTopRightRadius: 4,
+        borderBottom: finalizedFilter === "false" ? "#F8FAFC" : "lightgray"  } },
   ];
 
   const handleStatusToggle = (id) => {
@@ -171,11 +179,7 @@ export const Jobs = () => {
   };
 
   const handleFinalizedToggle = (id) => {
-    setFinalizedFilter(
-      finalizedFilter.includes(id)
-        ? finalizedFilter.filter((s) => s !== id)
-        : [...finalizedFilter, id]
-    );
+    setFinalizedFilter(id);
   };
 
   const columnsOptions = [
@@ -359,105 +363,99 @@ export const Jobs = () => {
   // );
 
   const NEWFilters = () => (
-    <Util.Row justify="between" align="start">
-      <Util.Row gap={1}>
-        <Util.Col gap={0}>
-          <H4>Status</H4>
-          <Dropdown prompt="Select Status" items={statusOptions.map(({id, label}) => ({text:
-              <div
-                key={id}
-                onClick={() => handleStatusToggle(id)}
-              >
-                <Util.Row justify="between" gap={0.5}>
-                    {statusFilter.includes(id) ? (
-                    <Icon i="square-check" />
-                  ) : (
-                    <Icon i="square" />
-                  )}
-                  {label}
-                </Util.Row>
-              </div>}))}
-            showSearch={false}/>
-        </Util.Col>
-        {(activeUser?.admin ||
-            userShop.accountType === "ADMIN" ||
-            userShop.accountType === "OPERATOR") && (
-            <Util.Col gap={0}>
-              <H4>Submitter</H4>
-              <ShopUserPicker
-                value={submitterFilter}
-                onChange={setSubmitterFilter}
-                includeNone={true}
-              />
-            </Util.Col>
-          )}
-        <Util.Col gap={0}>
-          <H4>Due Date Range</H4>
-          <Util.Row gap={0.5}>
-            <Input
-              type="date"
-              onChange={(e) => setStartDateFilter(e + "T00:00:00")}
-              value={startDateFilter?.split("T")[0]}
-              icon={startDateFilter && <Icon i="x" />}
-              iconPos="trailing"
-              separated={!!startDateFilter}
-              appendedLinkOnClick={() => setStartDateFilter(null)}
-            />
-            <h2> - </h2>
-            <Input
-              type="date"
-              onChange={(e) => setEndDateFilter(e + "T00:00:00")}
-              value={endDateFilter?.split("T")[0]}
-              icon={endDateFilter && <Icon i="x" />}
-              iconPos="trailing"
-              separated={!!endDateFilter}
-              appendedLinkOnClick={() => setEndDateFilter(null)}
-            />
-          </Util.Row>
-        </Util.Col>
-        <Util.Col gap={0}>
-          <h4>Columns</h4>
-          <Dropdown
-            prompt="Select Columns"
-            items={columnsOptions.map((id) => ({text:
-              <div
-                key={id}
-                onClick={() => handleColumnToggle(id)}
-              >
-                <Util.Row justify="between" gap={0.5}>
-                  {columnsToShow.includes(id) ? (
-                    <Icon i="square-check" />
-                  ) : (
-                    <Icon i="square" />
-                  )}
-                  {id}
-                </Util.Row>
-              </div>}))}
-            showSearch={false}
-            multiple={true}
-            selectedItems={columnsToShow.map((id) => ({ text: id, label: id }))}
-          />
-        </Util.Col>
-        <Util.Col>
-          <H4>Finalized</H4>
-          <Util.Col gap={0.5}>
-            <Dropdown
-              prompt="Select Columns"
-              items={finalizedOptions.map(({ id, label, color }) => ({text:
+    <div>
+      <Util.Row justify="between" align="start">
+        <Util.Row gap={1}>
+          <Util.Col gap={0}>
+            <H4>Status</H4>
+            <Dropdown prompt="Select Status" items={statusOptions.map(({id, label}) => ({text:
                 <div
                   key={id}
-                  onClick={() => handleFinalizedToggle(id)}
+                  onClick={() => handleStatusToggle(id)}
                 >
-                {label}
-                </div>
-              }))}
+                  <Util.Row justify="between" gap={0.5}>
+                      {statusFilter.includes(id) ? (
+                      <Icon i="square-check" />
+                    ) : (
+                      <Icon i="square" />
+                    )}
+                    {label}
+                  </Util.Row>
+                </div>}))}
+              showSearch={false}/>
+          </Util.Col>
+          {(activeUser?.admin ||
+              userShop.accountType === "ADMIN" ||
+              userShop.accountType === "OPERATOR") && (
+              <Util.Col gap={0}>
+                <H4>Submitter</H4>
+                <ShopUserPicker
+                  value={submitterFilter}
+                  onChange={setSubmitterFilter}
+                  includeNone={true}
+                />
+              </Util.Col>
+            )}
+          <Util.Col gap={0}>
+            <H4>Due Date Range</H4>
+            <Util.Row gap={0.5}>
+              <Input
+                type="date"
+                onChange={(e) => setStartDateFilter(e + "T00:00:00")}
+                value={startDateFilter?.split("T")[0]}
+                icon={startDateFilter && <Icon i="x" />}
+                iconPos="trailing"
+                separated={!!startDateFilter}
+                appendedLinkOnClick={() => setStartDateFilter(null)}
+              />
+              <h2> - </h2>
+              <Input
+                type="date"
+                onChange={(e) => setEndDateFilter(e + "T00:00:00")}
+                value={endDateFilter?.split("T")[0]}
+                icon={endDateFilter && <Icon i="x" />}
+                iconPos="trailing"
+                separated={!!endDateFilter}
+                appendedLinkOnClick={() => setEndDateFilter(null)}
+              />
+            </Util.Row>
+          </Util.Col>
+          <Util.Col gap={0}>
+            <h4>Columns</h4>
+            <Dropdown
+              prompt="Select Columns"
+              items={columnsOptions.map((id) => ({text:
+                <div
+                  key={id}
+                  onClick={(e) => {e.stopPropagation(), handleColumnToggle(id)}}
+                >
+                  <Util.Row justify="between" gap={0.5}>
+                    {columnsToShow.includes(id) ? (
+                      <Icon i="square-check" />
+                    ) : (
+                      <Icon i="square" />
+                    )}
+                    {id}
+                  </Util.Row>
+                </div>}))}
               showSearch={false}
-              // selectedItems={finalizedOptions.map((id) => ({ text: id, label: id }))}
+              multiple={true}
+              selectedItems={columnsToShow.map((id) => ({ text: id, label: id }))}
             />
           </Util.Col>
-        </Util.Col>
+        </Util.Row>
       </Util.Row>
-    </Util.Row>
+      <Util.Col>
+        <SegmentedControl
+          value={finalizedFilter}
+          items={finalizedOptions.map(({ id, label, style }) => ({id, label, style}))}
+          onChange={(newFilter) => handleFinalizedToggle(newFilter.id)}
+          style={{ minWidth: 150, marginBottom: -17, alignSelf: "flex-end" }}
+          buttonStyle={{ color: "black", fontFamily: "inherit", fontWeight: "inherit", borderRadius: 0, borderBottom: "1px solid rgb(218 223 228)" }}
+          buttonClassName="btn"
+        />
+      </Util.Col>
+      </div>
   );
 
   if (user?.simple === false) {
