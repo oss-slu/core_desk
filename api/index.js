@@ -82,6 +82,27 @@ if (process.env.JACK == "true") {
     try {
       const targetUrl = req.params[0];
 
+      // Restrict allowable base URLs
+      const allowedBaseUrls = [
+        "https://open-project-5skum.ondigitalocean.app",
+        // You may add more allowed origins here if necessary.
+      ];
+
+      let parsedUrl;
+      try {
+        parsedUrl = new URL(targetUrl);
+      } catch (e) {
+        return res.status(400).send("Invalid target URL.");
+      }
+
+      const isAllowed = allowedBaseUrls.some(allowed => 
+        parsedUrl.origin === allowed
+      );
+
+      if (!isAllowed) {
+        return res.status(403).send("Forbidden target host.");
+      }
+
       const upstream = await fetch(targetUrl, { redirect: "follow" });
 
       if (!upstream.ok) {
