@@ -4,6 +4,8 @@ import { StlViewer } from "react-stl-viewer";
 import classNames from "classnames";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 import * as Sentry from "@sentry/react";
+import { u } from "../../util/url.js";
+
 export const RenderMedia = ({
   mediaUrl,
   thumbnailUrl,
@@ -136,27 +138,19 @@ export const RenderMedia = ({
   ) {
     return (
       <>
-    <Sentry.ErrorBoundary
-      fallback={({ error }) => (
-        <ErrorBoundaries
-          error={error}
-        />
-      )}
-    >
-
-    
-      <img
-        src={mediaUrl}
-        className={classNames(
-          styles.image,
-          big ? styles.big : "",
-          small ? styles.small : ""
-        )}
-        alt="media"
-      />
-      </Sentry.ErrorBoundary>
-            
-            
+        <Sentry.ErrorBoundary
+          fallback={({ error }) => <ErrorBoundaries error={error} />}
+        >
+          <img
+            src={mediaUrl}
+            className={classNames(
+              styles.image,
+              big ? styles.big : "",
+              small ? styles.small : ""
+            )}
+            alt="media"
+          />
+        </Sentry.ErrorBoundary>
       </>
     );
   }
@@ -165,26 +159,20 @@ export const RenderMedia = ({
     if (preview && thumbnailUrl && !big) {
       return (
         <>
-      <Sentry.ErrorBoundary
-      fallback={({ error }) => (
-        <ErrorBoundaries
-          error={error}
-        />
-      )}
-    >
-
-    
-        <img
-          src={thumbnailUrl}
-          className={classNames(
-            styles.image,
-            big ? styles.big : "",
-            small ? styles.small : ""
-          )}
-          alt="media"
-          onClick={() => setPreview(false)}
-        />
-        </Sentry.ErrorBoundary>
+          <Sentry.ErrorBoundary
+            fallback={({ error }) => <ErrorBoundaries error={error} />}
+          >
+            <img
+              src={thumbnailUrl}
+              className={classNames(
+                styles.image,
+                big ? styles.big : "",
+                small ? styles.small : ""
+              )}
+              alt="media"
+              onClick={() => setPreview(false)}
+            />
+          </Sentry.ErrorBoundary>
         </>
       );
     }
@@ -195,7 +183,8 @@ export const RenderMedia = ({
       small ? styles.small : ""
     );
 
-    if (stlError) { //no need to wrap an error?
+    if (stlError) {
+      //no need to wrap an error?
       return (
         <div className={classNames(stlClasses, styles.unsupported)}>
           STL preview unavailable
@@ -203,7 +192,8 @@ export const RenderMedia = ({
       );
     }
 
-    if (!stlReadyUrl) { //no need to wrap in sentry?
+    if (!stlReadyUrl) {
+      //no need to wrap in sentry?
       return (
         <div className={stlClasses}>
           {stlLoading ? "Loading model…" : "Preparing model…"}
@@ -213,60 +203,46 @@ export const RenderMedia = ({
 
     return (
       <>
-          <Sentry.ErrorBoundary
-      fallback={({ error }) => (
-        <ErrorBoundaries
-          error={error}
-        />
-      )}
-    >
-      
-    
-      
-      
-
-      <StlViewer
-        className={stlClasses}
-        orbitControls
-        shadows
-        url={stlReadyUrl}
-        onMouseOut={handleMouseOut}
-        onMouseEnter={handleMouseEnter}
-        modelProps={{
-          color: "rgb(83, 195, 238)",
-        }}
-        cameraProps={{
-          initialPosition: {
-            distance: 1,
-          },
-        }}
-      />
-      </Sentry.ErrorBoundary>
-            </>
+        <Sentry.ErrorBoundary
+          fallback={({ error }) => <ErrorBoundaries error={error} />}
+        >
+          <StlViewer
+            className={stlClasses}
+            orbitControls
+            shadows
+            url={stlReadyUrl}
+            onMouseOut={handleMouseOut}
+            onMouseEnter={handleMouseEnter}
+            modelProps={{
+              color: "rgb(83, 195, 238)",
+            }}
+            cameraProps={{
+              initialPosition: {
+                distance: 1,
+              },
+            }}
+          />
+        </Sentry.ErrorBoundary>
+      </>
     );
   }
 
   if (fileType === "pdf") {
     return (
       <>
-          <Sentry.ErrorBoundary
-      fallback={({ error }) => (
-        <ErrorBoundaries
-          error={error}
-        />
-      )}
-    >
-      
-      <iframe
-        src={mediaUrl}
-        className={classNames(
-          styles.image,
-          big ? styles.big : "",
-          small ? styles.small : ""
-        )}
-        title="PDF"
-      />
-      </Sentry.ErrorBoundary>
+        <Sentry.ErrorBoundary
+          fallback={({ error }) => <ErrorBoundaries error={error} />}
+        >
+          <iframe
+            src={u`/api/proxy/` + mediaUrl}
+            className={classNames(
+              styles.image,
+              big ? styles.big : "",
+              small ? styles.small : ""
+            )}
+            title="PDF"
+          />
+        </Sentry.ErrorBoundary>
       </>
     );
   }

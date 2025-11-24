@@ -13,6 +13,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";
 import { createProxyMiddleware } from "http-proxy-middleware";
+import { Readable } from "stream";
+
 // import client from "#postmark";
 
 // Define __dirname for ES modules
@@ -74,6 +76,26 @@ if (process.env.JACK == "true") {
       console.log(req.method, req.url);
     }
     next();
+  });
+
+  app.get("/api/proxy/*", async (req, res) => {
+    try {
+      const targetUrl = req.params[0];
+
+      const upstream = await fetch(targetUrl, { redirect: "follow" });
+
+      if (!upstream.ok) {
+        return res.status(upstream.status).send("Unable to fetch target");
+      }
+
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", "inline");
+
+      Readable.fromWeb(upstream.body).pipe(res);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Proxy error");
+    }
   });
 
   // Passport SAML strategy
