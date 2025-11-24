@@ -24,56 +24,56 @@ export const switchStatusForBadge = (status) => {
         // <Badge color="yellow" soft>
         //   In Progress
         // </Badge>
-        <p>In Progress</p>
+        <p style={{marginBottom: 0}}>In Progress</p>
       );
     case "COMPLETED":
       return (
         // <Badge color="green" soft>
         //   Completed
         // </Badge>
-        <p>Completed</p>
+        <p style={{marginBottom: 0}}>Completed</p>
       );
     case "NOT_STARTED":
       return (
         // <Badge color="red" soft>
         //   Not Started
         // </Badge>
-        <p>Not Started</p>
+        <p style={{marginBottom: 0}}>Not Started</p>
       );
     case "CANCELLED":
       return (
         // <Badge color="secondary" soft>
         //   Cancelled
         // </Badge>
-        <p>Cancelled</p>
+        <p style={{marginBottom: 0}}>Cancelled</p>
       );
     case "WONT_DO":
       return (
         // <Badge color="secondary" soft>
         //   Won't Do
         // </Badge>
-        <p>Won't Do</p>
+        <p style={{marginBottom: 0}}>Won't Do</p>
       );
     case "WAITING":
       return (
         // <Badge color="blue" soft>
         //   Waiting
         // </Badge>
-        <p>Waiting</p>
+        <p style={{marginBottom: 0}}>Waiting</p>
       );
     case "WAITING_FOR_PICKUP":
       return (
         // <Badge color="teal" soft>
         //   Waiting for Pickup
         // </Badge>
-        <p>Waiting for Pickup</p>
+        <p style={{marginBottom: 0}}>Waiting for Pickup</p>
       );
     case "WAITING_FOR_PAYMENT":
       return (
         // <Badge color="orange" soft>
         //   Waiting for Payment
         // </Badge>
-        <p>Waiting for Payment</p>
+        <p style={{marginBottom: 0}}>Waiting for Payment</p>
       );
     default:
       return "primary";
