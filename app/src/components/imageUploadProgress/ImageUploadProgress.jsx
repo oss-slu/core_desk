@@ -12,6 +12,11 @@ export const ImageUploadProgress = ({ files, setFiles, progress, deleteAllKeys})
 
     const urls = [];
     Array.from(files).forEach((file) => {
+      if (file.name.toLowerCase().endsWith(".pdf")){
+        urls.push({ name: file.name, url : "PDF"});
+        if (urls.length === files.length) setPreviews(urls);
+        return;
+      }
       const reader = new FileReader();
       reader.onload = (e) => {
         urls.push({ name: file.name, url: e.target.result });

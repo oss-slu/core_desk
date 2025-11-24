@@ -24,7 +24,7 @@ const uploadFiles = async (url, { arg, addOrUpdateKey, deleteAllKeys }) => {
         method: "POST",
         body: formData,
       });
-
+      console.log(response.headers.get("content-type"));
       const data = await response.json();
 
       if (!response.ok) {
