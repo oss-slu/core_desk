@@ -45,6 +45,7 @@ if (process.env.JACK == "true") {
   app.get("/digitalocean-health-check", (req, res) => {
     res.send("OK");
   });
+
   // Enable CORS for your React app
   app.use(
     cors({
@@ -79,6 +80,19 @@ if (process.env.JACK == "true") {
   });
 
   app.get("/api/proxy/*", async (req, res) => {
+    const targetUrl = req.params[0];
+    const allowed = process.env.ALLOWED_S3_SOURCE;
+    if (!targetUrl.includes(allowed)) {
+      return res.status(403).send("Forbidden");
+    }
+
+    // Make sure the domain matches from allowed and target
+    const target = new URL(targetUrl);
+    const _allowed = new URL(allowed);
+    if (target.hostname !== _allowed.hostname) {
+      return res.status(403).send("Forbidden");
+    }
+
     try {
       const targetUrl = req.params[0];
 
