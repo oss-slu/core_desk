@@ -10,7 +10,7 @@ export const post = [
   }),
   async (req, res) => {
     try {
-      const jobItem =  await uploadFileToJob({
+      await uploadFileToJob({
         jobId: req.params.jobId,
         shopId: req.params.shopId,
         userId: req.user.id,
@@ -21,15 +21,7 @@ export const post = [
         },
         logging: true,
       });
-      res.json({
-        message: "Upload successful",
-        file: {
-          name: req.file.originalname,
-          location: req.file.location,
-          logId: req.fileLog.id,
-          jobItemId: jobItem,
-        },
-      });
+      res.sendStatus(200);
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: err.message });
