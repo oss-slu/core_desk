@@ -24,8 +24,8 @@ const uploadFiles = async (url, { arg, addOrUpdateKey, deleteAllKeys }) => {
         method: "POST",
         body: formData,
       });
-      console.log(response.headers.get("content-type"));
-      const data = await response.json();
+
+      const data = await response.text();
 
       if (!response.ok) {
         toast.error(`Error uploading ${file.name}`);
