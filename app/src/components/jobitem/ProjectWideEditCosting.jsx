@@ -145,9 +145,19 @@ const CostCard = ({
 
   const changed = JSON.stringify(localLineItem) !== JSON.stringify(lineItem);
 
+
   useEffect(() => {
-    setLocalLineItem(lineItem);
-  }, [lineItem]);
+  if (!lineItem) {
+    return ;
+  }
+
+  setLocalLineItem({
+    ...lineItem,
+    secondaryMaterialQty: lineItem.secondaryMaterialQty ?? 0, //change to zero if null
+  });
+}, [lineItem]);
+
+
 
   if (!localLineItem) return null;
 
