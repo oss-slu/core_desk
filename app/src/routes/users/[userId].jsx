@@ -198,7 +198,7 @@ export const UserPage = () => {
   };
 
   if (loading) return <Loading />;
-  if (!user?.id) return <NotFound />;
+  if (!user?.id || user?.simple === true) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenavItems("Users", activeUser?.admin)}>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useResource, useShop } from "#hooks";
+import { useAuth, useResource, useShop, useUser } from "#hooks";
 import { Loading } from "#loading";
 import {
   Typography,
@@ -15,6 +15,7 @@ import {
 } from "tabler-react-2";
 import { Gallery } from "../../../../components/gallery/gallery";
 import { UploadDropzone } from "../../../../components/upload/uploader";
+import { NotFound } from "../../../../components/404/404";
 import { Icon } from "#icon";
 const { H1, H2, H3, Text, B } = Typography;
 import "@mdxeditor/editor/style.css";
@@ -39,6 +40,7 @@ export const ResourcePage = () => {
     deleteResourceImage,
     deleteResource,
   } = useResource(shopId, resourceId);
+  const { user: activeUser } = useUser(user?.id);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingImages, setIsEditingImages] = useState(false);
 
@@ -83,6 +85,8 @@ export const ResourcePage = () => {
     return <NotFound />;
   }
 
+  if (activeUser?.simple === true) return <NotFound />;
+  
   return (
     <Page
       sidenavItems={shopSidenavItems(

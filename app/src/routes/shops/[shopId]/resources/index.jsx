@@ -8,12 +8,14 @@ import {
   useResources,
   useResourceTypes,
   useMaterials,
+  useUser,
 } from "#hooks";
 import { Typography, Util, Button, Card, useConfirm } from "tabler-react-2";
 import { Loading } from "#loading";
 import { Icon } from "#icon";
 import { Table } from "#table";
 import { Spinner } from "#spinner";
+import { NotFound } from "../../../../components/404/404";
 const { H1, H2, H3 } = Typography;
 
 export const ResourcesPage = () => {
@@ -25,6 +27,7 @@ export const ResourcesPage = () => {
     ModalElement: CreateResourceModalElement,
     createResource,
   } = useResources(shopId);
+  const { user: activeUser } = useUser(user?.id);
 
   const {
     resourceTypes,
@@ -51,6 +54,8 @@ export const ResourcesPage = () => {
         <Loading />
       </Page>
     );
+
+  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page

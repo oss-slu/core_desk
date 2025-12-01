@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Page } from "#page";
 import { shopSidenavItems } from "../../../..";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useMaterial, useShop } from "#hooks";
+import { useAuth, useMaterial, useShop, useUser } from "#hooks";
 import { Typography, Util, Input, Card, Switch, Badge } from "tabler-react-2";
 import { Loading } from "#loading";
 import { Button } from "#button";
@@ -12,6 +12,7 @@ import { UploadDropzone } from "../../../../../../../components/upload/uploader"
 import { MarkdownEditor } from "#markdownEditor";
 import { MarkdownRender } from "#markdownRender";
 import { Gallery } from "../../../../../../../components/gallery/gallery";
+import { NotFound } from "../../../../../../../components/404/404";
 import { Table } from "#table";
 const { H1, H2, H3, B } = Typography;
 
@@ -32,6 +33,7 @@ export const MaterialPage = () => {
     deleteMaterial,
     refetch,
   } = useMaterial(shopId, resourceTypeId, materialId);
+  const { user: activeUser } = useUser(user?.id);
 
   const [nm, setNm] = useState(material);
 
@@ -61,6 +63,8 @@ export const MaterialPage = () => {
         <Loading />
       </Page>
     );
+
+  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page

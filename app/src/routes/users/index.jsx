@@ -4,19 +4,21 @@ import { useAuth } from "#useAuth";
 import { Typography, Util, Badge, Button, DropdownInput } from "tabler-react-2";
 import { useModal } from "#modal";
 import { Table } from "#table";
-import { useUsers } from "../../hooks/useUsers";
+import { useUser, useUsers } from "#hooks";
 import { Spinner } from "#spinner";
 import { Avatar } from "#avatar";
 import { Icon } from "#icon";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { SearchBar } from "../../components/searchBar/SearchBar";
+import { NotFound } from "../../components/404/404";
 
 const { H1 } = Typography;
 
 export const UsersPage = () => {
   const { user } = useAuth();
   const { users, loading: usersLoading } = useUsers();
+  const { user: activeUser } = useUser(user?.id);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(50);
@@ -111,6 +113,8 @@ export const UsersPage = () => {
       )}
     </span>
   );
+
+  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenav}>

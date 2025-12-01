@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { act, useEffect, useState } from "react";
 import { Page } from "#page";
 import { useAuth } from "#useAuth";
 import { Loading } from "#loading";
@@ -6,7 +6,7 @@ import { Typography, Util, Input, Switch } from "tabler-react-2";
 import { Icon } from "#icon";
 import { useParams } from "react-router-dom";
 const { H1, H2 } = Typography;
-import { useShop } from "../../../hooks/useShop";
+import { useShop, useUser } from "#hooks";
 import { Button } from "#button";
 import { MarkdownRender } from "#markdownRender";
 import { MarkdownEditor } from "#markdownEditor";
@@ -115,6 +115,7 @@ export const ShopPage = () => {
     deleteShop,
     deleteModalElement,
   } = useShop(shopId);
+  const { user: activeUser } = useUser(user?.id);
   const [editing, setEditing] = useState(false);
   const [newShop, setNewShop] = useState(shop);
   useEffect(() => {
@@ -136,7 +137,7 @@ export const ShopPage = () => {
       </Page>
     );
 
-  if (!shop) return <NotFound />;
+  if (!shop || activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page

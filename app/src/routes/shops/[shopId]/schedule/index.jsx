@@ -3,11 +3,13 @@ import { useParams } from "react-router-dom";
 import { Page } from "#page";
 import { Typography, Util, Input, Button } from "tabler-react-2";
 import { useAuth } from "#useAuth";
+import { useUser } from "#hooks";
 import { sidenavItems } from "#page";
 import { useAppointments } from "#useAppointments";
 import { useResources } from "#useResources";
 import { ResourcePicker } from "#resourcePicker";
 import { useModal } from "#modal";
+import { NotFound } from "../../../../components/404/404";
 import toast from "react-hot-toast";
 import styles from "./SchedulePage.module.css";
 
@@ -110,6 +112,7 @@ export const SchedulePage = () => {
     deleteAppointment,
   } = useAppointments(shopId);
   const { resources, loading: resourcesLoading, error: resourcesError } = useResources(shopId);
+  const { user: activeUser } = useUser(user?.id);
 
   const { modal: openCreateModal, ModalElement: CreateModal } = useModal({
     title: "Create Appointment",
@@ -139,6 +142,8 @@ export const SchedulePage = () => {
     );
 
   const timeSlots = generateTimeSlots();
+
+  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
