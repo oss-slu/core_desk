@@ -6,22 +6,29 @@ export const useCalendarSettings = (shopId) => {
   const [settings, setSettings] = useState({
     calendarStartHour: 6,
     calendarEndHour: 24,
-    calendarDefaultIncrement: 30,
+    calendarIncrement: 30,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchSettings = useCallback(async () => {
-    if (!shopId) return;
+    if (!shopId) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     setError(null);
     try {
       const r = await authFetch(`/api/shop/${shopId}/appointments/settings`);
       const data = await r.json().catch(() => null);
       if (data?.settings) {
-        setSettings(data.settings);
-      } else {
-        setError(data?.error || "Failed to fetch settings");
+        setSettings({
+          calendarStartHour: data.settings.calendarStartHour ?? 6,
+          calendarEndHour: data.settings.calendarEndHour ?? 24,
+          calendarIncrement: data.settings.calendarIncrement ?? 30,
+        });
+      } else if (data?.error) {
+        setError(data.error);
       }
     } catch (err) {
       console.error(err);
@@ -45,7 +52,11 @@ export const useCalendarSettings = (shopId) => {
       const res = await r.json().catch(() => null);
       if (res?.settings) {
         toast.success("Calendar settings updated");
-        setSettings(res.settings);
+        setSettings({
+          calendarStartHour: res.settings.calendarStartHour ?? 6,
+          calendarEndHour: res.settings.calendarEndHour ?? 24,
+          calendarIncrement: res.settings.calendarIncrement ?? 30,
+        });
         return true;
       } else {
         setError(res?.error || "Failed to update settings");

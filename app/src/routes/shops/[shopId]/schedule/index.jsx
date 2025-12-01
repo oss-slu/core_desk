@@ -4,6 +4,7 @@ import { Page } from "#page";
 import { Typography, Util, Input, Button, SegmentedControl } from "tabler-react-2";
 import { useAuth } from "#useAuth";
 import { sidenavItems } from "#page";
+import { Icon } from "#icon";
 import { useAppointments } from "#useAppointments";
 import { useResources } from "#useResources";
 import { useCalendarSettings } from "#useCalendarSettings";
@@ -51,6 +52,40 @@ const timeToSlotIndex = (isoStr, incrementMinutes, startHour = 0) => {
   const totalMinutes = d.getHours() * 60 + d.getMinutes();
   const minutesFromStart = totalMinutes - (startHour * 60);
   return Math.floor(minutesFromStart / incrementMinutes);
+};
+
+const getTodayDateString = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+const isSameDay = (date1, date2) => {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  return (
+    d1.getFullYear() === d2.getFullYear() &&
+    d1.getMonth() === d2.getMonth() &&
+    d1.getDate() === d2.getDate()
+  );
+};
+
+const formatDateDisplay = (dateString) => {
+  const date = new Date(dateString + "T00:00:00");
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  if (isSameDay(date, today)) return "Today";
+  if (isSameDay(date, tomorrow)) return "Tomorrow";
+  if (isSameDay(date, yesterday)) return "Yesterday";
+
+  const options = { weekday: "short", month: "short", day: "numeric" };
+  return date.toLocaleDateString(undefined, options);
 };
 
 const AppointmentForm = ({ mode, appointment, onSave, onDelete }) => {
@@ -108,6 +143,13 @@ const AppointmentForm = ({ mode, appointment, onSave, onDelete }) => {
   );
 };
 
+const PRESET_INCREMENTS = [
+  { id: "15", label: "15 min", value: 15 },
+  { id: "30", label: "30 min", value: 30 },
+  { id: "60", label: "1 hour", value: 60 },
+  { id: "120", label: "2 hours", value: 120 },
+];
+
 export const SchedulePage = () => {
   const { shopId } = useParams();
   const { user, loading: authLoading } = useAuth();
@@ -122,27 +164,55 @@ export const SchedulePage = () => {
   const { resources, loading: resourcesLoading, error: resourcesError } = useResources(shopId);
   const { settings, loading: settingsLoading, updateSettings } = useCalendarSettings(shopId);
 
-  const [incrementMinutes, setIncrementMinutes] = React.useState(30);
+  const [viewIncrementMinutes, setViewIncrementMinutes] = React.useState(settings.calendarIncrement);
+
+  const [selectedDate, setSelectedDate] = React.useState(getTodayDateString());
 
   React.useEffect(() => {
-    if (settings.calendarDefaultIncrement) {
-      setIncrementMinutes(settings.calendarDefaultIncrement);
-    }
-  }, [settings.calendarDefaultIncrement]);
+    setViewIncrementMinutes(settings.calendarIncrement);
+  }, [settings.calendarIncrement]);
 
-  const presetIncrements = [
-    { id: "15", label: "15 min", value: 15 },
-    { id: "30", label: "30 min", value: 30 },
-    { id: "60", label: "1 hour", value: 60 },
-    { id: "120", label: "2 hours", value: 120 },
-  ];
+  const changeDate = (days) => {
+    const current = new Date(selectedDate + "T00:00:00");
+    current.setDate(current.getDate() + days);
+    const year = current.getFullYear();
+    const month = String(current.getMonth() + 1).padStart(2, "0");
+    const day = String(current.getDate()).padStart(2, "0");
+    setSelectedDate(`${year}-${month}-${day}`);
+  };
 
   const SettingsForm = () => {
     const [formData, setFormData] = React.useState({
-      calendarStartHour: settings.calendarStartHour || 6,
-      calendarEndHour: settings.calendarEndHour || 24,
-      calendarDefaultIncrement: settings.calendarDefaultIncrement || 30,
+      calendarStartHour: settings.calendarStartHour,
+      calendarEndHour: settings.calendarEndHour,
+      calendarIncrement: settings.calendarIncrement,
     });
+
+    const handleStartHourChange = (val) => {
+      let parsed = parseInt(val);
+      if (isNaN(parsed)) {
+        parsed = 0;
+      }
+      if (parsed < 0) {
+        parsed = 24;
+      } else if (parsed > 24) {
+        parsed = 0;
+      }
+      setFormData(prev => ({ ...prev, calendarStartHour: parsed }));
+    };
+
+    const handleEndHourChange = (val) => {
+      let parsed = parseInt(val);
+      if (isNaN(parsed)) {
+        parsed = 0;
+      }
+      if (parsed <0) {
+        parsed = 24;
+      } else if (parsed > 24) {
+        parsed = 0;
+      }
+      setFormData(prev => ({ ...prev, calendarEndHour: parsed }));
+    };
 
     return (
       <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
@@ -150,16 +220,16 @@ export const SchedulePage = () => {
           type="number"
           label="Start Hour (24-hour format)"
           value={formData.calendarStartHour}
-          onChange={(val) => setFormData(prev => ({ ...prev, calendarStartHour: parseInt(val) || 0 }))}
+          onChange={handleStartHourChange}
           min={0}
-          max={23}
+          max={24}
         />
         <Input
           type="number"
           label="End Hour (24-hour format)"
           value={formData.calendarEndHour}
-          onChange={(val) => setFormData(prev => ({ ...prev, calendarEndHour: parseInt(val) || 24 }))}
-          min={1}
+          onChange={handleEndHourChange}
+          min={0}
           max={24}
         />
         <div>
@@ -167,11 +237,11 @@ export const SchedulePage = () => {
             Default Time Increment
           </label>
           <SegmentedControl
-            value={formData.calendarDefaultIncrement.toString()}
+            value={formData.calendarIncrement.toString()}
             onChange={(selected) => {
-              setFormData(prev => ({ ...prev, calendarDefaultIncrement: parseInt(selected.id) }));
+              setFormData(prev => ({ ...prev, calendarIncrement: parseInt(selected.id) }));
             }}
-            items={presetIncrements}
+            items={PRESET_INCREMENTS}
           />
         </div>
         <Button 
@@ -214,25 +284,32 @@ export const SchedulePage = () => {
     text: <SettingsForm />,
   });
 
-  if (authLoading || appointmentsLoading || resourcesLoading || settingsLoading)
-    return <Page sidenavItems={sidenavItems("Shops", user?.admin)}>Loading schedule...</Page>;
+  const isLoading = authLoading || appointmentsLoading || resourcesLoading || settingsLoading;
 
-  if (appointmentsError || resourcesError)
+  if (isLoading) {
+    return <Page sidenavItems={sidenavItems("Shops", user?.admin)}>Loading schedule...</Page>;
+  }
+
+  if (appointmentsError || resourcesError) {
     return (
       <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
         <div className="text-danger">{appointmentsError?.message || resourcesError?.message}</div>
       </Page>
     );
+  }
 
-  const startHour = settings.calendarStartHour || 6;
-  const endHour = settings.calendarEndHour || 24;
-
-  const timeSlots = generateTimeSlots(startHour, endHour, incrementMinutes);
-
+  const startHour = settings.calendarStartHour;
+  const endHour = settings.calendarEndHour;
+  const timeSlots = generateTimeSlots(startHour, endHour, viewIncrementMinutes);
   const cellSize = 70;
 
   const userShop = user?.shops?.find(s => s.shopId === shopId);
   const canEditSettings = user?.admin || userShop?.accountType === "ADMIN" || userShop?.accountType === "OPERATOR";
+
+  const filteredAppointments = appointments.filter((evt) => {
+    if (!evt.active) return false;
+    return isSameDay(evt.startTime, selectedDate);
+  });
 
   return (
     <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
@@ -241,24 +318,42 @@ export const SchedulePage = () => {
           <H1>Resource Availability</H1>
           <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-              <span style={{ fontSize: "0.875rem", fontWeight: 500 }}>View:</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <Button variant="outline" onClick={() => changeDate(-1)}>
+                  ←
+                </Button>
+                <div style={{ minWidth: "120px", textAlign: "center" }}>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSelectedDate(getTodayDateString())}
+                    style={{ width: "100%" }}
+                  >
+                    {formatDateDisplay(selectedDate)}
+                  </Button>
+                </div>
+                <Button variant="outline" onClick={() => changeDate(1)}>
+                  →
+                </Button>
+              </div>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
               <SegmentedControl
-                value={incrementMinutes.toString()}
+                value={viewIncrementMinutes.toString()}
                 onChange={(selected) => {
-                  const preset = presetIncrements.find(p => p.id === selected.id);
+                  const preset = PRESET_INCREMENTS.find(p => p.id === selected.id);
                   if (preset) {
-                    setIncrementMinutes(preset.value);
+                    setViewIncrementMinutes(preset.value);
                   }
                 }}
-                items={presetIncrements}
+                items={PRESET_INCREMENTS}
               />
             </div>
+            <Button onClick={() => openCreateModal()}>Create Appointment</Button>
             {canEditSettings && (
               <Button variant="outline" onClick={() => openSettingsModal()}>
-                Settings
+                <Icon i="settings"/>
               </Button>
             )}
-            <Button onClick={() => openCreateModal()}>Create Appointment</Button>
           </div>
         </div>
 
@@ -288,15 +383,14 @@ export const SchedulePage = () => {
               </React.Fragment>
             ))}
 
-            {appointments
-              .filter((evt) => evt.active)
+            {filteredAppointments
               .map((evt) => {
                 if (!evt.resource) return null;
                 const rowIdx = resources.findIndex((r) => r.id === evt.resource.id);
                 if (rowIdx === -1) return null;
 
-                const startCol = timeToSlotIndex(evt.startTime, incrementMinutes, startHour) + 2;
-                const endCol = timeToSlotIndex(evt.endTime, incrementMinutes, startHour) + 2;
+                const startCol = timeToSlotIndex(evt.startTime, viewIncrementMinutes, startHour) + 2;
+                const endCol = timeToSlotIndex(evt.endTime, viewIncrementMinutes, startHour) + 2;
 
                 return (
                   <div
