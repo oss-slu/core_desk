@@ -57,9 +57,6 @@ export const JobPage = () => {
   const { user: activeUser, loading: userLoading } = useAuth();
   const { user } = useUser(activeUser?.id);
   const { userShop, loading: shopLoading } = useShop(shopId);
-
-  const index = 0;
-  const [currentIndex, setCurrentIndex] = useState(index); // Start at the first page
   const [editing, setEditing] = useState(false);
   const [job, setJob] = useState(uncontrolledJob);
 
@@ -68,12 +65,24 @@ export const JobPage = () => {
     userShop.accountType === "ADMIN" ||
     userShop.accountType === "OPERATOR";
 
+  // 1. Calculate Initial Index: 1 (Step 4) if resourceId exists, else 0 (Step 3).
+  // Use uncontrolledJob here as it represents the initial server state.
+  const initialIndex = uncontrolledJob?.resourceId ? 1 : 0;
+  
+  // 2. Initialize currentIndex using the calculated value.
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+
+  // ... handleNext, handlePrevious, pages definition are unchanged ...
+
   const handleNext = () => {
-    setCurrentIndex((currentIndex + 1) % (pages.length + 1));
+    // This correctly increments the index for navigation
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % (pages.length + 1));
   };
 
   const handlePrevious = () => {
-    setCurrentIndex((currentIndex - 1) % (pages.length + 1));
+    // This correctly decrements the index for navigation
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + pages.length + 1) % (pages.length + 1));
+    // Note: Used modulus for safety, although simple decrement to 0 is likely fine here.
   };
 
   const pages = [
@@ -81,13 +90,13 @@ export const JobPage = () => {
       <p>Step 3</p>
       <h1>Continue set-up</h1>
       <ResourceTypePicker
-        // loading={opLoading}
+        loading={opLoading}
         value={job.resourceTypeId}
         onChange={(value) => {
           updateJob({ resourceTypeId: value });
         }}
         shopId={shopId}
-        // opLoading={opLoading}
+        opLoading={opLoading}
         includeNone={true}
       />
     {job.resourceTypeId && (
@@ -98,7 +107,7 @@ export const JobPage = () => {
             updateJob({ resourceId: value });
           }}
           resourceTypeId={job.resourceTypeId}
-          // opLoading={opLoading}
+          opLoading={opLoading}
           includeNone={true}
         />
         <MaterialPicker
@@ -107,7 +116,7 @@ export const JobPage = () => {
             updateJob({ materialId: value });
           }}
           resourceTypeId={job.resourceTypeId}
-          // opLoading={opLoading}
+          opLoading={opLoading}
           includeNone={true}
           materialType={"Primary"}
         />
@@ -117,7 +126,7 @@ export const JobPage = () => {
             updateJob({ secondaryMaterialId: value });
           }}
           resourceTypeId={job.resourceTypeId}
-          // opLoading={opLoading}
+          opLoading={opLoading}
           includeNone={true}
           materialType={"Secondary"}
         />
@@ -186,7 +195,7 @@ export const JobPage = () => {
     <div key={"receipt"}>
       <h1>We have received your request.</h1>
       <p>Thank you for your submission. We will contact you when it is finished.</p>
-      <Button className="btn" href="../../../">
+      <Button className="btn" href="/">
         Submit another job
       </Button>
     </div>
@@ -208,7 +217,11 @@ export const JobPage = () => {
   if (user?.simple === true) {
     return (
       <div>
+        {loading ? (
+          <Spinner />
+        ) : (
         <div>{pages[currentIndex]}</div>
+        )}
       </div>
     );
   } else {

@@ -230,64 +230,62 @@ export const useJobs = (shopId) => {
     const [onBehalfOfBillingGroup] = useState(false);
     const [onBehalfOfBillingGroupId] = useState(null);
 
+    const { shopId } = useParams();
+    const { user } = useAuth();
+    const { loading: userShopLoading } = useUserShop(shopId, user?.id);
+
     return (
       <div>
-        {loading ? (
-          <Spinner />
-        ) : (
-          <div>
-            <p>Step 2</p>
-            <h1>Set up your job</h1>
-            <div>
-              <Input
-                value={title}
-                onChange={(e) => setTitle(e)}
-                label="Job Name"
-                placeholder="e.g. Wind Mill Assembly"
-                required
-              />
-              <Input
-                value={description}
-                onChange={(e) => setDescription(e)}
-                label="Job Description (optional)"
-                placeholder="e.g. Parts for version 2 of the wind mill design project"
-                optional
-              />
-              <Input
-                type="date"
-                label="Due Date"
-                onChange={(e) => setDueDate(e + "T00:00:00")}
-                value={dueDate?.split("T")[0]}
-                required
-              />
-            </div>
-            <br></br>
-            {title.length > 0 && dueDate.length > 0 ? (
-            <Button
-              variant="primary"
-              onClick={() => {
-                setLoading(true);
-                _createJob(
-                  title,
-                  description,
-                  dueDate,
-                  onBehalfOf,
-                  onBehalfOfUserId,
-                  onBehalfOfUserEmail,
-                  onBehalfOfUserFirstName,
-                  onBehalfOfUserLastName,
-                  onBehalfOfBillingGroup,
-                  onBehalfOfBillingGroupId
-                );
-              }}
-            >
-              Next
-            </Button>
-          ) : (
-            <Button disabled>Next</Button>
-          )}
-          </div>
-        )}
+        <p>Step 2</p>
+        <h1>Set up your job</h1>
+        <div>
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e)}
+            label="Job Name"
+            placeholder="e.g. Wind Mill Assembly"
+            required
+          />
+          <Input
+            value={description}
+            onChange={(e) => setDescription(e)}
+            label="Job Description (optional)"
+            placeholder="e.g. Parts for version 2 of the wind mill design project"
+            optional
+          />
+          <Input
+            type="date"
+            label="Due Date"
+            onChange={(e) => setDueDate(e + "T00:00:00")}
+            value={dueDate?.split("T")[0]}
+            required
+          />
+        </div>
+        <br></br>
+        {title.length > 0 && dueDate.length > 0 ? (
+        <Button
+          variant="primary"
+          onClick={() => {
+            setLoading(true);
+            _createJob(
+              title,
+              description,
+              dueDate,
+              onBehalfOf,
+              onBehalfOfUserId,
+              onBehalfOfUserEmail,
+              onBehalfOfUserFirstName,
+              onBehalfOfUserLastName,
+              onBehalfOfBillingGroup,
+              onBehalfOfBillingGroupId
+            );
+          }}
+        >
+          Next
+        </Button>
+      ) : (
+        <Button disabled>Next</Button>
+      )}
       </div>
     );
   };
