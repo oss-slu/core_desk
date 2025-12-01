@@ -15,7 +15,6 @@ import {
 } from "tabler-react-2";
 import { Gallery } from "../../../../components/gallery/gallery";
 import { UploadDropzone } from "../../../../components/upload/uploader";
-import { NotFound } from "../../../../components/404/404";
 import { Icon } from "#icon";
 const { H1, H2, H3, Text, B } = Typography;
 import "@mdxeditor/editor/style.css";
