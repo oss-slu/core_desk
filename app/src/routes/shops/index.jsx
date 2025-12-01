@@ -30,7 +30,7 @@ export const Shops = () => {
         <div>
           <H1>Shops</H1>
         </div>
-        {activeUser.admin && (
+        {activeUser?.admin && (
           <Button onClick={createShop}>Create Shop</Button>
         )}
       </Util.Row>
