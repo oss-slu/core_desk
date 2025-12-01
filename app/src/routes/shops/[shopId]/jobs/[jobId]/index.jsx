@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Page } from "#page";
 import { Icon } from "#icon";
 import { Link, useParams } from "react-router-dom";
-import { Typography, Util, Input, Card, Button, Badge } from "tabler-react-2";
+import { Typography, Util, Input, Card, Button, Badge, Spinner } from "tabler-react-2";
 import { Loading } from "#loading";
 import { UploadDropzone } from "../../../../../components/upload/uploader";
 import {

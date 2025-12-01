@@ -221,7 +221,7 @@ export const useJobs = (shopId) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
-    const [loading, setLoading] = useState(false);
+    const [setLoading] = useState(false);
     const [onBehalfOf] = useState(false);
     const [onBehalfOfUserId] = useState(null);
     const [onBehalfOfUserEmail] = useState("");
@@ -229,10 +229,6 @@ export const useJobs = (shopId) => {
     const [onBehalfOfUserLastName] = useState("");
     const [onBehalfOfBillingGroup] = useState(false);
     const [onBehalfOfBillingGroupId] = useState(null);
-
-    const { shopId } = useParams();
-    const { user } = useAuth();
-    const { loading: userShopLoading } = useUserShop(shopId, user?.id);
 
     return (
       <div>

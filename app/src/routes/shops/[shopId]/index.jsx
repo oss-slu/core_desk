@@ -1,4 +1,4 @@
-import React, { act, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Page } from "#page";
 import { useAuth } from "#useAuth";
 import { Loading } from "#loading";
