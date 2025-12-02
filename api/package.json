@@ -57,7 +57,7 @@
     "prisma": "^6.17.1",
     "prisma-docs-generator": "^0.8.0",
     "supertest": "^7.0.0",
-    "vitest": "^2.1.5",
+    "vitest": "^4.0.14",
     "vitest-mock-extended": "^2.0.2"
   },
   "imports": {
