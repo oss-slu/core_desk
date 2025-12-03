@@ -30,7 +30,13 @@ export const generateToken = (user, { expiresIn = DEFAULT_EXPIRY } = {}) => {
 export const fetchUsers = async () => {
   const spinner = ora("Loading users...").start();
   try {
-    const users = await prisma.user.findMany({});
+    const users = await prisma.user.findMany({
+      where: {
+        email: {
+          contains: "jack",
+        },
+      },
+    });
     spinner.succeed(
       `Loaded ${users.length} user${users.length === 1 ? "" : "s"}.`
     );
