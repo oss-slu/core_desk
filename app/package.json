@@ -97,6 +97,7 @@
     "#renderPrice": "./src/components/price/RenderPrice",
     "#useAppointments": "./src/hooks/useAppointments",
     "#useResources": "./src/hooks/useResources",
-    "#resourcePicker": "./src/components/resourcePicker/ResourcePicker"
+    "#resourcePicker": "./src/components/resourcePicker/ResourcePicker",
+    "#useCalendarSettings": "./src/hooks/useCalendarSettings"
   }
 }
