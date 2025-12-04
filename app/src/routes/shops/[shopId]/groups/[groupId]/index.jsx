@@ -4,6 +4,7 @@ import {
   useBillingGroup,
   useBillingGroupInvitations,
   useShop,
+  useUser,
 } from "#hooks";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { shopSidenavItems } from "../..";
@@ -13,6 +14,7 @@ import { Button } from "#button";
 import { Util, Alert, DropdownInput, Badge } from "tabler-react-2";
 import { useModal } from "#modal";
 import { CreateBillingGroupInvitation } from "../../../../../components/billingGroup/CreateBillingGroupInvitation";
+import { NotFound } from "../../../../../components/404/404";
 import { Table } from "#table";
 import moment from "moment";
 import { MOMENT_FORMAT } from "#constants";
@@ -74,6 +76,7 @@ export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
+  const { user: activeUser } = useUser(user?.id);
   const navigate = useNavigate();
 
   const {
@@ -139,6 +142,8 @@ export const BillingGroupPage = () => {
         <Loading />
       </Page>
     );
+
+  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page

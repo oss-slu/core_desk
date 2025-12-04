@@ -32,6 +32,7 @@ export function UserShopToggle({ userId }) {
         value={"Simplified"}
         onClick={() => {
           setSimple(true); // This also correctly calls the function from useUser
+          window.location.reload();
         }}
         style={{
           height: 36,
@@ -48,8 +49,8 @@ export function UserShopToggle({ userId }) {
         className='btn'
         value={"Standard"}
         onClick={() => {
-          console.log("1. Clicked 'Standard'. Calling setSimple(false)."); // <-- ADD THIS
           setSimple(false); // This also correctly calls the function from useUser
+          window.location.reload();
         }}
         style={{
           height: 36,

@@ -3,7 +3,7 @@ import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "#useAuth";
-import { useShop } from "#hooks";
+import { useShop, useUser } from "#hooks";
 import { Loading } from "#loading";
 import { Typography, Util, Badge } from "tabler-react-2";
 import { Table } from "#table";
@@ -11,6 +11,7 @@ import moment from "moment";
 import { Price } from "#renderPrice";
 import { Icon } from "#icon";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
+import { NotFound } from "../../../../components/404/404";
 import { Avatar } from "#avatar";
 const { H1 } = Typography;
 
@@ -49,6 +50,7 @@ export const ShopUsersPage = () => {
   const { userShop, loading, users } = useShop(shopId, {
     includeUsers: true,
   });
+  const { user: activeUser } = useUser(user?.id);
 
   if (loading)
     return (
@@ -64,6 +66,8 @@ export const ShopUsersPage = () => {
         <Loading />
       </Page>
     );
+
+  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page

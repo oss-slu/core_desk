@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Page } from "#page";
 import { Typography, Util, Input, Button, SegmentedControl } from "tabler-react-2";
 import { useAuth } from "#useAuth";
+import { useUser } from "#hooks";
 import { sidenavItems } from "#page";
 import { Icon } from "#icon";
 import { useAppointments } from "#useAppointments";
@@ -10,6 +11,7 @@ import { useResources } from "#useResources";
 import { useCalendarSettings } from "#useCalendarSettings";
 import { ResourcePicker } from "#resourcePicker";
 import { useModal } from "#modal";
+import { NotFound } from "../../../../components/404/404";
 import toast from "react-hot-toast";
 import styles from "./SchedulePage.module.css";
 
@@ -162,6 +164,7 @@ export const SchedulePage = () => {
     deleteAppointment,
   } = useAppointments(shopId);
   const { resources, loading: resourcesLoading, error: resourcesError } = useResources(shopId);
+  const { user: activeUser } = useUser(user?.id);
   const { settings, loading: settingsLoading, updateSettings } = useCalendarSettings(shopId);
 
   const [viewIncrementMinutes, setViewIncrementMinutes] = React.useState(settings.calendarIncrement);
@@ -310,6 +313,8 @@ export const SchedulePage = () => {
     if (!evt.active) return false;
     return isSameDay(evt.startTime, selectedDate);
   });
+
+  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenavItems("Shops", user?.admin)}>

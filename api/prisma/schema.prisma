@@ -28,7 +28,7 @@ model user {
   navigation       Navigation[]
   files            File[]
   appointments     Appointment[]
-  simple           Boolean            @default(false)
+  simple           Boolean            @default(true)
 }
 
 model File {
