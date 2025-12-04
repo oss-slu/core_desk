@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { authFetch } from "#url";
 import { useConfirm } from "#confirm";
 import toast from "react-hot-toast";
+import { getErrorMessage } from "../util/errorMessage";
 
 export const useAdditionalLineItem = (
   shopId,
@@ -63,13 +64,24 @@ export const useAdditionalLineItem = (
         setOpLoading(false);
         return true;
       } else {
-        toast.error(updatedlineItem);
+        toast.error(
+          getErrorMessage(
+            updatedlineItem,
+            "Failed to update the additional cost line item."
+          )
+        );
         setError(updatedlineItem);
         setOpLoading(false);
         fetchLineItem(false);
         return false;
       }
     } catch (error) {
+      toast.error(
+        getErrorMessage(
+          error,
+          "Failed to update the additional cost line item."
+        )
+      );
       setError(error);
       setOpLoading(false);
       fetchLineItem(false);
@@ -92,11 +104,22 @@ export const useAdditionalLineItem = (
         setLineItem(null);
         setOpLoading(false);
       } else {
-        toast.error(data);
+        toast.error(
+          getErrorMessage(
+            data,
+            "Failed to delete the additional cost line item."
+          )
+        );
         setError(data);
         setOpLoading(false);
       }
     } catch (error) {
+      toast.error(
+        getErrorMessage(
+          error,
+          "Failed to delete the additional cost line item."
+        )
+      );
       setError(error);
       setOpLoading(false);
     }

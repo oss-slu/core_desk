@@ -42,7 +42,7 @@
     "eslint": "^9.13.0",
     "eslint-plugin-react": "^7.37.2",
     "globals": "^15.11.0",
-    "vite": "^5.2.6"
+    "vite": "^5.4.21"
   },
   "babel": {
     "presets": [
@@ -97,6 +97,7 @@
     "#renderPrice": "./src/components/price/RenderPrice",
     "#useAppointments": "./src/hooks/useAppointments",
     "#useResources": "./src/hooks/useResources",
-    "#resourcePicker": "./src/components/resourcePicker/ResourcePicker"
+    "#resourcePicker": "./src/components/resourcePicker/ResourcePicker",
+    "#useCalendarSettings": "./src/hooks/useCalendarSettings"
   }
 }

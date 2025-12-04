@@ -4,7 +4,7 @@ import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
 import { shopSidenavItems } from "../../[shopId]/index";
 import { useAuth } from "#useAuth";
-import { Typography, Util, Input, Badge, Avatar } from "tabler-react-2";
+import { Typography, Util, Input, Badge, Dropdown, SegmentedControl } from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { useUser } from "../../../../hooks/useUser";
@@ -21,51 +21,59 @@ export const switchStatusForBadge = (status) => {
   switch (status) {
     case "IN_PROGRESS":
       return (
-        <Badge color="yellow" soft>
-          In Progress
-        </Badge>
+        // <Badge color="yellow" soft>
+        //   In Progress
+        // </Badge>
+        <p style={{marginBottom: 0}}>In Progress</p>
       );
     case "COMPLETED":
       return (
-        <Badge color="green" soft>
-          Completed
-        </Badge>
+        // <Badge color="green" soft>
+        //   Completed
+        // </Badge>
+        <p style={{marginBottom: 0}}>Completed</p>
       );
     case "NOT_STARTED":
       return (
-        <Badge color="red" soft>
-          Not Started
-        </Badge>
+        // <Badge color="red" soft>
+        //   Not Started
+        // </Badge>
+        <p style={{marginBottom: 0}}>Not Started</p>
       );
     case "CANCELLED":
       return (
-        <Badge color="secondary" soft>
-          Cancelled
-        </Badge>
+        // <Badge color="secondary" soft>
+        //   Cancelled
+        // </Badge>
+        <p style={{marginBottom: 0}}>Cancelled</p>
       );
     case "WONT_DO":
       return (
-        <Badge color="secondary" soft>
-          Won't Do
-        </Badge>
+        // <Badge color="secondary" soft>
+        //   Won't Do
+        // </Badge>
+        <p style={{marginBottom: 0}}>Won't Do</p>
       );
     case "WAITING":
       return (
-        <Badge color="blue" soft>
-          Waiting
-        </Badge>
+        // <Badge color="blue" soft>
+        //   Waiting
+        // </Badge>
+        <p style={{marginBottom: 0}}>Waiting</p>
       );
     case "WAITING_FOR_PICKUP":
       return (
-        <Badge color="teal" soft>
-          Waiting for Pickup
-        </Badge>
+        // <Badge color="teal" soft>
+        //   Waiting for Pickup
+        // </Badge>
+        <p style={{marginBottom: 0}}>Waiting for Pickup</p>
       );
     case "WAITING_FOR_PAYMENT":
       return (
-        <Badge color="orange" soft>
-          Waiting for Payment
-        </Badge>
+        // <Badge color="orange" soft>
+        //   Waiting for Payment
+        // </Badge>
+        <p style={{marginBottom: 0}}>Waiting for Payment</p>
       );
     default:
       return "primary";
@@ -105,41 +113,61 @@ export const Jobs = () => {
   const [startDateFilter, setStartDateFilter] = useState(null);
   const [endDateFilter, setEndDateFilter] = useState(null);
   const [submitterFilter, setSubmitterFilter] = useState(null);
-  const [finalizedFilter, setFinalizedFilter] = useState([]);
+  const [finalizedFilter, setFinalizedFilter] = useState("false");
 
   const statusOptions = [
     {
       id: "NOT_STARTED",
       label: "Not Started",
-      color: "red",
+      // color: "red",
     },
-    { id: "IN_PROGRESS", label: "In Progress", color: "yellow" },
-    { id: "COMPLETED", label: "Completed", color: "green" },
+    { 
+      id: "IN_PROGRESS", 
+      label: "In Progress", 
+      // color: "yellow" 
+    },
+    { 
+      id: "COMPLETED", 
+      label: "Completed", 
+      // color: "green" 
+    },
     {
       id: "WAITING",
       label: "Waiting",
-      color: "blue",
+      // color: "blue",
     },
-    { id: "CANCELLED", label: "Cancelled", color: "secondary" },
+    { 
+      id: "CANCELLED", 
+      label: "Cancelled", 
+      // color: "secondary" 
+    },
     {
       id: "WONT_DO",
       label: "Won't Do",
-      color: "secondary",
+      // color: "secondary",
     },
     {
       id: "WAITING_FOR_PICKUP",
       label: "Waiting for Pickup",
-      color: "teal",
+      // color: "teal",
     },
     {
       id: "WAITING_FOR_PAYMENT",
       label: "Waiting for Payment",
-      color: "orange",
+      // color: "orange",
     },
   ];
   const finalizedOptions = [
-    { id: "true", label: "Finalized", color: "green" },
-    { id: "false", label: "Not Finalized", color: "red" },
+    { id: "true", 
+      label: "Finalized", 
+      style: { borderColor: finalizedFilter === "true" ? "black" : "lightgray", 
+        borderTopLeftRadius: 4,
+        borderBottom: finalizedFilter === "true" ? "#F8FAFC" : "lightgray" } },
+    { id: "false", 
+      label: "Not Finalized", 
+      style: { borderColor: finalizedFilter === "false" ? "black" : "lightgray", 
+        borderTopRightRadius: 4,
+        borderBottom: finalizedFilter === "false" ? "#F8FAFC" : "lightgray"  } },
   ];
 
   const handleStatusToggle = (id) => {
@@ -151,11 +179,7 @@ export const Jobs = () => {
   };
 
   const handleFinalizedToggle = (id) => {
-    setFinalizedFilter(
-      finalizedFilter.includes(id)
-        ? finalizedFilter.filter((s) => s !== id)
-        : [...finalizedFilter, id]
-    );
+    setFinalizedFilter(id);
   };
 
   const columnsOptions = [
@@ -224,118 +248,100 @@ export const Jobs = () => {
     );
   });
 
-  const Filters = () => (
-    <Util.Row justify="between" align="start">
-      <Util.Row gap={1}>
-        <Util.Col gap={0.5}>
-          <H4>Status</H4>
-          {/* Render status filter UI here, e.g., checkboxes for each status */}
-          {statusOptions.map(({ id, label, color }) => (
-            <Badge
-              key={id}
-              color={color}
-              soft={!statusFilter.includes(id)}
-              onClick={() => handleStatusToggle(id)}
-            >
-              <Util.Row justify="between" gap={0.5}>
-                {statusFilter.includes(id) ? (
-                  <Icon i="square-check" />
-                ) : (
-                  <Icon i="square" />
-                )}
-                {label}
-              </Util.Row>
-            </Badge>
-          ))}
-          {/* {JSON.stringify(statusFilter)} */}
-        </Util.Col>
-        <Util.Col gap={0}>
-          <H4>Due Date Range</H4>
-          <Input
-            type="date"
-            onChange={(e) => setStartDateFilter(e + "T00:00:00")}
-            value={startDateFilter?.split("T")[0]}
-            icon={startDateFilter && <Icon i="x" />}
-            iconPos="trailing"
-            separated={!!startDateFilter}
-            appendedLinkOnClick={() => setStartDateFilter(null)}
-          />
-          <Input
-            type="date"
-            onChange={(e) => setEndDateFilter(e + "T00:00:00")}
-            value={endDateFilter?.split("T")[0]}
-            icon={endDateFilter && <Icon i="x" />}
-            iconPos="trailing"
-            separated={!!endDateFilter}
-            appendedLinkOnClick={() => setEndDateFilter(null)}
-            style={{
-              marginTop: -12,
-            }}
-          />
-          {/* Render date pickers for start and end dates */}
-          {/* </Util.Col>
-        <Util.Col gap={0}> */}
-          {(activeUser?.admin ||
-            userShop.accountType === "ADMIN" ||
-            userShop.accountType === "OPERATOR") && (
-            <>
-              <H4>Submitter</H4>
-              <ShopUserPicker
-                value={submitterFilter}
-                onChange={setSubmitterFilter}
-                includeNone={true}
-              />
-            </>
-          )}
-          {/* Render input for submitter name */}
-        </Util.Col>
-        <Util.Col>
-          <>
-            <H4>Finalized</H4>
-            <Util.Col gap={0.5}>
-              {finalizedOptions.map(({ id, label, color }) => (
-                <Badge
+  const NEWFilters = () => (
+    <div>
+      <Util.Row justify="between" align="start">
+        <Util.Row gap={1}>
+          <Util.Col gap={0}>
+            <H4>Status</H4>
+            <Dropdown prompt="Select Status" items={statusOptions.map(({id, label}) => ({text:
+                <div
                   key={id}
-                  color={color}
-                  soft={!finalizedFilter.includes(id)}
-                  onClick={() => handleFinalizedToggle(id)}
+                  onClick={() => handleStatusToggle(id)}
                 >
                   <Util.Row justify="between" gap={0.5}>
-                    {finalizedFilter.includes(id) ? (
+                      {statusFilter.includes(id) ? (
                       <Icon i="square-check" />
                     ) : (
                       <Icon i="square" />
                     )}
                     {label}
                   </Util.Row>
-                </Badge>
-              ))}
-            </Util.Col>
-          </>
-        </Util.Col>
-      </Util.Row>
-
-      <Util.Col gap={0.5}>
-        <H4>Columns</H4>
-        {columnsOptions.map((id) => (
-          <Badge
-            key={id}
-            color="azure"
-            soft={!columnsToShow.includes(id)}
-            onClick={() => handleColumnToggle(id)}
-          >
-            <Util.Row justify="between" gap={0.5}>
-              {columnsToShow.includes(id) ? (
-                <Icon i="square-check" />
-              ) : (
-                <Icon i="square" />
-              )}
-              {id}
+                </div>}))}
+              showSearch={false}/>
+          </Util.Col>
+          {(activeUser?.admin ||
+              userShop.accountType === "ADMIN" ||
+              userShop.accountType === "OPERATOR") && (
+              <Util.Col gap={0}>
+                <H4>Submitter</H4>
+                <ShopUserPicker
+                  value={submitterFilter}
+                  onChange={setSubmitterFilter}
+                  includeNone={true}
+                />
+              </Util.Col>
+            )}
+          <Util.Col gap={0}>
+            <H4>Due Date Range</H4>
+            <Util.Row gap={0.5}>
+              <Input
+                type="date"
+                onChange={(e) => setStartDateFilter(e + "T00:00:00")}
+                value={startDateFilter?.split("T")[0]}
+                icon={startDateFilter && <Icon i="x" />}
+                iconPos="trailing"
+                separated={!!startDateFilter}
+                appendedLinkOnClick={() => setStartDateFilter(null)}
+              />
+              <h2> - </h2>
+              <Input
+                type="date"
+                onChange={(e) => setEndDateFilter(e + "T00:00:00")}
+                value={endDateFilter?.split("T")[0]}
+                icon={endDateFilter && <Icon i="x" />}
+                iconPos="trailing"
+                separated={!!endDateFilter}
+                appendedLinkOnClick={() => setEndDateFilter(null)}
+              />
             </Util.Row>
-          </Badge>
-        ))}
+          </Util.Col>
+          <Util.Col gap={0}>
+            <h4>Columns</h4>
+            <Dropdown
+              prompt="Select Columns"
+              items={columnsOptions.map((id) => ({text:
+                <div
+                  key={id}
+                  onClick={() => {handleColumnToggle(id);}}
+                >
+                  <Util.Row justify="between" gap={0.5}>
+                    {columnsToShow.includes(id) ? (
+                      <Icon i="square-check" />
+                    ) : (
+                      <Icon i="square" />
+                    )}
+                    {id}
+                  </Util.Row>
+                </div>}))}
+              showSearch={false}
+              multiple={true}
+              selectedItems={columnsToShow.map((id) => ({ text: id, label: id }))}
+            />
+          </Util.Col>
+        </Util.Row>
+      </Util.Row>
+      <Util.Col>
+        <SegmentedControl
+          value={finalizedFilter}
+          items={finalizedOptions.map(({ id, label, style }) => ({id, label, style}))}
+          onChange={(newFilter) => handleFinalizedToggle(newFilter.id)}
+          style={{ minWidth: 150, marginBottom: -17, alignSelf: "flex-end" }}
+          buttonStyle={{ color: "black", fontFamily: "inherit", fontWeight: "inherit", borderRadius: 0, borderBottom: "1px solid rgb(218 223 228)" }}
+          buttonClassName="btn"
+        />
       </Util.Col>
-    </Util.Row>
+      </div>
   );
 
   if (user?.simple === false) {
@@ -357,9 +363,11 @@ export const Jobs = () => {
         </Util.Row>
         <Util.Spacer size={1} />
 
-        <H3>Filters</H3>
-        <Filters />
-        <Util.Spacer size={2} />
+        <div style={{ padding: 16, borderBottom: "1px solid rgb(218 223 228)", backgroundColor: "#F8FAFC" }}>
+          <H3>Filters</H3>
+          <NEWFilters />
+        </div>
+        {/* <Util.Spacer size={2} /> */}
 
         {/* Jobs Table */}
         {filteredJobs.length === 0 ? (
@@ -386,7 +394,7 @@ export const Jobs = () => {
                   accessor: "user.name",
                   render: (name, context) => (
                     <Util.Row gap={0.5} align="center">
-                      <Avatar size="sm" dicebear initials={context.user.id} />
+                      {/* <Avatar size="sm" dicebear initials={context.user.id} /> */}
                       <Util.Col align="start">
                         {name}
                         {context.user.id === activeUser?.id && (
@@ -434,70 +442,93 @@ export const Jobs = () => {
                   accessor: "itemsCount",
                   sortable: true,
                 },
+                // {
+                //   label: "Progress",
+                //   accessor: "progress",
+                //   render: (d, _) => (
+                //     <Util.Row gap={1} align="center">
+                //       <Util.Col justify="between" gap={1}>
+                //         {/* Prevent line break at all */}
+                //         <span
+                //           style={{
+                //             whiteSpace: "nowrap",
+                //             overflow: "hidden",
+                //             textOverflow: "ellipsis",
+                //           }}
+                //         >
+                //           <Icon i="sum" size={14} />
+                //           {_.itemsCount}
+                //         </span>
+                //         {_.itemsCount === 0 ? (
+                //           <PieProgressChart
+                //             complete={0}
+                //             inProgress={0}
+                //             notStarted={0}
+                //             exclude={1}
+                //           />
+                //         ) : (
+                //           <PieProgressChart
+                //             complete={d.completedCount / _.itemsCount}
+                //             inProgress={d.inProgressCount / _.itemsCount}
+                //             notStarted={d.notStartedCount / _.itemsCount}
+                //             exclude={d.excludedCount / _.itemsCount}
+                //           />
+                //         )}
+                //         <div className="sos-600">
+                //           <span className="text-success">{d.completedCount}</span>
+                //           <span className="text-yellow">{d.inProgressCount}</span>
+                //           <span className="text-danger">{d.notStartedCount}</span>
+                //           <span className="text-gray-400">{d.excludedCount}</span>
+                //         </div>
+                //       </Util.Col>
+                //       <div style={{ fontSize: 10 }} className="hos-600">
+                //         <span className="text-success">
+                //           <Icon i="circle-check" size={10} /> {d.completedCount} /{" "}
+                //           {_.itemsCount}
+                //           <span className="hos-900"> Completed</span>
+                //         </span>
+                //         <br />
+                //         <span className="text-yellow">
+                //           <Icon i="progress" size={10} /> {d.inProgressCount} /{" "}
+                //           {_.itemsCount}
+                //           <span className="hos-900"> In Progress</span>
+                //         </span>
+                //         <br />
+                //         <span className="text-danger">
+                //           <Icon i="minus" size={10} /> {d.notStartedCount} /{" "}
+                //           {_.itemsCount}
+                //           <span className="hos-900"> Not Started</span>
+                //         </span>
+                //         <br />
+                //         <span className="text-gray-400">
+                //           <Icon i="x" size={10} /> {d.excludedCount} /{" "}
+                //           {_.itemsCount}
+                //           <span className="hos-900"> Excluded</span>
+                //         </span>
+                //       </div>
+                //     </Util.Row>
+                //   ),
+                // },
                 {
                   label: "Progress",
                   accessor: "progress",
                   render: (d, _) => (
                     <Util.Row gap={1} align="center">
-                      <Util.Col justify="between" gap={1}>
-                        {/* Prevent line break at all */}
-                        <span
-                          style={{
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                          }}
-                        >
-                          <Icon i="sum" size={14} />
-                          {_.itemsCount}
-                        </span>
-                        {_.itemsCount === 0 ? (
-                          <PieProgressChart
-                            complete={0}
-                            inProgress={0}
-                            notStarted={0}
-                            exclude={1}
-                          />
-                        ) : (
-                          <PieProgressChart
-                            complete={d.completedCount / _.itemsCount}
-                            inProgress={d.inProgressCount / _.itemsCount}
-                            notStarted={d.notStartedCount / _.itemsCount}
-                            exclude={d.excludedCount / _.itemsCount}
-                          />
-                        )}
-                        <div className="sos-600">
-                          <span className="text-success">{d.completedCount}</span>
-                          <span className="text-yellow">{d.inProgressCount}</span>
-                          <span className="text-danger">{d.notStartedCount}</span>
-                          <span className="text-gray-400">{d.excludedCount}</span>
-                        </div>
-                      </Util.Col>
-                      <div style={{ fontSize: 10 }} className="hos-600">
-                        <span className="text-success">
-                          <Icon i="circle-check" size={10} /> {d.completedCount} /{" "}
-                          {_.itemsCount}
-                          <span className="hos-900"> Completed</span>
-                        </span>
-                        <br />
-                        <span className="text-yellow">
-                          <Icon i="progress" size={10} /> {d.inProgressCount} /{" "}
-                          {_.itemsCount}
-                          <span className="hos-900"> In Progress</span>
-                        </span>
-                        <br />
-                        <span className="text-danger">
-                          <Icon i="minus" size={10} /> {d.notStartedCount} /{" "}
-                          {_.itemsCount}
-                          <span className="hos-900"> Not Started</span>
-                        </span>
-                        <br />
-                        <span className="text-gray-400">
-                          <Icon i="x" size={10} /> {d.excludedCount} /{" "}
-                          {_.itemsCount}
-                          <span className="hos-900"> Excluded</span>
-                        </span>
-                      </div>
+                      {_.itemsCount === 0 ? (
+                        <PieProgressChart
+                          complete={0}
+                          inProgress={0}
+                          notStarted={0}
+                          exclude={1}
+                        />
+                      ) : (
+                        <PieProgressChart
+                          complete={d.completedCount / _.itemsCount}
+                          inProgress={d.inProgressCount / _.itemsCount}
+                          notStarted={d.notStartedCount / _.itemsCount}
+                          exclude={d.excludedCount / _.itemsCount}
+                        />
+                      )}
                     </Util.Row>
                   ),
                 },
