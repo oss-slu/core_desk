@@ -68,6 +68,30 @@ export const post = [
         },
       });
 
+      const promotedAccounts = await prisma.userShop.updateMany({
+        where: {
+          userId: userToConnect.userId,
+          shopId,
+          accountType: "CUSTOMER",
+        },
+        data: {
+          accountType: "GROUP_ADMIN",
+        },
+      });
+
+      if (promotedAccounts.count) {
+        await prisma.logs.create({
+          data: {
+            userId: userToConnect.userId,
+            shopId,
+            billingGroupId: group.id,
+            type: LogType.USER_SHOP_ROLE_CHANGED,
+            message: "User promoted to group admin by billing group creation",
+            to: JSON.stringify({ accountType: "GROUP_ADMIN" }),
+          },
+        });
+      }
+
       await prisma.logs.createMany({
         data: [
           {
