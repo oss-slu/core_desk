@@ -159,6 +159,34 @@ export const post = [
           },
         });
 
+        if (role === "ADMIN") {
+          const promotedAccounts = await prisma.userShop.updateMany({
+            where: {
+              userId,
+              shopId,
+              accountType: "CUSTOMER",
+            },
+            data: {
+              accountType: "GROUP_ADMIN",
+            },
+          });
+
+          if (promotedAccounts.count) {
+            await prisma.logs.create({
+              data: {
+                type: LogType.USER_SHOP_ROLE_CHANGED,
+                userId,
+                shopId,
+                billingGroupId: groupId,
+                userBillingGroupId: billingGroupUser.id,
+                message:
+                  "User promoted to group admin by billing group membership update",
+                to: JSON.stringify({ accountType: "GROUP_ADMIN" }),
+              },
+            });
+          }
+        }
+
         await prisma.logs.create({
           data: {
             type: LogType.USER_BILLING_GROUP_ROLE_CHANGED,
@@ -193,6 +221,34 @@ export const post = [
         role,
       },
     });
+
+    if (role === "ADMIN") {
+      const promotedAccounts = await prisma.userShop.updateMany({
+        where: {
+          userId,
+          shopId,
+          accountType: "CUSTOMER",
+        },
+        data: {
+          accountType: "GROUP_ADMIN",
+        },
+      });
+
+      if (promotedAccounts.count) {
+        await prisma.logs.create({
+          data: {
+            type: LogType.USER_SHOP_ROLE_CHANGED,
+            userId,
+            shopId,
+            billingGroupId: groupId,
+            userBillingGroupId: newUbg.id,
+            message:
+              "User promoted to group admin by billing group membership creation",
+            to: JSON.stringify({ accountType: "GROUP_ADMIN" }),
+          },
+        });
+      }
+    }
 
     await prisma.logs.create({
       data: {
