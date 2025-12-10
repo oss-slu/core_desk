@@ -1,7 +1,9 @@
 import React from "react";
+import { SWRConfig } from "swr";
 import { createRoot } from "react-dom/client";
 import App from "./App";
 import { AuthProvider } from "#useAuth";
+import { swrConfig } from "./util/swrConfig";
 import * as Sentry from "@sentry/react";
 
 Sentry.init({
@@ -39,6 +41,8 @@ Sentry.init({
 
 createRoot(document.getElementById("root")).render(
   <AuthProvider>
-    <App />
+    <SWRConfig value={swrConfig}>
+      <App />
+    </SWRConfig>
   </AuthProvider>
 );
