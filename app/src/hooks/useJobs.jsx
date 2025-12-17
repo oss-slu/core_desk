@@ -221,7 +221,7 @@ export const useJobs = (shopId) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
-    const [setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [onBehalfOf] = useState(false);
     const [onBehalfOfUserId] = useState(null);
     const [onBehalfOfUserEmail] = useState("");
