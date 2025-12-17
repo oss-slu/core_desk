@@ -221,7 +221,7 @@ export const useJobs = (shopId) => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState("");
-    const [setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [onBehalfOf] = useState(false);
     const [onBehalfOfUserId] = useState(null);
     const [onBehalfOfUserEmail] = useState("");
@@ -261,6 +261,7 @@ export const useJobs = (shopId) => {
         {title.length > 0 && dueDate.length > 0 ? (
         <Button
           variant="primary"
+          loading={loading}
           onClick={() => {
             setLoading(true);
             _createJob(
