@@ -261,6 +261,7 @@ export const useJobs = (shopId) => {
         {title.length > 0 && dueDate.length > 0 ? (
         <Button
           variant="primary"
+          loading={loading}
           onClick={() => {
             setLoading(true);
             _createJob(
