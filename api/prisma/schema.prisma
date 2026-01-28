@@ -11,6 +11,7 @@ datasource db {
 model user {
   id               String             @id @default(cuid())
   email            String             @unique
+  password         String?            
   firstName        String
   lastName         String
   admin            Boolean            @default(false)
@@ -427,7 +428,11 @@ model UserBillingGroup {
 }
 
 enum LogType {
-  USER_LOGIN
+
+  USER_LOGIN_LOCAL //local login locally
+  USER_PASSWORD_SET
+  USER_LOGIN_FAILURE
+  USER_LOGIN //sso
   USER_CREATED
   SHOP_CREATED
   USER_CONNECTED_TO_SHOP
