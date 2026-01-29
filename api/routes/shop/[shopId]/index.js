@@ -149,6 +149,7 @@ export const get = [
                 (acc, item) => acc + item.value,
                 0
               ),
+              password : undefined,
               jobCounts,
               totalJobs: userShop.user.jobs.length,
               ledgerItems: undefined,

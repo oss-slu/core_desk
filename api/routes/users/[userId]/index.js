@@ -25,6 +25,7 @@ export const get = [
 
           user = {
             ...user,
+            password : undefined,
             name: `${user.firstName} ${user.lastName}`,
           };
 
@@ -146,6 +147,7 @@ export const get = [
 
       user = {
         ...user,
+        password: undefined,
         name: `${user.firstName} ${user.lastName}`,
         shopCount: user._count.shops,
         jobCount: user._count.jobs,
