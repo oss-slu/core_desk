@@ -104,6 +104,7 @@ export const get = [
         0
       );
       delete user.user.ledgerItems;
+      delete user.user.password; //delete the password before returning user
 
       user.user.isMe = user.userId === req.user.id;
 
