@@ -122,7 +122,7 @@ export default () => {
                 path="*"
                 element={
                   <div>
-                    <h1>Welcome to SLU Open Project</h1>
+                    <h1>Welcome to sssSLU Open Project</h1>
                     <p>Please log in to continue</p>
                     <Button variant="primary" onClick={login}>
                       Login

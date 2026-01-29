@@ -1,5 +1,7 @@
 import samlConfig from "../../config/saml-config.js";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import { prisma }  from "#prisma";
 
 export const get = [
   (req, res) => {
@@ -32,12 +34,24 @@ export const post = [
       }
 
       await prisma.log.create({ data : {type: 'USER_LOGIN_LOCAL', userId: user.id}});
-      //swap for a token here?
-      //return a token and user to the front-end?
-    }
 
+        const token = jwt.sign( //signed with information
+        {
+        id:user.id,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "3h" }
+        );
+
+        return res.status(200).json(token);
+      }
 
     catch(error){
+      console.log("Error", error);//
+      
       return res.status(500).json({error : "Internal server error"});
 
     }

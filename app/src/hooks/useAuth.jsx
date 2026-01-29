@@ -23,6 +23,9 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
+
+
   const login = async () => {
     const r = await fetch(u("/api/auth/login"));
     const { url } = await r.json();
