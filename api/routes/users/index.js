@@ -43,6 +43,7 @@ export const get = [
       users = users.map((user) => ({
         ...user,
         name: `${user.firstName} ${user.lastName}`,
+        password : undefined, //return undefined as the password 
         isMe: user.id === req.user.id,
         shopCount: user._count.shops,
         jobCount: user._count.jobs,
