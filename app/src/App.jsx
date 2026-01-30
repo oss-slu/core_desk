@@ -120,9 +120,10 @@ export default () => {
             ) : (
               <Route
                 path="*"
-                element={
+                element={ //I dont like this I am going to create a login page
+
                   <div>
-                    <h1>Welcome to sssSLU Open Project</h1>
+                    <h1>Welcome to SLU Open Project</h1>
                     <p>Please log in to continue</p>
                     <Button variant="primary" onClick={login}>
                       Login

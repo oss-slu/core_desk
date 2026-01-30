@@ -10,7 +10,7 @@ import { LogTimeline } from "../../components/logs/timeline";
 import { Table } from "#table";
 import moment from "moment";
 import { Button } from "#button";
-import { Input, Badge } from "tabler-react-2";
+import { Input, Badge     } from "tabler-react-2";
 import { Icon } from "#icon";
 import { useModal } from "#modal";
 import { useShops } from "../../hooks/useShops";
@@ -125,6 +125,44 @@ const AddUserToShop = ({ user, shops, loading, onFinish }) => {
   );
 };
 
+
+const ChangePassword = ({ user }) => {
+  const [password, setPassword] = useState("");
+
+  return (
+    <div className="mb-3 text-start"> 
+      <label className="form-label">
+        Set New Password for {user.firstName}
+      </label>
+
+      {/* Changed from Input.Group to a standard div */}
+      <div className="input-group">
+        <Input
+          type="password"
+          placeholder="Enter new password..."
+          value={password}
+          onChange={(val) => setPassword(val)}
+        />
+
+        <Button
+          variant="primary" // Changed color to variant to match your other buttons
+          disabled={!password}
+          onClick={() => {
+            console.log("Updating password to:", password);
+            // Add your update logic here
+          }}
+        >
+          Update
+        </Button>
+      </div>
+
+      <small className="text-muted mt-2 d-block">
+        This will immediately override the user's current credentials.
+      </small>
+    </div>
+  );
+};
+
 export const UserPage = () => {
   const { userId } = useParams();
   const {
@@ -173,6 +211,7 @@ export const UserPage = () => {
     if (user) {
       setEditableFirstName(user.firstName);
       setEditableLastName(user.lastName);
+      console.log("user has password" , user.hasPassword);
     }
   }, [user]);
 
@@ -269,6 +308,18 @@ export const UserPage = () => {
               >
                 <Icon i="reload" size={18} /> Refetch User
               </Button>
+              {user.hasPassword && (
+                <>
+
+                <ChangePassword user = {user}/>
+                
+                </>
+
+
+              )}
+
+
+
               {!user.isMe &&
                 (user.admin ? (
                   <Button

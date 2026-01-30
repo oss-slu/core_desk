@@ -25,7 +25,8 @@ export const get = [
 
           user = {
             ...user,
-            password : undefined,
+            password : user.user,
+            hasPassword : true, //return true for now
             name: `${user.firstName} ${user.lastName}`,
           };
 
@@ -148,6 +149,7 @@ export const get = [
       user = {
         ...user,
         password: undefined,
+        hasPassword : true,
         name: `${user.firstName} ${user.lastName}`,
         shopCount: user._count.shops,
         jobCount: user._count.jobs,
