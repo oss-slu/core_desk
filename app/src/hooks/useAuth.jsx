@@ -24,14 +24,6 @@ export const AuthProvider = ({ children }) => {
   };
 
 
-  const getLocalToken = () => {
-    
-  }
-
-  const localLogin = async () => {
-    const r = await fetch
-  }
-
   const login = async () => {
     const r = await fetch(u("/api/auth/login"));
     const { url } = await r.json();
@@ -63,7 +55,6 @@ export const AuthProvider = ({ children }) => {
         name: user.firstName + " " + user.lastName,
         hasPassword : user.hasPassword,
       });
-      console.log("here");
       console.log({
         id: user.id,
         email: user.email,
