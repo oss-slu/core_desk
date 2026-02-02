@@ -15,8 +15,6 @@ export const get = [
 export const post = [
   async (req, res) => {
     const {email, password} = req.body;
-
-
     try{
       const user = await prisma.user.findUnique({ where : {email}, });
 
@@ -50,8 +48,43 @@ export const post = [
       }
 
     catch(error){
-      console.log("Error", error);//
+      console.log("Error", error);
+
+      return res.status(500).json({error : "Internal server error"});
+
+    }
+  }
+]
+
+
+
+
+export const put = [
+  async (req, res) => {
+    const {userId, firstName, lastName, password} = req.body;
+    try{
+      const user = await prisma.user.findUnique({ where : {userId}, });
+
+
+      if (!user || !user.password){ //if there is no user matching the userId
+        await prisma.log.create({ data: {type: 'USER_PASSWORD_SET_FAILURE'}, details: `User ID ${userId} not found`});
+        
+        return res.status(404).json({error : "Failed to find user."});
+
+      }
+      const hashedPassword = bcrypt.hash(password, 10);
       
+      await prisma.user.update({
+        where: { id: userId },
+        data: { password: hashedPassword }
+      });
+      await prisma.log.create({data : {type : 'USER_PASSWORD_CHANGE', userId: user.id}});
+      return res.status(200);
+    }
+
+    catch(error){
+      console.log("Error", error);
+
       return res.status(500).json({error : "Internal server error"});
 
     }

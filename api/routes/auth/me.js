@@ -1,6 +1,6 @@
 import { verifyAuth } from "#verifyAuth";
 
-const checkHasPassword = (user) => {
+export const checkHasPassword = (user) => {
   return !!user.password;
 };
 

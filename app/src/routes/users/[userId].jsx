@@ -19,6 +19,7 @@ import { Alert } from "#alert";
 import { useConfirm } from "#confirm";
 import { NotFound } from "#notFound";
 import { useUserLogs } from "../../hooks/useUserLogs";
+import toast from "react-hot-toast"
 const { H2, H3 } = Typography;
 
 const AddUserToShopForm = ({ user, onFinish }) => {
@@ -129,34 +130,78 @@ const AddUserToShop = ({ user, shops, loading, onFinish }) => {
 const ChangePassword = ({ user }) => {
   const [password, setPassword] = useState("");
 
+  const updatePassword = async (user) => {
+    try {
+      await authFetch(`/api/routes/login`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.userId, //we really only need to send userId?
+          firstName: user.firstName,
+          lastName: user.lastName,
+          password: password,
+        }),
+      });
+      console.log("Password updated.");
+    } catch (error) {
+      toast.error(data.error);
+      //add to sentry later?
+    }
+  };
+
   return (
-    <div className="mb-3 text-start"> 
-      <label className="form-label">
+    <div style={{ marginBottom: "1rem", textAlign: "left", width: "100%" }}>
+      <label 
+        style={{ 
+          display: "block", 
+          marginBottom: "0.5rem", 
+          fontWeight: "500", 
+          fontSize: "0.875rem" 
+        }}
+      >
         Set New Password for {user.firstName}
       </label>
 
-      {/* Changed from Input.Group to a standard div */}
-      <div className="input-group">
-        <Input
-          type="password"
-          placeholder="Enter new password..."
-          value={password}
-          onChange={(val) => setPassword(val)}
-        />
+      <div style={{ display: "flex", alignItems: "stretch", gap: "0px" }}>
+        <div style={{ flex: 1 }}>
+          <Input
+            type="password"
+            placeholder="Enter new password..."
+            value={password}
+            onChange={(val) => setPassword(val)}
+            style={{
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+            }}
+          />
+        </div>
 
         <Button
-          variant="primary" // Changed color to variant to match your other buttons
+          variant="primary"
           disabled={!password}
+          style={{
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            whiteSpace: "nowrap"
+          }}
           onClick={() => {
-            console.log("Updating password to:", password);
-            // Add your update logic here
+            updatePassword(user);
           }}
         >
           Update
         </Button>
       </div>
 
-      <small className="text-muted mt-2 d-block">
+      <small 
+        style={{ 
+          color: "#6c757d", 
+          marginTop: "0.5rem", 
+          display: "block", 
+          fontSize: "0.75rem" 
+        }}
+      >
         This will immediately override the user's current credentials.
       </small>
     </div>
