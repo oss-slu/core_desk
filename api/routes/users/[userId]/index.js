@@ -24,9 +24,9 @@ export const get = [
 
           if (!user) return res.status(404).json({ message: "User not found" });
           const hasPassword = checkHasPassword(user);
+          delete user.password;
           user = {
             ...user,
-            password : user.user,
             hasPassword : hasPassword,
             name: `${user.firstName} ${user.lastName}`,
           };
