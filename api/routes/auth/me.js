@@ -7,8 +7,6 @@ export const get = [
   (req, res) => {
     console.log(req.user);
     const hasPasswordFlag = checkHasPassword(req.user);
-    console.log(`Password Value: "${req.user.password}" - Result: ${hasPasswordFlag}`);
-
     res.json({
       user: {
         id: req.user.id,
