@@ -8,7 +8,7 @@ dotenv.config();
  * @returns {Promise<string>} - Returns the Bearer token.
  */
 export const authenticate = async (username, password) => {
-    const url = 'https://ask.slu.edu/SBTDWebApi/api/auth/login';
+    const url = `${process.env.TDX_URL}/auth/login`;
     
     // The "loginParams" structure based on typical TeamDynamix API requirements
     const loginParams = {

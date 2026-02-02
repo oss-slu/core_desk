@@ -1,23 +1,8 @@
-// const options = {
-    // "TicketClassification": {
-    //     "Name": "ServiceRequest",
-    //     "Value": 46
-    // },
-    // "TypeID": 15,
-    // "TypeName": "End-Point Computing",
-    // "TypeCategoryID": 7,
-    // "TypeCategoryName": "Printing",
-    // "ServiceCategoryID": "53",
-    // "ServiceCategoryName": "Poster Printing Request",
-//     "ComponentID": 32,
-//     "Name": "Student Service Desk tickets",
-//     "Page": {
-//         "PageSize": 200,
-//     }
-// };
+import dotenv from 'dotenv';
+dotenv.config();
 
 export const fetchTickets = async (id, token, appId = 31) => {
-    const url = `https://ask.slu.edu/SBTDWebApi/api/${appId}/tickets/${id}`;
+    const url = `${process.env.TDX_URL}/${appId}/tickets/${id}`;
 
     try {
         const response = await fetch(url, {
