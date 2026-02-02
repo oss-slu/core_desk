@@ -139,6 +139,7 @@ export const get = [
               excludedCount: 0,
             }
           );
+          delete userShop.user.password;
 
           return {
             ...userShop,
@@ -149,7 +150,6 @@ export const get = [
                 (acc, item) => acc + item.value,
                 0
               ),
-              password : undefined,
               jobCounts,
               totalJobs: userShop.user.jobs.length,
               ledgerItems: undefined,

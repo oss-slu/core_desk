@@ -1,5 +1,6 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
+import { checkHasPassword } from "#verifyAuth";
 
 export const get = [
   verifyAuth,
@@ -22,11 +23,11 @@ export const get = [
           });
 
           if (!user) return res.status(404).json({ message: "User not found" });
-
+          const hasPassword = checkHasPassword(user);
           user = {
             ...user,
             password : user.user,
-            hasPassword : true, //return true for now
+            hasPassword : hasPassword,
             name: `${user.firstName} ${user.lastName}`,
           };
 
@@ -146,10 +147,11 @@ export const get = [
 
       if (!user) return res.status(404).json({ message: "User not found" });
 
+      const hasPassword = checkHasPassword(user);
+      delete user.password;
       user = {
         ...user,
-        password: undefined,
-        hasPassword : true,
+        hasPassword : hasPassword,
         name: `${user.firstName} ${user.lastName}`,
         shopCount: user._count.shops,
         jobCount: user._count.jobs,
