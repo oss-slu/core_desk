@@ -29,7 +29,6 @@ export const useUser = (userId) => {
       shouldSetLoading && setLoading(true);
       const r = await authFetch(`/api/users/${userId}`);
       const data = await r.json();
-      console.log("data", data.user);
       setUser(data.user);
       setLoading(false);
     } catch (error) {
