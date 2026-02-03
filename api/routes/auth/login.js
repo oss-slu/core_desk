@@ -61,7 +61,7 @@ export const post = [
 
 export const put = [
   async (req, res) => {
-    const {userId, firstName, lastName, password} = req.body;
+    const {userId} = req.body;
     try{
       const user = await prisma.user.findUnique({ where : {userId}, });
 
