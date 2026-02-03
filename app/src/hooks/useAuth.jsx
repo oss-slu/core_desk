@@ -48,6 +48,7 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (r.ok) {
+      
       const { user } = await r.json();
       Sentry.setUser({
         id: user.id,
