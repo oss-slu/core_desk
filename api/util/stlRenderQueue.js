@@ -119,6 +119,20 @@ const markResult = async (task, result) => {
       data: {
         ...baseData,
         status: "SUCCEEDED",
+        lastError: null,
+        completedAt: new Date(),
+      },
+    });
+    return;
+  }
+
+  if (result.fatal) {
+    await prisma.stlRenderTask.update({
+      where: { id: task.id },
+      data: {
+        ...baseData,
+        status: "FAILED",
+        lastError: result.error || null,
         completedAt: new Date(),
       },
     });
@@ -135,6 +149,7 @@ const markResult = async (task, result) => {
     data: {
       ...baseData,
       status: "PENDING",
+      lastError: result.error || null,
       availableAt: new Date(Date.now() + backoffSeconds * 1000),
     },
   });
@@ -222,11 +237,22 @@ const callCloudflare = async (tasks) => {
       }),
     );
 
-    if (!resp.ok) {
-      throw new Error(`Cloudflare worker responded with ${resp.status}`);
+    if (resp.status === 429) {
+      const err = new Error("RATE_LIMIT");
+      err.rateLimited = true;
+      err.status = resp.status;
+      throw err;
     }
 
-    const payload = await resp.json();
+    const payload = await resp.json().catch(() => ({}));
+
+    if (!resp.ok) {
+      const err = new Error(payload?.error || `Cloudflare worker responded with ${resp.status}`);
+      err.status = resp.status;
+      err.rateLimited = payload?.errorType === "RATE_LIMIT";
+      throw err;
+    }
+
     if (!payload?.results) {
       throw new Error("Cloudflare worker payload missing results");
     }
@@ -285,7 +311,11 @@ const processBatch = async (tasks) => {
         task.id,
         result.error || "Unknown",
       );
-      await markResult(task, { ok: false, error: result.error || "Unknown" });
+      await markResult(task, {
+        ok: false,
+        fatal: Boolean(result.fatal),
+        error: result.error || "Unknown",
+      });
       continue;
     }
 

@@ -2,6 +2,18 @@ import puppeteer from "@cloudflare/puppeteer";
 
 const VIEWPORT = { width: 512, height: 512 };
 const THEME_COLOR = 0x53c3ee;
+const RATE_LIMIT_STATUS = 429;
+
+const isRateLimitError = (err) => {
+  const msg = (err?.message || "").toLowerCase();
+  return (
+    err?.status === RATE_LIMIT_STATUS ||
+    msg.includes("429") ||
+    msg.includes("rate limit") ||
+    msg.includes("too many") ||
+    msg.includes("exceeded usage")
+  );
+};
 
 const arrayBufferToBase64 = (ab) => {
   const bytes = new Uint8Array(ab);
@@ -59,13 +71,21 @@ const renderTask = async (page, task, hardDeadline) => {
       return {
         taskId,
         ok: false,
+        fatal: true,
+        errorType: "FETCH_FAILED",
         error: `Failed to fetch STL: ${stlRes.status}`,
       };
     }
     const ab = await stlRes.arrayBuffer();
     stlBase64 = arrayBufferToBase64(ab);
   } catch (e) {
-    return { taskId, ok: false, error: e?.message || String(e) };
+    return {
+      taskId,
+      ok: false,
+      fatal: true,
+      errorType: "FETCH_FAILED",
+      error: e?.message || String(e),
+    };
   }
 
   const logs = [];
@@ -97,70 +117,89 @@ const renderTask = async (page, task, hardDeadline) => {
           return out;
         };
 
-        const THREE = window.__THREE__;
-        const loader = new window.__STLLoader__();
+        try {
+          const THREE = window.__THREE__;
+          const loader = new window.__STLLoader__();
 
-        // Parse STL bytes (no network, no CORS).
-        const bytes = decodeBase64ToUint8(stlBase64);
-        const geometry = loader.parse(bytes.buffer);
+          // Parse STL bytes (no network, no CORS).
+          const bytes = decodeBase64ToUint8(stlBase64);
+          const geometry = loader.parse(bytes.buffer);
 
-        geometry.computeBoundingBox();
-        geometry.center();
+          geometry.computeBoundingBox();
+          geometry.center();
 
-        const size = new THREE.Vector3();
-        geometry.boundingBox.getSize(size);
+          const size = new THREE.Vector3();
+          geometry.boundingBox.getSize(size);
 
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0xf7f7f7);
+          const scene = new THREE.Scene();
+          scene.background = new THREE.Color(0xf7f7f7);
 
-        const material = new THREE.MeshPhysicalMaterial({
-          color,
-          metalness: 0.25,
-          roughness: 0.55,
-        });
+          const material = new THREE.MeshPhysicalMaterial({
+            color,
+            metalness: 0.25,
+            roughness: 0.55,
+          });
 
-        const mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
+          const mesh = new THREE.Mesh(geometry, material);
+          scene.add(mesh);
 
-        scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.15));
+          scene.add(new THREE.HemisphereLight(0xffffff, 0x888888, 1.15));
 
-        const radius = Math.max(size.x, size.y, size.z) || 1;
-        const camera = new THREE.PerspectiveCamera(
-          35,
-          width / height,
-          0.1,
-          1000,
-        );
-        camera.position.set(radius * 1.6, radius * 1.2, radius * 1.6);
-        camera.lookAt(0, 0, 0);
+          const radius = Math.max(size.x, size.y, size.z) || 1;
+          const camera = new THREE.PerspectiveCamera(
+            35,
+            width / height,
+            0.1,
+            1000,
+          );
+          camera.position.set(radius * 1.6, radius * 1.2, radius * 1.6);
+          camera.lookAt(0, 0, 0);
 
-        const renderer = new THREE.WebGLRenderer({
-          antialias: true,
-          alpha: true,
-          preserveDrawingBuffer: true,
-        });
+          const renderer = new THREE.WebGLRenderer({
+            antialias: true,
+            alpha: true,
+            preserveDrawingBuffer: true,
+          });
 
-        // IMPORTANT: numbers, not strings
-        renderer.setSize(width, height, false);
-        renderer.setPixelRatio(1);
+          // IMPORTANT: numbers, not strings
+          renderer.setSize(width, height, false);
+          renderer.setPixelRatio(1);
 
-        const gl = renderer.getContext();
-        if (!gl) throw new Error("WebGL context not available");
+          const gl = renderer.getContext();
+          if (!gl) throw new Error("WebGL context not available");
 
-        renderer.render(scene, camera);
+          renderer.render(scene, camera);
 
-        const dataUrl = renderer.domElement.toDataURL("image/png");
-        const pngBase64 = dataUrl.split(",")[1];
+          const dataUrl = renderer.domElement.toDataURL("image/png");
+          const pngBase64 = dataUrl.split(",")[1];
 
-        // Cleanup to reduce memory growth across tasks
-        renderer.dispose();
-        material.dispose();
-        geometry.dispose();
+          // Cleanup to reduce memory growth across tasks
+          renderer.dispose();
+          material.dispose();
+          geometry.dispose();
 
-        return {
-          pngBase64,
-          stats: { boundingBox: [size.x, size.y, size.z] },
-        };
+          return {
+            ok: true,
+            pngBase64,
+            stats: { boundingBox: [size.x, size.y, size.z] },
+          };
+        } catch (err) {
+          const msg = err?.message || String(err);
+          const lower = msg.toLowerCase();
+          const malformed =
+            lower.includes("stl") ||
+            lower.includes("triangle") ||
+            lower.includes("unexpected") ||
+            lower.includes("parse") ||
+            lower.includes("buffer");
+
+          return {
+            ok: false,
+            fatal: true,
+            errorType: malformed ? "MALFORMED_STL" : "RENDER_ERROR",
+            error: msg,
+          };
+        }
       },
       {
         stlBase64,
@@ -170,9 +209,29 @@ const renderTask = async (page, task, hardDeadline) => {
       },
     );
 
+    if (!result?.ok) {
+      return {
+        taskId,
+        ok: false,
+        fatal: result?.fatal ?? true,
+        errorType: result?.errorType || "RENDER_ERROR",
+        error: result?.error || "Unknown render error",
+        logs,
+      };
+    }
+
     return { taskId, ok: true, ...result, logs };
   } catch (e) {
-    return { taskId, ok: false, error: e?.message || String(e), logs };
+    const fatal = !isRateLimitError(e);
+    const errorType = fatal ? "RENDER_ERROR" : "RATE_LIMIT";
+    return {
+      taskId,
+      ok: false,
+      fatal,
+      errorType,
+      error: e?.message || String(e),
+      logs,
+    };
   } finally {
     page.off("console", onConsole);
     page.off("pageerror", onPageError);
@@ -194,14 +253,38 @@ export default {
     const { tasks = [], deadlineMs = 30_000 } = await request.json();
     const hardDeadline = Date.now() + Math.min(deadlineMs, 55_000);
 
-    // Browser Rendering binding: env.BROWSER must exist in wrangler config.  [oai_citation:3‡Cloudflare Docs](https://developers.cloudflare.com/browser-rendering/reference/wrangler/)
-    const browser = await puppeteer.launch(env.BROWSER, {
-      // optional: keep browser warm for reuse; see docs.  [oai_citation:4‡Cloudflare Docs](https://developers.cloudflare.com/browser-rendering/puppeteer/)
-      // keep_alive: 600_000,
-    });
+    let browser;
+    try {
+      // Browser Rendering binding: env.BROWSER must exist in wrangler config.  [oai_citation:3‡Cloudflare Docs](https://developers.cloudflare.com/browser-rendering/reference/wrangler/)
+      browser = await puppeteer.launch(env.BROWSER, {
+        // optional: keep browser warm for reuse; see docs.  [oai_citation:4‡Cloudflare Docs](https://developers.cloudflare.com/browser-rendering/puppeteer/)
+        // keep_alive: 600_000,
+      });
+    } catch (err) {
+      const status = isRateLimitError(err) ? RATE_LIMIT_STATUS : 500;
+      return Response.json(
+        {
+          error: err?.message || "Browser launch failed",
+          errorType: isRateLimitError(err) ? "RATE_LIMIT" : "BROWSER_LAUNCH_FAILED",
+        },
+        { status },
+      );
+    }
 
     try {
-      const page = await browser.newPage();
+      let page;
+      try {
+        page = await browser.newPage();
+      } catch (err) {
+        const status = isRateLimitError(err) ? RATE_LIMIT_STATUS : 500;
+        return Response.json(
+          {
+            error: err?.message || "Failed to start browser page",
+            errorType: isRateLimitError(err) ? "RATE_LIMIT" : "BROWSER_PAGE_FAILED",
+          },
+          { status },
+        );
+      }
 
       const results = [];
       for (const task of tasks) {
