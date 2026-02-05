@@ -3,6 +3,7 @@ import styles from "./renderMedia.module.css";
 import { StlViewer } from "react-stl-viewer";
 import classNames from "classnames";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import { SilentBoundary } from "../ErrorBoundaries/silent.jsx";
 import * as Sentry from "@sentry/react";
 import { u } from "../../util/url.js";
 
@@ -203,10 +204,11 @@ export const RenderMedia = ({
 
     return (
       <>
-        <Sentry.ErrorBoundary
+        <SilentBoundary
           fallback={({ error }) => <ErrorBoundaries error={error} />}
         >
           <StlViewer
+            onError={(e) => setStlError(e)}
             className={stlClasses}
             orbitControls
             shadows
@@ -222,7 +224,7 @@ export const RenderMedia = ({
               },
             }}
           />
-        </Sentry.ErrorBoundary>
+        </SilentBoundary>
       </>
     );
   }
