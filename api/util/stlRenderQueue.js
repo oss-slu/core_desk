@@ -5,9 +5,10 @@ import { renderStl } from "./renderStl.js";
 import { UTApi } from "uploadthing/server";
 
 const INSTANCE_ID = `stl-render-${process.pid}-${crypto.randomUUID()}`;
-const MAX_CONCURRENT_BROWSERS = 3;
-const MAX_BROWSER_STARTS_PER_MIN = 3;
-const SESSION_DURATION_MS = 30_000; // keep under Cloudflare 60s cap
+// Stay conservative to avoid Cloudflare 429s on shared accounts.
+const MAX_CONCURRENT_BROWSERS = 1;
+const MAX_BROWSER_STARTS_PER_MIN = 1;
+const SESSION_DURATION_MS = 50_000; // keep under Cloudflare 60s cap
 const BATCH_SIZE = 50;
 const POLL_INTERVAL_MS = 5_000;
 const MAX_ATTEMPTS = 4;
@@ -242,7 +243,7 @@ const callCloudflare = async (tasks) => {
       body: JSON.stringify({
         tasks: tasks.map((t) => ({
           id: t.id,
-          fileUrl: t.fileUrl,
+          fileUrl: "https://" + t.fileUrl,
           fileName: t.fileName,
         })),
         deadlineMs: SESSION_DURATION_MS,
@@ -250,18 +251,20 @@ const callCloudflare = async (tasks) => {
       signal: controller.signal,
     });
 
-    if (!resp.ok) {
-      let body;
-      try {
-        const text = await resp.text();
-        body = text || "<empty body>";
-      } catch {
-        body = "<failed to read body>";
-      }
+    console.log(
+      "Sent request to cloudflare",
+      JSON.stringify({
+        tasks: tasks.map((t) => ({
+          id: t.id,
+          fileUrl: "https://" + t.fileUrl,
+          fileName: t.fileName,
+        })),
+        deadlineMs: SESSION_DURATION_MS,
+      }),
+    );
 
-      throw new Error(
-        `Cloudflare worker responded with ${resp.status} ${resp.statusText}\n${body}`,
-      );
+    if (!resp.ok) {
+      throw new Error(`Cloudflare worker responded with ${resp.status}`);
     }
 
     const payload = await resp.json();
@@ -277,11 +280,34 @@ const callCloudflare = async (tasks) => {
 const processBatch = async (tasks) => {
   const started = now();
   let results = null;
+  let rateLimited = false;
 
   try {
     results = await callCloudflare(tasks);
   } catch (err) {
-    console.warn("Cloudflare render failed, will fall back locally", err);
+    if (err?.rateLimited || err?.message === "RATE_LIMIT") {
+      rateLimited = true;
+    } else {
+      console.warn("Cloudflare render failed, will fall back locally", err);
+    }
+  }
+
+  if (rateLimited) {
+    const delayMs = 70_000; // let the per-minute window clear
+    for (const task of tasks) {
+      await prisma.stlRenderTask.update({
+        where: { id: task.id },
+        data: {
+          status: "PENDING",
+          availableAt: new Date(Date.now() + delayMs),
+          lockedBy: null,
+          lockedAt: null,
+          lockExpiresAt: null,
+          lastError: "Rate limited by Cloudflare; retrying",
+        },
+      });
+    }
+    return;
   }
 
   if (!results) {
