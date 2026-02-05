@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAuth,
   useBillingGroup,
@@ -96,12 +96,13 @@ export const BillingGroupPage = () => {
     opLoading: opLoadingInvitations,
   } = useBillingGroupInvitations(shopId, groupId);
 
-  const { modal, ModalElement } = useModal({
+  const { modal, ModalElement, close, update } = useModal({
     title: "Create a new invitation link",
     text: (
       <CreateBillingGroupInvitation
         createBillingGroupInvitation={createBillingGroupInvitation}
         opLoading={opLoadingInvitations}
+        onCreated={() => close(true)}
       />
     ),
   });
@@ -127,6 +128,11 @@ export const BillingGroupPage = () => {
     userShop.accountType === "ADMIN" ||
     userShop.accountType === "OPERATOR" ||
     billingGroup?.userRole === "ADMIN";
+
+  useEffect(() => {
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opLoadingInvitations, billingGroupInvitations?.length]);
 
   if (loading || loadingInvitations)
     return (

@@ -5,6 +5,7 @@ import { Button } from "#button";
 export const CreateBillingGroupInvitation = ({
   createBillingGroupInvitation,
   opLoading,
+  onCreated,
 }) => {
   const [data, setData] = useState({ expires: "" });
 
@@ -22,10 +23,14 @@ export const CreateBillingGroupInvitation = ({
       </i>
       <Util.Spacer size={1} />
       <Button
-        onClick={() => createBillingGroupInvitation(data)}
+        onClick={async () => {
+          const ok = await createBillingGroupInvitation(data);
+          if (ok && onCreated) onCreated();
+        }}
         loading={opLoading}
+        disabled={opLoading}
       >
-        Create Invitation Link
+        {opLoading ? "Creating…" : "Create Invitation Link"}
       </Button>
     </div>
   );
