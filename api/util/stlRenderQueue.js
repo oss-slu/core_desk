@@ -1,8 +1,6 @@
 import crypto from "crypto";
-import NodeStl from "node-stl";
 import { prisma } from "#prisma";
-import { renderStl } from "./renderStl.js";
-import { UTApi } from "uploadthing/server";
+import { uploadFile } from "#upload";
 
 const INSTANCE_ID = `stl-render-${process.pid}-${crypto.randomUUID()}`;
 // Stay conservative to avoid Cloudflare 429s on shared accounts.
@@ -11,11 +9,7 @@ const MAX_BROWSER_STARTS_PER_MIN = 1;
 const SESSION_DURATION_MS = 50_000; // keep under Cloudflare 60s cap
 const BATCH_SIZE = 50;
 const POLL_INTERVAL_MS = 5_000;
-const MAX_ATTEMPTS = 4;
 const RETRY_BASE_SECONDS = 15;
-
-// Create a dedicated UTApi instance here to avoid circular imports
-const utapi = new UTApi({ token: process.env.UPLOADTHING_TOKEN });
 
 const activeSessions = new Map();
 let launchTimestamps = [];
@@ -117,7 +111,6 @@ const markResult = async (task, result) => {
     lockedBy: null,
     lockedAt: null,
     lockExpiresAt: null,
-    lastError: result.error || null,
   };
 
   if (result.ok) {
@@ -141,86 +134,52 @@ const markResult = async (task, result) => {
     where: { id: task.id },
     data: {
       ...baseData,
-      status: task.attempts >= MAX_ATTEMPTS ? "FAILED" : "PENDING",
-      availableAt:
-        task.attempts >= MAX_ATTEMPTS
-          ? new Date()
-          : new Date(Date.now() + backoffSeconds * 1000),
+      status: "PENDING",
+      availableAt: new Date(Date.now() + backoffSeconds * 1000),
     },
   });
 };
 
 const uploadThumbnail = async ({ pngBuffer, fileName }) => {
   const safeName = `${fileName || "stl"}.preview.png`;
-  const upload = await utapi.uploadFiles([
-    new File([pngBuffer], safeName, { type: "image/png" }),
-  ]);
-  const first = upload?.[0]?.data;
-  if (!first) throw new Error("UploadThing did not return file data");
-  return first;
+  // uploadFile stores a File row and returns the record
+  const { file, location, key } = await uploadFile({
+    body: Buffer.isBuffer(pngBuffer) ? pngBuffer : Buffer.from(pngBuffer),
+    originalname: safeName,
+    mimetype: "image/png",
+    contentType: "image/png",
+  });
+
+  return {
+    id: file.id,
+    key,
+    name: safeName,
+    url: location,
+  };
 };
 
-const persistSuccess = async ({ task, pngBuffer, stats }) => {
+const persistSuccess = async ({ task, pngBuffer }) => {
   const upload = await uploadThumbnail({
     pngBuffer,
     fileName: task.fileName,
   });
 
-  const statPayload = stats
-    ? {
-        stlVolume: stats.volume ?? null,
-        stlIsWatertight: stats.isWatertight ?? null,
-        stlBoundingBoxX: stats.boundingBox?.[0]
-          ? stats.boundingBox[0] / 10
-          : null,
-        stlBoundingBoxY: stats.boundingBox?.[1]
-          ? stats.boundingBox[1] / 10
-          : null,
-        stlBoundingBoxZ: stats.boundingBox?.[2]
-          ? stats.boundingBox[2] / 10
-          : null,
-      }
-    : {};
+  console.log("Success", upload);
 
   await prisma.jobItem.update({
     where: { id: task.jobItemId },
     data: {
-      fileThumbnailKey: upload.key,
-      fileThumbnailName: upload.name,
-      fileThumbnailUrl: upload.url,
-      ...statPayload,
+      fileThumbnail: {
+        connect: {
+          id: upload.id,
+        },
+      },
     },
   });
 
+  console.log("S");
+
   await markResult(task, { ok: true });
-};
-
-const renderLocally = async (task, startedAt) => {
-  try {
-    const elapsed = now() - startedAt;
-    if (elapsed > SESSION_DURATION_MS) {
-      return { taskId: task.id, ok: false, error: "Session deadline reached" };
-    }
-
-    const [pngData, stlData] = await renderStl(task.fileUrl);
-    const stlStats = new NodeStl(Buffer.from(stlData));
-    return {
-      taskId: task.id,
-      ok: true,
-      pngBase64: Buffer.from(pngData).toString("base64"),
-      stats: {
-        volume: stlStats.volume,
-        isWatertight: stlStats.isWatertight,
-        boundingBox: stlStats.boundingBox,
-      },
-    };
-  } catch (error) {
-    return {
-      taskId: task.id,
-      ok: false,
-      error: error?.message || String(error),
-    };
-  }
 };
 
 const callCloudflare = async (tasks) => {
@@ -278,7 +237,6 @@ const callCloudflare = async (tasks) => {
 };
 
 const processBatch = async (tasks) => {
-  const started = now();
   let results = null;
   let rateLimited = false;
 
@@ -288,7 +246,7 @@ const processBatch = async (tasks) => {
     if (err?.rateLimited || err?.message === "RATE_LIMIT") {
       rateLimited = true;
     } else {
-      console.warn("Cloudflare render failed, will fall back locally", err);
+      console.error("Cloudflare render failed, will retry", err);
     }
   }
 
@@ -303,7 +261,6 @@ const processBatch = async (tasks) => {
           lockedBy: null,
           lockedAt: null,
           lockExpiresAt: null,
-          lastError: "Rate limited by Cloudflare; retrying",
         },
       });
     }
@@ -311,10 +268,11 @@ const processBatch = async (tasks) => {
   }
 
   if (!results) {
-    results = [];
+    // No results means we likely hit network/timeout; requeue with backoff
     for (const task of tasks) {
-      results.push(await renderLocally(task, started));
+      await markResult(task, { ok: false, error: "No results from worker" });
     }
+    return;
   }
 
   for (const result of results) {
@@ -322,6 +280,11 @@ const processBatch = async (tasks) => {
     if (!task) continue;
 
     if (!result.ok) {
+      console.error(
+        "Render task failed; requeuing",
+        task.id,
+        result.error || "Unknown",
+      );
       await markResult(task, { ok: false, error: result.error || "Unknown" });
       continue;
     }
