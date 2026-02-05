@@ -171,7 +171,11 @@ export const RenderMedia = ({
                 small ? styles.small : "",
               )}
               alt="media"
-              onClick={() => setPreview(false)}
+              onClick={() => {
+                setPreview(false);
+                setStlLoading(true);
+                setStlReadyUrl(false);
+              }}
             />
           </Sentry.ErrorBoundary>
         </>
