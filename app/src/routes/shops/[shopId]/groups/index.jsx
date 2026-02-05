@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Loading } from "#loading";
 import { shopSidenavItems } from "..";
 import { Page } from "#page";
 import { useAuth, useBillingGroups, useShop, useUser } from "#hooks";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Util } from "tabler-react-2";
 import { Button } from "#button";
 import { useModal } from "#modal";
@@ -15,13 +15,14 @@ import { MOMENT_FORMAT } from "#constants";
 
 export const BillingGroupsPage = () => {
   const { shopId } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
   const { billingGroups, loading, createBillingGroup, opLoading } =
     useBillingGroups(shopId);
   const { user: activeUser } = useUser(user?.id);
 
-  const { modal, ModalElement } = useModal({
+  const { modal, ModalElement, update } = useModal({
     title: "Create Billing Group",
     text: (
       <CreateBillingGroup
@@ -29,9 +30,15 @@ export const BillingGroupsPage = () => {
         createBillingGroup={createBillingGroup}
         opLoading={opLoading}
         user={user}
+        onCreated={(id) => navigate(`/shops/${shopId}/billing-groups/${id}`)}
       />
     ),
   });
+
+  useEffect(() => {
+    update();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opLoading, userShop?.id, user?.id]);
 
   if (loading)
     return (
