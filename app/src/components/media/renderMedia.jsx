@@ -206,7 +206,7 @@ export const RenderMedia = ({
         <Sentry.ErrorBoundary
           fallback={({ error }) => <ErrorBoundaries error={error} />}
         >
-          {/* <StlViewer
+          <StlViewer
             className={stlClasses}
             orbitControls
             shadows
@@ -221,8 +221,7 @@ export const RenderMedia = ({
                 distance: 1,
               },
             }}
-          /> */}
-          STL
+          />
         </Sentry.ErrorBoundary>
       </>
     );
