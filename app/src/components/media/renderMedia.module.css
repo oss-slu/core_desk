@@ -16,7 +16,8 @@
   flex-direction: column;
   border: 2px solid var(--tblr-border-color);
   text-align: center;
-  font-size: 24px;
+  font-size: 18px;
+  padding: 10px;
 }
 
 .unsupported i {

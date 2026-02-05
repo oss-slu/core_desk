@@ -3,6 +3,7 @@ import styles from "./renderMedia.module.css";
 import { StlViewer } from "react-stl-viewer";
 import classNames from "classnames";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import { SilentBoundary } from "../ErrorBoundaries/silent.jsx";
 import * as Sentry from "@sentry/react";
 import { u } from "../../util/url.js";
 
@@ -127,7 +128,7 @@ export const RenderMedia = ({
         stlObjectUrlRef.current = null;
       }
     },
-    []
+    [],
   );
 
   if (
@@ -146,7 +147,7 @@ export const RenderMedia = ({
             className={classNames(
               styles.image,
               big ? styles.big : "",
-              small ? styles.small : ""
+              small ? styles.small : "",
             )}
             alt="media"
           />
@@ -167,10 +168,14 @@ export const RenderMedia = ({
               className={classNames(
                 styles.image,
                 big ? styles.big : "",
-                small ? styles.small : ""
+                small ? styles.small : "",
               )}
               alt="media"
-              onClick={() => setPreview(false)}
+              onClick={() => {
+                setPreview(false);
+                setStlLoading(true);
+                setStlReadyUrl(false);
+              }}
             />
           </Sentry.ErrorBoundary>
         </>
@@ -180,7 +185,7 @@ export const RenderMedia = ({
     const stlClasses = classNames(
       styles.image,
       big ? styles.big : "",
-      small ? styles.small : ""
+      small ? styles.small : "",
     );
 
     if (stlError) {
@@ -203,10 +208,11 @@ export const RenderMedia = ({
 
     return (
       <>
-        <Sentry.ErrorBoundary
+        <SilentBoundary
           fallback={({ error }) => <ErrorBoundaries error={error} />}
         >
           <StlViewer
+            onError={(e) => setStlError(e)}
             className={stlClasses}
             orbitControls
             shadows
@@ -222,7 +228,7 @@ export const RenderMedia = ({
               },
             }}
           />
-        </Sentry.ErrorBoundary>
+        </SilentBoundary>
       </>
     );
   }
@@ -238,7 +244,7 @@ export const RenderMedia = ({
             className={classNames(
               styles.image,
               big ? styles.big : "",
-              small ? styles.small : ""
+              small ? styles.small : "",
             )}
             title="PDF"
           />
@@ -252,7 +258,7 @@ export const RenderMedia = ({
       className={classNames(
         styles.unsupported,
         big ? styles.big : "",
-        small ? styles.small : ""
+        small ? styles.small : "",
       )}
     >
       {fileType}

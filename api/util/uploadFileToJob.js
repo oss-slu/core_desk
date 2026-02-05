@@ -1,7 +1,5 @@
 import { prisma } from "#prisma";
-import { uploadFile } from "#upload";
-import { renderStl } from "./renderStl.js";
-import NodeStl from "node-stl";
+import { enqueueStlRenderTask } from "./stlRenderQueue.js";
 import { LogType } from "@prisma/client"; // adjust import path
 
 export const uploadFileToJob = async ({
@@ -42,36 +40,13 @@ export const uploadFileToJob = async ({
       logging &&
         console.log("Skipping STL render: file too large", fileRecord.size);
     } else {
-      logging && console.log("Rendering STL...");
-      try {
-        const [pngData, stlData] = await renderStl(file.location);
-
-        const upload = await uploadFile({
-          body: Buffer.isBuffer(pngData) ? pngData : Buffer.from(pngData),
-          originalname: `${file.originalname}.preview.png`,
-          mimetype: "image/png",
-          contentType: "application/octet-stream",
-        });
-
-        const stlStats = new NodeStl(Buffer.from(stlData));
-
-        await prisma.jobItem.update({
-          where: { id: jobItem.id },
-          data: {
-            fileThumbnailId: upload.file.id,
-            stlVolume: stlStats.volume,
-            stlIsWatertight: stlStats.isWatertight,
-            stlBoundingBoxX: stlStats.boundingBox[0] / 10,
-            stlBoundingBoxY: stlStats.boundingBox[1] / 10,
-            stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
-          },
-        });
-      } catch (e) {
-        console.warn(
-          `STL rendering failed for jobItem ${jobItem.id}: ${e?.message || e}`
-        );
-        // Continue without thumbnail or STL stats
-      }
+      logging && console.log("Queueing STL render...");
+      await enqueueStlRenderTask({
+        jobItemId: jobItem.id,
+        fileUrl: file.location,
+        fileName: file.originalname,
+        fileKey: file.logId,
+      });
     }
   }
 

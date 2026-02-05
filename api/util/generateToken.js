@@ -23,7 +23,7 @@ export const generateToken = (user, { expiresIn = DEFAULT_EXPIRY } = {}) => {
       // Do NOT embed any admin/role claims here unless your app requires it.
     },
     process.env.JWT_SECRET,
-    { expiresIn }
+    { expiresIn },
   );
 };
 
@@ -32,7 +32,7 @@ export const fetchUsers = async () => {
   try {
     const users = await prisma.user.findMany({});
     spinner.succeed(
-      `Loaded ${users.length} user${users.length === 1 ? "" : "s"}.`
+      `Loaded ${users.length} user${users.length === 1 ? "" : "s"}.`,
     );
     return users;
   } catch (err) {
@@ -77,11 +77,11 @@ export const createUserInteractive = async () => {
         lastName: base.lastName.trim(),
         email: base.email,
       },
-      false
+      false,
     );
 
     spinner.succeed(
-      `Created user ${user.firstName} ${user.lastName} (${user.id}).`
+      `Created user ${user.firstName} ${user.lastName} (${user.id}).`,
     );
     return user;
   } catch (err) {
@@ -130,7 +130,7 @@ export const generateTokenForUser = async () => {
   const token = generateToken(user, { expiresIn: DEFAULT_EXPIRY });
 
   console.log(
-    `\nPaste the following into your browser's console to set the token (valid ${DEFAULT_EXPIRY}) and log in as ${user.firstName} ${user.lastName}:\n\nlocalStorage.setItem("token", "${token}");document.location.reload()\n`
+    `\nPaste the following into your browser's console to set the token (valid ${DEFAULT_EXPIRY}) and log in as ${user.firstName} ${user.lastName}:\n\nlocalStorage.setItem("token", "${token}");document.location.reload()\n`,
   );
 };
 
