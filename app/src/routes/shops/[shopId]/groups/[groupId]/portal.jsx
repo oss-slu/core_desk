@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Card, Typography, Util } from "tabler-react-2";
-import { useBillingGroup, useJob, useShop } from "#hooks";
+import { Button } from "#button";
+import { useModal } from "#modal";
+import { useBillingGroup, useJob, useShop, useJobs } from "#hooks";
 import { useParams } from "react-router-dom";
 import { Loading } from "#loading";
 import { MarkdownRender } from "#markdownRender";
@@ -11,8 +13,10 @@ import { MicroJobItem } from "../../../../../components/jobitem/MicroJobItem";
 
 export const BillingGroupPortal = () => {
   const { shopId, groupId } = useParams();
-  const { loading, billingGroup } = useBillingGroup(shopId, groupId);
+  const { loading, billingGroup, refetch: refetchBillingGroup } =
+    useBillingGroup(shopId, groupId);
   const { shop, loading: shopLoading } = useShop(shopId);
+  const { createJob, ModalElement: CreateJobModalElement } = useJobs(shopId);
 
   const [jobId, setJobId] = useState(null);
   const { job, loading: jobLoading, refetch } = useJob(shopId, jobId);
@@ -20,9 +24,11 @@ export const BillingGroupPortal = () => {
   if (loading || shopLoading) return <Loading />;
 
   return (
-    <Util.Responsive threshold={800} gap={2}>
-      <div className={styles.box}>
-        <Card className={styles.card}>
+    <>
+      {CreateJobModalElement}
+      <Util.Responsive threshold={800} gap={2}>
+        <div className={styles.box}>
+          <Card className={styles.card}>
           <Typography.H1>{billingGroup.title}</Typography.H1>
           {/* {JSON.stringify(job)} */}
           <p>
@@ -40,13 +46,27 @@ export const BillingGroupPortal = () => {
             that is most relevant to your request or as instructed by your group
             administrator.
           </p>
-          <JobPicker
-            value={jobId}
-            onChange={setJobId}
-            opLoading={false}
-            groupId={groupId}
-            showLabel={false}
-          />
+          <Util.Row gap={1} align="end" wrap>
+            <JobPicker
+              value={jobId}
+              onChange={setJobId}
+              opLoading={false}
+              groupId={groupId}
+              showLabel={false}
+            />
+            {billingGroup.userHasPermissionToCreateJobsOnBillingGroup && (
+              <Button
+                onClick={() =>
+                  createJob({
+                    billingGroupId: groupId,
+                    forceBillingGroupId: true,
+                  })
+                }
+              >
+                Create a new job
+              </Button>
+            )}
+          </Util.Row>
           <Util.Spacer size={2} />
           {jobId && (
             <>
@@ -99,11 +119,12 @@ export const BillingGroupPortal = () => {
               )}
             </>
           )}
-        </Card>
-      </div>
-      <div style={{ flex: 1, opacity: 0.8 }}>
-        <MarkdownRender markdown={billingGroup.description} />
-      </div>
-    </Util.Responsive>
+          </Card>
+        </div>
+        <div style={{ flex: 1, opacity: 0.8 }}>
+          <MarkdownRender markdown={billingGroup.description} />
+        </div>
+      </Util.Responsive>
+    </>
   );
 };
