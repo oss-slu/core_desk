@@ -1,7 +1,6 @@
 {
   "name": "two",
   "version": "1.0.0",
-  "description": "",
   "type": "module",
   "main": "index.js",
   "scripts": {
@@ -70,5 +69,6 @@
     "#setup": "./util/tests/setup.js",
     "#forceError": "./util/tests/forceError.js",
     "#upload": "./util/file.js"
-  }
+  },
+  "description": ""
 }

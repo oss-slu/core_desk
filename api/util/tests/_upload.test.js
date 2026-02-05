@@ -1,6 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("../util/stlRenderQueue.js", () => ({
+  enqueueStlRenderTask: vi.fn(),
+}));
+
 import { prisma } from "#prisma";
 import { handleUpload } from "../util/upload.js";
+import { enqueueStlRenderTask } from "../util/stlRenderQueue.js";
 
 describe("/upload", () => {
   describe("handleUpload", () => {
@@ -25,6 +31,7 @@ describe("/upload", () => {
       prisma.job.findFirst.mockResolvedValue({ id: '1', shopId: 'shop1' });
       prisma.jobItem.create.mockResolvedValue({ id: 'jobItem1' });
       prisma.logs.create.mockResolvedValue({});
+      enqueueStlRenderTask.mockResolvedValue();
 
       await handleUpload(mockData);
 

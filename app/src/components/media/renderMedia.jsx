@@ -127,7 +127,7 @@ export const RenderMedia = ({
         stlObjectUrlRef.current = null;
       }
     },
-    []
+    [],
   );
 
   if (
@@ -146,7 +146,7 @@ export const RenderMedia = ({
             className={classNames(
               styles.image,
               big ? styles.big : "",
-              small ? styles.small : ""
+              small ? styles.small : "",
             )}
             alt="media"
           />
@@ -167,7 +167,7 @@ export const RenderMedia = ({
               className={classNames(
                 styles.image,
                 big ? styles.big : "",
-                small ? styles.small : ""
+                small ? styles.small : "",
               )}
               alt="media"
               onClick={() => setPreview(false)}
@@ -180,7 +180,7 @@ export const RenderMedia = ({
     const stlClasses = classNames(
       styles.image,
       big ? styles.big : "",
-      small ? styles.small : ""
+      small ? styles.small : "",
     );
 
     if (stlError) {
@@ -206,7 +206,7 @@ export const RenderMedia = ({
         <Sentry.ErrorBoundary
           fallback={({ error }) => <ErrorBoundaries error={error} />}
         >
-          <StlViewer
+          {/* <StlViewer
             className={stlClasses}
             orbitControls
             shadows
@@ -221,7 +221,8 @@ export const RenderMedia = ({
                 distance: 1,
               },
             }}
-          />
+          /> */}
+          STL
         </Sentry.ErrorBoundary>
       </>
     );
@@ -238,7 +239,7 @@ export const RenderMedia = ({
             className={classNames(
               styles.image,
               big ? styles.big : "",
-              small ? styles.small : ""
+              small ? styles.small : "",
             )}
             title="PDF"
           />
@@ -252,7 +253,7 @@ export const RenderMedia = ({
       className={classNames(
         styles.unsupported,
         big ? styles.big : "",
-        small ? styles.small : ""
+        small ? styles.small : "",
       )}
     >
       {fileType}

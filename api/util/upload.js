@@ -1,8 +1,7 @@
 import { LogType } from "@prisma/client";
 import { prisma } from "#prisma";
 import { utapi } from "../config/uploadthing.js";
-import { renderStl } from "./renderStl.js";
-import NodeStl from "node-stl";
+import { enqueueStlRenderTask } from "./stlRenderQueue.js";
 
 const logging = false;
 
@@ -58,34 +57,12 @@ export const handleUpload = async (data) => {
       }
 
       if (!tooLarge) {
-        // Render stl
-        const [pngData, stlData] = await renderStl(data.file.url);
-
-        const upload = await utapi.uploadFiles([
-          new File([pngData], `${data.file.name}.preview.png`, {
-            type: "image/png",
-          }),
-        ]);
-
-        const stlStats = new NodeStl(Buffer.from(stlData));
-        console.log(stlStats);
-
-        const newJobItem = await prisma.jobItem.update({
-          where: {
-            id: jobItem.id,
-          },
-          data: {
-            fileThumbnailKey: upload[0].data.key,
-            fileThumbnailName: upload[0].data.name,
-            fileThumbnailUrl: upload[0].data.url,
-            stlVolume: stlStats.volume,
-            stlIsWatertight: stlStats.isWatertight,
-            stlBoundingBoxX: stlStats.boundingBox[0] / 10,
-            stlBoundingBoxY: stlStats.boundingBox[1] / 10,
-            stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
-          },
+        await enqueueStlRenderTask({
+          jobItemId: jobItem.id,
+          fileUrl: data.file.url,
+          fileName: data.file.name,
+          fileKey: data.file.key,
         });
-        console.log(newJobItem);
       } else {
         console.log("Skipping STL render: file too large (>20MB)");
       }
@@ -152,34 +129,12 @@ export const handleUpload = async (data) => {
       }
 
       if (!tooLarge) {
-        // Render stl
-        const [pngData, stlData] = await renderStl(data.file.url);
-
-        const upload = await utapi.uploadFiles([
-          new File([pngData], `${data.file.name}.preview.png`, {
-            type: "image/png",
-          }),
-        ]);
-
-        const stlStats = new NodeStl(Buffer.from(stlData));
-        console.log(stlStats);
-
-        const newJobItem = await prisma.jobItem.update({
-          where: {
-            id: jobItem.id,
-          },
-          data: {
-            fileThumbnailKey: upload[0].data.key,
-            fileThumbnailName: upload[0].data.name,
-            fileThumbnailUrl: upload[0].data.url,
-            stlVolume: stlStats.volume,
-            stlIsWatertight: stlStats.isWatertight,
-            stlBoundingBoxX: stlStats.boundingBox[0] / 10,
-            stlBoundingBoxY: stlStats.boundingBox[1] / 10,
-            stlBoundingBoxZ: stlStats.boundingBox[2] / 10,
-          },
+        await enqueueStlRenderTask({
+          jobItemId: jobItem.id,
+          fileUrl: data.file.url,
+          fileName: data.file.name,
+          fileKey: data.file.key,
         });
-        console.log(newJobItem);
       } else {
         console.log("Skipping STL render: file too large (>20MB)");
       }
