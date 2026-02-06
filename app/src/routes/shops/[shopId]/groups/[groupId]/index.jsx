@@ -131,7 +131,6 @@ export const BillingGroupPage = () => {
 
   useEffect(() => {
     update();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opLoadingInvitations, billingGroupInvitations?.length]);
 
   if (loading || loadingInvitations)
@@ -142,7 +141,7 @@ export const BillingGroupPage = () => {
           shopId,
           user.admin,
           userShop.accountType,
-          userShop.balance < 0
+          userShop.balance < 0,
         )}
       >
         <Loading />
@@ -158,7 +157,7 @@ export const BillingGroupPage = () => {
         shopId,
         user.admin,
         userShop.accountType,
-        userShop.balance < 0
+        userShop.balance < 0,
       )}
     >
       {ModalElement}
@@ -207,7 +206,7 @@ export const BillingGroupPage = () => {
             onDelete={async () => {
               if (
                 window.confirm(
-                  "Are you sure you want to delete this billing group?"
+                  "Are you sure you want to delete this billing group?",
                 )
               ) {
                 const success = await deleteBillingGroup();
@@ -259,7 +258,7 @@ export const BillingGroupPage = () => {
                         size="sm"
                         onClick={() =>
                           copyToClipboard(
-                            `${document.location.origin}/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`
+                            `${document.location.origin}/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`,
                           )
                         }
                       >

@@ -37,7 +37,6 @@ export const BillingGroupsPage = () => {
 
   useEffect(() => {
     update();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opLoading, userShop?.id, user?.id]);
 
   if (loading)
@@ -48,7 +47,7 @@ export const BillingGroupsPage = () => {
           shopId,
           user.admin,
           userShop.accountType,
-          userShop.balance < 0
+          userShop.balance < 0,
         )}
       >
         <Loading />
@@ -64,7 +63,7 @@ export const BillingGroupsPage = () => {
         shopId,
         user.admin,
         userShop.accountType,
-        userShop.balance < 0
+        userShop.balance < 0,
       )}
     >
       {ModalElement}
