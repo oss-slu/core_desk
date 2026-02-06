@@ -7,6 +7,7 @@ export const CreateBillingGroup = ({
   user,
   createBillingGroup,
   opLoading,
+  onCreated,
 }) => {
   const [data, setData] = useState({
     title: "",
@@ -53,7 +54,15 @@ export const CreateBillingGroup = ({
 
       <Util.Spacer size={2} />
 
-      <Button loading={opLoading} onClick={() => createBillingGroup(data)}>
+      <Button
+        loading={opLoading}
+        onClick={async () => {
+          const createdId = await createBillingGroup(data);
+          if (createdId && onCreated) {
+            onCreated(createdId);
+          }
+        }}
+      >
         Create Billing Group
       </Button>
     </div>

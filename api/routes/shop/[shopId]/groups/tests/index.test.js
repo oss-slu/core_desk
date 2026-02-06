@@ -134,6 +134,7 @@ describe("/shop/[shopId]", () => {
 
       expect(req.status).toBe(200);
       expect(req.body.groups[0].title).toBe("TestCreationGroup");
+      expect(req.body.createdGroupId).toBeDefined();
 
       const foundGroup = await prisma.billingGroup.findFirst({
         where: {
@@ -142,6 +143,7 @@ describe("/shop/[shopId]", () => {
       });
 
       expect(foundGroup).toBeDefined();
+      expect(req.body.createdGroupId).toBe(foundGroup?.id);
     });
 
     it("gives the admin user permissions", async () => {
