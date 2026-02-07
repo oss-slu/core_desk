@@ -20,6 +20,7 @@ import { useConfirm } from "#confirm";
 import { NotFound } from "#notFound";
 import { useUserLogs } from "../../hooks/useUserLogs";
 import toast from "react-hot-toast"
+import { authFetch } from "#url";
 const { H2, H3 } = Typography;
 
 const AddUserToShopForm = ({ user, onFinish }) => {
@@ -132,21 +133,28 @@ const ChangePassword = ({ user }) => {
 
   const updatePassword = async (user) => {
     try {
-      await authFetch(`/api/routes/login`, {
+      const r = await authFetch(`/api/routes/login`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.userId, //we really only need to send userId?
-          firstName: user.firstName,
-          lastName: user.lastName,
+          userId: user.userId, 
           password: password,
         }),
+
+        
       });
-      console.log("Password updated.");
+
+      const data =  await r.json();
+
+
+      if(!r.ok){
+        toast.error(data.error)
+        return;
+      }
     } catch (error) {
-      toast.error(data.error);
+      toast.error(error);
       //add to sentry later?
     }
   };
