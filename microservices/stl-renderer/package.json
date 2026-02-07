@@ -1,0 +1,15 @@
+{
+  "name": "stl-renderer",
+  "version": "1.0.0",
+  "description": "This worker runs on Cloudflare Workers with Browser Rendering enabled. It takes a batch of STL render tasks, spins up a browser session via `@cloudflare/puppeteer`, renders as many as possible inside a single request window (30–60s), and returns PNGs plus basic bounding box stats.",
+  "main": "stl-renderer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@cloudflare/puppeteer": "^1.0.6"
+  }
+}

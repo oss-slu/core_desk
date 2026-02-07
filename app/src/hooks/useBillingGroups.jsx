@@ -27,7 +27,6 @@ export const useBillingGroups = (shopId) => {
   };
 
   const createBillingGroup = async (data) => {
-    console.log(data);
     try {
       setOpLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/groups`, {
@@ -37,14 +36,16 @@ export const useBillingGroups = (shopId) => {
       const updatedBillingGroups = await r.json();
       if (updatedBillingGroups.groups) {
         setBillingGroups(updatedBillingGroups.groups);
-        setOpLoading(false);
-      } else {
-        toast.error(updatedBillingGroups);
-        setError(updatedBillingGroups);
-        setOpLoading(false);
+        return updatedBillingGroups.createdGroupId;
       }
+      toast.error(updatedBillingGroups.error || "Failed to create billing group");
+      setError(updatedBillingGroups);
+      return null;
     } catch (error) {
       setError(error);
+      toast.error("Failed to create billing group");
+      return null;
+    } finally {
       setOpLoading(false);
     }
   };

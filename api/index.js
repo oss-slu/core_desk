@@ -14,6 +14,7 @@ import { fileURLToPath } from "url";
 import registerRoutes from "./util/router.js";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { Readable } from "stream";
+import { startStlRenderQueue } from "./util/stlRenderQueue.js";
 
 // import client from "#postmark";
 
@@ -24,6 +25,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 let server;
+
+// Start background STL render queue worker (noop if disabled via env)
+startStlRenderQueue();
 
 app.get("/digitalocean-health-check", (_, res) => res.send("OK"));
 

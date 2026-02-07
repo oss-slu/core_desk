@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAuth,
   useBillingGroup,
@@ -96,12 +96,13 @@ export const BillingGroupPage = () => {
     opLoading: opLoadingInvitations,
   } = useBillingGroupInvitations(shopId, groupId);
 
-  const { modal, ModalElement } = useModal({
+  const { modal, ModalElement, close, update } = useModal({
     title: "Create a new invitation link",
     text: (
       <CreateBillingGroupInvitation
         createBillingGroupInvitation={createBillingGroupInvitation}
         opLoading={opLoadingInvitations}
+        onCreated={() => close(true)}
       />
     ),
   });
@@ -128,6 +129,10 @@ export const BillingGroupPage = () => {
     userShop.accountType === "OPERATOR" ||
     billingGroup?.userRole === "ADMIN";
 
+  useEffect(() => {
+    update();
+  }, [opLoadingInvitations, billingGroupInvitations?.length]);
+
   if (loading || loadingInvitations)
     return (
       <Page
@@ -136,7 +141,7 @@ export const BillingGroupPage = () => {
           shopId,
           user.admin,
           userShop.accountType,
-          userShop.balance < 0
+          userShop.balance < 0,
         )}
       >
         <Loading />
@@ -152,7 +157,7 @@ export const BillingGroupPage = () => {
         shopId,
         user.admin,
         userShop.accountType,
-        userShop.balance < 0
+        userShop.balance < 0,
       )}
     >
       {ModalElement}
@@ -201,7 +206,7 @@ export const BillingGroupPage = () => {
             onDelete={async () => {
               if (
                 window.confirm(
-                  "Are you sure you want to delete this billing group?"
+                  "Are you sure you want to delete this billing group?",
                 )
               ) {
                 const success = await deleteBillingGroup();
@@ -253,7 +258,7 @@ export const BillingGroupPage = () => {
                         size="sm"
                         onClick={() =>
                           copyToClipboard(
-                            `${document.location.origin}/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`
+                            `${document.location.origin}/shops/${shopId}/billing-groups/${groupId}/invitations/${id}`,
                           )
                         }
                       >

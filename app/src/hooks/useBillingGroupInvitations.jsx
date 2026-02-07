@@ -41,14 +41,16 @@ export const useBillingGroupInvitations = (shopId, billingGroupId) => {
       const updatedbillingGroupInvitations = await r.json();
       if (updatedbillingGroupInvitations.invites) {
         setbillingGroupInvitations(updatedbillingGroupInvitations.invites);
-        setOpLoading(false);
-      } else {
-        toast.error(updatedbillingGroupInvitations);
-        setError(updatedbillingGroupInvitations);
-        setOpLoading(false);
+        return true;
       }
+      toast.error(updatedbillingGroupInvitations.error || "Failed to create invitation");
+      setError(updatedbillingGroupInvitations);
+      return false;
     } catch (error) {
       setError(error);
+      toast.error("Failed to create invitation");
+      return false;
+    } finally {
       setOpLoading(false);
     }
   };

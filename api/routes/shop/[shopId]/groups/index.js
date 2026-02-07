@@ -169,7 +169,10 @@ export const post = [
         };
       });
 
-      res.send({ groups: groupsWithUserCountAndAdmin });
+      res.send({
+        groups: groupsWithUserCountAndAdmin,
+        createdGroupId: group.id,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).send({ error: "Internal server error" });

@@ -105,11 +105,13 @@ export const post = [
 
     const validatedData = validationResult.data;
 
+    console.log(validatedData, req.body);
+
     const invite = await prisma.billingGroupInvitationLink.create({
       data: {
         billingGroup: {
           connect: {
-            id: validatedData.billingGroupId,
+            id: req.params.groupId,
           },
         },
         expires,

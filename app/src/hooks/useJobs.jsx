@@ -9,7 +9,11 @@ import { useAuth } from "#useAuth";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
 
-const CreateJobModalContent = ({ onSubmit }) => {
+const CreateJobModalContent = ({
+  onSubmit,
+  defaultBillingGroupId = null,
+  forceBillingGroupId = false,
+}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState("");
@@ -19,8 +23,12 @@ const CreateJobModalContent = ({ onSubmit }) => {
   const [onBehalfOfUserEmail, setOnBehalfOfUserEmail] = useState("");
   const [onBehalfOfUserFirstName, setOnBehalfOfUserFirstName] = useState("");
   const [onBehalfOfUserLastName, setOnBehalfOfUserLastName] = useState("");
-  const [onBehalfOfBillingGroup, setOnBehalfOfBillingGroup] = useState(false);
-  const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] = useState(null);
+  const [onBehalfOfBillingGroup, setOnBehalfOfBillingGroup] = useState(
+    forceBillingGroupId || !!defaultBillingGroupId
+  );
+  const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] = useState(
+    defaultBillingGroupId
+  );
 
   const capitalize = (s) => {
     if (typeof s !== "string") return "";
@@ -118,7 +126,7 @@ const CreateJobModalContent = ({ onSubmit }) => {
           </>
         )
       )}
-      {!onBehalfOf ? (
+      {!onBehalfOf && !forceBillingGroupId ? (
         <>
           <label className="form-label">Billing Group</label>
           <Switch
@@ -127,13 +135,11 @@ const CreateJobModalContent = ({ onSubmit }) => {
             onChange={setOnBehalfOfBillingGroup}
           />
           {onBehalfOfBillingGroup && (
-            <>
-              <BillingGroupPicker
-                value={onBehalfOfBillingGroupId}
-                onChange={setOnBehalfOfBillingGroupId}
-                includeNone={false}
-              />
-            </>
+            <BillingGroupPicker
+              value={onBehalfOfBillingGroupId}
+              onChange={setOnBehalfOfBillingGroupId}
+              includeNone={false}
+            />
           )}
         </>
       ) : null}
@@ -303,8 +309,20 @@ export const useJobs = (shopId) => {
     }
   };
 
-  const createJob = async () => {
-    modal();
+  const createJob = async (options = {}) => {
+    const { billingGroupId: defaultBillingGroupId, forceBillingGroupId } =
+      options;
+
+    modal({
+      title: "Create a new Job",
+      text: (
+        <CreateJobModalContent
+          onSubmit={_createJob}
+          defaultBillingGroupId={defaultBillingGroupId}
+          forceBillingGroupId={forceBillingGroupId}
+        />
+      ),
+    });
   };
 
   const updateJob = async (jobId, newJob) => {

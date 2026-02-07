@@ -20,7 +20,12 @@ Sentry.init({
   ],
   beforeSend(event) {
     // Check if it is an exception, and if so, show the report dialog
-    if (event.exception && event.event_id) {
+    console.log("Event", event);
+    if (
+      event.exception &&
+      event.event_id &&
+      event.message?.includes("react-stl-viewer")
+    ) {
       Sentry.showReportDialog({
         eventId: event.event_id,
         title: "The application has crashed.",
@@ -44,5 +49,5 @@ createRoot(document.getElementById("root")).render(
     <SWRConfig value={swrConfig}>
       <App />
     </SWRConfig>
-  </AuthProvider>
+  </AuthProvider>,
 );

@@ -369,22 +369,50 @@ model JobItem {
   secondaryMaterialId  String?
   userId               String?
   approved             Boolean?
-  createdAt            DateTime      @default(now())
-  updatedAt            DateTime      @updatedAt
-  active               Boolean       @default(true)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+  active               Boolean         @default(true)
   processingTimeQty    Float?
   timeQty              Float?
   unitQty              Float?
   materialQty          Float?
   secondaryMaterialQty Float?
   jobId                String
-  job                  Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  material             Material?     @relation("JobItem::primaryMaterial", fields: [materialId], references: [id])
-  secondaryMaterial    Material?     @relation("JobItem::secondaryMaterial", fields: [secondaryMaterialId], references: [id])
-  resource             Resource?     @relation(fields: [resourceId], references: [id])
-  resourceType         ResourceType? @relation(fields: [resourceTypeId], references: [id])
-  user                 user?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job                  Job             @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  material             Material?       @relation("JobItem::primaryMaterial", fields: [materialId], references: [id])
+  secondaryMaterial    Material?       @relation("JobItem::secondaryMaterial", fields: [secondaryMaterialId], references: [id])
+  resource             Resource?       @relation(fields: [resourceId], references: [id])
+  resourceType         ResourceType?   @relation(fields: [resourceTypeId], references: [id])
+  user                 user?           @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs                 logs[]
+  StlRenderTask        StlRenderTask[]
+}
+
+enum StlRenderStatus {
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+}
+
+model StlRenderTask {
+  id            String          @id @default(cuid())
+  jobItemId     String
+  fileUrl       String
+  fileName      String?
+  fileKey       String?
+  status        StlRenderStatus @default(PENDING)
+  attempts      Int             @default(0)
+  lockedBy      String?
+  lockedAt      DateTime?
+  lockExpiresAt DateTime?
+  availableAt   DateTime        @default(now())
+  lastError     String?
+  completedAt   DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  jobItem JobItem @relation(fields: [jobItemId], references: [id], onDelete: Cascade)
 }
 
 model BillingGroup {
