@@ -1,13 +1,13 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Input, Util } from 'tabler-react-2';
 import { Button } from "#button";
 
 export const useTDXTickets = () => {
-    const [ticketId, setTicketId] = useState('');
+    const [ticketId] = useState('');
     const [ticket, setTicket] = useState(null);
     const [loading, setLoading] = useState(false);
 
-    const fetchTicket = async () => {
+    const fetchTicket = async (token) => {
         setLoading(true);
         try {
             const res = await fetch('/api/add-ons/tickets', {
@@ -18,7 +18,7 @@ export const useTDXTickets = () => {
             const data = await res.json();
             setTicket(data);
         } catch (err) {
-            alert("Ticket search failed");
+            alert(`Ticket search failed: ${err}`);
         } finally {
             setLoading(false);
         }

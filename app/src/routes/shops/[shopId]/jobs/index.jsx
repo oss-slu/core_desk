@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { act, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
@@ -102,7 +102,7 @@ export const Jobs = () => {
     createJob,
   } = useJobs(shopId);
   const { user } = useUser(activeUser.id);
-  const {TDXTicketIdInput} = useTDXTickets();
+  const {TDXTicketIdInput} = useTDXTickets(activeUser);
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
