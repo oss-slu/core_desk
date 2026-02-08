@@ -50,10 +50,11 @@ export const get = [
     
 
 
-    users = users.map(({ user: { password, ...userData } }) => ({
-      name: `${userData.firstName} ${userData.lastName}`,
-      ...userData,
-    }));
+
+    users = users.map(({ user: { password: _password, ...userData } }) => ({
+  name: `${userData.firstName} ${userData.lastName}`,
+  ...userData,
+}));
 
     return res.json({
       users,
