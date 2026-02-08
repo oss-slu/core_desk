@@ -57,7 +57,7 @@ describe("/users", () => {
         createdAt: expect.any(String),
         email: expect.any(String),
         firstName: expect.any(String),
-        hasPassword : expect.any(Boolean),
+        hasPassword: false,
         id: expect.any(String),
         isMe: expect.any(Boolean),
         jobCount: expect.any(Number),
