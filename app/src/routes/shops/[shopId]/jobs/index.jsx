@@ -1,4 +1,4 @@
-import React, { act, useState } from "react";
+import React, { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
