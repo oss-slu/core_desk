@@ -10,7 +10,7 @@ import { LogTimeline } from "../../components/logs/timeline";
 import { Table } from "#table";
 import moment from "moment";
 import { Button } from "#button";
-import { Input, Badge     } from "tabler-react-2";
+import { Input, Badge } from "tabler-react-2";
 import { Icon } from "#icon";
 import { useModal } from "#modal";
 import { useShops } from "../../hooks/useShops";
@@ -139,17 +139,17 @@ const ChangePassword = ({ user }) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.userId, 
+          userId: user.userId,
           password: password,
         }),
 
-        
+
       });
 
-      const data =  await r.json();
+      const data = await r.json();
 
 
-      if(!r.ok){
+      if (!r.ok) {
         toast.error(data.error)
         return;
       }
@@ -161,12 +161,12 @@ const ChangePassword = ({ user }) => {
 
   return (
     <div style={{ marginBottom: "1rem", textAlign: "left", width: "100%" }}>
-      <label 
-        style={{ 
-          display: "block", 
-          marginBottom: "0.5rem", 
-          fontWeight: "500", 
-          fontSize: "0.875rem" 
+      <label
+        style={{
+          display: "block",
+          marginBottom: "0.5rem",
+          fontWeight: "500",
+          fontSize: "0.875rem"
         }}
       >
         Set New Password for {user.firstName}
@@ -202,12 +202,12 @@ const ChangePassword = ({ user }) => {
         </Button>
       </div>
 
-      <small 
-        style={{ 
-          color: "#6c757d", 
-          marginTop: "0.5rem", 
-          display: "block", 
-          fontSize: "0.75rem" 
+      <small
+        style={{
+          color: "#6c757d",
+          marginTop: "0.5rem",
+          display: "block",
+          fontSize: "0.75rem"
         }}
       >
         This will immediately override the user's current credentials.
@@ -264,7 +264,6 @@ export const UserPage = () => {
     if (user) {
       setEditableFirstName(user.firstName);
       setEditableLastName(user.lastName);
-      console.log("user has password" , user.hasPassword);
     }
   }, [user]);
 
@@ -364,8 +363,8 @@ export const UserPage = () => {
               {user.hasPassword && (
                 <>
 
-                <ChangePassword user = {user}/>
-                
+                  <ChangePassword user={user} />
+
                 </>
 
 

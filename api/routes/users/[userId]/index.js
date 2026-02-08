@@ -27,7 +27,7 @@ export const get = [
           delete user.password;
           user = {
             ...user,
-            hasPassword : hasPassword,
+            hasPassword: hasPassword,
             name: `${user.firstName} ${user.lastName}`,
           };
 
@@ -151,9 +151,8 @@ export const get = [
       delete user.password;
       user = {
         ...user,
-        hasPassword : hasPassword,
+        hasPassword: hasPassword,
         name: `${user.firstName} ${user.lastName}`,
-        
         shopCount: user._count.shops,
         jobCount: user._count.jobs,
         _count: undefined,

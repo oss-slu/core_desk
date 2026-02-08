@@ -44,7 +44,7 @@ export const get = [
       users = users.map((user) => {
         const fullName = `${user.firstName} ${user.lastName}`;
         const lastLoginDate = user.logs[0]?.createdAt;
-        const hasPassword = !!user.passwordassword;
+        const hasPassword = !!user.password;
 
 
         delete user.password;
@@ -52,12 +52,12 @@ export const get = [
         return {
           ...user,
           name: fullName,
-          hasPassword : hasPassword,
+          hasPassword: hasPassword,
           isMe: user.id === req.user.id,
           shopCount: user._count.shops,
           jobCount: user._count.jobs,
-          _count : undefined,
-          
+          _count: undefined,
+
           lastLogin: lastLoginDate,
           logs: undefined,
         };
