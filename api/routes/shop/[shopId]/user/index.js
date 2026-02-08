@@ -46,15 +46,10 @@ export const get = [
     });
 
 
-
-    
-
-
-
-    users = users.map(({ user: { password: _password, ...userData } }) => ({
-  name: `${userData.firstName} ${userData.lastName}`,
-  ...userData,
-}));
+      users = users.map((user) => ({
+        name: `${user.user.firstName} ${user.user.lastName}`,
+        ...user.user,
+      }));
 
     return res.json({
       users,
