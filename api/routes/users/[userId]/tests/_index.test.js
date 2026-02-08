@@ -102,6 +102,7 @@ describe("/[userId]", () => {
         shops: expect.any(Array),
       });
 
+      expect(res.body.user.hasPassword).toBe(Boolean);
       expect(res.body.user.shopCount).toBe(1);
       expect(res.body.user.jobCount).toBe(0);
       expect(res.body.user.isMe).toBe(false);

@@ -5,7 +5,6 @@ import { checkHasPassword } from "#verifyAuth";
 export const get = [
   verifyAuth,
   (req, res) => {
-    console.log(req.user);
     const hasPasswordFlag = checkHasPassword(req.user);
     res.json({
       user: {
