@@ -22,8 +22,6 @@ const CreateJobModalContent = ({ onSubmit }) => {
   const [onBehalfOfBillingGroup, setOnBehalfOfBillingGroup] = useState(false);
   const [onBehalfOfBillingGroupId, setOnBehalfOfBillingGroupId] = useState(null);
 
-  const [tdxTicket, fetchTicket] = useState("");
-
   const capitalize = (s) => {
     if (typeof s !== "string") return "";
     return s.charAt(0).toUpperCase() + s.slice(1);
@@ -43,12 +41,6 @@ const CreateJobModalContent = ({ onSubmit }) => {
 
   return (
     <div>
-      <Input // will add functionality to fill in values with ticket info
-        value={tdxTicket}
-        onChange={(e) => fetchTicket(e)}
-        label="TDNext Ticket ID"
-        placeholder="Ticket ID"
-      />
       <Input
         value={title}
         onChange={(e) => setTitle(e)}

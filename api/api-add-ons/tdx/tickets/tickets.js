@@ -6,12 +6,10 @@ export const fetchTickets = async (id, token, appId = 31) => {
 
     try {
         const response = await fetch(url, {
-            // method: 'POST',
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
             },
-            // body: JSON.stringify(options) // Include searchParams in the request body
         });
         if (!response.ok) {
             const errorText = await response.text();
