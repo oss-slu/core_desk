@@ -153,6 +153,7 @@ export const get = [
         ...user,
         hasPassword : hasPassword,
         name: `${user.firstName} ${user.lastName}`,
+        
         shopCount: user._count.shops,
         jobCount: user._count.jobs,
         _count: undefined,

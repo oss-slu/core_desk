@@ -48,17 +48,12 @@ export const get = [
 
 
     
-    users = users.map((user) => {
-      delete user.user.password; 
 
-      return {
-        ...user,
-        user: {
-          ...user.user,
-          name: `${user.user.firstName} ${user.user.lastName}`,
-        },
-      };
-    });
+
+    users = users.map(({ user: { password, ...userData } }) => ({
+      name: `${userData.firstName} ${userData.lastName}`,
+      ...userData,
+    }));
 
     return res.json({
       users,

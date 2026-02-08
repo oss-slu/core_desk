@@ -44,19 +44,22 @@ export const get = [
       users = users.map((user) => {
         const fullName = `${user.firstName} ${user.lastName}`;
         const lastLoginDate = user.logs[0]?.createdAt;
+        const hasPassword = !!user.passwordassword;
 
 
         delete user.password;
-        delete user.logs;
-        delete user._count;
 
         return {
           ...user,
           name: fullName,
+          hasPassword : hasPassword,
           isMe: user.id === req.user.id,
-          shopCount: user.shopCount,
-          jobCount: user.jobCount,
+          shopCount: user._count.shops,
+          jobCount: user._count.jobs,
+          _count : undefined,
+          
           lastLogin: lastLoginDate,
+          logs: undefined,
         };
       });
       fs.writeFileSync("mapped-users.json", JSON.stringify(users));
