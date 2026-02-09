@@ -19,6 +19,8 @@ import { Alert } from "#alert";
 import { useConfirm } from "#confirm";
 import { NotFound } from "#notFound";
 import { useUserLogs } from "../../hooks/useUserLogs";
+import toast from "react-hot-toast"
+import { authFetch } from "#url";
 const { H2, H3 } = Typography;
 
 const AddUserToShopForm = ({ user, onFinish }) => {
@@ -121,6 +123,95 @@ const AddUserToShop = ({ user, shops, loading, onFinish }) => {
       >
         <Icon i="circle-plus" size={18} /> Add {user.firstName} to a new shop
       </Button>
+    </div>
+  );
+};
+
+
+const ChangePassword = ({ user }) => {
+  const [password, setPassword] = useState("");
+
+  const updatePassword = async (user) => {
+    try {
+      const r = await authFetch(`/api/routes/login`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.userId,
+          password: password,
+        }),
+
+
+      });
+
+      const data = await r.json();
+
+
+      if (!r.ok) {
+        toast.error(data.error)
+        return;
+      }
+    } catch (error) {
+      toast.error(error);
+      //add to sentry later?
+    }
+  };
+
+  return (
+    <div style={{ marginBottom: "1rem", textAlign: "left", width: "100%" }}>
+      <label
+        style={{
+          display: "block",
+          marginBottom: "0.5rem",
+          fontWeight: "500",
+          fontSize: "0.875rem"
+        }}
+      >
+        Set New Password for {user.firstName}
+      </label>
+
+      <div style={{ display: "flex", alignItems: "stretch", gap: "0px" }}>
+        <div style={{ flex: 1 }}>
+          <Input
+            type="password"
+            placeholder="Enter new password..."
+            value={password}
+            onChange={(val) => setPassword(val)}
+            style={{
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+            }}
+          />
+        </div>
+
+        <Button
+          variant="primary"
+          disabled={!password}
+          style={{
+            borderTopLeftRadius: 0,
+            borderBottomLeftRadius: 0,
+            whiteSpace: "nowrap"
+          }}
+          onClick={() => {
+            updatePassword(user);
+          }}
+        >
+          Update
+        </Button>
+      </div>
+
+      <small
+        style={{
+          color: "#6c757d",
+          marginTop: "0.5rem",
+          display: "block",
+          fontSize: "0.75rem"
+        }}
+      >
+        This will immediately override the user's current credentials.
+      </small>
     </div>
   );
 };
@@ -269,6 +360,18 @@ export const UserPage = () => {
               >
                 <Icon i="reload" size={18} /> Refetch User
               </Button>
+              {user.hasPassword && (
+                <>
+
+                  <ChangePassword user={user} />
+
+                </>
+
+
+              )}
+
+
+
               {!user.isMe &&
                 (user.admin ? (
                   <Button

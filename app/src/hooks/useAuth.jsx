@@ -23,6 +23,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+
   const login = async () => {
     const r = await fetch(u("/api/auth/login"));
     const { url } = await r.json();
@@ -47,16 +48,19 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (r.ok) {
+      
       const { user } = await r.json();
       Sentry.setUser({
         id: user.id,
         email: user.email,
         name: user.firstName + " " + user.lastName,
+        hasPassword : user.hasPassword,
       });
       console.log({
         id: user.id,
         email: user.email,
         name: user.firstName + " " + user.lastName,
+        hasPassword : user.hasPassword, //debug
       });
       setUser(user);
       setLoggedIn(true);

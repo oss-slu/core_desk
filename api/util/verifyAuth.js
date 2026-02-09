@@ -1,6 +1,12 @@
 import jwt from "jsonwebtoken";
 import { prisma } from "./prisma.js";
 
+
+export const checkHasPassword = (user) => {
+  return !!user.password;
+  
+};
+
 export const verifyAuth = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (authHeader) {

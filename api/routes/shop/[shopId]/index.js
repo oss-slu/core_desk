@@ -139,6 +139,7 @@ export const get = [
               excludedCount: 0,
             }
           );
+          delete userShop.user.password;
 
           return {
             ...userShop,

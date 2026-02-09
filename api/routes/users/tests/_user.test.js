@@ -57,6 +57,7 @@ describe("/users", () => {
         createdAt: expect.any(String),
         email: expect.any(String),
         firstName: expect.any(String),
+        hasPassword: false,
         id: expect.any(String),
         isMe: expect.any(Boolean),
         jobCount: expect.any(Number),
@@ -84,6 +85,7 @@ describe("/users", () => {
         "suspended",
         "suspensionReason",
         "updatedAt",
+        "hasPassword",
       ];
       expect(Object.keys(res.body.users[0]).sort()).toEqual(
         expectedKeys.sort()
