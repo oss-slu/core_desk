@@ -2,7 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Page } from "#page";
 import { Icon } from "#icon";
 import { Link, useParams } from "react-router-dom";
-import { Typography, Util, Input, Card, Button, Badge, Spinner } from "tabler-react-2";
+import {
+  Typography,
+  Util,
+  Input,
+  Card,
+  Button,
+  Badge,
+  Spinner,
+} from "tabler-react-2";
 import { Loading } from "#loading";
 import { UploadDropzone } from "../../../../../components/upload/uploader";
 import {
@@ -68,7 +76,7 @@ export const JobPage = () => {
   // 1. Calculate Initial Index: 1 (Step 4) if resourceId exists, else 0 (Step 3).
   // Use uncontrolledJob here as it represents the initial server state.
   const initialIndex = uncontrolledJob?.resourceId ? 1 : 0;
-  
+
   // 2. Initialize currentIndex using the calculated value.
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
 
@@ -81,7 +89,9 @@ export const JobPage = () => {
 
   const handlePrevious = () => {
     // This correctly decrements the index for navigation
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + pages.length + 1) % (pages.length + 1));
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + pages.length + 1) % (pages.length + 1),
+    );
     // Note: Used modulus for safety, although simple decrement to 0 is likely fine here.
   };
 
@@ -99,48 +109,44 @@ export const JobPage = () => {
         opLoading={opLoading}
         includeNone={true}
       />
-    {job.resourceTypeId && (
-      <div>
-        <ResourcePicker
-          value={job.resourceId}
-          onChange={(value) => {
-            updateJob({ resourceId: value });
-          }}
-          resourceTypeId={job.resourceTypeId}
-          opLoading={opLoading}
-          includeNone={true}
-        />
-        <MaterialPicker
-          value={job.materialId}
-          onChange={(value) => {
-            updateJob({ materialId: value });
-          }}
-          resourceTypeId={job.resourceTypeId}
-          opLoading={opLoading}
-          includeNone={true}
-          materialType={"Primary"}
-        />
-        <MaterialPicker
-          value={job.secondaryMaterialId}
-          onChange={(value) => {
-            updateJob({ secondaryMaterialId: value });
-          }}
-          resourceTypeId={job.resourceTypeId}
-          opLoading={opLoading}
-          includeNone={true}
-          materialType={"Secondary"}
-        />
-      </div>
+      {job.resourceTypeId && (
+        <div>
+          <ResourcePicker
+            value={job.resourceId}
+            onChange={(value) => {
+              updateJob({ resourceId: value });
+            }}
+            resourceTypeId={job.resourceTypeId}
+            opLoading={opLoading}
+            includeNone={true}
+          />
+          <MaterialPicker
+            value={job.materialId}
+            onChange={(value) => {
+              updateJob({ materialId: value });
+            }}
+            resourceTypeId={job.resourceTypeId}
+            opLoading={opLoading}
+            includeNone={true}
+            materialType={"Primary"}
+          />
+          <MaterialPicker
+            value={job.secondaryMaterialId}
+            onChange={(value) => {
+              updateJob({ secondaryMaterialId: value });
+            }}
+            resourceTypeId={job.resourceTypeId}
+            opLoading={opLoading}
+            includeNone={true}
+            materialType={"Secondary"}
+          />
+        </div>
       )}
       <br></br>
       {job.resourceId ? (
-        <Button onClick={handleNext}>
-          Next
-        </Button>
+        <Button onClick={handleNext}>Next</Button>
       ) : (
-        <Button disabled>
-          Next
-        </Button>
+        <Button disabled>Next</Button>
       )}
     </div>,
 
@@ -177,28 +183,24 @@ export const JobPage = () => {
       <br />
       <br />
       <Util.Row align="left" gap={1}>
-        <Button onClick={handlePrevious}>
-          Previous
-        </Button>
+        <Button onClick={handlePrevious}>Previous</Button>
         {job.items?.length !== 0 ? (
-          <Button onClick={handleNext}>
-            Next
-          </Button>
+          <Button onClick={handleNext}>Next</Button>
         ) : (
-          <Button disabled>
-            Next
-          </Button>
+          <Button disabled>Next</Button>
         )}
       </Util.Row>
     </div>,
 
     <div key={"receipt"}>
       <h1>We have received your request.</h1>
-      <p>Thank you for your submission. We will contact you when it is finished.</p>
+      <p>
+        Thank you for your submission. We will contact you when it is finished.
+      </p>
       <Button className="btn" href="/">
         Submit another job
       </Button>
-    </div>
+    </div>,
   ];
 
   useEffect(() => {
@@ -216,13 +218,7 @@ export const JobPage = () => {
 
   if (user?.simple === true) {
     return (
-      <div>
-        {loading ? (
-          <Spinner />
-        ) : (
-        <div>{pages[currentIndex]}</div>
-        )}
-      </div>
+      <div>{loading ? <Spinner /> : <div>{pages[currentIndex]}</div>}</div>
     );
   } else {
     return (
@@ -234,8 +230,8 @@ export const JobPage = () => {
             title="Job finalized"
             icon={<Icon i="alert-triangle" />}
           >
-            This job has already been finalized. You can still update it, but you
-            cannot re-charge the customer.
+            This job has already been finalized. You can still update it, but
+            you cannot re-charge the customer.
           </Alert>
         )}
         <Util.Responsive gap={1} align="start" threshold={800}>
@@ -418,8 +414,9 @@ export const JobPage = () => {
                         {job.group.title}
                       </Link>
                       <br />
-                      <b>Group Admin</b> {job.group.users[0].activeUser.firstName}{" "}
-                      {job.group.users[0].activeUser.lastName}
+                      <b>Group Admin</b>{" "}
+                      {job.group.users[0].activeUser?.firstName}{" "}
+                      {job.group.users[0].activeUser?.lastName}
                     </p>
                   </>
                 )}
@@ -457,7 +454,9 @@ export const JobPage = () => {
         <Util.Spacer size={1} />
         <H2>Items</H2>
         {job.items?.length === 0 ? (
-          <i>This job has no items. You can attach files in the dropzone above</i>
+          <i>
+            This job has no items. You can attach files in the dropzone above
+          </i>
         ) : (
           <Util.Col gap={0.5}>
             {job.items?.map((item) => (
