@@ -7,8 +7,10 @@ export const useTDXTickets = () => {
     const [ticketId] = useState('');
     const [ticket, setTicket] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
 
     const fetchTicket = async (token) => {
+        setError(null);
         setLoading(true);
         try {
             const res = await fetch('/api/add-ons/tickets', {
@@ -17,9 +19,14 @@ export const useTDXTickets = () => {
                 body: JSON.stringify({id: ticketId, token: token })
             });
             const data = await res.json();
-            setTicket(data);
-        } catch (err) {
-            toast(`Ticket search failed: ${err}`);
+            if (data) {
+                setTicket(data);
+            } else {
+                toast.error("Ticket search failed");
+                setError("Ticket search failed");
+            }
+        } catch (error) {
+            setError(error);
         } finally {
             setLoading(false);
         }
@@ -49,6 +56,7 @@ export const useTDXTickets = () => {
         ticketId,
         ticket,
         fetchTicket,
-        TDXTicketIdInput
+        TDXTicketIdInput,
+        error
     }
 }
