@@ -51,84 +51,87 @@ export const get = [
             },
           },
           jobs: true,
-          logs: includeLogs && {
-            orderBy: {
-              createdAt: "desc",
-            },
-            include: {
-              user: {
-                select: {
-                  firstName: true,
-                  lastName: true,
+          logs: includeLogs
+            ? {
+                orderBy: {
+                  createdAt: "desc",
                 },
-              },
-              shop: {
-                select: {
-                  name: true,
-                },
-              },
-              resource: {
-                select: {
-                  title: true,
-                  active: true,
-                },
-              },
-              resourceType: {
-                select: {
-                  title: true,
-                },
-              },
-              resourceImage: {
-                select: {
-                  file: true,
-                },
-              },
-              job: {
-                select: {
-                  title: true,
-                },
-              },
-              jobItem: {
-                select: {
-                  title: true,
-                  active: true,
-                  file: true,
-                  status: true,
-                },
-              },
-              material: {
-                select: {
-                  title: true,
-                  active: true,
-                  tdsFile: true,
-                  msdsFile: true,
+                take: 100,
+                include: {
+                  user: {
+                    select: {
+                      firstName: true,
+                      lastName: true,
+                    },
+                  },
+                  shop: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                  resource: {
+                    select: {
+                      title: true,
+                      active: true,
+                    },
+                  },
                   resourceType: {
                     select: {
-                      id: true,
                       title: true,
                     },
                   },
-                },
-              },
-              materialImage: {
-                select: {
-                  active: true,
-                  file: true,
+                  resourceImage: {
+                    select: {
+                      file: true,
+                    },
+                  },
+                  job: {
+                    select: {
+                      title: true,
+                    },
+                  },
+                  jobItem: {
+                    select: {
+                      title: true,
+                      active: true,
+                      file: true,
+                      status: true,
+                    },
+                  },
                   material: {
                     select: {
                       title: true,
+                      active: true,
+                      tdsFile: true,
+                      msdsFile: true,
                       resourceType: {
                         select: {
-                          title: true,
                           id: true,
+                          title: true,
+                        },
+                      },
+                    },
+                  },
+                  materialImage: {
+                    select: {
+                      active: true,
+                      file: true,
+                      material: {
+                        select: {
+                          title: true,
+                          resourceType: {
+                            select: {
+                              title: true,
+                              id: true,
+                            },
+                          },
                         },
                       },
                     },
                   },
                 },
-              },
-            },
-          },
+              }
+            : undefined,
           _count: {
             select: {
               shops: {
