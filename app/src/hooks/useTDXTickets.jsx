@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Input, Util } from 'tabler-react-2';
 import { Button } from "#button";
+import toast from 'react-hot-toast';
 
 export const useTDXTickets = () => {
     const [ticketId] = useState('');
@@ -18,7 +19,7 @@ export const useTDXTickets = () => {
             const data = await res.json();
             setTicket(data);
         } catch (err) {
-            alert(`Ticket search failed: ${err}`);
+            toast(`Ticket search failed: ${err}`);
         } finally {
             setLoading(false);
         }
