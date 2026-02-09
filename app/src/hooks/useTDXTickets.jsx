@@ -1,0 +1,62 @@
+import React, { useState } from 'react';
+import { Input, Util } from 'tabler-react-2';
+import { Button } from "#button";
+import toast from 'react-hot-toast';
+
+export const useTDXTickets = () => {
+    const [ticketId] = useState('');
+    const [ticket, setTicket] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    const fetchTicket = async (token) => {
+        setError(null);
+        setLoading(true);
+        try {
+            const res = await fetch('/api/add-ons/tickets', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({id: ticketId, token: token })
+            });
+            const data = await res.json();
+            if (data) {
+                setTicket(data);
+            } else {
+                toast.error("Ticket search failed");
+                setError("Ticket search failed");
+            }
+        } catch (error) {
+            setError(error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const TDXTicketIdInput = () => {
+        return (
+            <Util.Row justify="between" align="center">
+                <Input // will add functionality to fill in values with ticket info
+                    value={ticketId}
+                    // onChange={(e) => setTicketId(e.target.value)}
+                    label="TDNext Ticket ID"
+                    placeholder="Ticket ID"
+                />
+                <Button 
+                    loading={loading}
+                    onClick={() => {
+                        setLoading(true);
+                        fetchTicket();
+                    }}
+                >Import Ticket</Button>
+            </Util.Row>
+        );
+    }
+
+    return {
+        ticketId,
+        ticket,
+        fetchTicket,
+        TDXTicketIdInput,
+        error
+    }
+}
