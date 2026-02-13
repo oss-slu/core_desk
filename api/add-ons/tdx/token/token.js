@@ -42,3 +42,32 @@ export const getTDXToken = async (username, password) => {
         throw error;
     }
 }
+
+export const getTDXTokenSSO = async () => {
+    const url = `${process.env.TDX_URL}/auth/loginsso`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Authentication failed: ${response.status} - ${errorText}`);
+            throw new Error(`Authentication failed: ${response.status} - ${errorText}`);
+        }
+
+        // The API returns the token directly as a string or within an object
+        const token = await response.text();
+        
+        // Clean the token if it arrives with extra quotes
+        return token.replace(/"/g, ''); 
+        
+    } catch (error) {
+        console.error('Error during API authentication:', error);
+        throw error;
+    }
+}
