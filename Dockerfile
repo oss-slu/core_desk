@@ -1,41 +1,81 @@
-# Base image for frontend and backend
-FROM node:20-alpine AS base
+# ---------- BASE ----------
+FROM node:20-bullseye AS base
 
-RUN apk add --no-cache \
+# Install Chromium + required system libs (glibc-based)
+RUN apt-get update && apt-get install -y \
     chromium \
-    nss \
-    freetype \
-    harfbuzz \
     ca-certificates \
-    ttf-freefont \
-    openssl
+    fonts-freefont-ttf \
+    openssl \
+    curl \
+    dumb-init \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV PUPPETEER_SKIP_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV NODE_ENV=production
 
-# Accept build-time arguments
+# Puppeteer config
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
+# Enable core dumps (for debugging segfaults)
+RUN ulimit -c unlimited || true
+
+# ---------- BUILD STAGE ----------
+FROM base AS builder
+
+# Accept build args
 ARG DATABASE_URL
 ARG SENTRY_AUTH_TOKEN
 ARG VITE_BUILD_DATE
 ARG VITE_HASH
 
-# Make Vite see these at build time (Vite only inlines VITE_* at build)
+ENV DATABASE_URL=${DATABASE_URL}
+ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 ENV VITE_BUILD_DATE=${VITE_BUILD_DATE}
 ENV VITE_HASH=${VITE_HASH}
 
-# --- Frontend ---
+# ---- FRONTEND ----
 WORKDIR /app
-COPY ./app/ ./
-RUN yarn install
+COPY ./app/package.json ./app/yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY ./app/ .
 RUN yarn build
 
-# --- Backend ---
+# ---- BACKEND ----
 WORKDIR /api
-COPY ./api/ ./
-RUN yarn install
+COPY ./api/package.json ./api/yarn.lock ./
+RUN yarn install --frozen-lockfile
+
+COPY ./api/ .
+
+# Generate Prisma client
 RUN npx prisma generate
-RUN npx prisma migrate deploy
+
+# DO NOT run migrate at build time (this can crash + break builds)
+# Migrations should run at container start
+
+# ---------- RUNTIME ----------
+FROM base AS runtime
+
+# Install only runtime deps
+WORKDIR /api
+
+# Copy backend
+COPY --from=builder /api /api
+
+# Copy frontend build into backend if you serve static assets
+COPY --from=builder /app/dist /api/public
 
 EXPOSE 3000
-CMD ["yarn", "start"]
+
+# Use dumb-init to prevent zombie processes
+ENTRYPOINT ["dumb-init", "--"]
+
+CMD ["node", \
+  "--trace-uncaught", \
+  "--trace-warnings", \
+  "--report-on-fatalerror", \
+  "--report-uncaught-exception", \
+  "--report-directory=/tmp/node-reports", \
+  "index.js"]
