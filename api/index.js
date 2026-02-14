@@ -15,6 +15,8 @@ import registerRoutes from "./util/router.js";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { Readable } from "stream";
 import { startStlRenderQueue } from "./util/stlRenderQueue.js";
+// import { getTDXToken } from "./add-ons/tdx/token/token.js";
+import { fetchTickets } from "./add-ons/tdx/tickets/tickets.js";
 
 // import client from "#postmark";
 
@@ -377,6 +379,28 @@ if (process.env.JACK == "true") {
   // );
 
   // app.use("/api", await router());
+
+  // Routes for TDX Web API
+
+  app.post('/api/add-ons/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const token = await getTDXToken();
+      res.json({ token });
+    } catch (err) {
+      res.status(401).json({ error: "Auth failed" });
+    }
+  });
+
+  app.get('/api/add-ons/ticket', async (req, res) => {
+    try {
+      const { id } = req.body;
+      const data = await fetchTickets(id);
+      res.json(data);
+    } catch (err) {
+      res.status(500).json({ error: "Fetch failed" });
+    }
+  });
 
   // This route is used for training purposes only. It is not used in production.
   app.use((req, res, next) => {

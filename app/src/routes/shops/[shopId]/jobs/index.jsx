@@ -99,10 +99,16 @@ export const Jobs = () => {
     loading: jobsLoading,
     ModalElement,
     CreateSimpleSubPage,
+    CreateTDXJob,
     createJob,
   } = useJobs(shopId);
   const { user } = useUser(activeUser.id);
-  const {TDXTicketIdInput} = useTDXTickets(activeUser);
+
+  // Create Job options
+  const createJobOptions = [
+    <CreateTDXJob/>,
+    <Button onClick={createJob}>Create Job</Button>
+  ]
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
@@ -361,8 +367,15 @@ export const Jobs = () => {
           <div>
             <H1>Jobs</H1>
           </div>
-          <TDXTicketIdInput />
-          <Button onClick={createJob}>Create Job</Button>
+          <Dropdown
+            prompt="Create or Import Job"
+            items={createJobOptions.map((id) => ({text:
+              <div>
+                {id}
+              </div>
+            }))}
+          >
+          </Dropdown>
         </Util.Row>
         <Util.Spacer size={1} />
 

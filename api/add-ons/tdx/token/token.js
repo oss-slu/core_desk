@@ -7,7 +7,7 @@ dotenv.config();
  * @param {string} password - Your TDX password.
  * @returns {Promise<string>} - Returns the Bearer token.
  */
-export const getTDXToken = async (username, password) => {
+export const getTDXToken = async (username = process.env.TDX_USERNAME, password = process.env.TDX_PASSWORD) => { // placeholders just to make sure it works
     const url = `${process.env.TDX_URL}/auth/login`;
     
     // The "loginParams" structure based on typical TeamDynamix API requirements
