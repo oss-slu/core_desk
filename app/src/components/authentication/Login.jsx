@@ -119,15 +119,10 @@ export const Login = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "10px",
-                  backgroundColor: "#ffffff",
+                  backgroundColor: "#2b4dd5",
                   border: "1px solid #ced4da",
                 }}
               >
-                <img
-                  src="/microsoft-logo.svg"
-                  alt="Microsoft"
-                  style={{ width: "18px", height: "18px" }}
-                />
                 Login with SSO
               </Button>
             </>
