@@ -24,6 +24,7 @@ import { BillingGroupPage } from "#billingGroupPage";
 import { BillingGroupInvitationPage } from "#billingGroupInvitationPage";
 import { BillingGroupPortal } from "#billingGroupsPortal";
 import { SchedulePage } from "./routes/shops/[shopId]/schedule";
+import { Login } from "./components/authentication/Login";
 
 // eslint-disable-next-line
 export default () => {
@@ -120,15 +121,7 @@ export default () => {
             ) : (
               <Route
                 path="*"
-                element={ //I dont like this I am going to create a login page
-
-                  <div>
-                    <h1>Welcome to SLU Open Project</h1>
-                    <p>Please log in to continue</p>
-                    <Button variant="primary" onClick={login}>
-                      Login
-                    </Button>
-                  </div>
+                element={ <Login />
                 }
               />
             )}

@@ -23,8 +23,52 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+const standardLogin = async (email, password) => {
+  try {
+    const r = await fetch(u("api/auth/login"), {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    });
 
-  const login = async () => {
+    const data = await r.json();
+    if (!r.ok) {
+      throw new Error(data.error || "Login failed");
+    }
+    localStorage.setItem("token", data.token); //set token
+
+  } catch (error) {
+    console.error("Login error:", error.message);
+  }
+};
+
+const forgotPassword = async ( email ) => {
+  try{
+    const r = await fetch(u("api/auth/forgotPassword") , {
+      method : "POST",
+      body : JSON.stringify({email}),
+    
+    });
+
+    const data = await r.json();
+    if (!r.ok){
+      throw new Error(data.error);
+    }
+
+    //Add toast success
+
+  }
+
+  catch(error) {
+    console.error("Error sending email: ", error.message);
+  }
+
+};
+
+
+
+
+
+  const loginWithOkta = async () => {
     const r = await fetch(u("/api/auth/login"));
     const { url } = await r.json();
     window.location.href = url + "?RelayState=" + window.location.href;
@@ -89,7 +133,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, loggedIn }}>
+    <AuthContext.Provider value={{ user, loading, standardLogin ,loginWithOkta, forgotPassword,  logout, loggedIn }}>
       {children}
     </AuthContext.Provider>
   );
