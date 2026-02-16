@@ -15,9 +15,9 @@ export const post = [
 
       const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
 
-      const resetToken = crypto.randomUUID(); //we need some mechanism to add expiry dates, on the reset , should we also store this in db?
+      const resetToken = jwt.sign({id : user.id}, process.env.JWT_SECRET, {expiresIn : "1h"});
 
-      const resetLink = `${process.env.BASE_URL}/password-reset?token=${resetToken}`;
+      const resetLink = `${process.env.SERVER_URL}reset?reset_tok=${resetToken}`;
 
       client.sendEmail({
         From: "coredesk@jackcrane.rocks",
@@ -30,9 +30,8 @@ export const post = [
         MessageStream: "outbound",
       });
     } catch (error) {
+        console.error(error);
         return res.status(500).json({ error: "Failed to send email." });
     }
   },
 ];
-
-export const put = [];

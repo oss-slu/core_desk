@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { u } from "#url";
 import { emitter } from "../util/mitt";
 import * as Sentry from "@sentry/react";
+import toast from "react-hot-toast";
 
 // Create Auth Context
 const AuthContext = createContext();
@@ -53,8 +54,7 @@ const forgotPassword = async ( email ) => {
     if (!r.ok){
       throw new Error(data.error);
     }
-
-    //Add toast success
+    toast.success(`Reset link sent to ${email}`);
 
   }
 

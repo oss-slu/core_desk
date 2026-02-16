@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button } from "#button";
 import { useAuth } from "#useAuth";
+import { Input, Button } from "tabler-react-2";
 
 export const Login = () => {
   const { standardLogin, loginWithOkta, forgotPassword } = useAuth();
@@ -17,14 +17,13 @@ export const Login = () => {
   const handleForgotPassword = (e) => {
     e.preventDefault();
     forgotPassword({ email });
-    
-    console.log("Reset link sent to:", email);
+
   };
 
   return (
     <div
       style={{
-        minHeight: "100vh",
+        minHeight: "calc(100vh - 60px)",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -41,10 +40,16 @@ export const Login = () => {
         }}
       >
         <h1 style={{ marginBottom: "11px", textAlign: "center" }}>
-          Welcome to SLU Open Project
+          Welcome to CoreDesk
         </h1>
 
-        <p style={{ marginBottom: "30px", color: "#6c757d", textAlign: "center"  }}>
+        <p
+          style={{
+            marginBottom: "30px",
+            color: "#6c757d",
+            textAlign: "center",
+          }}
+        >
           {forgotMode
             ? "Enter your email to reset your password"
             : "Please log in to continue"}
@@ -52,46 +57,28 @@ export const Login = () => {
 
         <form onSubmit={forgotMode ? handleForgotPassword : handleSubmit}>
           <div style={{ marginBottom: "20px" }}>
-            <input
+            <Input
               type="email"
               placeholder="Email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "1px solid #ced4da",
-                fontSize: "14px",
-              }}
             />
           </div>
 
           {!forgotMode && (
             <div style={{ marginBottom: "20px" }}>
-              <input
+              <Input
                 type="password"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                style={{
-                  width: "100%",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  border: "1px solid #ced4da",
-                  fontSize: "14px",
-                }}
               />
             </div>
           )}
 
-          <Button
-            variant="primary"
-            type="submit"
-            style={{ width: "100%", marginBottom: "15px" }}
-          >
+          <Button variant="primary" type="submit" style={{ width: "100%" }}>
             {forgotMode ? "Send Reset Link" : "Login"}
           </Button>
 
@@ -108,7 +95,6 @@ export const Login = () => {
                 — OR —
               </div>
 
-              {/* I want to use OKTA Image or some sort of image*/}
               <Button
                 variant="secondary"
                 type="button"
@@ -119,8 +105,6 @@ export const Login = () => {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: "10px",
-                  backgroundColor: "#2b4dd5",
-                  border: "1px solid #ced4da",
                 }}
               >
                 Login with SSO
