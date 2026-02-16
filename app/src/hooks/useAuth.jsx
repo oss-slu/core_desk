@@ -24,49 +24,68 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-const standardLogin = async (email, password) => {
-  try {
-    const r = await fetch(u("api/auth/login"), {
-      method: "POST",
-      body: JSON.stringify({ email, password }),
-    });
+  const standardLogin = async ({ email, password }) => {
+    try {
+      const r = await fetch(u("/api/auth/login"), {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
 
-    const data = await r.json();
-    if (!r.ok) {
-      throw new Error(data.error || "Login failed");
+      const data = await r.json();
+      if (!r.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+      localStorage.setItem("token", data.token); //set token
+    } catch (error) {
+      console.error("Login error:", error.message);
     }
-    localStorage.setItem("token", data.token); //set token
+  };
 
-  } catch (error) {
-    console.error("Login error:", error.message);
-  }
-};
+  const sendPasswordResetEmail = async ({ email }) => { //sends email
+    try {
+      console.log("email", email);
+      const r = await fetch(u("/api/auth/forgotPassword"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
 
-const forgotPassword = async ( email ) => {
-  try{
-    const r = await fetch(u("api/auth/forgotPassword") , {
-      method : "POST",
-      body : JSON.stringify({email}),
-    
-    });
-
-    const data = await r.json();
-    if (!r.ok){
-      throw new Error(data.error);
+      const data = await r.json();
+      if (!r.ok) {
+        throw new Error(data.error);
+      }
+      toast.success(`Reset link sent to ${email}`); //this will do for now, but I am going to add more UI functionality later
+    } catch (error) {
+      console.error("Error sending email: ", error.message);
     }
-    toast.success(`Reset link sent to ${email}`);
+  };
 
-  }
+  const resetPassword = async ({ password }) => { //resets the password
+    try {
+      console.log("password", password);
+      const r = await fetch(u("/api/auth/forgotPassword"), {
+        method: "PUT",
+        headers : {
+          "Content-Type" : "application/json",
+        },
+        body : JSON.stringify({password}),
+      });
+      const data = await r.json();
+      if (!r.ok){
+        throw new Error(data.error);
+      }
 
-  catch(error) {
-    console.error("Error sending email: ", error.message);
-  }
 
-};
+    }
 
 
+    catch(error){
+      console.error("Error resetting passsword" , error.message);
+    }
 
-
+  };
 
   const loginWithOkta = async () => {
     const r = await fetch(u("/api/auth/login"));
@@ -92,19 +111,18 @@ const forgotPassword = async ( email ) => {
     });
 
     if (r.ok) {
-      
       const { user } = await r.json();
       Sentry.setUser({
         id: user.id,
         email: user.email,
         name: user.firstName + " " + user.lastName,
-        hasPassword : user.hasPassword,
+        hasPassword: user.hasPassword,
       });
       console.log({
         id: user.id,
         email: user.email,
         name: user.firstName + " " + user.lastName,
-        hasPassword : user.hasPassword, //debug
+        hasPassword: user.hasPassword, //debug
       });
       setUser(user);
       setLoggedIn(true);
@@ -133,7 +151,18 @@ const forgotPassword = async ( email ) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, standardLogin ,loginWithOkta, forgotPassword,  logout, loggedIn }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        loading,
+        standardLogin,
+        loginWithOkta,
+        sendPasswordResetEmail,
+        resetPassword,
+        logout,
+        loggedIn,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

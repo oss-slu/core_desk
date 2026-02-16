@@ -1,13 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "#useAuth";
 import { Input, Button } from "tabler-react-2";
 
 export const Login = () => {
-  const { standardLogin, loginWithOkta, forgotPassword } = useAuth();
+  const { standardLogin, loginWithOkta, sendPasswordResetEmail, resetPassword } =
+    useAuth();
+
+  const [token, setToken] = useState(null);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [forgotMode, setForgotMode] = useState(false);
+
+
+  //reset password
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const isResetMode = !!token;
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const resetTok = url.searchParams.get("reset_tok");
+    url.searchParams.delete("reset_tok");
+    setToken(resetTok);
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -16,7 +33,12 @@ export const Login = () => {
 
   const handleForgotPassword = (e) => {
     e.preventDefault();
-    forgotPassword({ email });
+    sendPasswordResetEmail({ email });
+  };
+
+  const handleResetPassword =  (e) => {
+    e.preventDefault();
+    resetPassword({ password, token });
 
   };
 
@@ -50,39 +72,79 @@ export const Login = () => {
             textAlign: "center",
           }}
         >
-          {forgotMode
+          {isResetMode
+            ? "Enter your new password"
+            : forgotMode
             ? "Enter your email to reset your password"
             : "Please log in to continue"}
         </p>
 
-        <form onSubmit={forgotMode ? handleForgotPassword : handleSubmit}>
-          <div style={{ marginBottom: "20px" }}>
-            <Input
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
+        <form
+          onSubmit={
+            isResetMode
+              ? handleResetPassword
+              : forgotMode
+              ? handleForgotPassword
+              : handleSubmit
+          }
+        >
+          {isResetMode ? (
+            <>
+              <div style={{ marginBottom: "20px" }}>
+                <Input
+                  type="password"
+                  placeholder="New password"
+                  value={newPassword}
+                  onChange={(value) => setNewPassword(value)}
+                  required
+                />
+              </div>
 
-          {!forgotMode && (
-            <div style={{ marginBottom: "20px" }}>
-              <Input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+              <div style={{ marginBottom: "20px" }}>
+                <Input
+                  type="password"
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(value) => setConfirmPassword(value)}
+                  required
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div style={{ marginBottom: "20px" }}>
+                <Input
+                  type="email"
+                  placeholder="Email address"
+                  value={email}
+                  onChange={(value) => setEmail(value)}
+                  required
+                />
+              </div>
+
+              {!forgotMode && (
+                <div style={{ marginBottom: "20px" }}>
+                  <Input
+                    type="password"
+                    placeholder="Password"
+                    value={password}
+                    onChange={(value) => setPassword(value)}
+                    required
+                  />
+                </div>
+              )}
+            </>
           )}
 
           <Button variant="primary" type="submit" style={{ width: "100%" }}>
-            {forgotMode ? "Send Reset Link" : "Login"}
+            {isResetMode
+              ? "Reset Password"
+              : forgotMode
+              ? "Send Reset Link"
+              : "Login"}
           </Button>
 
-          {!forgotMode && (
+          {!forgotMode && !isResetMode && (
             <>
               <div
                 style={{
@@ -113,23 +175,25 @@ export const Login = () => {
           )}
         </form>
 
-        <div style={{ textAlign: "center", marginTop: "20px" }}>
-          <a
-            href="/#"
-            onClick={(e) => {
-              e.preventDefault();
-              setForgotMode(!forgotMode);
-            }}
-            style={{
-              fontSize: "14px",
-              color: "#206bc4",
-              textDecoration: "none",
-              cursor: "pointer",
-            }}
-          >
-            {forgotMode ? "Back to Login" : "Forgot Password?"}
-          </a>
-        </div>
+        {!isResetMode && (
+          <div style={{ textAlign: "center", marginTop: "20px" }}>
+            <a
+              href="/#"
+              onClick={(e) => {
+                e.preventDefault();
+                setForgotMode(!forgotMode);
+              }}
+              style={{
+                fontSize: "14px",
+                color: "#206bc4",
+                textDecoration: "none",
+                cursor: "pointer",
+              }}
+            >
+              {forgotMode ? "Back to Login" : "Forgot Password?"}
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

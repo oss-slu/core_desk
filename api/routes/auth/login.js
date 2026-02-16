@@ -25,7 +25,7 @@ export const post = [
         return res.status(401).json({ error: "Invalid credentials or SSO required" });
 
       }
-      const isMatched = bcrypt.compare(password, user.password);
+      const isMatched = await bcrypt.compare(password, user.password);
       if (!isMatched) {
         await prisma.log.create({ data: { type: 'USER_LOGIN_FAILURE', userId: user.id } });
         return res.status(401).json({ error: "Invalid credentials " });
