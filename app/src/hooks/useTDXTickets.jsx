@@ -53,36 +53,39 @@ export const useTDXTickets = () => {
 
     const TDXTicketIdInput = ({ onSubmit }) => {
         return (
-            <div className="d-flex align-items-end gap-2">
-                <Input
-                    value={ticketId}
-                    onChange={(val) => setTicketId(val)}
-                    label="TDNext Ticket ID"
-                    placeholder="Ticket ID"
-                />
-                <Button 
-                    loading={isFetching}
-                    onClick={async () => {
-                        const data = await fetchTicket(ticketId);
-                        if (data && onSubmit) {
-                            // Call onSubmit with positional arguments to match _createJob
-                            onSubmit(
-                                data.title,
-                                data.description,
-                                data.dueDate,
-                                data.onBehalfOf,
-                                data.onBehalfOfUserId,
-                                data.onBehalfOfUserEmail,
-                                data.onBehalfOfUserFirstName,
-                                data.onBehalfOfUserLastName,
-                                data.onBehalfOfBillingGroup,
-                                data.onBehalfOfBillingGroupId
-                            );
-                        }
-                    }}
-                >
-                    Import Ticket
-                </Button>
+            <div>
+                <div className="d-flex align-items-end gap-2 border-b-5 border-b-black">
+                    <Input
+                        value={ticketId}
+                        onChange={(val) => setTicketId(val)}
+                        label="TDNext Ticket ID"
+                        placeholder="Ticket ID"
+                        className="mt-0"
+                    />
+                    <Button 
+                        loading={isFetching}
+                        onClick={async () => {
+                            const data = await fetchTicket(ticketId);
+                            if (data && onSubmit) {
+                                // Call onSubmit with positional arguments to match _createJob
+                                onSubmit(
+                                    data.title,
+                                    data.description,
+                                    data.dueDate,
+                                    data.onBehalfOf,
+                                    data.onBehalfOfUserId,
+                                    data.onBehalfOfUserEmail,
+                                    data.onBehalfOfUserFirstName,
+                                    data.onBehalfOfUserLastName,
+                                    data.onBehalfOfBillingGroup,
+                                    data.onBehalfOfBillingGroupId
+                                );
+                            }
+                        }}
+                    >
+                        Import Ticket
+                    </Button>
+                </div>
             </div>
         );
     };

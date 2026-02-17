@@ -105,8 +105,8 @@ export const Jobs = () => {
 
   // Create Job options
   const createJobOptions = [
-    <CreateTDXJob />,
-    <Button onClick={createJob}>Create Job</Button>
+    <div><Button onClick={createJob}>Create Job</Button><hr className="mt-2 mb-0"/></div>,
+    <CreateTDXJob />
   ];
 
   // State variables for filters
@@ -367,6 +367,7 @@ export const Jobs = () => {
             <H1>Jobs</H1>
           </div>
           <Dropdown
+            dropdownClassName="hover:bg-white"
             prompt="Create or Import Job"
             items={createJobOptions.map((id) => ({text:
               <div>
