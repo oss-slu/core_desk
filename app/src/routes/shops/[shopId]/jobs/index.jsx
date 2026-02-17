@@ -8,7 +8,6 @@ import { Typography, Util, Input, Badge, Dropdown, SegmentedControl } from "tabl
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { useUser } from "../../../../hooks/useUser";
-import { useTDXTickets } from "../../../../hooks/useTDXTickets";
 import { Button } from "#button";
 import { Table } from "#table";
 import moment from "moment";
@@ -108,7 +107,7 @@ export const Jobs = () => {
   const createJobOptions = [
     <CreateTDXJob />,
     <Button onClick={createJob}>Create Job</Button>
-  ]
+  ];
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
