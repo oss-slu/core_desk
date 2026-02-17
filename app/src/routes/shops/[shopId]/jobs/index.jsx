@@ -106,7 +106,7 @@ export const Jobs = () => {
 
   // Create Job options
   const createJobOptions = [
-    <CreateTDXJob/>,
+    <CreateTDXJob />,
     <Button onClick={createJob}>Create Job</Button>
   ]
 

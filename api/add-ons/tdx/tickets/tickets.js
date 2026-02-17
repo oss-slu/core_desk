@@ -1,4 +1,4 @@
-import { getTDXToken } from '../token/token.js';
+import getTDXToken from '../token/token.js';
 import dotenv from 'dotenv';
 dotenv.config();
 

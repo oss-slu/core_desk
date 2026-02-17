@@ -15,8 +15,6 @@ import registerRoutes from "./util/router.js";
 import { createProxyMiddleware } from "http-proxy-middleware";
 import { Readable } from "stream";
 import { startStlRenderQueue } from "./util/stlRenderQueue.js";
-// import { getTDXToken } from "./add-ons/tdx/token/token.js";
-import { fetchTickets } from "./add-ons/tdx/tickets/tickets.js";
 
 // import client from "#postmark";
 
@@ -382,23 +380,47 @@ if (process.env.JACK == "true") {
 
   // Routes for TDX Web API
 
-  app.post('/api/add-ons/login', async (req, res) => {
-    try {
-      const { username, password } = req.body;
-      const token = await getTDXToken();
-      res.json({ token });
-    } catch (err) {
-      res.status(401).json({ error: "Auth failed" });
-    }
-  });
+  app.get('/api/tdx-ticket', async (req, res) => {
+    const { ticketId } = req.query;
 
-  app.get('/api/add-ons/ticket', async (req, res) => {
+    if (!ticketId) {
+        return res.status(400).json({ error: "Ticket ID is required" });
+    }
+
     try {
-      const { id } = req.body;
-      const data = await fetchTickets(id);
-      res.json(data);
-    } catch (err) {
-      res.status(500).json({ error: "Fetch failed" });
+        // 1. Authenticate with TDX
+        const authRes = await fetch(`${process.env.TDX_URL}/auth`, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                UserName: process.env.TDX_USERNAME,
+                Password: process.env.TDX_PASSWORD
+            }),
+        });
+
+        if (!authRes.ok) throw new Error("TDX Authentication failed");
+        const token = await authRes.text();
+
+        // 2. Fetch the specific ticket
+        const ticketRes = await fetch(`${process.env.TDX_URL}/31/tickets/${ticketId}`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!ticketRes.ok) {
+            return res.status(ticketRes.status).json({ error: "Ticket not found" });
+        }
+
+        const data = await ticketRes.json();
+        
+        // 3. Return data to your React frontend
+        res.json(data);
+
+    } catch (error) {
+        console.error("TDX Proxy Error:", error);
+        res.status(500).json({ error: "Internal Server Error", details: error.message });
     }
   });
 

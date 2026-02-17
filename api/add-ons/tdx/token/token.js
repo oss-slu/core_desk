@@ -1,73 +1,30 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-/**
- * Authenticates with the TeamDynamix API.
- * @param {string} username - Your TDX username.
- * @param {string} password - Your TDX password.
- * @returns {Promise<string>} - Returns the Bearer token.
- */
-export const getTDXToken = async (username = process.env.TDX_USERNAME, password = process.env.TDX_PASSWORD) => { // placeholders just to make sure it works
-    const url = `${process.env.TDX_URL}/auth/login`;
-    
-    // The "loginParams" structure based on typical TeamDynamix API requirements
-    const loginParams = {
-        UserName: username,
-        Password: password
-    };
+// /api/token/tdx-proxy.js (Server-side)
+export default async function getTDXToken(req, res) {
+    const { ticketId } = req.query;
 
     try {
-        const response = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(loginParams)
+        // 1. Authenticate server-side (Credentials never leave the server)
+        const authRes = await fetch(`${process.env.TDX_URL}/auth`, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                UserName: process.env.TDX_USERNAME, 
+                Password: process.env.TDX_PASSWORD
+            }),
         });
+        const token = await authRes.text();
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Authentication failed: ${response.status} - ${errorText}`);
-            throw new Error(`Authentication failed: ${response.status} - ${errorText}`);
-        }
-
-        // The API returns the token directly as a string or within an object
-        const token = await response.text();
-        
-        // Clean the token if it arrives with extra quotes
-        return token.replace(/"/g, ''); 
-        
-    } catch (error) {
-        console.error('Error during API authentication:', error);
-        throw error;
-    }
-}
-
-export const getTDXTokenSSO = async () => {
-    const url = `${process.env.TDX_URL}/auth/loginsso`;
-
-    try {
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+        // 2. Fetch the Ticket
+        const ticketRes = await fetch(`${process.env.TDX_URL}/31/tickets/${ticketId}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
         });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error(`Authentication failed: ${response.status} - ${errorText}`);
-            throw new Error(`Authentication failed: ${response.status} - ${errorText}`);
-        }
-
-        // The API returns the token directly as a string or within an object
-        const token = await response.text();
         
-        // Clean the token if it arrives with extra quotes
-        return token.replace(/"/g, ''); 
-        
+        const data = await ticketRes.json();
+        res.status(200).json(data);
     } catch (error) {
-        console.error('Error during API authentication:', error);
-        throw error;
+        res.status(500).json({ error: "Failed to fetch from TDX" });
     }
 }
