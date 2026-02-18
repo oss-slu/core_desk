@@ -32,7 +32,7 @@ export const useTDXTickets = () => {
 
             // Extract values from TDX Attributes
             const costAttr = ticket?.Attributes.find(item => item.ID === 2312)?.Value || 0.00;
-            const descriptionAttr = ticket?.Attributes.find(item => item.ID === 2311)?.Value || 'No Cost Breakdown Available';
+            const descriptionAttr = `${ticket?.Attributes.find(item => item.ID === 2328)?.Value}; ${ticket?.Attributes.find(item => item.ID === 2311)?.Value}`;
             
             // Map the TDX response to the specific order _createJob expects
             return {
