@@ -3,9 +3,8 @@ import { Input, Button } from 'tabler-react-2';
 import { authFetch } from "#url";
 import toast from 'react-hot-toast';
 
-// const filterById = (attributes, id) => attributes?.find(attr => attr.id === id || attr.AttributeID === id);
-
 export const useTDXTickets = () => {
+    const [ticketData, setTicketData] = useState(null);
     const [ticketId, setTicketId] = useState('');
     const [isFetching, setIsFetching] = useState(false);
     const [error, setError] = useState(null);
@@ -29,13 +28,15 @@ export const useTDXTickets = () => {
             
             if (!r.ok) throw new Error(`Ticket fetch failed: ${r.status}`);
             const ticket = await r.json();
+            setTicketData(ticket);
 
             // Extract values from TDX Attributes
-            const descriptionAttr = ticket?.Attributes[3]?.Value || 'No Cost Breakdown Available';
+            const costAttr = ticket?.Attributes.find(item => item.ID === 2312)?.Value || 0.00;
+            const descriptionAttr = ticket?.Attributes.find(item => item.ID === 2311)?.Value || 'No Cost Breakdown Available';
             
             // Map the TDX response to the specific order _createJob expects
             return {
-                title: ticket?.Title || 'No Title Available',
+                title: `TDX: ${ticket?.Title}` || 'No Title Available',
                 description: descriptionAttr,
                 dueDate: nextWeekDate.setDate(currentDate.getDate() + 7), // Defaulting to week from current day
                 onBehalfOf: true,
@@ -44,7 +45,8 @@ export const useTDXTickets = () => {
                 onBehalfOfUserFirstName: ticket?.RequestorFullName?.split(" ")[0] || "Unknown",
                 onBehalfOfUserLastName: ticket?.RequestorFullName?.split(" ")[1] || "Unknown",
                 onBehalfOfBillingGroup: false, // Defaulting as per your previous state
-                onBehalfOfBillingGroupId: null
+                onBehalfOfBillingGroupId: null,
+                cost: costAttr
             };
         } catch (err) {
             setError(err.message);
@@ -94,6 +96,7 @@ export const useTDXTickets = () => {
     };
 
     return {
+        ticketData,
         ticketId,
         setTicketId,
         fetchTicket,
