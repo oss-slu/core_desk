@@ -10,6 +10,9 @@ export const useTDXTickets = () => {
     const [isFetching, setIsFetching] = useState(false);
     const [error, setError] = useState(null);
 
+    const currentDate = new Date();
+    const nextWeekDate = new Date(currentDate);
+
     const fetchTicket = useCallback(async (id) => {
         if (!id) {
             toast.error("Please enter a Ticket ID");
@@ -34,7 +37,7 @@ export const useTDXTickets = () => {
             return {
                 title: ticket?.Title || 'No Title Available',
                 description: descriptionAttr,
-                dueDate: new Date(), // Defaulting to now
+                dueDate: nextWeekDate.setDate(currentDate.getDate() + 7), // Defaulting to week from current day
                 onBehalfOf: true,
                 onBehalfOfUserId: ticket?.RequestorUID || '',
                 onBehalfOfUserEmail: ticket?.RequestorEmail || '',
