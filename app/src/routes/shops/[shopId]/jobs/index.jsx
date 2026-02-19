@@ -103,12 +103,6 @@ export const Jobs = () => {
   } = useJobs(shopId);
   const { user } = useUser(activeUser.id);
 
-  // Create Job options
-  const jobOptions = [
-    <div><Button onClick={createJob}>Create Job</Button><hr className="mt-2 mb-0"/></div>,
-    <CreateTDXJob />
-  ];
-
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
     "NOT_STARTED",
