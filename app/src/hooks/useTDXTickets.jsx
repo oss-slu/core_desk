@@ -35,7 +35,7 @@ export const useTDXTickets = () => {
             
             // Map the TDX response to the specific order _createJob expects
             return {
-                title: `TDX: ${ticket?.Title}` || 'No Title Available',
+                title: ticket?.Title ? `TDX: ${ticket?.Title}` : "No Title Available",
                 description: descriptionAttr,
                 dueDate: nextWeekDate.setDate(currentDate.getDate() + 7), // Defaulting to week from current day
                 onBehalfOf: true,
@@ -52,7 +52,6 @@ export const useTDXTickets = () => {
             return null;
         } finally {
             setIsFetching(false);
-            setLoading(false);
         }
     }, []);
 

@@ -369,11 +369,11 @@ export const Jobs = () => {
           <Dropdown
             dropdownClassName="hover:bg-white"
             prompt="Create or Import Job"
-            items={jobOptions.map((key) => ({text:
-              <div>
-                {key}
-              </div>
-            }))}
+            items={[
+              {type: "item", text: <Button onClick={createJob}>Create Job</Button>},
+              {type: "divider"},
+              {type: "item", text: <CreateTDXJob />}
+            ]}
           >
           </Dropdown>
         </Util.Row>
