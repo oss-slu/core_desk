@@ -28,20 +28,26 @@ export const AuthProvider = ({ children }) => {
     try {
       const r = await fetch(u("/api/auth/login"), {
         method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await r.json();
       if (!r.ok) {
-        throw new Error(data.error || "Login failed");
+        toast.error(data.error);
       }
       localStorage.setItem("token", data.token); //set token
+      fetchUser(); //should I fetchUser here? it works and directs to next page.
     } catch (error) {
+      toast.error(error);
       console.error("Login error:", error.message);
     }
   };
 
-  const sendPasswordResetEmail = async ({ email }) => { //sends email
+  const sendPasswordResetEmail = async ({ email }) => {
+    //sends email
     try {
       console.log("email", email);
       const r = await fetch(u("/api/auth/forgotPassword"), {
@@ -51,40 +57,38 @@ export const AuthProvider = ({ children }) => {
         },
         body: JSON.stringify({ email }),
       });
-
-      const data = await r.json();
       if (!r.ok) {
-        throw new Error(data.error);
+        // toast.error(data.error); we are not going to put up a toast, we just wont send an email if they dont exist in our db
+        return;
       }
-      toast.success(`Reset link sent to ${email}`); //this will do for now, but I am going to add more UI functionality later
+      toast.success(`Reset link sent to ${email}`);
     } catch (error) {
+      toast.error(error);
       console.error("Error sending email: ", error.message);
+      return;
     }
   };
 
-  const resetPassword = async ({ password }) => { //resets the password
+  const resetPassword = async ({ newPassword, token }) => {
     try {
-      console.log("password", password);
       const r = await fetch(u("/api/auth/forgotPassword"), {
         method: "PUT",
-        headers : {
-          "Content-Type" : "application/json",
+        headers: {
+          "Content-Type": "application/json",
         },
-        body : JSON.stringify({password}),
+        body: JSON.stringify({ newPassword, token }),
       });
+
       const data = await r.json();
-      if (!r.ok){
-        throw new Error(data.error);
+
+      if (!r.ok) {
+        throw new Error(data.error || "Failed to reset password");
       }
-
-
+      return true;
+    } catch (err) {
+      toast.error(err.message || "Something went wrong");
+      throw err;
     }
-
-
-    catch(error){
-      console.error("Error resetting passsword" , error.message);
-    }
-
   };
 
   const loginWithOkta = async () => {
