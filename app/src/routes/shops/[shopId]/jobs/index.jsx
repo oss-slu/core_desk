@@ -104,7 +104,7 @@ export const Jobs = () => {
   const { user } = useUser(activeUser.id);
 
   // Create Job options
-  const createJobOptions = [
+  const jobOptions = [
     <div><Button onClick={createJob}>Create Job</Button><hr className="mt-2 mb-0"/></div>,
     <CreateTDXJob />
   ];
@@ -369,9 +369,9 @@ export const Jobs = () => {
           <Dropdown
             dropdownClassName="hover:bg-white"
             prompt="Create or Import Job"
-            items={createJobOptions.map((id) => ({text:
+            items={jobOptions.map((key) => ({text:
               <div>
-                {id}
+                {key}
               </div>
             }))}
           >

@@ -20,7 +20,6 @@ export const useTDXTickets = () => {
 
         setIsFetching(true);
         setError(null);
-        const loadToast = toast.loading("Fetching ticket from TDX...");
         
         try {
             // Pointing to your proxy endpoint
@@ -53,6 +52,7 @@ export const useTDXTickets = () => {
             return null;
         } finally {
             setIsFetching(false);
+            setLoading(false);
         }
     }, []);
 
