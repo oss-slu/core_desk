@@ -23,7 +23,7 @@ export const ResetPasswordForm = ({ token, setMode }) => {
     try {
       const success = await resetPassword({ newPassword, token });
       setSuccess(success);
-    } catch (err) {
+    } catch {
       setError("This reset link is no longer valid.");
     }
   };
