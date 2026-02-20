@@ -13,7 +13,7 @@ export const ForgotPasswordForm = ({ setMode }) => {
     setError("");
     try {
       await sendPasswordResetEmail({ email });
-      setMode("check-email"); 
+      setMode("check-email");
     } catch (err) {
       setError(err.message || "Failed to send reset link");
     }
@@ -53,6 +53,18 @@ export const ForgotPasswordForm = ({ setMode }) => {
           Enter your email address below and we’ll send you a link to reset your
           password.
         </p>
+        {error && (
+          <div
+            style={{
+              color: "red",
+              marginTop: "8px",
+              fontSize: "14px",
+              fontWeight: "500",
+            }}
+          >
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: "20px" }}>
@@ -65,12 +77,7 @@ export const ForgotPasswordForm = ({ setMode }) => {
             />
           </div>
 
-
-          <Button
-            type="submit"
-            variant="primary"
-            style={{ width: "100%" }}
-          >
+          <Button type="submit" variant="primary" style={{ width: "100%" }}>
             Send Reset Link
           </Button>
 

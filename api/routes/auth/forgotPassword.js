@@ -10,7 +10,7 @@ export const post = [
       const user = await prisma.user.findUnique({
         where: { email: email.toLowerCase() },
       }); //emails need to be exact so when we create user, the email needs to be stored with lowercase.
-      if (!user) {
+      if (!user) { 
         return res.status(401).json({ error: "User does not exist." });
       }
 
@@ -23,7 +23,7 @@ export const post = [
       const resetLink = `${process.env.BASE_URL}/reset?reset_tok=${resetToken}`; //setting to base_url for now to test locally
 
       await client.sendEmail({
-        From: "coredesk@jackcrane.rocks",
+        From: "CoreDesk Notifications",
         To: email,
         Subject: "Reset Your CoreDesk Password",
         HtmlBody: `

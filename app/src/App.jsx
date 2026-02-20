@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Header } from "#header";
 import { Home } from "#home";
 import { useAuth } from "#useAuth";
-import { Button } from "#button";
 import { UsersPage } from "#usersPage";
 import { UserPage } from "#userPage";
 import { ShopPage } from "#shopPage";
@@ -28,7 +27,7 @@ import { Login } from "./components/authentication/Login";
 
 // eslint-disable-next-line
 export default () => {
-  const { loggedIn, loading, login, user } = useAuth();
+  const { loggedIn, loading, user } = useAuth();
 
   if (loading) return null;
 
