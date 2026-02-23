@@ -4,9 +4,8 @@ import dotenv from "dotenv";
 import { z } from "zod";
 import prisma from "../api/util/prisma";
 import jwt from "jsonwebtoken";
-dotenv.config({
-  path: "../api/.env",
-});
+dotenv.config({ path: "./docker/.env.e2e" });
+dotenv.config({ path: "../api/.env" });
 const baseUrl = "http://localhost:3030";
 import path from "path";
 import fs from "fs";
@@ -30,7 +29,7 @@ registerCommand(
 
         cy.log('Authenticated as ' + ${emailLabel});
 
-        cy.visit('/');
+        cy.reload();
       });`,
     ];
   },
@@ -177,6 +176,12 @@ export default defineConfig({
           return null;
         },
         authenticateUser: async ({ email }) => {
+          if (!process.env.JWT_SECRET) {
+            throw new Error(
+              "JWT_SECRET must be set to sign e2e auth tokens (check e2e/docker/.env.e2e)",
+            );
+          }
+
           const user = await prisma.user.findFirst({
             where: {
               email,

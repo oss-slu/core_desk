@@ -69,11 +69,18 @@ stop_stack() {
 run_cypress() {
   local runner="$1"
   local host_database_url="${E2E_DATABASE_URL:-}"
+  local jwt_secret="${E2E_JWT_SECRET:-}"
   if [[ -z "${host_database_url}" ]]; then
     host_database_url="$(read_env_value DATABASE_URL || true)"
   fi
   if [[ -z "${host_database_url}" ]]; then
     host_database_url="${DATABASE_URL:-}"
+  fi
+  if [[ -z "${jwt_secret}" ]]; then
+    jwt_secret="$(read_env_value JWT_SECRET || true)"
+  fi
+  if [[ -z "${jwt_secret}" ]]; then
+    jwt_secret="${JWT_SECRET:-}"
   fi
   host_database_url="$(to_host_database_url "${host_database_url}")"
 
@@ -86,7 +93,7 @@ run_cypress() {
     cd "${E2E_DIR}"
     BASE_URL="${APP_BASE_URL}" \
     DATABASE_URL="${host_database_url}" \
-    JWT_SECRET="${JWT_SECRET:-}" \
+    JWT_SECRET="${jwt_secret}" \
     npx cypress "${runner}"
   )
 }

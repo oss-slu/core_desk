@@ -24,16 +24,20 @@ export const verifyAuth = async (req, res, next) => {
       });
 
       if (!_user) {
+        console.log("User not found");
+        console.log(user);
         return res.sendStatus(401); // Unauthorized
       }
 
       // Make sure user is not suspended. If they are, they are still allowed to access /api/auth/me.
       if (_user.suspended && req.originalUrl !== "/api/auth/me") {
+        console.log("User is suspended");
         return res.sendStatus(403); // Forbidden
       }
 
       req.user = _user;
 
+      console.log(45);
       next();
     });
   } else {
