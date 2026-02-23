@@ -8,10 +8,6 @@ dotenv.config({
   path: "../api/.env",
 });
 const baseUrl = "http://localhost:3030";
-import pg from "pg";
-const client = new pg.Client({
-  connectionString: process.env.DATABASE_URL,
-});
 import path from "path";
 import fs from "fs";
 import { spawnSync } from "child_process";
@@ -63,8 +59,9 @@ function sanitizeDbUrlForPsql(dbUrl) {
 
 function runPsql(dbUrl, args) {
   const sanitizedDbUrl = sanitizeDbUrlForPsql(dbUrl);
-  const result = spawnSync("psql", [sanitizedDbUrl, ...args], {
-    stdio: "ignore",
+  const result = spawnSync("psql", [...args, sanitizedDbUrl], {
+    stdio: "pipe",
+    encoding: "utf8",
     env: process.env,
   });
 
@@ -73,7 +70,44 @@ function runPsql(dbUrl, args) {
   }
 
   if (result.status !== 0) {
-    throw new Error(`psql command failed with exit code ${result.status}`);
+    const stderr = result.stderr?.trim();
+    const stdout = result.stdout?.trim();
+    const details = stderr || stdout || "no output from psql";
+    throw new Error(
+      `psql command failed with exit code ${result.status}: ${details}`,
+    );
+  }
+
+  return (result.stdout || "").trim();
+}
+
+function getDbInfo(dbUrl) {
+  const sanitizedDbUrl = sanitizeDbUrlForPsql(dbUrl);
+  const url = new URL(sanitizedDbUrl);
+  const dbName = decodeURIComponent(url.pathname.replace(/^\/+/, ""));
+
+  if (!dbName) {
+    throw new Error("DATABASE_URL must include a database name in the path");
+  }
+
+  const adminUrl = new URL(sanitizedDbUrl);
+  adminUrl.pathname = "/postgres";
+
+  return { dbName, adminDbUrl: adminUrl.toString() };
+}
+
+function ensureDatabaseExists(dbUrl) {
+  const { dbName, adminDbUrl } = getDbInfo(dbUrl);
+  const escapedLiteralDbName = dbName.replace(/'/g, "''");
+  const escapedIdentifierDbName = dbName.replace(/"/g, '""');
+
+  const exists = runPsql(adminDbUrl, [
+    "-tAc",
+    `SELECT 1 FROM pg_database WHERE datname = '${escapedLiteralDbName}'`,
+  ]);
+
+  if (exists !== "1") {
+    runPsql(adminDbUrl, ["-c", `CREATE DATABASE "${escapedIdentifierDbName}"`]);
   }
 }
 
@@ -123,10 +157,9 @@ export default defineConfig({
           const isLocal =
             dbUrl.includes("localhost") || dbUrl.includes("127.0.0.1");
           if (!isLocal) {
-            console.error(
+            throw new Error(
               "DATABASE_URL must point to localhost; refusing to seed remote database",
             );
-            process.exit(1);
           }
 
           const sqlFilePath = resolveSqlPath(relativeSqlPath);
@@ -135,6 +168,7 @@ export default defineConfig({
             throw new Error(`SQL file not found: ${sqlFilePath}`);
           }
 
+          ensureDatabaseExists(dbUrl);
           runPsql(dbUrl, ["-c", "DROP SCHEMA IF EXISTS public CASCADE"]);
           runPsql(dbUrl, ["-c", "CREATE SCHEMA public"]);
           runPrismaMigrate(dbUrl);

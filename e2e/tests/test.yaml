@@ -6,4 +6,4 @@ steps:
       width: 1280
       height: 720
   - authenticateUser:
-      email: test@slu.edu
+      email: user@slu.edu

@@ -30,6 +30,22 @@ load_env_defaults() {
   done < "${ENV_FILE}"
 }
 
+read_env_value() {
+  local key="$1"
+  if [[ ! -f "${ENV_FILE}" ]]; then
+    return 1
+  fi
+
+  local line
+  line="$(grep -E "^${key}=" "${ENV_FILE}" | tail -n 1 || true)"
+
+  if [[ -z "${line}" ]]; then
+    return 1
+  fi
+
+  printf "%s" "${line#*=}"
+}
+
 to_host_database_url() {
   local db_url="${1:-}"
   db_url="${db_url//@postgres:/@127.0.0.1:}"
@@ -52,7 +68,13 @@ stop_stack() {
 
 run_cypress() {
   local runner="$1"
-  local host_database_url="${DATABASE_URL:-}"
+  local host_database_url="${E2E_DATABASE_URL:-}"
+  if [[ -z "${host_database_url}" ]]; then
+    host_database_url="$(read_env_value DATABASE_URL || true)"
+  fi
+  if [[ -z "${host_database_url}" ]]; then
+    host_database_url="${DATABASE_URL:-}"
+  fi
   host_database_url="$(to_host_database_url "${host_database_url}")"
 
   (
