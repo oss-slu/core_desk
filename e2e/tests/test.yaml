@@ -1,5 +1,5 @@
 name: Storefront smoke
-seedFile: fixtures/empty.sql
+seedFile: fixtures/users.sql
 steps:
   - open: /
   - setViewport:
