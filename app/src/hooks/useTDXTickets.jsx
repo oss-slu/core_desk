@@ -20,6 +20,7 @@ export const useTDXTickets = () => {
 
         setIsFetching(true);
         setError(null);
+        toast.loading("Fetching ticket from TDX...");
         
         try {
             // Pointing to your proxy endpoint
@@ -76,18 +77,7 @@ export const useTDXTickets = () => {
                             const data = await fetchTicket(ticketId);
                             if (data && onSubmit) {
                                 // Call onSubmit with positional arguments to match _createJob
-                                onSubmit(
-                                    data.title,
-                                    data.description,
-                                    data.dueDate,
-                                    data.onBehalfOf,
-                                    data.onBehalfOfUserId,
-                                    data.onBehalfOfUserEmail,
-                                    data.onBehalfOfUserFirstName,
-                                    data.onBehalfOfUserLastName,
-                                    data.onBehalfOfBillingGroup,
-                                    data.onBehalfOfBillingGroupId
-                                );
+                                onSubmit(data);
                             }
                         }}
                     >
