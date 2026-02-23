@@ -26,6 +26,7 @@ export const useTDXTickets = () => {
             try {
                 const r = await authFetch(`/api/tdx-ticket?ticketId=${id}`);
             } catch (error) {
+                setError(error);
                 toast.error(`Ticket fetch failed: ${error}`);
             }
 
@@ -33,7 +34,7 @@ export const useTDXTickets = () => {
             setTicketData(ticket);
 
             // Extract values from TDX Attributes
-            const costAttr = ticket?.Attributes.find(item => item.ID === 2312)?.Value || 0.00;
+            // const costAttr = ticket?.Attributes.find(item => item.ID === 2312)?.Value || 0.00;
             const descriptionAttr = `${ticket?.Attributes.find(item => item.ID === 2328)?.Value}; ${ticket?.Attributes.find(item => item.ID === 2311)?.Value}`;
             
             // Map the TDX response to the specific order _createJob expects
@@ -47,11 +48,11 @@ export const useTDXTickets = () => {
                 onBehalfOfUserFirstName: ticket?.RequestorFullName?.split(" ")[0] || "Unknown",
                 onBehalfOfUserLastName: ticket?.RequestorFullName?.split(" ")[1] || "Unknown",
                 onBehalfOfBillingGroup: false, // Defaulting as per your previous state
-                onBehalfOfBillingGroupId: null,
-                cost: costAttr
+                onBehalfOfBillingGroupId: null
             };
-        } catch (err) {
-            setError(err.message);
+        } catch (error) {
+            setError(error.message);
+            toast.error(error.message);
             return null;
         } finally {
             setIsFetching(false);
