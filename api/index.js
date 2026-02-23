@@ -388,7 +388,6 @@ if (process.env.JACK == "true") {
     }
 
     try {
-        // 1. Authenticate with TDX
         const authRes = await fetch(`${process.env.TDX_URL}/auth`, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -401,8 +400,7 @@ if (process.env.JACK == "true") {
         if (!authRes.ok) throw new Error("TDX Authentication failed");
         const token = await authRes.text();
 
-        // 2. Fetch the specific ticket
-        const ticketRes = await fetch(`${process.env.TDX_URL}/31/tickets/${ticketId}`, {
+        const ticketRes = await fetch(`${process.env.TDX_URL}/${process.env.TDX_APP_ID}/tickets/${ticketId}`, {
             headers: { 
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -415,7 +413,6 @@ if (process.env.JACK == "true") {
 
         const data = await ticketRes.json();
         
-        // 3. Return data to your React frontend
         res.json(data);
 
     } catch (error) {
