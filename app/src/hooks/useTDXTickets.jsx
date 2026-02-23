@@ -23,9 +23,12 @@ export const useTDXTickets = () => {
         
         try {
             // Pointing to your proxy endpoint
-            const r = await authFetch(`/api/tdx-ticket?ticketId=${id}`);
-            
-            if (!r.ok) throw new Error(`Ticket fetch failed: ${r.status}`);
+            try {
+                const r = await authFetch(`/api/tdx-ticket?ticketId=${id}`);
+            } catch (error) {
+                toast.error(`Ticket fetch failed: ${error}`);
+            }
+
             const ticket = await r.json();
             setTicketData(ticket);
 
