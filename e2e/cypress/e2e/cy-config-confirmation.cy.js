@@ -7,7 +7,7 @@ describe("Cyprus setup confirmation", () => {
   it("loads the app", () => {
     cy.visit("/");
     // Adjust selectors/text to your app
-    cy.contains("Welcome to SLU Open Project").should("exist");
+    cy.contains("Welcome to CoreDesk").should("exist");
   });
 
   it("can create a user fixture directly in DB sync", () => {

@@ -1,4 +1,4 @@
-# SLU Open Project
+# CoreDesk
 
 [![codecov](https://codecov.io/gh/jackcrane/slu-open-project/graph/badge.svg?token=OUAS5BV7BW)](https://codecov.io/gh/jackcrane/slu-open-project)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/oss-slu/core_desk)
