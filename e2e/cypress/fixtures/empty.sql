@@ -16,7 +16,7 @@ VALUES (
   'User',
   false,
   false,
-  true,
+  false,
   CURRENT_TIMESTAMP,
   CURRENT_TIMESTAMP
 );
