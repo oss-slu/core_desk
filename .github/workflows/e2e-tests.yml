@@ -22,9 +22,11 @@ jobs:
           cache: "npm"
 
       - name: Install dependencies
+        id: install_deps
         run: npm ci
 
       - name: Install PostgreSQL client
+        id: install_psql
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
@@ -72,6 +74,10 @@ jobs:
         if: always() && github.event_name == 'pull_request'
         shell: bash
         env:
+          JOB_STATUS: ${{ job.status }}
+          INSTALL_DEPS_CONCLUSION: ${{ steps.install_deps.conclusion }}
+          INSTALL_PSQL_CONCLUSION: ${{ steps.install_psql.conclusion }}
+          RUN_E2E_CONCLUSION: ${{ steps.run_e2e.conclusion }}
           E2E_FAILED: ${{ steps.run_e2e.outputs.failed }}
           VIDEO_ARTIFACT_URL: ${{ steps.upload_videos.outputs.artifact-url }}
           STDOUT_ARTIFACT_URL: ${{ steps.upload_stdout.outputs.artifact-url }}
@@ -82,6 +88,30 @@ jobs:
           FAILURE_SNIPPET_PATH="e2e/cypress/e2e-failure-snippet.log"
           VIDEO_LIST_PATH="e2e/cypress/e2e-video-files.txt"
           COMMENT_PATH="e2e/cypress/e2e-pr-comment.md"
+          REASON_PATH="e2e/cypress/e2e-status-reason.txt"
+
+          STATUS="Passed"
+          {
+            if [ "${JOB_STATUS}" != "success" ]; then
+              STATUS="Failed"
+            fi
+
+            if [ "${INSTALL_DEPS_CONCLUSION}" != "success" ]; then
+              echo '- `npm ci` failed.'
+            fi
+
+            if [ "${INSTALL_PSQL_CONCLUSION}" != "success" ]; then
+              echo "- PostgreSQL client installation failed."
+            fi
+
+            if [ "${RUN_E2E_CONCLUSION}" = "skipped" ]; then
+              echo "- E2E test step was skipped because an earlier step failed."
+            elif [ "${RUN_E2E_CONCLUSION}" = "failure" ]; then
+              echo "- E2E test step encountered a workflow failure."
+            elif [ "${E2E_FAILED}" = "true" ]; then
+              echo "- Cypress reported failing tests."
+            fi
+          } > "${REASON_PATH}"
 
           if [ -f "${LOG_PATH}" ]; then
             tail -n 220 "${LOG_PATH}" > "${FAILURE_SNIPPET_PATH}"
@@ -95,7 +125,7 @@ jobs:
 
           {
             echo "<!-- e2e-tests-report -->"
-            if [ "${E2E_FAILED}" = "true" ]; then
+            if [ "${STATUS}" = "Failed" ]; then
               echo "## E2E Tests: Failed"
             else
               echo "## E2E Tests: Passed"
@@ -122,8 +152,14 @@ jobs:
               echo
             fi
 
-            if [ "${E2E_FAILED}" = "true" ]; then
-              echo "### Failed test stdout (tail)"
+            if [ "${STATUS}" = "Failed" ] && [ -s "${REASON_PATH}" ]; then
+              echo "### Failure summary"
+              cat "${REASON_PATH}"
+              echo
+            fi
+
+            if [ "${STATUS}" = "Failed" ]; then
+              echo "### Failure stdout (tail)"
               echo '```text'
               cat "${FAILURE_SNIPPET_PATH}"
               echo '```'
