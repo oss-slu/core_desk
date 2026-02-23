@@ -22,6 +22,8 @@
     "cypress": "^15.10.0"
   },
   "dependencies": {
-    "cypress-yaml-plugin": "^0.1.14"
+    "cypress-yaml-plugin": "^0.1.14",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.18.0"
   }
 }

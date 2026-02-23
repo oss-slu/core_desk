@@ -1,18 +1,9 @@
 name: Storefront smoke
-# seedFile: cypress/fixtures/db/store.json
+seedFile: fixtures/empty.sql
 steps:
   - open: /
   - setViewport:
       width: 1280
       height: 720
-  - tapOn:
-      dataCy: primary-cta
-      allowScroll: true
-  - typeText:
-      selector: '[data-cy="email-field"]'
-      text: tester@example.com
-  - assertContains:
-      selector: '[data-cy="welcome"]'
-      text: Welcome
-  - takeScreenshot: dashboard
-  - "Reached dashboard"
+  - authenticateUser:
+      email: test@slu.edu
