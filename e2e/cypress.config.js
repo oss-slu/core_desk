@@ -3,6 +3,7 @@ import { yamlPreprocessor, registerCommand } from "cypress-yaml-plugin";
 import dotenv from "dotenv";
 import { z } from "zod";
 dotenv.config();
+const baseUrl = process.env.BASE_URL || "http://localhost:3030";
 
 registerCommand(
   "authenticateUser",
@@ -42,7 +43,7 @@ export default defineConfig({
       });
     },
     specPattern: "tests/**/*.yaml",
-    baseUrl: "http://localhost:3030",
+    baseUrl,
     supportFile: false,
   },
 });

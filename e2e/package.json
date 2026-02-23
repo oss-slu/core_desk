@@ -1,9 +1,18 @@
 {
   "name": "e2e",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d --build",
+    "docker:wait": "bash docker/wait-for-http.sh http://localhost:3030/health 180",
+    "docker:down": "docker compose -f docker/docker-compose.yml down -v --remove-orphans",
+    "test:docker": "bash docker/run-e2e.sh run",
+    "test:docker:interactive": "bash docker/run-e2e.sh interactive",
+    "test:docker:watch": "bash docker/run-e2e.sh watch",
+    "down:docker": "bash docker/run-e2e.sh down"
   },
   "keywords": [],
   "author": "",
