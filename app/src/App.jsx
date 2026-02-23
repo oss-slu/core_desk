@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Header } from "#header";
 import { Home } from "#home";
 import { useAuth } from "#useAuth";
-import { Button } from "#button";
 import { UsersPage } from "#usersPage";
 import { UserPage } from "#userPage";
 import { ShopPage } from "#shopPage";
@@ -24,10 +23,11 @@ import { BillingGroupPage } from "#billingGroupPage";
 import { BillingGroupInvitationPage } from "#billingGroupInvitationPage";
 import { BillingGroupPortal } from "#billingGroupsPortal";
 import { SchedulePage } from "./routes/shops/[shopId]/schedule";
+import { Login } from "./components/authentication/Login";
 
 // eslint-disable-next-line
 export default () => {
-  const { loggedIn, loading, login, user } = useAuth();
+  const { loggedIn, loading, user } = useAuth();
 
   if (loading) return null;
 
@@ -120,15 +120,7 @@ export default () => {
             ) : (
               <Route
                 path="*"
-                element={ //I dont like this I am going to create a login page
-
-                  <div>
-                    <h1>Welcome to SLU Open Project</h1>
-                    <p>Please log in to continue</p>
-                    <Button variant="primary" onClick={login}>
-                      Login
-                    </Button>
-                  </div>
+                element={ <Login />
                 }
               />
             )}
