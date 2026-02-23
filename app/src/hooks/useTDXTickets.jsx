@@ -4,7 +4,7 @@ import { authFetch } from "#url";
 import toast from 'react-hot-toast';
 
 export const useTDXTickets = () => {
-    const [ticketData, setTicketData] = useState(null);
+    const [ticket, setTicketData] = useState(null);
     const [ticketId, setTicketId] = useState('');
     const [isFetching, setIsFetching] = useState(false);
     const [error, setError] = useState(null);
@@ -13,6 +13,8 @@ export const useTDXTickets = () => {
     const nextWeekDate = new Date(currentDate);
 
     const fetchTicket = useCallback(async (id) => {
+        var ticket;
+
         if (!id) {
             toast.error("Please enter a Ticket ID");
             return null;
@@ -26,13 +28,12 @@ export const useTDXTickets = () => {
             // Pointing to your proxy endpoint
             try {
                 const r = await authFetch(`/api/tdx-ticket?ticketId=${id}`);
+                ticket = await r.json();
+                setTicketData(ticket);
             } catch (error) {
                 setError(error);
                 toast.error(`Ticket fetch failed: ${error}`);
             }
-
-            const ticket = await r.json();
-            setTicketData(ticket);
 
             // Extract values from TDX Attributes
             // const costAttr = ticket?.Attributes.find(item => item.ID === 2312)?.Value || 0.00;
@@ -77,7 +78,18 @@ export const useTDXTickets = () => {
                             const data = await fetchTicket(ticketId);
                             if (data && onSubmit) {
                                 // Call onSubmit with positional arguments to match _createJob
-                                onSubmit(data);
+                                onSubmit(
+                                    data.title,
+                                    data.description,
+                                    data.dueDate,
+                                    data.onBehalfOf,
+                                    data.onBehalfOfUserId,
+                                    data.onBehalfOfUserEmail,
+                                    data.onBehalfOfUserFirstName,
+                                    data.onBehalfOfUserLastName,
+                                    data.onBehalfOfBillingGroup,
+                                    data.onBehalfOfBillingGroupId
+                                );
                             }
                         }}
                     >
@@ -89,7 +101,7 @@ export const useTDXTickets = () => {
     };
 
     return {
-        ticketData,
+        ticket,
         ticketId,
         setTicketId,
         fetchTicket,
