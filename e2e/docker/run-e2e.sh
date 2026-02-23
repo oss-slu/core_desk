@@ -53,6 +53,16 @@ to_host_database_url() {
   printf "%s" "${db_url}"
 }
 
+redact_database_url() {
+  local db_url="${1:-}"
+  if [[ -z "${db_url}" ]]; then
+    printf "<missing>"
+    return 0
+  fi
+
+  printf "%s" "${db_url}" | sed -E 's#://([^:/?#]+):[^@]*@#://\1:***@#'
+}
+
 compose() {
   docker compose -f "${COMPOSE_FILE}" "$@"
 }
@@ -69,9 +79,13 @@ stop_stack() {
 run_cypress() {
   local runner="$1"
   local host_database_url="${E2E_DATABASE_URL:-}"
+  local env_file_database_url=""
+  local expected_host_database_url=""
   local jwt_secret="${E2E_JWT_SECRET:-}"
+  env_file_database_url="$(read_env_value DATABASE_URL || true)"
+  expected_host_database_url="$(to_host_database_url "${env_file_database_url}")"
   if [[ -z "${host_database_url}" ]]; then
-    host_database_url="$(read_env_value DATABASE_URL || true)"
+    host_database_url="${env_file_database_url}"
   fi
   if [[ -z "${host_database_url}" ]]; then
     host_database_url="${DATABASE_URL:-}"
@@ -83,6 +97,12 @@ run_cypress() {
     jwt_secret="${JWT_SECRET:-}"
   fi
   host_database_url="$(to_host_database_url "${host_database_url}")"
+
+  echo "[e2e] Cypress DATABASE_URL: $(redact_database_url "${host_database_url}")"
+  if [[ -n "${expected_host_database_url}" && "${host_database_url}" != "${expected_host_database_url}" ]]; then
+    echo "[e2e] WARNING: Cypress is using a DB URL different from e2e/docker/.env.e2e DATABASE_URL"
+    echo "[e2e] .env.e2e DATABASE_URL: $(redact_database_url "${expected_host_database_url}")"
+  fi
 
   (
     cd "${ROOT_DIR}"

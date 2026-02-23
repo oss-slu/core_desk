@@ -1,8 +1,8 @@
 import { defineConfig } from "cypress";
-import { yamlPreprocessor, registerCommand } from "cypress-yaml-plugin";
+import { yamlPreprocessor, registerCommand, loadYaml } from "cypress-yaml-plugin";
 import dotenv from "dotenv";
 import { z } from "zod";
-import prisma from "../api/util/prisma";
+import prisma from "../api/util/prisma.js";
 import jwt from "jsonwebtoken";
 dotenv.config({ path: "./docker/.env.e2e" });
 dotenv.config({ path: "../api/.env" });
@@ -10,6 +10,9 @@ const baseUrl = "http://localhost:3030";
 import path from "path";
 import fs from "fs";
 import { spawnSync } from "child_process";
+import { fileURLToPath } from "url";
+
+const currentDir = path.dirname(fileURLToPath(import.meta.url));
 
 registerCommand(
   "authenticateUser",
@@ -56,9 +59,22 @@ function sanitizeDbUrlForPsql(dbUrl) {
   }
 }
 
-function runPsql(dbUrl, args) {
+function redactDbUrl(dbUrl) {
+  try {
+    const url = new URL(dbUrl);
+    if (url.password) {
+      url.password = "***";
+    }
+    return url.toString();
+  } catch (error) {
+    return dbUrl;
+  }
+}
+
+function runPsql(dbUrl, args, context) {
   const sanitizedDbUrl = sanitizeDbUrlForPsql(dbUrl);
-  const result = spawnSync("psql", [...args, sanitizedDbUrl], {
+  const psqlArgs = ["-v", "ON_ERROR_STOP=1", "-X", ...args, sanitizedDbUrl];
+  const result = spawnSync("psql", psqlArgs, {
     stdio: "pipe",
     encoding: "utf8",
     env: process.env,
@@ -71,9 +87,18 @@ function runPsql(dbUrl, args) {
   if (result.status !== 0) {
     const stderr = result.stderr?.trim();
     const stdout = result.stdout?.trim();
-    const details = stderr || stdout || "no output from psql";
+    const details = [stderr, stdout].filter(Boolean).join("\n") || "no output";
+    const contextDetails = context ? ` (${context})` : "";
     throw new Error(
-      `psql command failed with exit code ${result.status}: ${details}`,
+      [
+        `psql command failed${contextDetails} with exit code ${result.status}.`,
+        `Database: ${redactDbUrl(sanitizedDbUrl)}`,
+        `Command: psql ${[
+          ...psqlArgs.slice(0, -1),
+          redactDbUrl(psqlArgs[psqlArgs.length - 1]),
+        ].join(" ")}`,
+        details,
+      ].join("\n"),
     );
   }
 
@@ -111,17 +136,19 @@ function ensureDatabaseExists(dbUrl) {
 }
 
 function runPrismaMigrate(dbUrl) {
-  const prismaPath = path.resolve(__dirname, "../api/node_modules/.bin/prisma");
+  const prismaPath = path.resolve(currentDir, "../api/node_modules/.bin/prisma");
 
   const result = spawnSync(prismaPath, ["migrate", "deploy"], {
     stdio: "inherit",
     env: { ...process.env, DATABASE_URL: dbUrl },
-    cwd: path.resolve(__dirname, "../api"),
+    cwd: path.resolve(currentDir, "../api"),
   });
 
   if (result.error) throw result.error;
   if (result.status !== 0) {
-    throw new Error("Prisma migrate deploy failed");
+    throw new Error(
+      `Prisma migrate deploy failed with exit code ${result.status}`,
+    );
   }
 }
 
@@ -136,45 +163,84 @@ function resolveSqlPath(relativePath) {
     return relativePath;
   }
 
-  return path.resolve(process.cwd(), "cypress", relativePath);
+  return path.resolve(currentDir, "cypress", relativePath);
 }
 
 export default defineConfig({
   e2e: {
     setupNodeEvents(on) {
       yamlPreprocessor(on);
-      on("task", {
-        "db:seed": (relativeSqlPath) => {
-          const dbUrl = process.env.DATABASE_URL;
+      const runSeed = (relativeSqlPath, triggerLabel = "task") => {
+        const dbUrl = process.env.DATABASE_URL;
 
-          if (!dbUrl) {
-            throw new Error(
-              "DATABASE_URL env variable must be set for db:seed",
-            );
-          }
+        if (!dbUrl) {
+          throw new Error("DATABASE_URL env variable must be set for db:seed");
+        }
 
-          const isLocal =
-            dbUrl.includes("localhost") || dbUrl.includes("127.0.0.1");
-          if (!isLocal) {
-            throw new Error(
-              "DATABASE_URL must point to localhost; refusing to seed remote database",
-            );
-          }
+        const isLocal =
+          dbUrl.includes("localhost") || dbUrl.includes("127.0.0.1");
+        if (!isLocal) {
+          throw new Error(
+            "DATABASE_URL must point to localhost; refusing to seed remote database",
+          );
+        }
 
-          const sqlFilePath = resolveSqlPath(relativeSqlPath);
+        const sqlFilePath = resolveSqlPath(relativeSqlPath);
 
-          if (!fs.existsSync(sqlFilePath)) {
-            throw new Error(`SQL file not found: ${sqlFilePath}`);
-          }
+        if (!fs.existsSync(sqlFilePath)) {
+          throw new Error(`SQL file not found: ${sqlFilePath}`);
+        }
 
+        const startedAtMs = Date.now();
+        console.log(
+          `[e2e][db:seed] Starting seed (${triggerLabel}): ${sqlFilePath} -> ${redactDbUrl(dbUrl)}`,
+        );
+
+        try {
           ensureDatabaseExists(dbUrl);
-          runPsql(dbUrl, ["-c", "DROP SCHEMA IF EXISTS public CASCADE"]);
-          runPsql(dbUrl, ["-c", "CREATE SCHEMA public"]);
+          runPsql(
+            dbUrl,
+            ["-c", "DROP SCHEMA IF EXISTS public CASCADE"],
+            "drop schema",
+          );
+          runPsql(dbUrl, ["-c", "CREATE SCHEMA public"], "create schema");
           runPrismaMigrate(dbUrl);
-          runPsql(dbUrl, ["-f", sqlFilePath]);
+          const seedOutput = runPsql(
+            dbUrl,
+            ["-f", sqlFilePath],
+            `seed file ${sqlFilePath}`,
+          );
+          if (seedOutput) {
+            console.log(`[e2e][db:seed] psql output:\n${seedOutput}`);
+          } else {
+            console.log(
+              `[e2e][db:seed] psql output: <empty stdout from seed file>`,
+            );
+          }
 
+          const userCount = runPsql(
+            dbUrl,
+            ['-tAc', 'SELECT COUNT(*) FROM "user"'],
+            "post-seed user count",
+          );
+          console.log(`[e2e][db:seed] user rows after seed: ${userCount}`);
+
+          const durationMs = Date.now() - startedAtMs;
+          console.log(
+            `[e2e][db:seed] Completed seed in ${durationMs}ms: ${sqlFilePath}`,
+          );
           return null;
-        },
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.error(`[e2e][db:seed] FAILED: ${sqlFilePath}\n${message}`);
+          throw new Error(
+            `[e2e][db:seed] Seed failed for ${relativeSqlPath}. See error output above.`,
+          );
+        }
+      };
+
+      on("task", {
+        "db:seed": (relativeSqlPath) => runSeed(relativeSqlPath, "cy.task"),
         authenticateUser: async ({ email }) => {
           if (!process.env.JWT_SECRET) {
             throw new Error(
@@ -189,7 +255,18 @@ export default defineConfig({
           });
 
           if (!user) {
-            throw new Error(`User not found: ${email}`);
+            const [userCount, dbUrl] = await Promise.all([
+              prisma.user.count(),
+              Promise.resolve(process.env.DATABASE_URL || "<missing>"),
+            ]);
+            throw new Error(
+              [
+                `User not found: ${email}`,
+                `[e2e][auth] user table row count: ${userCount}`,
+                `[e2e][auth] DATABASE_URL: ${redactDbUrl(dbUrl)}`,
+                `[e2e][auth] This usually means db:seed did not run or seeded a different database.`,
+              ].join("\n"),
+            );
           }
 
           return jwt.sign(
@@ -203,6 +280,24 @@ export default defineConfig({
             { expiresIn: "6h" },
           );
         },
+      });
+
+      on("before:spec", async (spec) => {
+        if (!spec?.absolute || !/\.ya?ml$/i.test(spec.absolute)) {
+          return;
+        }
+
+        const loadedSpec = await loadYaml(spec.absolute);
+        const seedFile = loadedSpec?.data?.seedFile;
+        if (!seedFile) {
+          return;
+        }
+
+        const specLabel = spec.relative || spec.absolute;
+        console.log(
+          `[e2e][db:seed] before:spec found seedFile for ${specLabel}: ${seedFile}`,
+        );
+        runSeed(seedFile, `before:spec ${specLabel}`);
       });
     },
     specPattern: "tests/**/*.yaml",
