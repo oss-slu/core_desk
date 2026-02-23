@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
+name: Admins can create shops
+seedFile: fixtures/users.sql
+steps:
+  - open: /
+  - setViewport:
+      width: 1280
+      height: 720
+  - authenticateUser:
+      email: admin@coredesk-test.slu.edu
+  - tapOn:
+      text: Shops
+  - tapOn:
+      text: Create Shop
+  - typeText:
+      placeholder: e.g. South Campus Shop
+      text: E2E Test Shop
+  - tapOn:
+      text: Submit
+  - waitFor: 500
+  - assertVisible:
+      text: "E2E Test Shop"
+  ################################################################################
+  - authenticateUser:
+      email: user@coredesk-test.slu.edu
+  - tapOn:
+      text: Shops
+  - assertNotVisible:
+      text: "E2E Test Shop"
+      mode: missing

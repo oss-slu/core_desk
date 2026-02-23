@@ -1,9 +1,0 @@
-name: Storefront smoke
-seedFile: fixtures/users.sql
-steps:
-  - open: /
-  - setViewport:
-      width: 1280
-      height: 720
-  - authenticateUser:
-      email: user@slu.edu
