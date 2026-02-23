@@ -23,13 +23,13 @@ export const post = [
       const resetLink = `${process.env.BASE_URL}/reset?reset_tok=${resetToken}`; //setting to base_url for now to test locally
 
       await client.sendEmail({
-        From: "CoreDesk Notifications",
+        From: '"CoreDesk Notifications" <coredesk@jackcrane.rocks>',
         To: email,
         Subject: "Reset Your CoreDesk Password",
         HtmlBody: `
-        <p>Click below to reset your password:</p>
-        <a href="${resetLink}">${resetLink}</a>
-      `,
+          <p>Click below to reset your password:</p>
+          <a href="${resetLink}">${resetLink}</a>
+        `,
         MessageStream: "outbound",
       });
       return res.status(200).json({ success: true });
