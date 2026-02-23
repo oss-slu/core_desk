@@ -71,7 +71,6 @@ function runPsql(dbUrl, args) {
   if (result.error) {
     throw result.error;
   }
-  console.log(result, dbUrl, args);
 
   if (result.status !== 0) {
     throw new Error(`psql command failed with exit code ${result.status}`);
