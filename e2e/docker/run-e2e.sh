@@ -4,9 +4,38 @@ set -euo pipefail
 MODE="${1:-run}"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 E2E_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
+ROOT_DIR="$(cd "${E2E_DIR}/.." && pwd)"
 COMPOSE_FILE="${SCRIPT_DIR}/docker-compose.yml"
+ENV_FILE="${SCRIPT_DIR}/.env.e2e"
 APP_BASE_URL="${BASE_URL:-http://localhost:3030}"
 WAIT_TIMEOUT_SECONDS="${E2E_WAIT_SECONDS:-180}"
+
+load_env_defaults() {
+  if [[ ! -f "${ENV_FILE}" ]]; then
+    return 0
+  fi
+
+  while IFS= read -r line || [[ -n "${line}" ]]; do
+    [[ -z "${line}" || "${line}" == \#* ]] && continue
+    if [[ "${line}" != *"="* ]]; then
+      continue
+    fi
+
+    local key="${line%%=*}"
+    local value="${line#*=}"
+
+    if [[ -z "${!key+x}" ]]; then
+      export "${key}=${value}"
+    fi
+  done < "${ENV_FILE}"
+}
+
+to_host_database_url() {
+  local db_url="${1:-}"
+  db_url="${db_url//@postgres:/@127.0.0.1:}"
+  db_url="${db_url//@db:/@127.0.0.1:}"
+  printf "%s" "${db_url}"
+}
 
 compose() {
   docker compose -f "${COMPOSE_FILE}" "$@"
@@ -23,11 +52,24 @@ stop_stack() {
 
 run_cypress() {
   local runner="$1"
+  local host_database_url="${DATABASE_URL:-}"
+  host_database_url="$(to_host_database_url "${host_database_url}")"
+
+  (
+    cd "${ROOT_DIR}"
+    npm --workspace api exec prisma generate
+  )
+
   (
     cd "${E2E_DIR}"
-    BASE_URL="${APP_BASE_URL}" npx cypress "${runner}"
+    BASE_URL="${APP_BASE_URL}" \
+    DATABASE_URL="${host_database_url}" \
+    JWT_SECRET="${JWT_SECRET:-}" \
+    npx cypress "${runner}"
   )
 }
+
+load_env_defaults
 
 case "${MODE}" in
 run)
