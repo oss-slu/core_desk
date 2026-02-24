@@ -8,6 +8,7 @@ import { useUserShop } from "./useUserShop";
 import { useAuth } from "#useAuth";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
+import { useTDXTickets } from "./useTDXTickets";
 
 const CreateJobModalContent = ({
   onSubmit,
@@ -181,6 +182,8 @@ export const useJobs = (shopId) => {
   const [opLoading, setOpLoading] = useState(false);
   const [microLoading, setMicroLoading] = useState(false);
 
+  const { TDXTicketIdInput } = useTDXTickets();
+
   const _createJob = async (
     title,
     description,
@@ -309,6 +312,14 @@ export const useJobs = (shopId) => {
     }
   };
 
+  const CreateTDXJob = () => {
+    return (
+      <div>
+        <TDXTicketIdInput onSubmit={_createJob}/>
+      </div>
+    );
+  };
+
   const createJob = async (options = {}) => {
     const { billingGroupId: defaultBillingGroupId, forceBillingGroupId } =
       options;
@@ -371,6 +382,7 @@ export const useJobs = (shopId) => {
     refetch: fetchJobs,
     CreateSimpleSubPage,
     ModalElement,
+    CreateTDXJob,
     createJob,
     opLoading,
     updateJob,

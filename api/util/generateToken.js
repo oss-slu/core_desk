@@ -5,6 +5,7 @@ import { prisma } from "#prisma";
 import inquirer from "inquirer";
 import ora from "ora";
 import { createUser } from "./createUser.js";
+const [, , searchTerm] = process.argv;
 
 dotenv.config();
 
@@ -27,10 +28,21 @@ export const generateToken = (user, { expiresIn = DEFAULT_EXPIRY } = {}) => {
   );
 };
 
-export const fetchUsers = async () => {
+export const fetchUsers = async (search) => {
   const spinner = ora("Loading users...").start();
   try {
-    const users = await prisma.user.findMany({});
+    const users = await prisma.user.findMany({
+      where: search
+        ? {
+            OR: [
+              { firstName: { contains: search, mode: "insensitive" } },
+              { lastName: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : undefined,
+    });
+
     spinner.succeed(
       `Loaded ${users.length} user${users.length === 1 ? "" : "s"}.`,
     );
@@ -95,7 +107,7 @@ export const generateTokenForUser = async () => {
   if (!process.env.JWT_SECRET)
     throw new Error("Missing JWT_SECRET in environment.");
 
-  const users = await fetchUsers();
+  const users = await fetchUsers(searchTerm);
 
   const CHOICE_CREATE = "__CREATE_USER__";
   const { selection } = await inquirer.prompt([

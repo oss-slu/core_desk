@@ -378,6 +378,49 @@ if (process.env.JACK == "true") {
 
   // app.use("/api", await router());
 
+  // Routes for TDX Web API
+
+  app.get('/api/tdx-ticket', async (req, res) => {
+    const { ticketId } = req.query;
+
+    if (!ticketId) {
+        return res.status(400).json({ error: "Ticket ID is required" });
+    }
+
+    try {
+        const authRes = await fetch(`${process.env.TDX_URL}/auth`, {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                UserName: process.env.TDX_USERNAME,
+                Password: process.env.TDX_PASSWORD
+            }),
+        });
+
+        if (!authRes.ok) throw new Error("TDX Authentication failed");
+        const token = await authRes.text();
+
+        const ticketRes = await fetch(`${process.env.TDX_URL}/${process.env.TDX_APP_ID}/tickets/${ticketId}`, {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!ticketRes.ok) {
+            return res.status(ticketRes.status).json({ error: "Ticket not found" });
+        }
+
+        const data = await ticketRes.json();
+        
+        res.json(data);
+
+    } catch (error) {
+        console.error("TDX Proxy Error:", error);
+        res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+  });
+
   // This route is used for training purposes only. It is not used in production.
   app.use((req, res, next) => {
     if (req.url.includes("joke/emoji")) {
