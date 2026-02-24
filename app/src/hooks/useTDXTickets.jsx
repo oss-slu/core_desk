@@ -2,6 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Input, Button } from 'tabler-react-2';
 import { authFetch } from "#url";
 import toast from 'react-hot-toast';
+import { use } from 'chai';
 
 export const useTDXTickets = () => {
     const [ticket, setTicketData] = useState(null);
@@ -11,6 +12,30 @@ export const useTDXTickets = () => {
 
     const currentDate = new Date();
     const nextWeekDate = new Date(currentDate);
+
+    const getToken = () => {
+        const url = new URL(window.location.href);
+        const tdxToken = url.searchParams.get("token");
+        if (tdxToken) {
+            localStorage.getItem("token", tdxToken);
+            url.searchParams.delete("token");
+            window.history.replaceState({}, document.title, url);
+        }
+    }
+
+    const ssoAuth = useCallback(async () => {
+        var tdxToken;
+
+        setError(null);
+
+        try {
+            const res = await authFetch('api/tdx-auth');
+            tdxToken = res.json();
+        } catch (error) {
+            setError(error);
+            toast.error("Authentication failed");
+        }
+    });
 
     const fetchTicket = useCallback(async (id) => {
         var ticket;

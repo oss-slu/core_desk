@@ -380,26 +380,48 @@ if (process.env.JACK == "true") {
 
   // Routes for TDX Web API
 
+  app.get('api/tdx-auth', async (req, res) => {
+    // const { username, password } = req.query;
+
+    // if (!username || !password) {
+    //   return res.status(400).json({error: "Username or Password is required"});
+    // }
+
+    try {
+      const authRes = await fetch(`${process.env.TDX_URL}/auth/loginsso`, {
+            // method: "POST",
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            // body: JSON.stringify({
+            //     UserName: process.env.TDX_USERNAME,
+            //     Password: process.env.TDX_PASSWORD
+            // }),
+        });
+
+      if (!authRes.ok) throw new Error("TDX Authentication failed");
+
+      const token = await authRes.text();
+
+      token = token.replace(/"/g, '');
+
+      res.text(token);
+    } catch (error) {
+      console.error("TDX Proxy Error:", error);
+      res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+  })
+
   app.get('/api/tdx-ticket', async (req, res) => {
-    const { ticketId } = req.query;
+    const { ticketId, token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({error: "Token is required"});
+    }
 
     if (!ticketId) {
         return res.status(400).json({ error: "Ticket ID is required" });
     }
 
     try {
-        const authRes = await fetch(`${process.env.TDX_URL}/auth`, {
-            method: "POST",
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                UserName: process.env.TDX_USERNAME,
-                Password: process.env.TDX_PASSWORD
-            }),
-        });
-
-        if (!authRes.ok) throw new Error("TDX Authentication failed");
-        const token = await authRes.text();
-
         const ticketRes = await fetch(`${process.env.TDX_URL}/${process.env.TDX_APP_ID}/tickets/${ticketId}`, {
             headers: { 
                 'Authorization': `Bearer ${token}`,
