@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Input, Button } from 'tabler-react-2';
 import { authFetch } from "#url";
 import toast from 'react-hot-toast';
@@ -11,6 +11,9 @@ export const useTDXTickets = () => {
     const [ticket, setTicket] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+
+    const currentDate = new Date();
+    const nextWeekDate = new Date(currentDate);
 
     const handleLogin = (shopId) => {
         setLoading(true);
