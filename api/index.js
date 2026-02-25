@@ -380,35 +380,29 @@ if (process.env.JACK == "true") {
 
   // Routes for TDX Web API
 
-  app.get('api/tdx-auth', async (req, res) => {
-    // const { username, password } = req.query;
-
-    // if (!username || !password) {
-    //   return res.status(400).json({error: "Username or Password is required"});
-    // }
-
+  app.get('/api/tdx-auth', async (req, res) => {
+    const { shopId } = req.query;
+    
     try {
-      const authRes = await fetch(`${process.env.TDX_URL}/auth/loginsso`, {
-            // method: "POST",
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-            // body: JSON.stringify({
-            //     UserName: process.env.TDX_USERNAME,
-            //     Password: process.env.TDX_PASSWORD
-            // }),
-        });
+      const response = await fetch(`${process.env.TDX_URL}/auth/loginSSO`);
+      const html = await response.text();
 
-      if (!authRes.ok) throw new Error("TDX Authentication failed");
+      const tokenMatch = html.match(/[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}/) 
+                        || html.match(/[A-Za-z0-9]{32,}/); 
 
-      const token = await authRes.text();
-
-      token = token.replace(/"/g, '');
-
-      res.text(token);
+      if (tokenMatch) {
+        const token = tokenMatch[0];
+        
+        const destination = `http://localhost:5173/shops/${shopId}/jobs?token=${encodeURIComponent(token)}#`;
+        
+        res.redirect(destination);
+      } else {
+        res.status(500).send("SSO Success, but no token found in HTML output.");
+      }
     } catch (error) {
-      console.error("TDX Proxy Error:", error);
-      res.status(500).json({ error: "Internal Server Error", details: error.message });
+      res.status(500).send("Login relay failed.");  
     }
-  })
+  });
 
   app.get('/api/tdx-ticket', async (req, res) => {
     const { ticketId, token } = req.query;
@@ -418,28 +412,28 @@ if (process.env.JACK == "true") {
     }
 
     if (!ticketId) {
-        return res.status(400).json({ error: "Ticket ID is required" });
+      return res.status(400).json({ error: "Ticket ID is required" });
     }
 
     try {
-        const ticketRes = await fetch(`${process.env.TDX_URL}/${process.env.TDX_APP_ID}/tickets/${ticketId}`, {
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!ticketRes.ok) {
-            return res.status(ticketRes.status).json({ error: "Ticket not found" });
+      const ticketRes = await fetch(`${process.env.TDX_URL}/${process.env.TDX_APP_ID}/tickets/${ticketId}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
+      });
 
-        const data = await ticketRes.json();
-        
-        res.json(data);
+      if (!ticketRes.ok) {
+        return res.status(ticketRes.status).json({ error: "Ticket not found" });
+      }
+
+      const data = await ticketRes.json();
+      
+      res.json(data);
 
     } catch (error) {
-        console.error("TDX Proxy Error:", error);
-        res.status(500).json({ error: "Internal Server Error", details: error.message });
+      console.error("TDX Proxy Error:", error);
+      res.status(500).json({ error: "Internal Server Error", details: error.message });
     }
   });
 

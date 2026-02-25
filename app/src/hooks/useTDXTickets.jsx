@@ -2,42 +2,46 @@ import React, { useState, useCallback } from 'react';
 import { Input, Button } from 'tabler-react-2';
 import { authFetch } from "#url";
 import toast from 'react-hot-toast';
-import { use } from 'chai';
+import { useParams } from 'react-router-dom';
 
 export const useTDXTickets = () => {
-    const [ticket, setTicketData] = useState(null);
+    const {shopId} = useParams();
+    const [auth, setAuth] = useState({ token: sessionStorage.getItem('bearer_token') });
     const [ticketId, setTicketId] = useState('');
-    const [isFetching, setIsFetching] = useState(false);
+    const [ticket, setTicket] = useState(null);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    const currentDate = new Date();
-    const nextWeekDate = new Date(currentDate);
+    const handleLogin = (shopId) => {
+        setLoading(true);
 
-    const getToken = () => {
-        const url = new URL(window.location.href);
-        const tdxToken = url.searchParams.get("token");
-        if (tdxToken) {
-            localStorage.getItem("token", tdxToken);
-            url.searchParams.delete("token");
-            window.history.replaceState({}, document.title, url);
-        }
-    }
+        const relayUrl = `http://localhost:3030/api/tdx-auth?shopId=${shopId}`; // update later
+        const loginWindow = window.open(relayUrl, "OktaLogin", "width=500,height=600");
 
-    const ssoAuth = useCallback(async () => {
-        var tdxToken;
-
-        setError(null);
-
+        const timer = setInterval(() => {
         try {
-            const res = await authFetch('api/tdx-auth');
-            tdxToken = res.json();
-        } catch (error) {
-            setError(error);
-            toast.error("Authentication failed");
-        }
-    });
+            if (loginWindow.location.href.includes(window.location.hostname)) {
+            const urlParams = new URLSearchParams(loginWindow.location.search);
+            const token = urlParams.get('token');
 
-    const fetchTicket = useCallback(async (id) => {
+            if (token) {
+                sessionStorage.setItem('bearer_token', token);
+                setAuth({ token: token });
+                
+                loginWindow.close(); // This will work now because domains match!
+                clearInterval(timer);
+                setLoading(false);
+                toast.success("TDX Authenticated");
+            }
+            }
+        } catch (e) {
+            toast.error(e);
+            setError(e);
+        }
+        }, 1000);
+    };
+
+    const fetchTicket = async (id) => {
         var ticket;
 
         if (!id) {
@@ -45,16 +49,16 @@ export const useTDXTickets = () => {
             return null;
         }
 
-        setIsFetching(true);
+        setLoading(true);
         setError(null);
         toast.loading("Fetching ticket from TDX...");
         
         try {
             // Pointing to your proxy endpoint
             try {
-                const r = await authFetch(`/api/tdx-ticket?ticketId=${id}`);
+                const r = await authFetch(`/api/tdx-ticket?ticketId=${id}&token=${auth.token}`);
                 ticket = await r.json();
-                setTicketData(ticket);
+                setTicket(ticket);
             } catch (error) {
                 setError(error);
                 toast.error(`Ticket fetch failed: ${error}`);
@@ -82,11 +86,27 @@ export const useTDXTickets = () => {
             toast.error(error.message);
             return null;
         } finally {
-            setIsFetching(false);
+            setLoading(false);
         }
-    }, []);
+    };
 
     const TDXTicketIdInput = ({ onSubmit }) => {
+        if (!auth.token) {
+            return (
+                <div>
+                    <div>
+                        <Button
+                            loading={loading}
+                            onClick={async () => {
+                                handleLogin(shopId);
+                            }}
+                        >
+                            Log Into TDNext
+                        </Button>
+                    </div>
+                </div>
+            )
+        }
         return (
             <div>
                 <div className="d-flex align-items-end gap-2 border-b-5 border-b-black">
@@ -98,7 +118,7 @@ export const useTDXTickets = () => {
                         className="mt-0"
                     />
                     <Button 
-                        loading={isFetching}
+                        loading={loading}
                         onClick={async () => {
                             const data = await fetchTicket(ticketId);
                             if (data && onSubmit) {
