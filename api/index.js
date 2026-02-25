@@ -385,13 +385,13 @@ if (process.env.JACK == "true") {
     
     try {
       const response = await fetch(`${process.env.TDX_URL}/auth/loginSSO`);
-      const html = await response.text();
+      const r = await response.text();
 
-      const tokenMatch = html.match(/[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}/) 
-                        || html.match(/[A-Za-z0-9]{32,}/); 
+      const tokMatch = r.match(/[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}/)
+        || r.match(/[A-Za-z0-9]{32,}/); 
 
-      if (tokenMatch) {
-        const token = tokenMatch[0];
+      if (tokMatch) {
+        const token = tokMatch[0];
         
         const destination = `http://localhost:5173/shops/${shopId}/jobs?token=${encodeURIComponent(token)}#`;
         
@@ -400,7 +400,7 @@ if (process.env.JACK == "true") {
         res.status(500).send("SSO Success, but no token found in HTML output.");
       }
     } catch (error) {
-      res.status(500).send("Login relay failed.");  
+      res.status(500).send(error);  
     }
   });
 
