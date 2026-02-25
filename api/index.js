@@ -387,11 +387,10 @@ if (process.env.JACK == "true") {
       const response = await fetch(`${process.env.TDX_URL}/auth/loginSSO`);
       const r = await response.text();
 
-      const tokMatch = r.match(/[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}\.[A-Za-z0-9-_]{20,}/)
-        || r.match(/[A-Za-z0-9]{32,}/); 
+      const t = r.match(/([A-Za-z0-9-_]{20,}\.){2}[A-Za-z0-9-_]{20,}|[A-Za-z0-9]{32,}/);
 
-      if (tokMatch) {
-        const token = tokMatch[0];
+      if (t) {
+        const token = t[0];
         
         const destination = `http://localhost:5173/shops/${shopId}/jobs?token=${encodeURIComponent(token)}#`;
         
