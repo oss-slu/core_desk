@@ -14,12 +14,9 @@ export const post = [
       
       
       if (!user) {
-        console.log("error user not found");
         return res.status(404).json({ error: "User does not exist." });
       }
 
-
-      console.log("User found, sending email...");
 
       const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
 

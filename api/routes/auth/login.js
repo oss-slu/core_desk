@@ -88,11 +88,12 @@ export const put = [
       await prisma.logs.create({
         data: { type: LogType.USER_PASSWORD_CHANGE, userId: user.id },
       });
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (error) {
       console.log("Error", error);
-
-      return res.status(500).json({ error: "Internal server error" });
+      return res
+        .status(401)
+        .json({ error: "Invalid credentials or SSO required" });
     }
   },
 ];

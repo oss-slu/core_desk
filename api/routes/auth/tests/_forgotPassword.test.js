@@ -11,13 +11,13 @@ import jwt from "jsonwebtoken";
 const sendEmailMock = vi.fn().mockResolvedValue(true);
 
 vi.mock("postmark", () => {
-    return {
-        ServerClient: vi.fn().mockImplementation(() => {
-            return {
-                sendEmail: sendEmailMock,
-            };
-        }),
-    };
+  const ServerClient = vi.fn().mockImplementation(() => ({
+    sendEmail: sendEmailMock,
+  }));
+
+  return {
+    default: { ServerClient }, 
+  };
 });
 
 

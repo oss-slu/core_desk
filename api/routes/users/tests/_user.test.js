@@ -57,7 +57,7 @@ describe("/users", () => {
         createdAt: expect.any(String),
         email: expect.any(String),
         firstName: expect.any(String),
-        hasPassword: false,
+        hasPassword: expect.any(Boolean), //there is sso user and non-sso user, this will vary
         id: expect.any(String),
         isMe: expect.any(Boolean),
         jobCount: expect.any(Number),

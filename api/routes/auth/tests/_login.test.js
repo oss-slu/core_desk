@@ -12,7 +12,7 @@ describe("/api/auth/login", () => {
                 .post("/api/auth/login")
                 .send({
                     email: tc.globalLocalUser.email,
-                    password: tc.globalLocalUser.password,
+                    password: "TestPassword",
                 });
 
             expect(res.status).toBe(200);
@@ -107,6 +107,7 @@ describe("/api/auth/login", () => {
                         password: "newPassword",
                     });
                 expect(res.status).toBe(200);
+                expect(res.body).toEqual({ success: true });
 
                 //get the user
                 const User = await prisma.user.findUnique({
