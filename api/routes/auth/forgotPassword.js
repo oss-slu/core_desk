@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "#prisma";
 import postmark from "postmark";
+import { LogType } from "@prisma/client";
 
 export const post = [
   async (req, res) => {
@@ -10,9 +11,15 @@ export const post = [
       const user = await prisma.user.findUnique({
         where: { email: email.toLowerCase() },
       }); //emails need to be exact so when we create user, the email needs to be stored with lowercase.
-      if (!user) { 
-        return res.status(401).json({ error: "User does not exist." });
+      
+      
+      if (!user) {
+        console.log("error user not found");
+        return res.status(404).json({ error: "User does not exist." });
       }
+
+
+      console.log("User found, sending email...");
 
       const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
 
@@ -60,11 +67,14 @@ export const put = [
         where: { id: decodedToken.id },
         data: { password: hashedPassword },
       });
+      await prisma.logs.create({
+        data: { type: LogType.USER_PASSWORD_CHANGE, userId: user.id },
+      });
 
       return res.status(200).json({ success: true });
     } catch (error) {
       console.error(error);
-      return res.status(400).json({ error: "Invalid or expired link." });
+      return res.status(401).json({ error: "Invalid or expired link." });
     }
   },
 ];

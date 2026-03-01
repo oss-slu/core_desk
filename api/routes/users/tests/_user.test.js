@@ -50,7 +50,7 @@ describe("/users", () => {
         .send();
 
       expect(res.status).toBe(200);
-      expect(res.body.users).toHaveLength(2);
+      expect(res.body.users).toHaveLength(3);
 
       expect(res.body.users[0]).toMatchObject({
         admin: expect.any(Boolean),
