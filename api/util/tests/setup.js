@@ -1,6 +1,7 @@
 import prisma from "#prisma";
 import { AccountType } from "@prisma/client";
 import { beforeEach } from "vitest";
+import jwt from "jsonwebtoken";
 
 export let tc = {};
 
@@ -52,6 +53,27 @@ beforeEach(async () => {
 
     tc.globalUser = globalUser;
     tc.user = globalUser;
+
+
+
+    const globalLocalUser = await prisma.user.create({
+      data: {
+        firstName: "TestFirstName",
+        lastName: "TestLastName",
+        email: "localTest@email.com",
+        password: "TestPassword",
+      },
+    });
+
+
+    const token = jwt.sign(
+      { id: globalLocalUser.id },
+      process.env.JWT_SECRET
+    );
+    tc.token = token
+
+    tc.globalLocalUser = globalLocalUser;
+
 
     const targetUser = await prisma.user.create({
       data: {
