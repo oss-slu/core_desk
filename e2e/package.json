@@ -4,13 +4,13 @@
   "private": true,
   "type": "module",
   "devDependencies": {
-    "@prisma/client": "6.16.2",
+    "@prisma/client": "7.0.0",
     "cypress": "13.17.0",
     "nodemon": "^3.1.7",
-    "prisma": "6.16.2"
+    "prisma": "7.0.0"
   },
   "scripts": {
-    "prepare:prisma": "prisma generate --schema ../api/prisma/schema.prisma",
+    "prepare:prisma": "prisma generate --config ../api/prisma.config.ts",
     "cy:open": "npm run prepare:prisma && cypress open --e2e",
     "cy:run": "npm run prepare:prisma && cypress run --e2e",
     "cy:watch": "npm run prepare:prisma && nodemon --legacy-watch --watch cypress --watch cypress.config.cjs --ext js,ts,jsx,tsx,cjs,mjs,json --exec \"cypress run --e2e\"",
