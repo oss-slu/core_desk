@@ -135,19 +135,31 @@ function ensureDatabaseExists(dbUrl) {
   }
 }
 
-function runPrismaMigrate(dbUrl) {
-  const prismaPath = path.resolve(currentDir, "../api/node_modules/.bin/prisma");
+function runSqlMigrations(dbUrl) {
+  const migrationsDir = path.resolve(currentDir, "../api/prisma/migrations");
+  if (!fs.existsSync(migrationsDir)) {
+    throw new Error(`Prisma migrations directory not found: ${migrationsDir}`);
+  }
 
-  const result = spawnSync(prismaPath, ["migrate", "deploy"], {
-    stdio: "inherit",
-    env: { ...process.env, DATABASE_URL: dbUrl },
-    cwd: path.resolve(currentDir, "../api"),
-  });
+  const migrationFiles = fs
+    .readdirSync(migrationsDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => ({
+      name: entry.name,
+      file: path.resolve(migrationsDir, entry.name, "migration.sql"),
+    }))
+    .filter(({ file }) => fs.existsSync(file))
+    .sort((a, b) => a.name.localeCompare(b.name));
 
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    throw new Error(
-      `Prisma migrate deploy failed with exit code ${result.status}`,
+  if (migrationFiles.length === 0) {
+    throw new Error(`No migration.sql files found in ${migrationsDir}`);
+  }
+
+  for (const migration of migrationFiles) {
+    runPsql(
+      dbUrl,
+      ["-f", migration.file],
+      `apply migration ${migration.name}`,
     );
   }
 }
@@ -204,7 +216,7 @@ export default defineConfig({
             "drop schema",
           );
           runPsql(dbUrl, ["-c", "CREATE SCHEMA public"], "create schema");
-          runPrismaMigrate(dbUrl);
+          runSqlMigrations(dbUrl);
           const seedOutput = runPsql(
             dbUrl,
             ["-f", sqlFilePath],
