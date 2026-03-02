@@ -10,7 +10,7 @@
     "dev": "npm run prisma:generate && nodemon --exec \"node --import tsx\" index.js",
     "coverage": "yarn test --coverage --ui",
     "lint": "eslint .",
-    "okta": "node util/generateToken.js"
+    "okta": "node --import tsx util/generateToken.js"
   },
   "keywords": [],
   "author": "",
