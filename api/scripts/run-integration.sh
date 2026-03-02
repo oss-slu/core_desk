@@ -20,6 +20,7 @@ echo '🟢 - Database is ready!'
 sleep 5
 
 npx prisma migrate dev --name init
+npx prisma generate
 
 echo '⚡ Running integration tests...'
 

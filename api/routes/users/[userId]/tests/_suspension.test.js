@@ -4,7 +4,7 @@ import { app } from "#index";
 import { gt } from "#gt";
 import { prisma } from "#prisma";
 import { prisma as mockPrisma } from "#mock-prisma";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 
 describe("/[userId]", () => {
   describe("Suspend user", async () => {

@@ -4,6 +4,7 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
+    "prepare:prisma": "prisma generate --config ../api/prisma.config.ts",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "docker:up": "docker compose -f docker/docker-compose.yml up -d --build",
@@ -19,7 +20,10 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "cypress": "^15.10.0"
+    "@prisma/client": "7.0.0",
+    "cypress": "^15.10.0",
+    "nodemon": "^3.1.7",
+    "prisma": "7.0.0"
   },
   "dependencies": {
     "cypress-yaml-plugin": "^0.1.14",
