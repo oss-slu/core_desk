@@ -34,7 +34,6 @@ export const verifyAuth = async (req, res, next) => {
 
       req.user = _user;
 
-      console.log(45);
       next();
     });
   } else {
