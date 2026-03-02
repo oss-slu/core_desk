@@ -40,4 +40,4 @@ RUN chmod +x /api-entrypoint.sh
 
 EXPOSE 3030
 ENTRYPOINT ["/api-entrypoint.sh"]
-CMD ["node", "/api/index.js"]
+CMD ["npm", "run", "start"]
