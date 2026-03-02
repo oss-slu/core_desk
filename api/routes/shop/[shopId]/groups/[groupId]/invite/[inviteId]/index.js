@@ -1,6 +1,6 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import { LedgerItemType, LogType } from "@prisma/client";
+import { LedgerItemType, LogType } from "#prisma-client";
 import { z } from "zod";
 
 const billingGroupSchema = z.object({

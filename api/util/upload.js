@@ -1,4 +1,4 @@
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { utapi } from "../config/uploadthing.js";
 import { enqueueStlRenderTask } from "./stlRenderQueue.js";
