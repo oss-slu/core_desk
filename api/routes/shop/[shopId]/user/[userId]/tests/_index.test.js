@@ -4,7 +4,7 @@ import { app } from "#index";
 import { gt } from "#gt";
 import { prisma } from "#prisma";
 import { tc } from "#setup";
-import { LedgerItemType, LogType } from "@prisma/client";
+import { LedgerItemType, LogType } from "#prisma-client";
 import { prisma as mockPrisma } from "#mock-prisma";
 
 describe("/shop/[shopId]/user/[userId]", () => {

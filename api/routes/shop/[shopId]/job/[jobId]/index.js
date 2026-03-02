@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { LedgerItemType, LogType, Prisma } from "@prisma/client";
+import { LedgerItemType, LogType, Prisma } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";

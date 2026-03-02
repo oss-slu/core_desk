@@ -3,7 +3,7 @@ import request from "supertest";
 import { app } from "#index";
 import { gt } from "#gt";
 import { prisma } from "#prisma";
-import { AccountType, LogType } from "@prisma/client";
+import { AccountType, LogType } from "#prisma-client";
 
 describe("/[userId]", () => {
   describe("Fetch user profile", () => {

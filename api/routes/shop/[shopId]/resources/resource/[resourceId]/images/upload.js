@@ -1,7 +1,7 @@
 import prisma from "#prisma";
 import { upload } from "#upload";
 import { verifyAuth } from "#verifyAuth";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 
 export const post = [
   verifyAuth,
