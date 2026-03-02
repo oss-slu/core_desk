@@ -387,19 +387,27 @@ if (process.env.JACK == "true") {
       const response = await fetch(`${process.env.TDX_URL}/auth/loginSSO`);
       const r = await response.text();
 
+      // gets token from html code returned from fetch (matches token characters)
+      // basically an extraction (thanks, Gemini)
       const t = r.match(/([A-Za-z0-9-_]{20,}\.){2}[A-Za-z0-9-_]{20,}|[A-Za-z0-9]{32,}/);
 
       if (t) {
         const token = t[0];
         
-        const destination = `http://localhost:5173/shops/${shopId}/jobs?token=${encodeURIComponent(token)}#`;
-        
-        res.redirect(destination);
+        const redirectTo =
+          (relayState ? relayState : `${process.env.BASE_URL}/shops/${shopId}/jobs`) +
+          "?token" +
+          "=" +
+          token;
+
+        res.redirect(redirectTo);
       } else {
         res.status(500).send("SSO Success, but no token found in HTML output.");
+        console.log(`${res.status(500)}: SSO Success, but no token found in HTML output.`);
+        // add sentry notif
       }
     } catch (error) {
-      res.status(500).send(error);  
+      res.status(500).send(error);
     }
   });
 
