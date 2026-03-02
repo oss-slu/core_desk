@@ -24,8 +24,6 @@ export const verifyAuth = async (req, res, next) => {
       });
 
       if (!_user) {
-        console.log("User not found");
-        console.log(user);
         return res.sendStatus(401); // Unauthorized
       }
 
