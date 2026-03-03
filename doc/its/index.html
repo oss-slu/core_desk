@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>index.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="slu-open-project--coredesk">SLU Open Project / CoreDesk</h1>
+<ul>
+<li><a href="#slu-open-project--coredesk">SLU Open Project / CoreDesk</a>
+<ul>
+<li><a href="#changelog">Changelog</a></li>
+<li><a href="#project-overview">Project Overview</a></li>
+<li><a href="#system-architecture">System Architecture</a></li>
+<li><a href="#deployment-architecture">Deployment Architecture</a></li>
+<li><a href="#security">Security</a></li>
+<li><a href="#code-quality-and-testing">Code Quality and Testing</a></li>
+<li><a href="#the-relationship-between-slu-open-source-slu-oss-and-slu-center-for-additive-manufacturing-slu-cam">The relationship between SLU Open Source (SLU-OSS) and SLU Center for Additive Manufacturing (SLU-CAM)</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="changelog">Changelog</h2>
+<ul>
+<li><strong>2024-11-15</strong>: Initial draft</li>
+<li><strong>2024-11-18</strong>: Added code quality and testing section</li>
+<li><strong>2025-10-03</strong>: Updated deployment architecture &amp; added information on the relationship between SLU Open Source and SLU Center for Additive Manufacturing</li>
+</ul>
+<h2 id="project-overview">Project Overview</h2>
+<p>SLU Open Project is a tool built by a collaboration between the Saint Louis University Center for Additive Manufacturing and SLU Open Source. It is a platform for managing and tracking jobs to be submitted to shops across the SLU community. It is designed to be a simple one-stop-shop for shops to manage their workloads and to serve as a hub for users to submit jobs to these shops. Shops can recieve jobs from single users, or from billing groups of users that allow users to submit jobs to a shop, but to have their billing handled by a separate entity, like a department or lab.</p>
+<p>It was originally built by Jack Crane (jack.crane@slu.edu) and is designed to be maintained by the SLU Open Source team. It is built using a modern stack of technologies and is designed to be easily maintainable and extendable. I have experience building and maintaining large-scale applications built with security and performance in mind, having &quot;interned&quot; for 16 months as one of 15 developers at a <a href="https://apollos.app">white-label social media platform</a>, built 3 internal tools for a fortune-500 company, a <a href="https://og-image.xyz">server-side image generator</a> with over 10,000 MAU and over 2,000,000 images generated this year. All this to say, I have experience building and maintaining applications and have put great consideration into the futureproofing and maintainability of this application.</p>
+<h2 id="system-architecture">System Architecture</h2>
+<p><img src="./arch.png" alt="Architecture"></p>
+<p>The application is composed of the following high-level components:</p>
+<ul>
+<li><strong>Frontend</strong>: The frontend is a web application that is served to the user's browser. It is responsible for rendering the user interface user interactions, and routing. The frontend is built using React and React Router. The frontend handles almost no logic.</li>
+<li><strong>Backend</strong>: The backend is a RESTful API that is responsible for handling requests from the frontend, interacting with the database, validating requests, and performing business logic. The backend is built using Express and Node.js.</li>
+<li><strong>Database</strong>: The database is a Postgres database that stores all the data for the application. The database is designed, made type-safe, and accessed with Prisma. Once moving to production, a production-level database will be provisioned and used. The database lives outside of the application container to ensure persistence and to allow for managed security, backups, scaling, and optimization.</li>
+<li><strong>Authentication &amp; Authorization</strong>: Authorization and initial authentication is handled by Okta. Once authenticated, the frontend and backend communicate using JWT tokens, cutting Okta out of the loop. JWT tokens remain valid for 3 hours before requiring the user to re-authenticate with their Okta credentials.</li>
+</ul>
+<p>There are also a few external services that the application interacts with:</p>
+<ul>
+<li><strong>Okta</strong>: Used for initial authentication and authorization.</li>
+<li><strong>S3</strong>: Used to store uploaded files. Files in S3 are encrypted at rest and behind strong access control limitations.</li>
+<li><strong>Postmark</strong>: A managed email sending service. Postmark is used to send transactional emails to users regarding their account and jobs. Postmark is only accessed by the backend.</li>
+<li><strong>Sentry</strong>: A managed error tracking service. Sentry is used to track errors occuring on the frontend (client-facing) application. It has access to sourcemap files provided by the build step. Sentry does not have access to any user data, files, or otherwise sensitive information not directly provided to the client.</li>
+</ul>
+<p>The application is deployed using a Docker container. It currently runs off of a DigitalOcean App Platform instance (DigitalOcean's managed kubernetes solution), but can be deployed to any solution capable of running Docker containers. The dockerized application is ephemeral and stateless, allowing for a complete failure of the application without significant data loss and immediate recovery.</p>
+<p>The application is automatically built and deployed from the <code>main</code> branch of every push to the SLU Open Source-controlled repository.</p>
+<h2 id="deployment-architecture">Deployment Architecture</h2>
+<p><img src="./build.png" alt="Deployment Architecture"></p>
+<ul>
+<li>The React-powered frontend is built to static files using Vite and is made available to the frontend via a static file route.</li>
+<li>The node backend is run through a strict ESLint step ensuring code quality and consistency.</li>
+<li>Sourcemaps are uploaded to Sentry for up-to-date error tracking an stack trace information. This allows for quick debugging and resolution of issues while still providing users with vague error messages.</li>
+<li>Prisma is used to generate the database access library, ensuring type safety and consistency in database interactions. On the build process, Prisma runs a migration step to make sure the database and the live application are in sync.</li>
+<li>In development, a local Postgres database is used, preventing any accidental changes or damage to the production database and to ensure that the production database remains secure and consistent. Production database calls and queries are only done in emergencies or for recovery purposes.</li>
+</ul>
+<h2 id="security">Security</h2>
+<ul>
+<li><strong>Authentication &amp; Authorization</strong>: Authentication is handled by Okta. Once authenticated, the frontend and backend communicate using JWT tokens. JWT tokens are only valid for 3 hours before requiring the user to re-authenticate with their Okta credentials. JWT tokens are stored in LocalStorage and are not accessible by any other domain. JWT tokens are only sent over HTTPS and are compared against a user's IP address and user agent to prevent token theft. JWT tokens are signed and verified using a secret key stored in the backend. In the event of a security issue, the secret key can be rotated to invalidate all existing tokens and require every user to re-authenticate. If a user's token expires, they are redirected to a login page and subsequent or in-flight requests are rejected.</li>
+<li><strong>Data Protection</strong>: All data is stored in a Postgres database. The database is accessed using Prisma, which provides type-safe access to the database. Prisma automatically sanitizes all inputs to prevent SQL injection attacks. The database is hosted on a managed service that provides security, backups, and scaling. The database is configured to only allow requests from recognized IP addresses and to require a password for access. Unauthorized requests are logged and reported.</li>
+<li><strong>File Uploads</strong>: File uploads are handled by UploadThing. UploadThing provides a secure URL for the uploaded file that is stored in the database. File uploads are initiated by the frontend and authorized by the backend. As per <a href="https://uploadthing.com/info/terms-of-service">UploadThing's terms of service</a>, files are only accessible by SLU Open Project unless otherwise required by law. Files uploaded are not deleted unless a privileged user requests deletion explicitly or via a delete operation in the application.</li>
+<li><strong>Vulnerability Management</strong>: The application is built using modern technologies and best practices. Dependencies are kept up-to-date using Dependabot, and attack surfaces are minimized by limiting the access scope of each user and verifying permissions before issuing any write commands or returning any sensitive data. The application is monitored using a logging solution and Sentry for error tracking. In the event of a security issue, the offending user can be suspended and reported, and access to the application can be limited by putting the database into a reject-all state.</li>
+<li><strong>Disaster recovery and Backup</strong>: Disaster recovery and backup will be dependent on the final deployment solution, but in testing, database backups occur daily and are stored in a secure, read-only location. In the event of catastrophic system failure, the application will automatically roll back to the same image and attempt a restart. After multiple failed restarts, it will revert back to a known stable point. The codebase is tracked by git and all changes are tracked.</li>
+<li><strong>Third-party dependencies</strong>: Following is a list of third-party dependencies used by the application, its purpose, and access level.
+<ul>
+<li><strong>Prisma</strong>: Database access library. Prisma has full access to the application's data and is used to perform all database operations. Prisma is a critical dependency and is used in almost every part of the application. Prisma is a reputable ORM with a good track record of bug fixes and security patches.</li>
+<li><strong>Express</strong>: Web server framework. Express is used to facilitate incoming requests and their responses. Express is a massively popular and well-maintained library with a good track record of bug fixes and security patches.</li>
+<li><strong>JSON Web Tokens</strong>: JWT tokens are used to authenticate users. The JWT library is first-party by Auth0 and is given access to only the authentication header of requests.</li>
+<li><strong>Puppeteer</strong>: Puppeteer is used for server-side rendering. Puppeteer is a first-party library by Google and is used for rendering static pages (like invoices) to PDF on the server side.</li>
+<li><strong>UploadThing</strong>: The UploadThing library is used for signing file upload requests and for performing delete and modify operations on existing files.</li>
+<li><strong>React</strong>: React is used for building the frontend. React is a first-party library by Facebook and is used for rendering the user interface.</li>
+<li><strong>React Router</strong>: React Router is used for routing in the frontend.</li>
+<li><strong>Remark</strong>: Remark is used for markdown parsing in the frontend. Remark is well tested and is given extremely limited access to data and is situationally isolated from the rest of the application. <code>&lt;script&gt;</code> and <code>&lt;style&gt;</code> tags are disallowed to prevent JS and CSS injection attacks.</li>
+<li><strong>SWR</strong>: SWR is used for data fetching in the frontend. SWR is a first-party library by Vercel and is used for caching and fetching data from the backend. We use it sparingly for its caching capabilities and its ability to handle stale data. It is only used on non-critical and non-sensitive data.</li>
+<li><strong>Three</strong>: Three is used for rendering 3D models in the frontend. Three is a first-party library by the Three.js team and is used for rendering 3D models in the browser. Three is given access to the canvas element and file URLs.</li>
+<li><strong>Moment</strong>: Moment is used for date formatting in the frontend. Moment is a well-tested library and is given access to only the date and time fields of the application.</li>
+</ul>
+</li>
+</ul>
+<h2 id="code-quality-and-testing">Code Quality and Testing</h2>
+<p>Integration testing is used to ensure consistent and expected behavior across the entire codebase including keeping track of database state. When tests are run, a database instance is spun up and seeded with minimal test data. Tests are run against this database and the database is torn down after the tests are complete. This ensures that tests are isolated and that the database is in a known state before each test run.</p>
+<h2 id="the-relationship-between-slu-open-source-slu-oss-and-slu-center-for-additive-manufacturing-slu-cam">The relationship between SLU Open Source (SLU-OSS) and SLU Center for Additive Manufacturing (SLU-CAM)</h2>
+<p>Open source is the <em>product developer</em> of CoreDesk, responsible for its development and roadmap under the guidance of SLUCAM, the owner of the <em>CoreDesk</em> IP. SLUCAM is a tenant who is hosting an instance of CoreDesk/SLU Open Project. The instance hosted by SLUCAM is what should be considered the canonical version of CoreDesk/SLU Open Project and is what needs to be made available to the SLU community.</p>
+
+</body>
+</html>
