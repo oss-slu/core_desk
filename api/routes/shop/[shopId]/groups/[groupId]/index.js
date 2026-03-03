@@ -9,6 +9,20 @@ const billingGroupSchema = z.object({
   membersCanCreateJobs: z.boolean().optional().default(false),
 });
 
+const getGroupBalance = async (shopId, groupId) => {
+  const balanceResult = await prisma.ledgerItem.aggregate({
+    where: {
+      shopId,
+      billingGroupId: groupId,
+    },
+    _sum: {
+      value: true,
+    },
+  });
+
+  return balanceResult._sum.value || 0;
+};
+
 export const put = [
   verifyAuth,
   async (req, res) => {
@@ -218,6 +232,7 @@ export const get = [
       }));
 
       group._count = undefined;
+      group.balance = await getGroupBalance(shopId, groupId);
 
       group.userIsMember = false;
       group.userRole = null;

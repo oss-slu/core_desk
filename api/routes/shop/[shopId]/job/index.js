@@ -4,6 +4,46 @@ import { verifyAuth } from "#verifyAuth";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
 // import client from "#postmark";
 
+const getUserBalanceMap = async (shopId, userIds) => {
+  if (!userIds.length) return {};
+
+  const rows = await prisma.ledgerItem.groupBy({
+    by: ["userId"],
+    where: {
+      shopId,
+      userId: {
+        in: userIds,
+      },
+    },
+    _sum: {
+      value: true,
+    },
+  });
+
+  return Object.fromEntries(rows.map((row) => [row.userId, row._sum.value || 0]));
+};
+
+const getGroupBalanceMap = async (shopId, groupIds) => {
+  if (!groupIds.length) return {};
+
+  const rows = await prisma.ledgerItem.groupBy({
+    by: ["billingGroupId"],
+    where: {
+      shopId,
+      billingGroupId: {
+        in: groupIds,
+      },
+    },
+    _sum: {
+      value: true,
+    },
+  });
+
+  return Object.fromEntries(
+    rows.map((row) => [row.billingGroupId, row._sum.value || 0])
+  );
+};
+
 export const post = [
   verifyAuth,
   async (req, res) => {
@@ -295,6 +335,12 @@ export const get = [
               id: true,
             },
           },
+          group: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
           additionalCosts: {
             include: {
               material: true,
@@ -306,6 +352,18 @@ export const get = [
         // take: req.query.limit ? parseInt(req.query.limit) : 2000,
         // skip: req.query.offset ? parseInt(req.query.offset) : 0,
       });
+
+      const userIds = [
+        ...new Set(
+          jobs.filter((job) => !job.groupId).map((job) => job.user.id)
+        ),
+      ];
+      const groupIds = [...new Set(jobs.map((job) => job.groupId).filter(Boolean))];
+
+      const [userBalanceMap, groupBalanceMap] = await Promise.all([
+        getUserBalanceMap(shopId, userIds),
+        getGroupBalanceMap(shopId, groupIds),
+      ]);
 
       jobs = jobs.map((job) => {
         job.itemsCount = job._count.items;
@@ -334,6 +392,19 @@ export const get = [
         delete job.additionalCosts;
 
         job.user.name = `${job.user.firstName} ${job.user.lastName}`;
+        job.billingAccount = job.groupId
+          ? {
+              type: "GROUP",
+              id: job.groupId,
+              name: job.group?.title || "Billing Group",
+              balance: groupBalanceMap[job.groupId] || 0,
+            }
+          : {
+              type: "USER",
+              id: job.user.id,
+              name: job.user.name,
+              balance: userBalanceMap[job.user.id] || 0,
+            };
 
         delete job._count;
         delete job.items;
