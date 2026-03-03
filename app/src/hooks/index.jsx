@@ -25,3 +25,4 @@ export { useBillingGroup } from "./useBillingGroup";
 export { useBillingGroupInvitations } from "./useBillingGroupInvitations";
 export { useBillingGroupInvitation } from "./useBillingGroupInvitation";
 export { useBillingGroupUser } from "./useBillingGroupUser";
+export { useBillingGroupLedger } from "./useBillingGroupLedger";

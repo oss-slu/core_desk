@@ -3,6 +3,7 @@ import {
   useAuth,
   useBillingGroup,
   useBillingGroupInvitations,
+  useBillingGroupLedger,
   useShop,
   useUser,
 } from "#hooks";
@@ -11,7 +12,7 @@ import { shopSidenavItems } from "../..";
 import { Page } from "#page";
 import { Loading } from "#loading";
 import { Button } from "#button";
-import { Util, Alert, DropdownInput, Badge } from "tabler-react-2";
+import { Util, Alert, DropdownInput, Badge, Input } from "tabler-react-2";
 import { useModal } from "#modal";
 import { CreateBillingGroupInvitation } from "../../../../../components/billingGroup/CreateBillingGroupInvitation";
 import { NotFound } from "../../../../../components/404/404";
@@ -25,6 +26,8 @@ import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { Icon } from "#icon";
 import { MarkdownRender } from "#markdownRender";
 import { ShopUserPicker } from "#shopUserPicker";
+import { Price } from "#renderPrice";
+import { LedgerTable } from "../../../../../components/ledger/LedgerTable";
 
 const AddUserToBillingGroupModal = () => {
   const navigate = useNavigate();
@@ -72,6 +75,51 @@ const AddUserToBillingGroupModal = () => {
   );
 };
 
+const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading }) => {
+  const [type, setType] = useState(null);
+  const [value, setValue] = useState(0);
+
+  return (
+    <Util.Col gap={1}>
+      <div>
+        <label className="form-label">Add balance type</label>
+        <DropdownInput
+          label="Type"
+          values={[
+            { label: "Topup", id: "MANUAL_TOPUP" },
+            { label: "Deposit", id: "MANUAL_DEPOSIT" },
+            { label: "User Purchased", id: "FUNDS_PURCHASED" },
+            { label: "Reduction", id: "MANUAL_REDUCTION" },
+          ]}
+          value={type}
+          onChange={(v) => setType(v.id)}
+          prompt="Select type"
+        />
+      </div>
+      <Input
+        type="number"
+        label="Amount"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Select an amount"
+        prependedText="$"
+      />
+      <i>
+        A topup will bring the group's balance to the specified amount if it is
+        lower than that amount. A deposit will add the fixed amount.
+      </i>
+      <Button
+        loading={opLoading}
+        onClick={async () => {
+          await postLedgerItem({ type, value });
+        }}
+      >
+        Post Ledger Item
+      </Button>
+    </Util.Col>
+  );
+};
+
 export const BillingGroupPage = () => {
   const { shopId, groupId } = useParams();
   const { user } = useAuth();
@@ -95,6 +143,13 @@ export const BillingGroupPage = () => {
     createBillingGroupInvitation,
     opLoading: opLoadingInvitations,
   } = useBillingGroupInvitations(shopId, groupId);
+  const {
+    ledger,
+    loading: ledgerLoading,
+    balance,
+    postLedgerItem,
+    opLoading: ledgerOpLoading,
+  } = useBillingGroupLedger(shopId, groupId);
 
   const { modal, ModalElement, close, update } = useModal({
     title: "Create a new invitation link",
@@ -118,6 +173,16 @@ export const BillingGroupPage = () => {
         />
       ),
     });
+  const { modal: addLedgerItemModal, ModalElement: AddLedgerItemModal } =
+    useModal({
+      title: "Post ledger item",
+      text: (
+        <AddGroupBalanceModalContent
+          postLedgerItem={postLedgerItem}
+          opLoading={ledgerOpLoading}
+        />
+      ),
+    });
 
   const [editing, setEditing] = useState(false);
 
@@ -128,12 +193,16 @@ export const BillingGroupPage = () => {
     userShop.accountType === "ADMIN" ||
     userShop.accountType === "OPERATOR" ||
     billingGroup?.userRole === "ADMIN";
+  const userIsStaff =
+    user.admin ||
+    userShop.accountType === "ADMIN" ||
+    userShop.accountType === "OPERATOR";
 
   useEffect(() => {
     update();
   }, [opLoadingInvitations, billingGroupInvitations?.length]);
 
-  if (loading || loadingInvitations)
+  if (loading || loadingInvitations || ledgerLoading)
     return (
       <Page
         sidenavItems={shopSidenavItems(
@@ -162,6 +231,7 @@ export const BillingGroupPage = () => {
     >
       {ModalElement}
       {SelectUserModalElement}
+      {AddLedgerItemModal}
       <Util.Row justify="between" align="center">
         <h1>{billingGroup.title}</h1>
         <Util.Row gap={1}>
@@ -226,6 +296,24 @@ export const BillingGroupPage = () => {
         </p>
       )}
       <Util.Spacer size={1} />
+      {!editing && (
+        <>
+          <Util.Row justify="between" align="center">
+            <h2>Ledger</h2>
+            {userIsStaff && (
+              <Button onClick={addLedgerItemModal}>Post ledger item</Button>
+            )}
+          </Util.Row>
+          <Util.Spacer size={1} />
+          <p>
+            Current balance:
+            <Price value={balance} icon size={24} />
+          </p>
+          <Util.Spacer size={1} />
+          <LedgerTable data={ledger} shopId={shopId} />
+          <Util.Spacer size={2} />
+        </>
+      )}
       {userIsPrivileged && !editing && (
         <>
           <Util.Row justify="between" align="center">

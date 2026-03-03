@@ -2,6 +2,27 @@ import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { LogType } from "#prisma-client";
 
+const getGroupBalanceMap = async (shopId, groupIds) => {
+  if (!groupIds.length) return {};
+
+  const rows = await prisma.ledgerItem.groupBy({
+    by: ["billingGroupId"],
+    where: {
+      shopId,
+      billingGroupId: {
+        in: groupIds,
+      },
+    },
+    _sum: {
+      value: true,
+    },
+  });
+
+  return Object.fromEntries(
+    rows.map((row) => [row.billingGroupId, row._sum.value || 0])
+  );
+};
+
 export const post = [
   verifyAuth,
   async (req, res) => {
@@ -153,12 +174,17 @@ export const post = [
           },
         },
       });
+      const groupBalanceMap = await getGroupBalanceMap(
+        shopId,
+        groups.map((g) => g.id)
+      );
 
       // Process each group to find the admin user and rename _count.users to userCount
       const groupsWithUserCountAndAdmin = groups.map((group) => {
         const adminUsers = group.users.filter((user) => user.role === "ADMIN");
         return {
           ...group,
+          balance: groupBalanceMap[group.id] || 0,
           userCount: group._count.users,
           adminUsers: adminUsers.map((user) => ({
             name: user.user.firstName + " " + user.user.lastName,
@@ -246,6 +272,10 @@ export const get = [
           },
         },
       });
+      const groupBalanceMap = await getGroupBalanceMap(
+        shopId,
+        groups.map((g) => g.id)
+      );
 
       // Process each group to find the admin user and rename _count.users to userCount
       const groupsWithUserCountAndAdmin = groups.map((group) => {
@@ -262,6 +292,7 @@ export const get = [
 
         return {
           ...group,
+          balance: groupBalanceMap[group.id] || 0,
           userCount: group._count.users,
           adminUsers: adminUsers.map((user) => ({
             name: user.user.firstName + " " + user.user.lastName,

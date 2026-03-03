@@ -4,6 +4,48 @@ import { verifyAuth } from "#verifyAuth";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
 // import client from "#postmark";
 
+const getUserBalanceMap = async (shopId, userIds) => {
+  if (!userIds.length) return {};
+
+  const rows = await prisma.ledgerItem.groupBy({
+    by: ["userId"],
+    where: {
+      shopId,
+      userId: {
+        in: userIds,
+      },
+    },
+    _sum: {
+      value: true,
+    },
+  });
+
+  return Object.fromEntries(
+    rows.map((row) => [row.userId, row._sum.value || 0]),
+  );
+};
+
+const getGroupBalanceMap = async (shopId, groupIds) => {
+  if (!groupIds.length) return {};
+
+  const rows = await prisma.ledgerItem.groupBy({
+    by: ["billingGroupId"],
+    where: {
+      shopId,
+      billingGroupId: {
+        in: groupIds,
+      },
+    },
+    _sum: {
+      value: true,
+    },
+  });
+
+  return Object.fromEntries(
+    rows.map((row) => [row.billingGroupId, row._sum.value || 0]),
+  );
+};
+
 export const post = [
   verifyAuth,
   async (req, res) => {
@@ -180,12 +222,12 @@ export const post = [
           id: shopId,
         }
       });
-      
+
       const adminsOperators = await prisma.userShop.findMany({
         where: {
           shopId: shopId,
           accountType: {
-            in: ['ADMIN', 'OPERATOR'], 
+            in: ['ADMIN', 'OPERATOR'],
           },
         },
         include: {
@@ -205,12 +247,12 @@ export const post = [
       if (!emails.includes(req.user.email)) {
         emails.push(req.user.email);
       }
-      
+
       client.sendEmail({
-        "From": `${process.env.POSTMARK_FROM_EMAIL}`, 
+        "From": `${process.env.POSTMARK_FROM_EMAIL}`,
         "To": `${emails.join(',')}`,
         "Subject": `A Job was Created on Your Shop`,
-        "HtmlBody": `The job ${title} was created on the ${shopName} shop.` , 
+        "HtmlBody": `The job ${title} was created on the ${shopName} shop.` ,
         "TextBody": `The job ${title} was created on the ${shopName} shop.`,
         "MessageStream": "outbound"
       });
@@ -295,6 +337,12 @@ export const get = [
               id: true,
             },
           },
+          group: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
           additionalCosts: {
             include: {
               material: true,
@@ -307,6 +355,20 @@ export const get = [
         // skip: req.query.offset ? parseInt(req.query.offset) : 0,
       });
 
+      const userIds = [
+        ...new Set(
+          jobs.filter((job) => !job.groupId).map((job) => job.user.id),
+        ),
+      ];
+      const groupIds = [
+        ...new Set(jobs.map((job) => job.groupId).filter(Boolean)),
+      ];
+
+      const [userBalanceMap, groupBalanceMap] = await Promise.all([
+        getUserBalanceMap(shopId, userIds),
+        getGroupBalanceMap(shopId, groupIds),
+      ]);
+
       jobs = jobs.map((job) => {
         job.itemsCount = job._count.items;
 
@@ -318,10 +380,10 @@ export const get = [
           job.items.filter((item) => item.status === "WAITING_FOR_PICKUP")
             .length;
         job.progress.inProgressCount = job.items.filter(
-          (item) => item.status === "IN_PROGRESS"
+          (item) => item.status === "IN_PROGRESS",
         ).length;
         job.progress.notStartedCount = job.items.filter(
-          (item) => item.status === "NOT_STARTED"
+          (item) => item.status === "NOT_STARTED",
         ).length;
         job.progress.excludedCount =
           job.items.filter((item) => item.status === "CANCELLED").length +
@@ -334,6 +396,19 @@ export const get = [
         delete job.additionalCosts;
 
         job.user.name = `${job.user.firstName} ${job.user.lastName}`;
+        job.billingAccount = job.groupId
+          ? {
+              type: "GROUP",
+              id: job.groupId,
+              name: job.group?.title || "Billing Group",
+              balance: groupBalanceMap[job.groupId] || 0,
+            }
+          : {
+              type: "USER",
+              id: job.user.id,
+              name: job.user.name,
+              balance: userBalanceMap[job.user.id] || 0,
+            };
 
         delete job._count;
         delete job.items;
