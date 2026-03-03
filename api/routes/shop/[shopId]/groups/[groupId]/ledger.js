@@ -34,7 +34,7 @@ const getBalance = async (shopId, groupId) => {
   return balanceResult._sum.value || 0;
 };
 
-const requireGroupAccess = async (req, res) => {
+const requireGroupAccess = async (req) => {
   const { shopId, groupId } = req.params;
 
   const reqUserShop = await prisma.userShop.findFirst({
