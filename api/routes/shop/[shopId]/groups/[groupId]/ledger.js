@@ -142,13 +142,18 @@ export const post = [
       },
     });
 
-    const balance = existingLedgerItems.reduce((acc, item) => acc + item.value, 0);
+    const balance = existingLedgerItems.reduce(
+      (acc, item) => acc + item.value,
+      0,
+    );
 
     let valueToPost = 0;
     switch (type) {
       case "MANUAL_TOPUP":
         if (balance > value) {
-          return res.status(400).json({ error: "Balance is greater than topup" });
+          return res
+            .status(400)
+            .json({ error: "Balance is greater than topup" });
         }
         if (parseFloat(value) - balance === 0) {
           return res.status(400).json({ error: "Balance is unchanged" });

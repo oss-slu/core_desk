@@ -20,7 +20,9 @@ const getUserBalanceMap = async (shopId, userIds) => {
     },
   });
 
-  return Object.fromEntries(rows.map((row) => [row.userId, row._sum.value || 0]));
+  return Object.fromEntries(
+    rows.map((row) => [row.userId, row._sum.value || 0]),
+  );
 };
 
 const getGroupBalanceMap = async (shopId, groupIds) => {
@@ -40,7 +42,7 @@ const getGroupBalanceMap = async (shopId, groupIds) => {
   });
 
   return Object.fromEntries(
-    rows.map((row) => [row.billingGroupId, row._sum.value || 0])
+    rows.map((row) => [row.billingGroupId, row._sum.value || 0]),
   );
 };
 
@@ -220,12 +222,12 @@ export const post = [
           id: shopId,
         }
       });
-      
+
       const adminsOperators = await prisma.userShop.findMany({
         where: {
           shopId: shopId,
           accountType: {
-            in: ['ADMIN', 'OPERATOR'], 
+            in: ['ADMIN', 'OPERATOR'],
           },
         },
         include: {
@@ -245,12 +247,12 @@ export const post = [
       if (!emails.includes(req.user.email)) {
         emails.push(req.user.email);
       }
-      
+
       client.sendEmail({
-        "From": `${process.env.POSTMARK_FROM_EMAIL}`, 
+        "From": `${process.env.POSTMARK_FROM_EMAIL}`,
         "To": `${emails.join(',')}`,
         "Subject": `A Job was Created on Your Shop`,
-        "HtmlBody": `The job ${title} was created on the ${shopName} shop.` , 
+        "HtmlBody": `The job ${title} was created on the ${shopName} shop.` ,
         "TextBody": `The job ${title} was created on the ${shopName} shop.`,
         "MessageStream": "outbound"
       });
@@ -355,10 +357,12 @@ export const get = [
 
       const userIds = [
         ...new Set(
-          jobs.filter((job) => !job.groupId).map((job) => job.user.id)
+          jobs.filter((job) => !job.groupId).map((job) => job.user.id),
         ),
       ];
-      const groupIds = [...new Set(jobs.map((job) => job.groupId).filter(Boolean))];
+      const groupIds = [
+        ...new Set(jobs.map((job) => job.groupId).filter(Boolean)),
+      ];
 
       const [userBalanceMap, groupBalanceMap] = await Promise.all([
         getUserBalanceMap(shopId, userIds),
@@ -376,10 +380,10 @@ export const get = [
           job.items.filter((item) => item.status === "WAITING_FOR_PICKUP")
             .length;
         job.progress.inProgressCount = job.items.filter(
-          (item) => item.status === "IN_PROGRESS"
+          (item) => item.status === "IN_PROGRESS",
         ).length;
         job.progress.notStartedCount = job.items.filter(
-          (item) => item.status === "NOT_STARTED"
+          (item) => item.status === "NOT_STARTED",
         ).length;
         job.progress.excludedCount =
           job.items.filter((item) => item.status === "CANCELLED").length +
