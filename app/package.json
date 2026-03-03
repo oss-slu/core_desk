@@ -68,6 +68,7 @@
     "#notFound": "./src/components/404/404",
     "#materialPage": "./src/routes/shops/[shopId]/resources/type/resourceTypeId/materials/[materialId]",
     "#billing": "./src/routes/shops/[shopId]/billing",
+    "#shopLedgerPage": "./src/routes/shops/[shopId]/ledger",
     "#jobCostingPage": "./src/routes/shops/[shopId]/jobs/[jobId]/costing",
     "#shopUsersPage": "./src/routes/shops/[shopId]/users",
     "#shopUserPage": "./src/routes/shops/[shopId]/users/[userId]",
