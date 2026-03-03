@@ -19,7 +19,9 @@ ENV PUPPETEER_SKIP_DOWNLOAD=true \
 
 # Build-time args (optional)
 ARG SENTRY_AUTH_TOKEN
+ARG DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+ENV DATABASE_URL=${DATABASE_URL}
 
 # --- Build frontend ---
 WORKDIR /app
@@ -40,4 +42,4 @@ RUN chmod +x /api-entrypoint.sh
 
 EXPOSE 3030
 ENTRYPOINT ["/api-entrypoint.sh"]
-CMD ["node", "/api/index.js"]
+CMD ["npm", "run", "start"]
