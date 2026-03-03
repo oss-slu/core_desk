@@ -394,20 +394,15 @@ if (process.env.JACK == "true") {
       if (t) {
         const token = t[0];
         
-        const redirectTo =
-          (relayState ? relayState : `${process.env.BASE_URL}/shops/${shopId}/jobs`) +
-          "?token" +
-          "=" +
-          token;
-
-        res.redirect(redirectTo);
+        const destination = `${process.env.BASE_URL}/shops/${shopId}/jobs?token=${encodeURIComponent(token)}#`;
+        
+        res.redirect(destination);
       } else {
         res.status(500).send("SSO Success, but no token found in HTML output.");
         console.log(`${res.status(500)}: SSO Success, but no token found in HTML output.`);
-        // add sentry notif
       }
     } catch (error) {
-      res.status(500).send(error);
+      res.status(500).send(error);  
     }
   });
 
