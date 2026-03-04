@@ -76,5 +76,30 @@ describe("/shop/[shopId]/job", () => {
             expect(res.body.error).toBe("Unauthorized")
             expect(createLogsSpy).not.toHaveBeenCalled();
         });
+
+        it("defaults due date to two weeks out when dueDate is not provided", async () => {
+            prisma.userShop.findFirst = findFirstSpy.mockResolvedValue({
+                userId: "example-id",
+                shopId: tc.shop.id,
+                active: true,
+            });
+
+            const expectedDueDate = new Date();
+            expectedDueDate.setDate(expectedDueDate.getDate() + 14);
+            expectedDueDate.setHours(0, 0, 0, 0);
+
+            const res = await request(app)
+                .post(`/api/shop/${tc.shop.id}/job`)
+                .set(...(await gt({ ga: true })))
+                .send({
+                    title: "Job with default due date",
+                    description: "Missing due date should be defaulted",
+                });
+
+            expect(res.status).toBe(200);
+            expect(new Date(res.body.job.dueDate).toISOString()).toBe(
+                expectedDueDate.toISOString(),
+            );
+        });
     })
 })
