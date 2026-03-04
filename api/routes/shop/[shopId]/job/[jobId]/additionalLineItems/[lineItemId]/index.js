@@ -1,6 +1,40 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 
+const ADDITIONAL_LINE_ITEM_INCLUDE = {
+  resourceType: {
+    select: {
+      title: true,
+      id: true,
+    },
+  },
+  resource: {
+    select: {
+      title: true,
+      id: true,
+      costPerTime: true,
+      costPerProcessingTime: true,
+      costPerUnit: true,
+    },
+  },
+  material: {
+    select: {
+      title: true,
+      id: true,
+      costPerUnit: true,
+      unitDescriptor: true,
+    },
+  },
+  secondaryMaterial: {
+    select: {
+      title: true,
+      id: true,
+      costPerUnit: true,
+      unitDescriptor: true,
+    },
+  },
+};
+
 export const get = [
   verifyAuth,
   async (req, res) => {
@@ -45,32 +79,7 @@ export const get = [
           id: req.params.lineItemId,
           active: true,
         },
-        include: {
-          resourceType: {
-            select: {
-              title: true,
-              id: true,
-            },
-          },
-          resource: {
-            select: {
-              title: true,
-              id: true,
-            },
-          },
-          material: {
-            select: {
-              title: true,
-              id: true,
-            },
-          },
-          secondaryMaterial: {
-            select: {
-              title: true,
-              id: true,
-            },
-          },
-        },
+        include: ADDITIONAL_LINE_ITEM_INCLUDE,
       });
 
       return res.json({ lineItem });
@@ -135,32 +144,7 @@ export const put = [
           id: req.params.lineItemId,
           active: true,
         },
-        include: {
-          resourceType: {
-            select: {
-              title: true,
-              id: true,
-            },
-          },
-          resource: {
-            select: {
-              title: true,
-              id: true,
-            },
-          },
-          material: {
-            select: {
-              title: true,
-              id: true,
-            },
-          },
-          secondaryMaterial: {
-            select: {
-              title: true,
-              id: true,
-            }
-          }
-        },
+        include: ADDITIONAL_LINE_ITEM_INCLUDE,
       });
 
       if (!lineItem) {
@@ -181,7 +165,14 @@ export const put = [
         where: {
           id: lineItem.id,
         },
-        data: req.body,
+        data: {
+          ...req.body,
+          amount:
+            req.body.amount === null || req.body.amount === undefined
+              ? null
+              : Math.max(Number(req.body.amount) || 0, 0),
+        },
+        include: ADDITIONAL_LINE_ITEM_INCLUDE,
       });
 
       return res.json({ lineItem: updatedLineItem });
