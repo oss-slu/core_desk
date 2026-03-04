@@ -187,7 +187,7 @@ const buildInvoiceRows = (job) => {
   return rows;
 };
 
-const drawInvoicePdf = async ({ job, shop, customer, rows, total }) =>
+const drawInvoicePdf = async ({ job, shop, customer, rows, total, draft }) =>
   new Promise((resolve, reject) => {
     const doc = new PDFDocument({ margin: 50, size: "LETTER" });
     const chunks = [];
@@ -210,6 +210,19 @@ const drawInvoicePdf = async ({ job, shop, customer, rows, total }) =>
     const colQty = colItem + itemWidth;
     const colPrice = colQty + qtyWidth;
     const colSubtotal = colPrice + priceWidth;
+
+    if (draft) {
+      doc
+        .fillColor("red")
+        .font("Helvetica-Bold")
+        .fontSize(12)
+        .text("DRAFT INVOICE", left, doc.y, {
+          width: pageWidth,
+          align: "center",
+        });
+      doc.moveDown(0.3);
+      doc.fillColor("black");
+    }
 
     doc.fontSize(20).font("Helvetica-Bold").text("INVOICE");
     doc.moveDown(0.5);
@@ -295,7 +308,12 @@ const drawInvoicePdf = async ({ job, shop, customer, rows, total }) =>
     doc.end();
   });
 
-export const generateInvoice = async (data, userId, shopId) => {
+export const generateInvoice = async (
+  data,
+  userId,
+  shopId,
+  { draft = false } = {}
+) => {
   const job = await prisma.job.findFirst({
     where: {
       id: data.id,
@@ -372,6 +390,7 @@ export const generateInvoice = async (data, userId, shopId) => {
     },
     rows,
     total,
+    draft,
   });
 
   const uploaded = await uploadFile({
