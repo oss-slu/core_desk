@@ -40,7 +40,7 @@ export const BillingGroupPortal = () => {
             </p>
             <Typography.H2>Pick a job</Typography.H2>
             <p>
-              SLU Open Project uses jobs to organize work. You should pick the
+              CoreDesk uses jobs to organize work. You should pick the
               job that is most relevant to your request or as instructed by your
               group administrator.
             </p>
