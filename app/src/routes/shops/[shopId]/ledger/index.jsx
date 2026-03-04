@@ -48,7 +48,12 @@ export const ShopLedgerPage = () => {
     user?.admin ||
     userShop?.accountType === "ADMIN" ||
     userShop?.accountType === "OPERATOR";
-  const { rows: debtRows, loading: ledgerLoading } = useShopLedger(shopId, {
+  const {
+    rows: debtRows,
+    loading: ledgerLoading,
+    opLoading,
+    rectify,
+  } = useShopLedger(shopId, {
     enabled: userIsStaff,
   });
 
@@ -113,6 +118,31 @@ export const ShopLedgerPage = () => {
               accessor: "value",
               render: (value) => <Price value={value} icon />,
               sortable: true,
+            },
+            {
+              label: "Actions",
+              accessor: "targetId",
+              render: (_, context) => (
+                <Button
+                  size="sm"
+                  loading={opLoading}
+                  onClick={async () => {
+                    if (
+                      !window.confirm(
+                        `Mark ${context.payer} as paid/rectified?`
+                      )
+                    ) {
+                      return;
+                    }
+                    await rectify({
+                      targetType: context.targetType,
+                      targetId: context.targetId,
+                    });
+                  }}
+                >
+                  Mark as paid/rectified
+                </Button>
+              ),
             },
           ]}
           data={debtRows}

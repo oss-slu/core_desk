@@ -132,6 +132,8 @@ export const get = [
           const value = toCents(debt + purchased);
 
           return {
+            targetType: "USER",
+            targetId: row.userId,
             payer: `${row.user.firstName} ${row.user.lastName}`.trim(),
             value,
           };
@@ -146,6 +148,8 @@ export const get = [
           const value = toCents(debt + purchased);
 
           return {
+            targetType: "GROUP",
+            targetId: group.id,
             payer: group.title,
             value,
           };
