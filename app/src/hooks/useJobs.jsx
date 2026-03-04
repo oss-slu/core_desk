@@ -174,6 +174,15 @@ const CreateJobModalContent = ({
   );
 };
 
+const CreateTDXImportModalContent = ({
+    onSubmit
+  }) => {
+  const { TDXTicketIdInput } = useTDXTickets();
+  return (
+    <TDXTicketIdInput onSubmit={onSubmit}/>
+  );
+};
+
 export const useJobs = (shopId) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -181,8 +190,6 @@ export const useJobs = (shopId) => {
   const [meta, setMeta] = useState(null);
   const [opLoading, setOpLoading] = useState(false);
   const [microLoading, setMicroLoading] = useState(false);
-
-  const { TDXTicketIdInput } = useTDXTickets();
 
   const _createJob = async (
     title,
@@ -224,6 +231,11 @@ export const useJobs = (shopId) => {
   const { modal, ModalElement } = useModal({
     title: "Create a new Job",
     text: <CreateJobModalContent onSubmit={_createJob} />,
+  });
+
+  const { modal: tdxModal, ModalElement: TDXModalElement } = useModal({
+    title: "Import from TDNext",
+    text: <CreateTDXImportModalContent onSubmit={_createJob}/>
   });
 
   const CreateSimpleSubPage = () => {
@@ -312,14 +324,6 @@ export const useJobs = (shopId) => {
     }
   };
 
-  const CreateTDXJob = () => {
-    return (
-      <div>
-        <TDXTicketIdInput onSubmit={_createJob}/>
-      </div>
-    );
-  };
-
   const createJob = async (options = {}) => {
     const { billingGroupId: defaultBillingGroupId, forceBillingGroupId } =
       options;
@@ -334,6 +338,15 @@ export const useJobs = (shopId) => {
         />
       ),
     });
+  };
+
+  const importTDXJob = async () => {
+    tdxModal({
+      title: "Import ticket from TDNext",
+      text: (
+        <CreateTDXImportModalContent onSubmit={_createJob} />
+      )
+    })
   };
 
   const updateJob = async (jobId, newJob) => {
@@ -382,8 +395,9 @@ export const useJobs = (shopId) => {
     refetch: fetchJobs,
     CreateSimpleSubPage,
     ModalElement,
-    CreateTDXJob,
+    TDXModalElement,
     createJob,
+    importTDXJob,
     opLoading,
     updateJob,
   };

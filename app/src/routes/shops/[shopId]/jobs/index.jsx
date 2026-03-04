@@ -98,8 +98,9 @@ export const Jobs = () => {
     loading: jobsLoading,
     ModalElement,
     CreateSimpleSubPage,
-    CreateTDXJob,
+    TDXModalElement,
     createJob,
+    importTDXJob,
   } = useJobs(shopId);
   const { user } = useUser(activeUser.id);
 
@@ -366,7 +367,7 @@ export const Jobs = () => {
             items={[
               {type: "item", text: <Button onClick={createJob}>Create Job</Button>},
               {type: "divider"},
-              {type: "item", text: <CreateTDXJob />}
+              {type: "item", text: <Button onClick={importTDXJob}>Import from TDNext</Button>}
             ]}
           >
           </Dropdown>
