@@ -22,25 +22,25 @@ export const useTDXTickets = () => {
         const loginWindow = window.open(relayUrl, "OktaLogin", "width=500,height=600");
 
         const timer = setInterval(() => {
-        try {
-            if (loginWindow.location.href.includes(window.location.hostname)) {
-            const urlParams = new URLSearchParams(loginWindow.location.search);
-            const token = urlParams.get('token');
+            try {
+                if (loginWindow.location.href.includes(window.location.hostname)) {
+                    const urlParams = new URLSearchParams(loginWindow.location.search);
+                    const token = urlParams.get('token');
 
-            if (token) {
-                localStorage.setItem('bearer_token', token);
-                setAuth({ token: token });
-                
-                loginWindow.close(); // This will work now because domains match!
-                clearInterval(timer);
-                setLoading(false);
-                toast.success("TDX Authenticated");
+                    if (token) {
+                        localStorage.setItem('bearer_token', token);
+                        setAuth({ token: token });
+                        
+                        loginWindow.close();
+                        clearInterval(timer);
+                        setLoading(false);
+                        toast.success("TDX Authenticated");
+                    }
+                }
+            } catch (e) {
+                toast.error(e);
+                setError(e);
             }
-            }
-        } catch (e) {
-            toast.error(e);
-            setError(e);
-        }
         }, 1000);
     };
 
@@ -51,10 +51,6 @@ export const useTDXTickets = () => {
             toast.error("Please enter a Ticket ID");
             return null;
         }
-
-        setLoading(true);
-        setError(null);
-        toast.loading("Fetching ticket from TDX...");
         
         try {
             // Pointing to your proxy endpoint
@@ -115,7 +111,7 @@ export const useTDXTickets = () => {
                 <div className="d-flex align-items-end gap-2 border-b-5 border-b-black">
                     <Input
                         value={ticketId}
-                        onChange={(val) => setTicketId(val)}
+                        onChange={(e) => setTicketId(e)}
                         label="TDNext Ticket ID"
                         placeholder="Ticket ID"
                         className="mt-0"
@@ -124,6 +120,11 @@ export const useTDXTickets = () => {
                         loading={loading}
                         onClick={async () => {
                             const data = await fetchTicket(ticketId);
+                            toast.promise(data, {
+                                loading: "Fetching ticket from TDX...",
+                                success: "Successfully imported ticket.",
+                                error: "Error when fetching",
+                            });
                             if (data && onSubmit) {
                                 // Call onSubmit with positional arguments to match _createJob
                                 onSubmit(
