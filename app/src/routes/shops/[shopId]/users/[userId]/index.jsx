@@ -43,7 +43,7 @@ const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
         type="number"
         label="Amount"
         value={value}
-        onChange={(e) => setValue(e.target.value)}
+        onChange={(v) => setValue(v)}
         placeholder="Select a topup amount"
         prependedText="$"
       />

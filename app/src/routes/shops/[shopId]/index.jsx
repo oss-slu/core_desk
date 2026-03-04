@@ -20,6 +20,9 @@ export const shopSidenavItems = (
   accountType,
   isInDebt = true
 ) => {
+  const userIsStaff =
+    accountType === "ADMIN" || accountType === "OPERATOR" || isGlobalAdmin;
+
   const items = [
     {
       type: "item",
@@ -73,6 +76,16 @@ export const shopSidenavItems = (
   if (accountType !== "CUSTOMER" || isGlobalAdmin) {
     items.push({
       type: "divider",
+    });
+  }
+
+  if (userIsStaff) {
+    items.push({
+      type: "item",
+      href: `/shops/${shopId}/ledger`,
+      text: "Ledger",
+      active: activeText === "Ledger",
+      icon: <Icon i="report-money" size={18} />,
     });
   }
 
