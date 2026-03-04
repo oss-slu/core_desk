@@ -36,6 +36,13 @@ const JOB_INCLUDE = {
           title: true,
         },
       },
+      resourceType: {
+        select: {
+          id: true,
+          title: true,
+          costingMode: true,
+        },
+      },
       user: {
         select: {
           firstName: true,
@@ -71,6 +78,13 @@ const JOB_INCLUDE = {
       secondaryMaterial: {
         select: {
           costPerUnit: true,
+        },
+      },
+      resourceType: {
+        select: {
+          id: true,
+          title: true,
+          costingMode: true,
         },
       },
     },
@@ -343,6 +357,7 @@ export const put = [
               material: true,
               secondaryMaterial: true,
               resource: true,
+              resourceType: true,
             },
           },
           items: {
@@ -350,6 +365,7 @@ export const put = [
               material: true,
               secondaryMaterial: true,
               resource: true,
+              resourceType: true,
             },
           },
         },

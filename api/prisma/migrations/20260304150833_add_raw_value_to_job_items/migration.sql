@@ -1,0 +1,11 @@
+-- CreateEnum
+CREATE TYPE "CostingMode" AS ENUM ('CALCULATE_WITH_RESOURCE_AND_MATERIAL', 'RAW_VALUE_ENTRY');
+
+-- AlterTable
+ALTER TABLE "AdditionalCostLineItem" ADD COLUMN     "rawValue" DOUBLE PRECISION;
+
+-- AlterTable
+ALTER TABLE "JobItem" ADD COLUMN     "rawValue" DOUBLE PRECISION;
+
+-- AlterTable
+ALTER TABLE "ResourceType" ADD COLUMN     "costingMode" "CostingMode" NOT NULL DEFAULT 'CALCULATE_WITH_RESOURCE_AND_MATERIAL';

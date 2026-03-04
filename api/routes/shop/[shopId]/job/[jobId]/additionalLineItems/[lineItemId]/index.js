@@ -1,40 +1,6 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 
-const ADDITIONAL_LINE_ITEM_INCLUDE = {
-  resourceType: {
-    select: {
-      title: true,
-      id: true,
-    },
-  },
-  resource: {
-    select: {
-      title: true,
-      id: true,
-      costPerTime: true,
-      costPerProcessingTime: true,
-      costPerUnit: true,
-    },
-  },
-  material: {
-    select: {
-      title: true,
-      id: true,
-      costPerUnit: true,
-      unitDescriptor: true,
-    },
-  },
-  secondaryMaterial: {
-    select: {
-      title: true,
-      id: true,
-      costPerUnit: true,
-      unitDescriptor: true,
-    },
-  },
-};
-
 export const get = [
   verifyAuth,
   async (req, res) => {
@@ -79,7 +45,33 @@ export const get = [
           id: req.params.lineItemId,
           active: true,
         },
-        include: ADDITIONAL_LINE_ITEM_INCLUDE,
+        include: {
+          resourceType: {
+            select: {
+              title: true,
+              id: true,
+              costingMode: true,
+            },
+          },
+          resource: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          material: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          secondaryMaterial: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+        },
       });
 
       return res.json({ lineItem });
@@ -144,7 +136,33 @@ export const put = [
           id: req.params.lineItemId,
           active: true,
         },
-        include: ADDITIONAL_LINE_ITEM_INCLUDE,
+        include: {
+          resourceType: {
+            select: {
+              title: true,
+              id: true,
+              costingMode: true,
+            },
+          },
+          resource: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          material: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          secondaryMaterial: {
+            select: {
+              title: true,
+              id: true,
+            }
+          }
+        },
       });
 
       if (!lineItem) {
@@ -161,18 +179,54 @@ export const put = [
       delete req.body.material;
       delete req.body.secondaryMaterial;
 
+      const updatedData = { ...req.body };
+      if (Object.hasOwn(updatedData, "amount")) {
+        if (
+          updatedData.amount === null ||
+          updatedData.amount === undefined ||
+          updatedData.amount === ""
+        ) {
+          updatedData.amount = null;
+        } else {
+          const parsedAmount = Number(updatedData.amount);
+          updatedData.amount = Number.isFinite(parsedAmount)
+            ? Math.max(parsedAmount, 0)
+            : 0;
+        }
+      }
+
       const updatedLineItem = await prisma.additionalCostLineItem.update({
         where: {
           id: lineItem.id,
         },
-        data: {
-          ...req.body,
-          amount:
-            req.body.amount === null || req.body.amount === undefined
-              ? null
-              : Math.max(Number(req.body.amount) || 0, 0),
+        data: updatedData,
+        include: {
+          resourceType: {
+            select: {
+              title: true,
+              id: true,
+              costingMode: true,
+            },
+          },
+          resource: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          material: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          secondaryMaterial: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
         },
-        include: ADDITIONAL_LINE_ITEM_INCLUDE,
       });
 
       return res.json({ lineItem: updatedLineItem });

@@ -20,6 +20,7 @@ export const get = [
             material: true,
             secondaryMaterial: true,
             resource: true,
+            resourceType: true,
           },
         },
         items: {
@@ -27,6 +28,7 @@ export const get = [
             material: true,
             secondaryMaterial: true,
             resource: true,
+            resourceType: true,
           },
         },
       },

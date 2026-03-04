@@ -136,7 +136,11 @@ const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
   const {
     editModal: editResourceType,
     editModalElement: EditResourceTypeModalElement,
-  } = useEditResourceTypeModal(resourceType.id, resourceType.title);
+  } = useEditResourceTypeModal(
+    resourceType.id,
+    resourceType.title,
+    resourceType.costingMode
+  );
 
   return (
     <div>

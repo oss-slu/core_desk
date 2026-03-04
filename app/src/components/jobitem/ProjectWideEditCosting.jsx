@@ -1,45 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Util, Typography, Switch, Card, Badge, Input } from "tabler-react-2";
+import { QuantityInput, TimeInput } from "./EditCosting";
 import { Button } from "#button";
+import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
+import { ResourcePicker } from "../resourcePicker/ResourcePicker";
+import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import {
   useAdditionalLineItem,
   useAdditionalLineItems,
   useAuth,
+  useMaterial,
+  useResource,
+  useResourceTypes,
   useShop,
 } from "#hooks";
 import { useParams } from "react-router-dom";
+import { Spinner } from "#spinner";
 import { Icon } from "#icon";
 import { Price } from "#renderPrice";
 const { H2, H3 } = Typography;
 import styles from "./jobItem.module.css";
-
-const calculateLegacyTotalCost = (lineItem) => {
-  if (
-    !lineItem?.resource ||
-    !lineItem?.material ||
-    !lineItem?.secondaryMaterial
-  ) {
-    return 0;
-  }
-
-  return (
-    (lineItem.timeQty || 0) * (lineItem.resource.costPerTime || 0) +
-    (lineItem.processingTimeQty || 0) *
-      (lineItem.resource.costPerProcessingTime || 0) +
-    (lineItem.unitQty || 0) * (lineItem.resource.costPerUnit || 0) +
-    (lineItem.materialQty || 0) * (lineItem.material.costPerUnit || 0) +
-    (lineItem.secondaryMaterialQty || 0) *
-      (lineItem.secondaryMaterial.costPerUnit || 0)
-  );
-};
-
-const getLineItemAmount = (lineItem) => {
-  if (typeof lineItem?.amount === "number") {
-    return lineItem.amount;
-  }
-
-  return calculateLegacyTotalCost(lineItem);
-};
 
 export const ProjectWideEditCosting = ({
   job: initialJob,
@@ -54,6 +34,7 @@ export const ProjectWideEditCosting = ({
     refetch: fetchLineItems,
     opLoading: createOpLoading,
   } = useAdditionalLineItems(initialJob.shopId, initialJob.id);
+  const { resourceTypes } = useResourceTypes(initialJob.shopId);
 
   useEffect(() => {
     setJob(initialJob);
@@ -110,6 +91,7 @@ export const ProjectWideEditCosting = ({
                   refetchLineItems={fetchLineItems}
                   jobFinalized={job.finalized}
                   userIsPrivileged={userIsPrivileged}
+                  resourceTypes={resourceTypes}
                 />
                 <Util.Spacer size={1} />
               </React.Fragment>
@@ -141,49 +123,77 @@ const CostCard = ({
   jobFinalized,
   userIsPrivileged,
   refetchJob,
+  resourceTypes,
 }) => {
   const { shopId, jobId } = useParams();
   const { lineItem, updateLineItem, deleteLineItem, opLoading, ConfirmModal } =
     useAdditionalLineItem(shopId, jobId, lineItemId, jobFinalized);
   const [localLineItem, setLocalLineItem] = useState(lineItem);
 
-  useEffect(() => {
-    if (!lineItem) {
-      return;
-    }
+  const selectedResourceType =
+    resourceTypes?.find((_) => _.id === localLineItem?.resourceTypeId) ||
+    localLineItem?.resourceType;
 
-    setLocalLineItem(lineItem);
+  const isRawMode = selectedResourceType?.costingMode === "RAW_VALUE_ENTRY";
+
+  const { loading: materialLoading, material } = useMaterial(
+    shopId,
+    localLineItem?.resourceTypeId,
+    localLineItem?.materialId
+  );
+
+  const { loading: secondaryMaterialLoading, material: secondaryMaterial } =
+    useMaterial(
+      shopId,
+      localLineItem?.resourceTypeId,
+      localLineItem?.secondaryMaterialId
+    );
+
+  const { loading: resourceLoading, resource } = useResource(
+    shopId,
+    localLineItem?.resourceId
+  );
+
+  const changed = JSON.stringify(localLineItem) !== JSON.stringify(lineItem);
+
+  useEffect(() => {
+    if (!lineItem) return;
+
+    setLocalLineItem({
+      ...lineItem,
+      secondaryMaterialQty: lineItem.secondaryMaterialQty ?? 0,
+      rawValue: lineItem.rawValue ?? 0,
+    });
   }, [lineItem]);
 
   if (!localLineItem) return null;
 
-  const amount = getLineItemAmount(localLineItem);
-  const usesLegacyBuilder =
-    typeof localLineItem.amount !== "number" &&
-    (localLineItem.resourceTypeId ||
-      localLineItem.resourceId ||
-      localLineItem.materialId ||
-      localLineItem.secondaryMaterialId);
+  const calculateTotalCost = () => {
+    if (isRawMode) {
+      return localLineItem.rawValue || 0;
+    }
 
-  const changed = JSON.stringify(localLineItem) !== JSON.stringify(lineItem);
+    const {
+      timeQty,
+      processingTimeQty,
+      unitQty,
+      materialQty,
+      secondaryMaterialQty,
+    } = localLineItem;
+    return (
+      (timeQty * resource?.costPerTime || 0) +
+      (processingTimeQty * resource?.costPerProcessingTime || 0) +
+      (unitQty * resource?.costPerUnit || 0) +
+      (materialQty * material?.costPerUnit || 0) +
+      (secondaryMaterialQty * secondaryMaterial?.costPerUnit || 0)
+    );
+  };
 
   const handleSave = async () => {
-    const normalizedAmount = Math.max(Number(localLineItem.amount) || 0, 0);
-
-    await updateLineItem({
-      amount: normalizedAmount,
-      resourceTypeId: null,
-      resourceId: null,
-      materialId: null,
-      secondaryMaterialId: null,
-      timeQty: null,
-      processingTimeQty: null,
-      unitQty: null,
-      materialQty: null,
-      secondaryMaterialQty: null,
-    });
-
-    refetchJob(false);
+    const success = await updateLineItem(localLineItem);
+    if (success) {
+      refetchJob(false);
+    }
   };
 
   return (
@@ -191,35 +201,113 @@ const CostCard = ({
       {ConfirmModal}
       <Util.Col gap={1}>
         <Util.Row gap={1} align="start">
-          <Util.Col gap={0.5}>
-            <H3 style={{ marginBottom: 0 }}>Additional Cost</H3>
-            <label className="form-label mb-0">Amount to add to total</label>
+          <Util.Col gap={1}>
             {userIsPrivileged ? (
-              <Input
-                noMargin
-                value={localLineItem.amount ?? amount}
+              <ResourceTypePicker
+                value={localLineItem.resourceTypeId}
                 onChange={(value) => {
-                  const parsed = Number.parseFloat(value);
+                  const nextResourceType =
+                    resourceTypes?.find((_) => _.id === value) || null;
                   setLocalLineItem({
                     ...localLineItem,
-                    amount: Number.isNaN(parsed) ? 0 : Math.max(parsed, 0),
+                    resourceTypeId: value,
+                    resourceType: nextResourceType
+                      ? {
+                          id: nextResourceType.id,
+                          title: nextResourceType.title,
+                          costingMode: nextResourceType.costingMode,
+                        }
+                      : null,
+                    resourceId: null,
+                    materialId: null,
+                    secondaryMaterialId: null,
                   });
                 }}
-                type="number"
-                min={0}
-                step={0.01}
-                style={{ minWidth: 180, maxWidth: 220 }}
-                icon={<Icon i="currency-dollar" />}
+                loading={opLoading}
               />
             ) : (
-              <Price value={amount} icon />
+              <>
+                <span className="form-label mb-0">Resource Type</span>
+                <span>
+                  <Badge soft>{selectedResourceType?.title}</Badge>
+                </span>
+              </>
             )}
-            {usesLegacyBuilder && (
-              <Badge color="yellow" soft>
-                <Icon i="alert-triangle" />
-                Legacy additional cost detected. Saving will convert it to a
-                direct dollar amount.
-              </Badge>
+
+            {localLineItem.resourceTypeId ? (
+              isRawMode ? (
+                <span>
+                  <Badge color="blue" soft>
+                    <Icon i="currency-dollar" />
+                    Costing mode: Raw value entry
+                  </Badge>
+                </span>
+              ) : (
+                <Util.Row gap={1}>
+                  {userIsPrivileged ? (
+                    <ResourcePicker
+                      value={localLineItem.resourceId}
+                      resourceTypeId={localLineItem.resourceTypeId}
+                      onChange={(value) =>
+                        setLocalLineItem({ ...localLineItem, resourceId: value })
+                      }
+                      loading={opLoading}
+                    />
+                  ) : (
+                    <Util.Col gap={1}>
+                      <span className="form-label mb-0">Resource</span>
+                      <span>
+                        <Badge soft>{localLineItem.resource?.title}</Badge>
+                      </span>
+                    </Util.Col>
+                  )}
+                  {userIsPrivileged ? (
+                    <MaterialPicker
+                      value={localLineItem.materialId}
+                      resourceTypeId={localLineItem.resourceTypeId}
+                      onChange={(value) =>
+                        setLocalLineItem({ ...localLineItem, materialId: value })
+                      }
+                      loading={opLoading}
+                      materialType={"Primary"}
+                    />
+                  ) : (
+                    <Util.Col gap={1}>
+                      <span className="form-label mb-0">Material</span>
+                      <span>
+                        <Badge soft>{localLineItem.material?.title}</Badge>
+                      </span>
+                    </Util.Col>
+                  )}
+                  {userIsPrivileged ? (
+                    <MaterialPicker
+                      value={localLineItem.secondaryMaterialId}
+                      resourceTypeId={localLineItem.resourceTypeId}
+                      onChange={(value) =>
+                        setLocalLineItem({
+                          ...localLineItem,
+                          secondaryMaterialId: value,
+                        })
+                      }
+                      loading={opLoading}
+                      materialType={"Secondary"}
+                    />
+                  ) : (
+                    <Util.Col gap={1}>
+                      <span className="form-label mb-0">Secondary Material</span>
+                      <span>
+                        <Badge soft>
+                          {localLineItem.secondaryMaterial?.title}
+                        </Badge>
+                      </span>
+                    </Util.Col>
+                  )}
+                </Util.Row>
+              )
+            ) : (
+              <i style={{ alignSelf: "center" }}>
+                Select a resource type to continue
+              </i>
             )}
           </Util.Col>
           <div style={{ flex: 1 }} />
@@ -236,29 +324,147 @@ const CostCard = ({
             </Button>
           )}
         </Util.Row>
+        <Util.Col gap={1}>
+          <H3>Line Item Quantities</H3>
+          {isRawMode && localLineItem.resourceTypeId ? (
+            <Util.Col gap={0}>
+              <Util.Col gap={0.5} align="start">
+                <label className="form-label mb-0">Raw value</label>
+                {userIsPrivileged ? (
+                  <Input
+                    value={localLineItem.rawValue || 0}
+                    onChange={(value) => {
+                      const parsedValue = parseFloat(value);
+                      setLocalLineItem({
+                        ...localLineItem,
+                        rawValue:
+                          Number.isNaN(parsedValue) || parsedValue < 0
+                            ? 0
+                            : parsedValue,
+                      });
+                    }}
+                    type="number"
+                    min={0}
+                  />
+                ) : (
+                  <Price value={localLineItem.rawValue || 0} icon />
+                )}
+              </Util.Col>
+              <Util.Spacer size={1} />
+              <Util.Row gap={1} align="center" justify="end">
+                <span className={styles.bottomLine}>
+                  <Util.Row gap={1}>
+                    Total:
+                    <Price value={calculateTotalCost()} icon />
+                  </Util.Row>
+                </span>
+              </Util.Row>
+            </Util.Col>
+          ) : localLineItem.resourceTypeId &&
+            localLineItem.resourceId &&
+            localLineItem.materialId &&
+            localLineItem.secondaryMaterialId ? (
+            <>
+              {materialLoading || secondaryMaterialLoading || resourceLoading ? (
+                <Spinner />
+              ) : !resource || !material || !secondaryMaterial ? (
+                <span>
+                  <Badge color="danger" soft>
+                    <Icon i="coin-off" />
+                    Costing unavailable without material, secondary material and
+                    resource
+                  </Badge>
+                </span>
+              ) : (
+                <Util.Col gap={0}>
+                  <TimeInput
+                    label="Resource Time (hr:mm)"
+                    timeQty={localLineItem.timeQty || 0}
+                    costPerTime={resource.costPerTime || 0}
+                    onChange={(value) =>
+                      setLocalLineItem({ ...localLineItem, timeQty: value })
+                    }
+                    showInput={userIsPrivileged}
+                  />
+                  <TimeInput
+                    label="Processing Time (hr:mm)"
+                    timeQty={localLineItem.processingTimeQty || 0}
+                    costPerTime={resource.costPerProcessingTime || 0}
+                    onChange={(value) =>
+                      setLocalLineItem({
+                        ...localLineItem,
+                        processingTimeQty: value,
+                      })
+                    }
+                    showInput={userIsPrivileged}
+                  />
+                  <QuantityInput
+                    label="Unit runs"
+                    quantity={localLineItem.unitQty || 0}
+                    costPerUnit={resource.costPerUnit || 0}
+                    icon={<Icon i="refresh" />}
+                    onChange={(value) =>
+                      setLocalLineItem({ ...localLineItem, unitQty: value })
+                    }
+                    showInput={userIsPrivileged}
+                  />
+                  <QuantityInput
+                    label={`Material quantity in ${material.unitDescriptor}s`}
+                    quantity={localLineItem.materialQty || 0}
+                    costPerUnit={material.costPerUnit || 0}
+                    icon={<Icon i="weight" />}
+                    onChange={(value) =>
+                      setLocalLineItem({ ...localLineItem, materialQty: value })
+                    }
+                    showInput={userIsPrivileged}
+                  />
+                  <QuantityInput
+                    label={`Secondary material quantity in ${secondaryMaterial.unitDescriptor}s`}
+                    quantity={localLineItem.secondaryMaterialQty || 0}
+                    costPerUnit={secondaryMaterial.costPerUnit || 0}
+                    icon={<Icon i="weight" />}
+                    onChange={(value) =>
+                      setLocalLineItem({
+                        ...localLineItem,
+                        secondaryMaterialQty: value,
+                      })
+                    }
+                    showInput={userIsPrivileged}
+                  />
+                  <Util.Row gap={1} align="center" justify="end">
+                    <span className={styles.bottomLine}>
+                      <Util.Row gap={1}>
+                        Total:
+                        <Price value={calculateTotalCost()} icon />
+                      </Util.Row>
+                    </span>
+                  </Util.Row>
+                </Util.Col>
+              )}
+            </>
+          ) : (
+            <span>
+              <Badge color="danger" soft>
+                <Icon i="coin-off" />
+                Costing unavailable without required configuration
+              </Badge>
+            </span>
+          )}
 
-        <Util.Row gap={1} align="center" justify="end">
-          <span className={styles.bottomLine}>
-            <Util.Row gap={1}>
-              Total:
-              <Price value={amount} icon />
+          {changed ? (
+            <Util.Row gap={1} align="center">
+              <Button onClick={handleSave} loading={opLoading}>
+                Save
+              </Button>
+              <Button onClick={() => setLocalLineItem(lineItem)}>Discard</Button>
+              <Badge color="red" soft>
+                You have unsaved changes!
+              </Badge>
             </Util.Row>
-          </span>
-        </Util.Row>
-
-        {changed ? (
-          <Util.Row gap={1} align="center">
-            <Button onClick={handleSave} loading={opLoading}>
-              Save
-            </Button>
-            <Button onClick={() => setLocalLineItem(lineItem)}>Discard</Button>
-            <Badge color="red" soft>
-              You have unsaved changes!
-            </Badge>
-          </Util.Row>
-        ) : (
-          <div />
-        )}
+          ) : (
+            <div></div>
+          )}
+        </Util.Col>
       </Util.Col>
     </Card>
   );

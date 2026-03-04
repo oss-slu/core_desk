@@ -44,6 +44,15 @@ export const get = [
           jobId: job.id,
           active: true,
         },
+        include: {
+          resourceType: {
+            select: {
+              id: true,
+              title: true,
+              costingMode: true,
+            },
+          },
+        },
       });
 
       return res.json({ lineItems });
@@ -112,6 +121,15 @@ export const post = [
         where: {
           jobId: job.id,
           active: true,
+        },
+        include: {
+          resourceType: {
+            select: {
+              id: true,
+              title: true,
+              costingMode: true,
+            },
+          },
         },
       });
 

@@ -1,6 +1,7 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import { LogType } from "#prisma-client";
+import { CostingMode, LogType } from "#prisma-client";
+import { z } from "zod";
 
 export const get = [
   verifyAuth,
@@ -94,11 +95,25 @@ export const put = [
       });
     }
 
+    const parsedCostingMode = z
+      .nativeEnum(CostingMode)
+      .optional()
+      .safeParse(req.body.costingMode);
+    if (!parsedCostingMode.success) {
+      return res.status(400).json({
+        error: "Invalid costing mode",
+        issues: parsedCostingMode.error.format(),
+      });
+    }
+
     const updatedResourceType = await prisma.resourceType.update({
       where: {
         id: resourceTypeId,
       },
-      data: req.body,
+      data: {
+        ...req.body,
+        costingMode: parsedCostingMode.data,
+      },
       include: {
         resources: true,
       },
