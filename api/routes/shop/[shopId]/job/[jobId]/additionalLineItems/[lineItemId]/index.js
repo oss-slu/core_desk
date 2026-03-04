@@ -1,41 +1,6 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 
-const ADDITIONAL_LINE_ITEM_INCLUDE = {
-  resourceType: {
-    select: {
-      title: true,
-      id: true,
-      costingMode: true,
-    },
-  },
-  resource: {
-    select: {
-      title: true,
-      id: true,
-      costPerTime: true,
-      costPerProcessingTime: true,
-      costPerUnit: true,
-    },
-  },
-  material: {
-    select: {
-      title: true,
-      id: true,
-      costPerUnit: true,
-      unitDescriptor: true,
-    },
-  },
-  secondaryMaterial: {
-    select: {
-      title: true,
-      id: true,
-      costPerUnit: true,
-      unitDescriptor: true,
-    },
-  },
-};
-
 export const get = [
   verifyAuth,
   async (req, res) => {
@@ -234,7 +199,7 @@ export const put = [
         where: {
           id: lineItem.id,
         },
-        data: req.body,
+        data: updatedData,
         include: {
           resourceType: {
             select: {
