@@ -34,7 +34,9 @@ export const get = [
       },
     });
 
-    const { url, key } = await generateInvoice(job, userId, shopId);
+    const { url, key } = await generateInvoice(job, userId, shopId, {
+      draft: true,
+    });
 
     return res.json({ url, key });
   },

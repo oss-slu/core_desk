@@ -139,19 +139,19 @@ const CostCard = ({
   const { loading: materialLoading, material } = useMaterial(
     shopId,
     localLineItem?.resourceTypeId,
-    localLineItem?.materialId
+    localLineItem?.materialId,
   );
 
   const { loading: secondaryMaterialLoading, material: secondaryMaterial } =
     useMaterial(
       shopId,
       localLineItem?.resourceTypeId,
-      localLineItem?.secondaryMaterialId
+      localLineItem?.secondaryMaterialId,
     );
 
   const { loading: resourceLoading, resource } = useResource(
     shopId,
-    localLineItem?.resourceId
+    localLineItem?.resourceId,
   );
 
   const changed = JSON.stringify(localLineItem) !== JSON.stringify(lineItem);
@@ -236,12 +236,7 @@ const CostCard = ({
 
             {localLineItem.resourceTypeId ? (
               isRawMode ? (
-                <span>
-                  <Badge color="blue" soft>
-                    <Icon i="currency-dollar" />
-                    Costing mode: Raw value entry
-                  </Badge>
-                </span>
+                <></>
               ) : (
                 <Util.Row gap={1}>
                   {userIsPrivileged ? (
@@ -249,7 +244,10 @@ const CostCard = ({
                       value={localLineItem.resourceId}
                       resourceTypeId={localLineItem.resourceTypeId}
                       onChange={(value) =>
-                        setLocalLineItem({ ...localLineItem, resourceId: value })
+                        setLocalLineItem({
+                          ...localLineItem,
+                          resourceId: value,
+                        })
                       }
                       loading={opLoading}
                     />
@@ -266,7 +264,10 @@ const CostCard = ({
                       value={localLineItem.materialId}
                       resourceTypeId={localLineItem.resourceTypeId}
                       onChange={(value) =>
-                        setLocalLineItem({ ...localLineItem, materialId: value })
+                        setLocalLineItem({
+                          ...localLineItem,
+                          materialId: value,
+                        })
                       }
                       loading={opLoading}
                       materialType={"Primary"}
@@ -294,7 +295,9 @@ const CostCard = ({
                     />
                   ) : (
                     <Util.Col gap={1}>
-                      <span className="form-label mb-0">Secondary Material</span>
+                      <span className="form-label mb-0">
+                        Secondary Material
+                      </span>
                       <span>
                         <Badge soft>
                           {localLineItem.secondaryMaterial?.title}
@@ -365,7 +368,9 @@ const CostCard = ({
             localLineItem.materialId &&
             localLineItem.secondaryMaterialId ? (
             <>
-              {materialLoading || secondaryMaterialLoading || resourceLoading ? (
+              {materialLoading ||
+              secondaryMaterialLoading ||
+              resourceLoading ? (
                 <Spinner />
               ) : !resource || !material || !secondaryMaterial ? (
                 <span>
@@ -456,7 +461,9 @@ const CostCard = ({
               <Button onClick={handleSave} loading={opLoading}>
                 Save
               </Button>
-              <Button onClick={() => setLocalLineItem(lineItem)}>Discard</Button>
+              <Button onClick={() => setLocalLineItem(lineItem)}>
+                Discard
+              </Button>
               <Badge color="red" soft>
                 You have unsaved changes!
               </Badge>

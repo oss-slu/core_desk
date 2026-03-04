@@ -9,13 +9,13 @@ export const jobItemUpdateSchema = z.object({
   materialId: z.string().nullable().optional(),
   secondaryMaterialId: z.string().nullable().optional(),
 
-  timeQty: z.number().optional().default(0),
+  timeQty: z.number().optional().nullable().default(0),
   processingTimeQty: z.number().nullable().optional().default(0),
   unitQty: z.number().nullable().optional().default(0),
-  materialQty: z.number().nullable().optional().default(0),
+  materialQty: z.number().nullable().optional().nullable().default(0),
   secondaryMaterialQty: z.number().nullable().optional().default(0),
   rawValue: z.number().nullable().optional().default(0),
-  qty: z.number().optional().default(0),
+  qty: z.number().optional().nullable().default(0),
 
   approved: z.boolean().nullable().optional(),
   status: z.string().optional(),
