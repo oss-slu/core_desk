@@ -390,9 +390,11 @@ export const JobItem = ({
                   title: "Costing",
                   content: (
                     <>
-                      {item.materialId &&
-                      item.resourceId &&
-                      item.secondaryMaterialId ? (
+                      {(item.resourceType?.costingMode === "RAW_VALUE_ENTRY" &&
+                        item.resourceTypeId) ||
+                      (item.materialId &&
+                        item.resourceId &&
+                        item.secondaryMaterialId) ? (
                         <EditCosting
                           item={item}
                           onChange={(value) => updateJobItem(value)}

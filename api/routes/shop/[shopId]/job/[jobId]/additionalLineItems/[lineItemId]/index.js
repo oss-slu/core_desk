@@ -50,6 +50,7 @@ export const get = [
             select: {
               title: true,
               id: true,
+              costingMode: true,
             },
           },
           resource: {
@@ -140,6 +141,7 @@ export const put = [
             select: {
               title: true,
               id: true,
+              costingMode: true,
             },
           },
           resource: {
@@ -182,6 +184,33 @@ export const put = [
           id: lineItem.id,
         },
         data: req.body,
+        include: {
+          resourceType: {
+            select: {
+              title: true,
+              id: true,
+              costingMode: true,
+            },
+          },
+          resource: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          material: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+          secondaryMaterial: {
+            select: {
+              title: true,
+              id: true,
+            },
+          },
+        },
       });
 
       return res.json({ lineItem: updatedLineItem });

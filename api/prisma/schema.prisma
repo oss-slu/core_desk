@@ -244,6 +244,7 @@ model ResourceType {
   id                  String                   @id @default(cuid())
   title               String
   description         String?
+  costingMode         CostingMode              @default(CALCULATE_WITH_RESOURCE_AND_MATERIAL)
   createdAt           DateTime                 @default(now())
   updatedAt           DateTime                 @updatedAt
   active              Boolean                  @default(true)
@@ -333,6 +334,7 @@ model AdditionalCostLineItem {
   resourceId           String?
   materialId           String?
   secondaryMaterialId  String?
+  rawValue             Float?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   unitQty              Float?
@@ -354,6 +356,7 @@ model JobItem {
   title  String
   status ProgressStatus @default(NOT_STARTED)
   qty    Float?
+  rawValue Float?
 
   fileId String?
   file   File?   @relation("JobItem_file", fields: [fileId], references: [id], onDelete: Cascade)
@@ -535,6 +538,11 @@ enum SuppliedMaterialLevels {
   SOMETIMES
   NEVER
   SPECIAL
+}
+
+enum CostingMode {
+  CALCULATE_WITH_RESOURCE_AND_MATERIAL
+  RAW_VALUE_ENTRY
 }
 
 enum Color {

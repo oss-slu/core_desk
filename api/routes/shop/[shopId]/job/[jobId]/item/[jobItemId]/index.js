@@ -3,12 +3,20 @@ import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { z } from "zod";
 
-const jobSchema = z.object({
-  costingPublic: z.boolean().optional(),
-  costPerProcessingTime: z.number().optional(),
-  costPerTime: z.number().optional(),
-  costPerUnit: z.number().optional(),
-  unitDescriptor: z.string().optional(),
+const jobItemUpdateSchema = z.object({
+  resourceTypeId: z.string().nullable().optional(),
+  resourceId: z.string().nullable().optional(),
+  materialId: z.string().nullable().optional(),
+  secondaryMaterialId: z.string().nullable().optional(),
+  timeQty: z.number().optional(),
+  processingTimeQty: z.number().optional(),
+  unitQty: z.number().optional(),
+  materialQty: z.number().optional(),
+  secondaryMaterialQty: z.number().optional(),
+  rawValue: z.number().optional(),
+  qty: z.number().optional(),
+  approved: z.boolean().nullable().optional(),
+  status: z.string().optional(),
 });
 
 export const get = [
@@ -36,6 +44,35 @@ export const get = [
           jobId,
         },
         include: {
+          resource: {
+            select: {
+              id: true,
+              title: true,
+              costingPublic: true,
+              costPerProcessingTime: true,
+              costPerTime: true,
+              costPerUnit: true,
+            },
+          },
+          material: {
+            select: {
+              costPerUnit: true,
+              unitDescriptor: true,
+            },
+          },
+          secondaryMaterial: {
+            select: {
+              costPerUnit: true,
+              unitDescriptor: true,
+            },
+          },
+          resourceType: {
+            select: {
+              id: true,
+              title: true,
+              costingMode: true,
+            },
+          },
           file: true,
           fileThumbnail: true,
         },
@@ -132,7 +169,7 @@ export const put = [
 
     console.log(req.body.data);
 
-    const validationResult = jobSchema.safeParse(req.body);
+    const validationResult = jobItemUpdateSchema.safeParse(req.body.data);
     if (!validationResult.success) {
       return res.status(400).json({
         error: "Invalid data",
@@ -167,6 +204,13 @@ export const put = [
           select: {
             costPerUnit: true,
             unitDescriptor: true,
+          },
+        },
+        resourceType: {
+          select: {
+            id: true,
+            title: true,
+            costingMode: true,
           },
         },
         file: true,

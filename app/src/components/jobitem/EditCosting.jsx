@@ -20,7 +20,13 @@ export const EditCosting = ({
     setNewItem(item);
   }, [item]);
 
+  const isRawMode = newItem?.resourceType?.costingMode === "RAW_VALUE_ENTRY";
+
   const calculateTotalCost = (includeQty = true) => {
+    if (isRawMode) {
+      return (newItem.rawValue || 0) * (includeQty ? (newItem.qty ?? 1) : 1);
+    }
+
     const {
       timeQty,
       processingTimeQty,
@@ -42,71 +48,87 @@ export const EditCosting = ({
         (unitQty * resource.costPerUnit || 0) +
         (materialQty * material.costPerUnit || 0) +
         (secondaryMaterialQty * secondaryMaterial.costPerUnit || 0)) *
-      (includeQty ? qty : 1)
+      (includeQty ? (qty ?? 1) : 1)
     );
   };
 
   if (!userIsPrivileged)
     return (
       <div style={{ width: "100%" }}>
-        <Util.Row gap={1} align="center" justify="between">
-          <label className="form-label">Resource Time</label>
-          <div
-            style={{
-              flex: 1,
-              height: 2,
-              backgroundColor: "var(--tblr-border-color)",
-            }}
-          />
-          <Time value={newItem.timeQty} icon />
-        </Util.Row>
-        <Util.Row gap={1} align="center" justify="between">
-          <label className="form-label">Processing Time</label>
-          <div
-            style={{
-              flex: 1,
-              height: 2,
-              backgroundColor: "var(--tblr-border-color)",
-            }}
-          />
-          <Time value={newItem.processingTimeQty} icon />
-        </Util.Row>
-        <Util.Row gap={1} align="center" justify="between">
-          <label className="form-label">Unit runs</label>
-          <div
-            style={{
-              flex: 1,
-              height: 2,
-              backgroundColor: "var(--tblr-border-color)",
-            }}
-          />
-          <Icon i="refresh" />
-          <span>{newItem.unitQty || 0}</span>
-        </Util.Row>
-        <Util.Row gap={1} align="center" justify="between">
-          <label className="form-label">Material quantity</label>
-          <div
-            style={{
-              flex: 1,
-              height: 2,
-              backgroundColor: "var(--tblr-border-color)",
-            }}
-          />
-          <Icon i="weight" />
-          <span>{newItem.materialQty || 0}</span>
-        </Util.Row>
-        <Util.Row gap={1} align="center" justify="between">
-          <label className="form-label">Secondary Material quantity</label>
-          <div
-            style={{
-              flex: 1,
-              height: 2,
-              backgroundColor: "var(--tblr-border-color)",
-            }}
-          />
-          <Icon i="weight" />
-          <span>{newItem.secondaryMaterialQty || 0}</span>
-        </Util.Row>
+        {isRawMode ? (
+          <Util.Row gap={1} align="center" justify="between">
+            <label className="form-label">Raw value</label>
+            <div
+              style={{
+                flex: 1,
+                height: 2,
+                backgroundColor: "var(--tblr-border-color)",
+              }}
+            />
+            <Price value={newItem.rawValue || 0} icon />
+          </Util.Row>
+        ) : (
+          <>
+            <Util.Row gap={1} align="center" justify="between">
+              <label className="form-label">Resource Time</label>
+              <div
+                style={{
+                  flex: 1,
+                  height: 2,
+                  backgroundColor: "var(--tblr-border-color)",
+                }}
+              />
+              <Time value={newItem.timeQty} icon />
+            </Util.Row>
+            <Util.Row gap={1} align="center" justify="between">
+              <label className="form-label">Processing Time</label>
+              <div
+                style={{
+                  flex: 1,
+                  height: 2,
+                  backgroundColor: "var(--tblr-border-color)",
+                }}
+              />
+              <Time value={newItem.processingTimeQty} icon />
+            </Util.Row>
+            <Util.Row gap={1} align="center" justify="between">
+              <label className="form-label">Unit runs</label>
+              <div
+                style={{
+                  flex: 1,
+                  height: 2,
+                  backgroundColor: "var(--tblr-border-color)",
+                }}
+              />
+              <Icon i="refresh" />
+              <span>{newItem.unitQty || 0}</span>
+            </Util.Row>
+            <Util.Row gap={1} align="center" justify="between">
+              <label className="form-label">Material quantity</label>
+              <div
+                style={{
+                  flex: 1,
+                  height: 2,
+                  backgroundColor: "var(--tblr-border-color)",
+                }}
+              />
+              <Icon i="weight" />
+              <span>{newItem.materialQty || 0}</span>
+            </Util.Row>
+            <Util.Row gap={1} align="center" justify="between">
+              <label className="form-label">Secondary Material quantity</label>
+              <div
+                style={{
+                  flex: 1,
+                  height: 2,
+                  backgroundColor: "var(--tblr-border-color)",
+                }}
+              />
+              <Icon i="weight" />
+              <span>{newItem.secondaryMaterialQty || 0}</span>
+            </Util.Row>
+          </>
+        )}
         <Util.Row gap={1} align="center" justify="between">
           <div />
           <span className={styles.bottomLine}>
@@ -132,70 +154,100 @@ export const EditCosting = ({
   return (
     <div style={{ width: "100%" }}>
       {ModalElement}
-      <TimeInput
-        label="Resource Time (hr:mm)"
-        helpText={HELP_TEXT.resourceTime}
-        timeQty={newItem.timeQty}
-        costPerTime={newItem.resource.costPerTime}
-        onChange={(value) => setNewItem({ ...newItem, timeQty: value })}
-        modal={modal}
-        showInput={userIsPrivileged}
-      />
-      <TimeInput
-        label="Processing Time (hr:mm)"
-        helpText={HELP_TEXT.processingTime}
-        timeQty={newItem.processingTimeQty}
-        costPerTime={newItem.resource.costPerProcessingTime}
-        onChange={(value) =>
-          setNewItem({ ...newItem, processingTimeQty: value })
-        }
-        modal={modal}
-        showInput={userIsPrivileged}
-      />
-      <QuantityInput
-        label="Unit runs"
-        helpText={HELP_TEXT.unit}
-        quantity={newItem.unitQty}
-        costPerUnit={newItem.resource.costPerUnit}
-        icon={<Icon i="refresh" />}
-        onChange={(value) => setNewItem({ ...newItem, unitQty: value })}
-        modal={modal}
-        showInput={userIsPrivileged}
-      />
-      <QuantityInput
-        label={`Material quantity in ${newItem.material.unitDescriptor}s`}
-        helpText={HELP_TEXT.material}
-        quantity={newItem.materialQty}
-        costPerUnit={newItem.material.costPerUnit}
-        icon={<Icon i="weight" />}
-        onChange={(value) => setNewItem({ ...newItem, materialQty: value })}
-        modal={modal}
-        showInput={userIsPrivileged}
-      />
-      <QuantityInput
-        label={`Secondary material quantity in ${newItem.secondaryMaterial.unitDescriptor}s`}
-        helpText={HELP_TEXT.secondaryMaterial}
-        quantity={newItem.secondaryMaterialQty}
-        costPerUnit={newItem.secondaryMaterial.costPerUnit}
-        icon={<Icon i="weight" />}
-        onChange={(value) =>
-          setNewItem({ ...newItem, secondaryMaterialQty: value })
-        }
-        modal={modal}
-        showInput={userIsPrivileged}
-      />
+      {isRawMode ? (
+        <>
+          <Util.Col gap={0.5} align="start">
+            <label className="form-label mb-0">Raw value</label>
+            <Input
+              value={newItem.rawValue || 0}
+              onChange={(value) => {
+                const parsedValue = parseFloat(value);
+                setNewItem({
+                  ...newItem,
+                  rawValue:
+                    Number.isNaN(parsedValue) || parsedValue < 0
+                      ? 0
+                      : parsedValue,
+                });
+              }}
+              type="number"
+              min={0}
+            />
+          </Util.Col>
+          <Util.Spacer size={1} />
+        </>
+      ) : (
+        <>
+          <TimeInput
+            label="Resource Time (hr:mm)"
+            helpText={HELP_TEXT.resourceTime}
+            timeQty={newItem.timeQty}
+            costPerTime={newItem.resource.costPerTime}
+            onChange={(value) => setNewItem({ ...newItem, timeQty: value })}
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+          <TimeInput
+            label="Processing Time (hr:mm)"
+            helpText={HELP_TEXT.processingTime}
+            timeQty={newItem.processingTimeQty}
+            costPerTime={newItem.resource.costPerProcessingTime}
+            onChange={(value) =>
+              setNewItem({ ...newItem, processingTimeQty: value })
+            }
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+          <QuantityInput
+            label="Unit runs"
+            helpText={HELP_TEXT.unit}
+            quantity={newItem.unitQty}
+            costPerUnit={newItem.resource.costPerUnit}
+            icon={<Icon i="refresh" />}
+            onChange={(value) => setNewItem({ ...newItem, unitQty: value })}
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+          <QuantityInput
+            label={`Material quantity in ${newItem.material.unitDescriptor}s`}
+            helpText={HELP_TEXT.material}
+            quantity={newItem.materialQty}
+            costPerUnit={newItem.material.costPerUnit}
+            icon={<Icon i="weight" />}
+            onChange={(value) => setNewItem({ ...newItem, materialQty: value })}
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+          <QuantityInput
+            label={`Secondary material quantity in ${newItem.secondaryMaterial.unitDescriptor}s`}
+            helpText={HELP_TEXT.secondaryMaterial}
+            quantity={newItem.secondaryMaterialQty}
+            costPerUnit={newItem.secondaryMaterial.costPerUnit}
+            icon={<Icon i="weight" />}
+            onChange={(value) =>
+              setNewItem({ ...newItem, secondaryMaterialQty: value })
+            }
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+        </>
+      )}
       <Util.Row gap={1} align="center" justify="between">
         {JSON.stringify(newItem) !== JSON.stringify(item) ? (
           <Util.Row gap={1} align="center" wrap>
             <Button
               onClick={() =>
-                onChange({
-                  timeQty: newItem.timeQty,
-                  processingTimeQty: newItem.processingTimeQty,
-                  unitQty: newItem.unitQty,
-                  materialQty: newItem.materialQty,
-                  secondaryMaterialQty: newItem.secondaryMaterialQty,
-                })
+                isRawMode
+                  ? onChange({
+                      rawValue: newItem.rawValue,
+                    })
+                  : onChange({
+                      timeQty: newItem.timeQty,
+                      processingTimeQty: newItem.processingTimeQty,
+                      unitQty: newItem.unitQty,
+                      materialQty: newItem.materialQty,
+                      secondaryMaterialQty: newItem.secondaryMaterialQty,
+                    })
               }
               loading={loading}
             >

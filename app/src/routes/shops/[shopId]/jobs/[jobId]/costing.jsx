@@ -142,8 +142,11 @@ export const JobCostingPage = () => {
           {job.items?.map((item) => {
             if (!item) return null;
             if (!item.resourceTypeId) return null;
-            if (!item.resourceId) return null;
-            if (!item.material) return null;
+            const isRawMode =
+              item.resourceType?.costingMode === "RAW_VALUE_ENTRY";
+            if (!isRawMode && !item.resourceId) return null;
+            if (!isRawMode && !item.material) return null;
+            if (!isRawMode && !item.secondaryMaterial) return null;
             return (
               <ItemCostCard key={item.id} item={item} refetchJob={refetchJob} />
             );
