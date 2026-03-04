@@ -27,6 +27,8 @@ import { MaterialPicker } from "../../../../../components/materialPicker/Materia
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
 import { Comments } from "../../../../../components/comments/Comments";
 import { Alert } from "#alert";
+import { ShopUserPicker } from "#shopUserPicker";
+import { BillingGroupPicker } from "../../../../../components/billingGroupPicker/BillingGroupPicker";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {
@@ -402,24 +404,56 @@ export const JobPage = () => {
                     </i>
                   )}
                 </Util.Row>
-                {job.group && (
-                  <>
-                    <Util.Spacer size={2} />
-                    <H3>Group</H3>
-                    <p>
-                      <b>Group Title</b>{" "}
-                      <Link
-                        to={`/shops/${shopId}/billing-groups/${job.group.id}`}
-                      >
+                <Util.Spacer size={2} />
+                <H3>Current Billing Account</H3>
+                {job.group ? (
+                  <Link to={`/shops/${shopId}/billing-groups/${job.group.id}`}>
+                    {job.group.title}
+                  </Link>
+                ) : (
+                  <p>
+                    {job.user?.firstName} {job.user?.lastName}
+                  </p>
+                )}
+                <Util.Spacer size={1} />
+                <Util.Row gap={1} wrap align="end">
+                  <Util.Col gap={0}>
+                    <label className="form-label">Requested By</label>
+                    {userIsPrivileged ? (
+                      <ShopUserPicker
+                        value={job.userId}
+                        onChange={(value) => {
+                          updateJob({ userId: value });
+                        }}
+                        includeNone={false}
+                      />
+                    ) : (
+                      <p>
+                        {job.user?.firstName} {job.user?.lastName}
+                      </p>
+                    )}
+                  </Util.Col>
+                  <Util.Col gap={0}>
+                    <label className="form-label">Billing Group</label>
+                    {userIsPrivileged ? (
+                      <BillingGroupPicker
+                        value={job.groupId}
+                        onChange={(value) => {
+                          updateJob({ groupId: value });
+                        }}
+                        includeNone={true}
+                      />
+                    ) : job.group ? (
+                      <Link to={`/shops/${shopId}/billing-groups/${job.group.id}`}>
                         {job.group.title}
                       </Link>
-                      <br />
-                      <b>Group Admin</b>{" "}
-                      {job.group.users[0].activeUser?.firstName}{" "}
-                      {job.group.users[0].activeUser?.lastName}
-                    </p>
-                  </>
-                )}
+                    ) : (
+                      <Badge color="secondary" soft>
+                        None
+                      </Badge>
+                    )}
+                  </Util.Col>
+                </Util.Row>
               </>
             )}
           </div>

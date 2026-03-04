@@ -146,62 +146,30 @@
     <table>
       <thead>
         <tr>
-          <th>Title</th>
-          <th>Qty</th>
-          <th>Unit Cost</th>
-          <th>Subtotal</th>
+          <th>Description</th>
           <th>Cost</th>
         </tr>
       </thead>
       <tbody>
-        <% additionalCosts.forEach(cost => { %> <% if (cost.resource &&
-        cost.material && cost.secondaryMaterial) { %> <% const materialCost = (cost.materialQty || 0) *
-        cost.material.costPerUnit; %> <% const secondaryMaterialCost = (cost.secondaryMaterialQty || 0) *
-        cost.secondaryMaterial.costPerUnit; %> <% const timeCost = (cost.timeQty || 0) *
-        (cost.resource.costPerTime || 0); %> <% const processingCost =
-        (cost.processingTimeQty || 0) * (cost.resource.costPerProcessingTime ||
-        0); %> <% const unitCost = (cost.unitQty || 0) *
-        (cost.resource.costPerUnit || 0); %> <% const totalCost = timeCost +
-        processingCost + unitCost + materialCost + secondaryMaterialCost; %>
-
+        <% additionalCosts.forEach((cost, i) => { %>
+        <% if (typeof cost.amount === "number") { %>
         <tr>
-          <td rowspan="5">Manually Entered Cost</td>
-          <td><%= cost.timeQty || '-' %> hours</td>
-          <td>$<%= cost.resource.costPerTime || 0 %> / hour</td>
-          <td>$<%= timeCost.toFixed(2) %></td>
-          <td rowspan="5">$<%= totalCost.toFixed(2) %></td>
+          <td>Additional Cost #<%= i + 1 %></td>
+          <td>$<%= cost.amount.toFixed(2) %></td>
         </tr>
+        <% } else if (cost.resource && cost.material && cost.secondaryMaterial) { %>
+        <% const materialCost = (cost.materialQty || 0) * cost.material.costPerUnit; %>
+        <% const secondaryMaterialCost = (cost.secondaryMaterialQty || 0) * cost.secondaryMaterial.costPerUnit; %>
+        <% const timeCost = (cost.timeQty || 0) * (cost.resource.costPerTime || 0); %>
+        <% const processingCost = (cost.processingTimeQty || 0) * (cost.resource.costPerProcessingTime || 0); %>
+        <% const unitCost = (cost.unitQty || 0) * (cost.resource.costPerUnit || 0); %>
+        <% const totalCost = timeCost + processingCost + unitCost + materialCost + secondaryMaterialCost; %>
         <tr>
-          <td><%= cost.processingTimeQty || '-' %> units</td>
-          <td>$<%= cost.resource.costPerProcessingTime || 0 %></td>
-          <td>$<%= processingCost.toFixed(2) %></td>
+          <td>Legacy Additional Cost #<%= i + 1 %></td>
+          <td>$<%= totalCost.toFixed(2) %></td>
         </tr>
-        <tr>
-          <td><%= cost.unitQty || '-' %> runs</td>
-          <td>$<%= cost.resource.costPerUnit || 0 %> / unit</td>
-          <td>$<%= unitCost.toFixed(2) %></td>
-        </tr>
-        <tr>
-          <td>
-            <%= cost.materialQty || '-' %> <%= cost.material.unitDescriptor %>
-          </td>
-          <td>
-            $<%= cost.material.costPerUnit %> / <%= cost.material.unitDescriptor
-            %>
-          </td>
-          <td>$<%= materialCost.toFixed(2) %></td>
-        </tr>
-        <tr>
-          <td>
-            <%= cost.secondaryMaterialQty || '-' %> <%= cost.secondaryMaterial.unitDescriptor %>
-          </td>
-          <td>
-            $<%= cost.secondaryMaterial.costPerUnit %> / <%= cost.secondaryMaterial.unitDescriptor
-            %>
-          </td>
-          <td>$<%= secondaryMaterialCost.toFixed(2) %></td>
-        </tr>
-        <% } %> <% }) %>
+        <% } %>
+        <% }) %>
       </tbody>
     </table>
 

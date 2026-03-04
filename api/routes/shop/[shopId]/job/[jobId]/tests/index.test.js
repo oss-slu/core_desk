@@ -123,4 +123,155 @@ describe("/shop/[shopId]/job/[jobId]", () => {
     expect(ledgerItem.value).toBe(-33);
     expect(ledgerItem.type).toBe("JOB");
   });
+
+  it("allows privileged users to change the requester", async () => {
+    await prisma.userShop.create({
+      data: {
+        shopId: tc.shop.id,
+        userId: tc.targetUser.id,
+      },
+    });
+
+    const job = await prisma.job.create({
+      data: {
+        title: "Requester Reassignment",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+      },
+    });
+
+    const res = await request(app)
+      .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+      .set(...(await gt({ sat: "OPERATOR" })))
+      .send({ userId: tc.targetUser.id });
+
+    expect(res.status).toBe(200);
+    expect(res.body.job.userId).toBe(tc.targetUser.id);
+    expect(res.body.job.user.id).toBe(tc.targetUser.id);
+  });
+
+  it("blocks non-privileged users from changing the requester", async () => {
+    await prisma.userShop.create({
+      data: {
+        shopId: tc.shop.id,
+        userId: tc.targetUser.id,
+      },
+    });
+
+    const job = await prisma.job.create({
+      data: {
+        title: "Requester Reassignment Blocked",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+      },
+    });
+
+    const res = await request(app)
+      .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+      .set(...(await gt()))
+      .send({ userId: tc.targetUser.id });
+
+    expect(res.status).toBe(403);
+  });
+
+  it("allows privileged users to assign and unassign groups", async () => {
+    const group = await prisma.billingGroup.create({
+      data: {
+        shopId: tc.shop.id,
+        title: "Assignable Group",
+      },
+    });
+
+    const job = await prisma.job.create({
+      data: {
+        title: "Group Assignment",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+      },
+    });
+
+    const assignRes = await request(app)
+      .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+      .set(...(await gt({ sat: "OPERATOR" })))
+      .send({ groupId: group.id });
+
+    expect(assignRes.status).toBe(200);
+    expect(assignRes.body.job.groupId).toBe(group.id);
+
+    const unassignRes = await request(app)
+      .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+      .set(...(await gt({ sat: "OPERATOR" })))
+      .send({ groupId: null });
+
+    expect(unassignRes.status).toBe(200);
+    expect(unassignRes.body.job.groupId).toBeNull();
+  });
+
+  it("allows customers to assign their own job when group rules allow it", async () => {
+    const group = await prisma.billingGroup.create({
+      data: {
+        shopId: tc.shop.id,
+        title: "Members Can Create Jobs",
+        membersCanCreateJobs: true,
+      },
+    });
+
+    await prisma.userBillingGroup.create({
+      data: {
+        userId: tc.user.id,
+        billingGroupId: group.id,
+      },
+    });
+
+    const job = await prisma.job.create({
+      data: {
+        title: "Customer Group Assignment",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+      },
+    });
+
+    const res = await request(app)
+      .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+      .set(...(await gt()))
+      .send({ groupId: group.id });
+
+    expect(res.status).toBe(200);
+    expect(res.body.job.groupId).toBe(group.id);
+  });
+
+  it("rejects assigning a job to a group outside the shop", async () => {
+    const otherShop = await prisma.shop.create({
+      data: {
+        name: "Other Shop",
+        users: {
+          create: {
+            userId: tc.targetUser.id,
+          },
+        },
+      },
+    });
+
+    const otherShopGroup = await prisma.billingGroup.create({
+      data: {
+        title: "Other Shop Group",
+        shopId: otherShop.id,
+      },
+    });
+
+    const job = await prisma.job.create({
+      data: {
+        title: "Cross Shop Group Assignment",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+      },
+    });
+
+    const res = await request(app)
+      .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+      .set(...(await gt({ sat: "OPERATOR" })))
+      .send({ groupId: otherShopGroup.id });
+
+    expect(res.status).toBe(400);
+  });
 });

@@ -8,6 +8,11 @@ export const calculateTotalCostOfJob = (data) => {
       return;
     }
 
+    if (typeof cost.amount === "number") {
+      totalCost += cost.amount;
+      return;
+    }
+
     if (!cost.resource || !cost.material || !cost.secondaryMaterial) return;
 
     totalCost += (cost.unitQty || 0) * (cost.resource.costPerUnit || 0);

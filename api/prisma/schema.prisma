@@ -335,6 +335,7 @@ model AdditionalCostLineItem {
   materialId           String?
   secondaryMaterialId  String?
   rawValue             Float?
+  amount               Float?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   unitQty              Float?
