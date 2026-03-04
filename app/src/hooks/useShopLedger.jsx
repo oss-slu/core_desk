@@ -47,7 +47,6 @@ export const useShopLedger = (shopId, options = {}) => {
       });
       const data = await r.json();
       if (data.success) {
-        await fetchLedger(false);
         return true;
       }
       setError(data);

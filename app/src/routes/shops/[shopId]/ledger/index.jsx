@@ -52,6 +52,7 @@ export const ShopLedgerPage = () => {
     rows: debtRows,
     loading: ledgerLoading,
     opLoading,
+    refetch,
     rectify,
   } = useShopLedger(shopId, {
     enabled: userIsStaff,
@@ -134,10 +135,13 @@ export const ShopLedgerPage = () => {
                     ) {
                       return;
                     }
-                    await rectify({
+                    const success = await rectify({
                       targetType: context.targetType,
                       targetId: context.targetId,
                     });
+                    if (success) {
+                      await refetch(false);
+                    }
                   }}
                 >
                   Mark as paid/rectified
