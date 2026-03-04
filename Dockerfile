@@ -20,10 +20,6 @@ ENV NODE_OPTIONS="--trace-uncaught --trace-warnings --abort-on-uncaught-exceptio
 ENV NODE_REPORT_DIRECTORY=/var/log/node-reports
 ENV NODE_REPORT_FILENAME=report.json
 
-# 🔴 Enable Prisma logging
-ENV DEBUG="prisma:*"
-ENV PRISMA_LOG_LEVEL=debug
-
 # Accept build-time arguments
 ARG DATABASE_URL
 ARG SENTRY_AUTH_TOKEN
