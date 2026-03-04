@@ -6,6 +6,7 @@ const ADDITIONAL_LINE_ITEM_INCLUDE = {
     select: {
       title: true,
       id: true,
+      costingMode: true,
     },
   },
   resource: {
@@ -161,17 +162,27 @@ export const put = [
       delete req.body.material;
       delete req.body.secondaryMaterial;
 
+      const updatedData = { ...req.body };
+      if (Object.hasOwn(updatedData, "amount")) {
+        if (
+          updatedData.amount === null ||
+          updatedData.amount === undefined ||
+          updatedData.amount === ""
+        ) {
+          updatedData.amount = null;
+        } else {
+          const parsedAmount = Number(updatedData.amount);
+          updatedData.amount = Number.isFinite(parsedAmount)
+            ? Math.max(parsedAmount, 0)
+            : 0;
+        }
+      }
+
       const updatedLineItem = await prisma.additionalCostLineItem.update({
         where: {
           id: lineItem.id,
         },
-        data: {
-          ...req.body,
-          amount:
-            req.body.amount === null || req.body.amount === undefined
-              ? null
-              : Math.max(Number(req.body.amount) || 0, 0),
-        },
+        data: updatedData,
         include: ADDITIONAL_LINE_ITEM_INCLUDE,
       });
 
