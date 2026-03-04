@@ -97,12 +97,14 @@ export const JobCostingPage = () => {
           {job.finalized ? (
             <>
               <Link
-                onClick={() =>
+                to="#"
+                onClick={(e) => {
+                  e.preventDefault();
                   downloadFile(
                     job.ledgerItems[0].invoiceUrl,
                     `invoice-${jobId}.pdf`
-                  )
-                }
+                  );
+                }}
               >
                 <Icon i="download" /> Download invoice
               </Link>

@@ -26,14 +26,30 @@ import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
 export function downloadFile(url, filename) {
+  if (!url) return;
+
   fetch(url)
-    .then((response) => response.blob())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to download: ${response.status}`);
+      }
+      return response.blob();
+    })
     .then((blob) => {
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = filename;
       link.click();
       URL.revokeObjectURL(link.href); // Clean up
+    })
+    .catch(() => {
+      // Fallback for cross-origin URLs (ex: S3) when fetch is blocked by CORS.
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.download = filename;
+      link.click();
     })
     .catch((error) => {
       console.error("Error downloading file:", error);
