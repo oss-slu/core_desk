@@ -24,7 +24,9 @@ const csvEscape = (value) => {
 const downloadCsv = (rows, shopId) => {
   const csv = [
     "Payer,Value",
-    ...rows.map((row) => `${csvEscape(row.payer)},${Number(row.value).toFixed(2)}`),
+    ...rows.map(
+      (row) => `${csvEscape(row.payer)},${Number(row.value).toFixed(2)}`,
+    ),
   ].join("\n");
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const href = URL.createObjectURL(blob);
@@ -66,7 +68,7 @@ export const ShopLedgerPage = () => {
           shopId,
           user?.admin,
           userShop?.accountType,
-          userShop?.balance < 0
+          userShop?.balance < 0,
         )}
       >
         <Loading />
@@ -83,12 +85,12 @@ export const ShopLedgerPage = () => {
         shopId,
         user?.admin,
         userShop?.accountType,
-        userShop?.balance < 0
+        userShop?.balance < 0,
       )}
     >
       <Util.Row justify="between" align="center">
         <Util.Col gap={0.5}>
-          <H1>Ledger</H1>
+          <H1 title="ledger? i hardly know 'er">Ledger</H1>
           <p>
             This shows everyone who currently owes {shop.name} money (debts and
             manually posted User Purchased ledger items), including individual
@@ -130,7 +132,7 @@ export const ShopLedgerPage = () => {
                   onClick={async () => {
                     if (
                       !window.confirm(
-                        `Mark ${context.payer} as paid/rectified?`
+                        `Mark ${context.payer} as paid/rectified?`,
                       )
                     ) {
                       return;
