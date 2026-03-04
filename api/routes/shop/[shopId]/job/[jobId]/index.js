@@ -80,6 +80,13 @@ const JOB_INCLUDE = {
       type: LedgerItemType.JOB,
     },
   },
+  user: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+    },
+  },
   group: {
     select: {
       id: true,
@@ -191,6 +198,25 @@ const attachBillingAccount = async (job, shopId) => {
     billingAccount,
   };
 };
+
+const ALLOWED_JOB_UPDATE_FIELDS = [
+  "title",
+  "description",
+  "imageUrl",
+  "userId",
+  "materialId",
+  "materialQty",
+  "resourceTypeId",
+  "resourceId",
+  "groupId",
+  "dueDate",
+  "finalized",
+  "finalizedAt",
+  "additionalCostOverride",
+  "status",
+  "secondaryMaterialId",
+  "secondaryMaterialQty",
+];
 
 export const get = [
   verifyAuth,
@@ -333,16 +359,97 @@ export const put = [
         return res.status(404).json({ error: "Not found" });
       }
 
-      delete req.body.id;
-      delete req.body.userId;
-      delete req.body.shopId;
-      delete req.body.createdAt;
-      delete req.body.updatedAt;
-      delete req.body.items;
-      delete req.body.resource;
+      const jobUpdateData = Object.fromEntries(
+        Object.entries(req.body).filter(([key]) =>
+          ALLOWED_JOB_UPDATE_FIELDS.includes(key)
+        )
+      );
+
+      if (jobUpdateData.userId === job.userId) {
+        delete jobUpdateData.userId;
+      }
+
+      const requesterIsBeingUpdated = Object.prototype.hasOwnProperty.call(
+        jobUpdateData,
+        "userId"
+      );
+      if (requesterIsBeingUpdated) {
+        if (!shouldLoadAll) {
+          return res.status(403).json({ error: "Forbidden" });
+        }
+
+        if (
+          !jobUpdateData.userId ||
+          typeof jobUpdateData.userId !== "string"
+        ) {
+          return res.status(400).json({ error: "Invalid requester" });
+        }
+
+        const requesterOnShop = await prisma.userShop.findFirst({
+          where: {
+            userId: jobUpdateData.userId,
+            shopId,
+            active: true,
+          },
+        });
+
+        if (!requesterOnShop) {
+          return res.status(400).json({ error: "Requester is not in this shop" });
+        }
+      }
+
+      if (jobUpdateData.groupId === job.groupId) {
+        delete jobUpdateData.groupId;
+      }
+
+      const groupIsBeingUpdated = Object.prototype.hasOwnProperty.call(
+        jobUpdateData,
+        "groupId"
+      );
+      if (groupIsBeingUpdated) {
+        if (
+          jobUpdateData.groupId !== null &&
+          typeof jobUpdateData.groupId !== "string"
+        ) {
+          return res.status(400).json({ error: "Invalid billing group" });
+        }
+
+        if (jobUpdateData.groupId !== null) {
+          const billingGroup = await prisma.billingGroup.findFirst({
+            where: {
+              id: jobUpdateData.groupId,
+              shopId,
+              active: true,
+            },
+          });
+
+          if (!billingGroup) {
+            return res.status(400).json({ error: "Billing group not found" });
+          }
+
+          if (!shouldLoadAll) {
+            const userBillingGroup = await prisma.userBillingGroup.findFirst({
+              where: {
+                userId: req.user.id,
+                billingGroupId: billingGroup.id,
+                active: true,
+              },
+            });
+
+            const canAssignToGroup =
+              !!userBillingGroup &&
+              (billingGroup.membersCanCreateJobs ||
+                userBillingGroup.role === "ADMIN");
+
+            if (!canAssignToGroup) {
+              return res.status(403).json({ error: "Forbidden" });
+            }
+          }
+        }
+      }
 
       let updatedJob;
-      if (req.body.finalized && !job.finalized) {
+      if (jobUpdateData.finalized && !job.finalized) {
         if (
           !(
             userShop.accountType === "ADMIN" ||
@@ -425,7 +532,7 @@ export const put = [
           where: {
             id: jobId,
           },
-          data: req.body,
+          data: jobUpdateData,
           include: JOB_INCLUDE,
         });
 

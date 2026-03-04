@@ -185,6 +185,7 @@ export const Jobs = () => {
   const columnsOptions = [
     "Title",
     "Submitter",
+    "Payer",
     "Description",
     "Total Cost",
     "Affordability",
@@ -199,6 +200,7 @@ export const Jobs = () => {
   const [columnsToShow, setColumnsToShow] = useState([
     "Title",
     "Submitter",
+    "Payer",
     "Total Cost",
     "Progress",
     "Status",
@@ -403,6 +405,20 @@ export const Jobs = () => {
                           </Badge>
                         )}
                       </Util.Col>
+                    </Util.Row>
+                  ),
+                },
+                {
+                  label: "Payer",
+                  accessor: "billingAccount.name",
+                  render: (name, context) => (
+                    <Util.Row gap={0.5} align="center">
+                      <span>{name || "N/A"}</span>
+                      {context.billingAccount?.type === "GROUP" && (
+                        <Badge color="blue" soft>
+                          Group
+                        </Badge>
+                      )}
                     </Util.Row>
                   ),
                 },
