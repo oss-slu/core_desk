@@ -14,7 +14,11 @@ const { H2, H3 } = Typography;
 import styles from "./jobItem.module.css";
 
 const calculateLegacyTotalCost = (lineItem) => {
-  if (!lineItem?.resource || !lineItem?.material || !lineItem?.secondaryMaterial) {
+  if (
+    !lineItem?.resource ||
+    !lineItem?.material ||
+    !lineItem?.secondaryMaterial
+  ) {
     return 0;
   }
 
@@ -192,7 +196,6 @@ const CostCard = ({
             <label className="form-label mb-0">Amount to add to total</label>
             {userIsPrivileged ? (
               <Input
-                size="sm"
                 noMargin
                 value={localLineItem.amount ?? amount}
                 onChange={(value) => {
