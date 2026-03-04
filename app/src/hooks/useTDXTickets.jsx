@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 
 export const useTDXTickets = () => {
     const {shopId} = useParams();
-    const [auth, setAuth] = useState({ token: sessionStorage.getItem('bearer_token') });
+    const [auth, setAuth] = useState({ token: localStorage.getItem('bearer_token') });
     const [ticketId, setTicketId] = useState('');
     const [ticket, setTicket] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -28,7 +28,7 @@ export const useTDXTickets = () => {
             const token = urlParams.get('token');
 
             if (token) {
-                sessionStorage.setItem('bearer_token', token);
+                localStorage.setItem('bearer_token', token);
                 setAuth({ token: token });
                 
                 loginWindow.close(); // This will work now because domains match!
