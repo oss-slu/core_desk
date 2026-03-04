@@ -1,6 +1,6 @@
 import { prisma } from "#prisma";
 import { verifyAuth, verifyAuthAlone } from "#verifyAuth";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 import { z } from "zod";
 
 const billingGroupSchema = z.object({
@@ -8,6 +8,20 @@ const billingGroupSchema = z.object({
   description: z.string().optional().nullable(),
   membersCanCreateJobs: z.boolean().optional().default(false),
 });
+
+const getGroupBalance = async (shopId, groupId) => {
+  const balanceResult = await prisma.ledgerItem.aggregate({
+    where: {
+      shopId,
+      billingGroupId: groupId,
+    },
+    _sum: {
+      value: true,
+    },
+  });
+
+  return balanceResult._sum.value || 0;
+};
 
 export const put = [
   verifyAuth,
@@ -218,6 +232,7 @@ export const get = [
       }));
 
       group._count = undefined;
+      group.balance = await getGroupBalance(shopId, groupId);
 
       group.userIsMember = false;
       group.userRole = null;

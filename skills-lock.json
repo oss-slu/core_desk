@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "prisma-upgrade-v7": {
+      "source": "prisma/skills",
+      "sourceType": "github",
+      "computedHash": "a3944954fcaabe06285ad866ca7ba19de0a8ab73ff988cbccd795a7694ecdcd6"
+    }
+  }
+}

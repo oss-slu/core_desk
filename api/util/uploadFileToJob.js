@@ -1,6 +1,6 @@
 import { prisma } from "#prisma";
 import { enqueueStlRenderTask } from "./stlRenderQueue.js";
-import { LogType } from "@prisma/client"; // adjust import path
+import { LogType } from "#prisma-client"; // adjust import path
 
 export const uploadFileToJob = async ({
   jobId,

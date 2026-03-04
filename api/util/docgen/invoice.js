@@ -1,7 +1,7 @@
 import ejs from "ejs";
 import { utapi } from "../../config/uploadthing.js";
 import { prisma } from "#prisma";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 import { htmlToPdf } from "../htmlToPdf.js";
 
 export const calculateTotalCostOfJobByJobId = async (jobId) => {

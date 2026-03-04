@@ -12,6 +12,7 @@ import { NotFound } from "../../../../components/404/404";
 import { Table } from "#table";
 import moment from "moment";
 import { MOMENT_FORMAT } from "#constants";
+import { Price } from "#renderPrice";
 
 export const BillingGroupsPage = () => {
   const { shopId } = useParams();
@@ -96,6 +97,11 @@ export const BillingGroupsPage = () => {
             label: "Admin",
             accessor: "adminUsers",
             render: (adminUsers) => adminUsers[0]?.name,
+          },
+          {
+            label: "Balance",
+            accessor: "balance",
+            render: (balance) => <Price value={balance || 0} icon />,
           },
         ]}
         data={billingGroups}

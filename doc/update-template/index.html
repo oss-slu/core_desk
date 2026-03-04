@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <div class="logo">
+        <img src="coredesk.svg" alt="core desk logo" />
+        <div>
+          <h2>Client Update 1</h2>
+          <p>Progress report 1 of Spring semester 2026</p>
+        </div>
+      </div>
+      <div class="subheader">
+        <h3>Reliability & Product Direction</h3>
+        <p>
+          The first two sprints of the semester focused on improving the
+          reliability and the direction of the product. Through both small and
+          large wins, we laid some excellent foundations for the remainder of
+          the semester.
+        </p>
+      </div>
+      <div class="bento1">
+        <h3>Non-SSO Login</h3>
+        <div>
+          <p>
+            Over the past two sprints, we have improved the login experience for
+            non-SSO users, allowing shops to grant access to their resources to
+            indviduals outside the SLU ecosystem or allowing them to create
+            service accounts.
+          </p>
+          <p>
+            This is a move forward both for the SLU CoreDesk instance and for
+            the overall product, making it possible for organizations without an
+            SSO provider to use the platform.
+          </p>
+          <p>
+            This body of work included significant architecting, backend, and
+            frontend work to ensure a smooth interaction for users while keeping
+            the platform secure.
+          </p>
+        </div>
+      </div>
+      <div class="bento3">
+        <h3>Plugin System</h3>
+        <div>
+          <p>
+            In order to host the TDNext integration without altering the core of
+            CoreDesk's business logic, we architected a plugin system that
+            allows non-critical add-ons to integrate with the core platform
+            without adding bulk and risk to the main paths.
+          </p>
+        </div>
+      </div>
+      <div class="bento2">
+        <h3>TDNext Integration</h3>
+        <div>
+          <p>
+            As the Academic Tech Commons in Pius Library transitions to using
+            CoreDesk for its poster and 3d printing needs, a desire to integrate
+            CoreDesk with their existing ticketing system, TDNext, was
+            identified.
+          </p>
+          <p>
+            Incorporating TDNext into CoreDesk has been a group collaboration
+            between CoreDesk, ITS, and the Pius Library/Academic Tech Commons
+            team.
+          </p>
+          <p>
+            This work started with building a plugin system, then moving to
+            securely integrate TDNext into CoreDesk and create the basis for a
+            bi-directional link.
+          </p>
+        </div>
+      </div>
+      <div class="bento4">
+        <h3>Rendering Service</h3>
+        <div>
+          <p>
+            Server-side STL rendering was completely rebuilt to improve overall
+            application stability and rendering quality.
+          </p>
+          <p>
+            STL rendering is now handled by a seperate service, isolating the
+            memory and CPU heavy rendering operations from the main application
+          </p>
+        </div>
+      </div>
+      <div class="bento5">
+        <h3>Postgres upgrade</h3>
+        <div>
+          <p>
+            The production database was upgraded from v17.6 to v17.8, resulting
+            in a small query time reduction, stability improvements, and adding
+            point-in-time recovery.
+          </p>
+        </div>
+      </div>
+      <div class="bento6">
+        <h3>E2E Test Setup</h3>
+        <div>
+          <p>
+            Automated e2e tests now run on each push, adding intentionality and
+            preventing regressions.
+          </p>
+        </div>
+      </div>
+      <div class="bento7">
+        <h3>Global error boundary</h3>
+        <div>
+          <p>
+            Error boundaries have been added to prevent small components from
+            crashing the entire app.
+          </p>
+        </div>
+      </div>
+      <div class="bento8">
+        <h3>API instance duplication</h3>
+        <div>
+          <p>
+            API now runs 2 clones, providing a hot fallback in case of failure,
+            allowing time for recovery
+          </p>
+        </div>
+      </div>
+      <div class="bento9">
+        <h3>Optimizations</h3>
+        <div>
+          <p>API memory usage has been reduced from ~300mb to ~100mb</p>
+        </div>
+      </div>
+      <div class="bento11">
+        <h3>Billing Group Improvements</h3>
+        <div>
+          <p>
+            Assorted functionality improvements and bug fixes were pushed for
+            billing groups
+          </p>
+        </div>
+      </div>
+      <div class="bento12">
+        <h3>User Count</h3>
+        <div>
+          <p>Over 700 users have visited CoreDesk at least once.</p>
+        </div>
+      </div>
+      <div class="bento13">
+        <h3>Crash-free sessions</h3>
+        <div>
+          <p>
+            Since taking on CoreDesk from the previous developer team, we have
+            improved the crash-free session rate from 64% to 97%. Sprint 2
+            should provide a small bump. Planned sprint 3 and 4 will include a
+            focus on testing preventing regressions.
+          </p>
+        </div>
+      </div>
+      <div class="bento14">
+        <h3>Request latency</h3>
+        <div>
+          <p>
+            Across the board, api requests are roughly 100ms faster, providing a
+            snappier feel.
+          </p>
+        </div>
+      </div>
+      <div class="bento15">
+        <img src="slucam.png" alt="slucam" />
+        <img src="oss.png" alt="open source" />
+      </div>
+    </main>
+  </body>
+</html>

@@ -70,6 +70,43 @@ describe("/shop/[shopId]", () => {
 
       expect(adminGroup.title).toBe("TestGroupWithAdmin");
       expect(adminGroup.userHasPermissionToCreateJobsOnBillingGroup).toBe(true);
+      expect(typeof adminGroup.balance).toBe("number");
+    });
+
+    it("includes the aggregated balance for each group", async () => {
+      await setup();
+
+      const group = await prisma.billingGroup.findFirst({
+        where: {
+          title: "TestGroupWithAdmin",
+        },
+      });
+
+      await prisma.ledgerItem.createMany({
+        data: [
+          {
+            shopId: tc.shop.id,
+            billingGroupId: group.id,
+            type: "MANUAL_DEPOSIT",
+            value: 120,
+          },
+          {
+            shopId: tc.shop.id,
+            billingGroupId: group.id,
+            type: "MANUAL_REDUCTION",
+            value: -20,
+          },
+        ],
+      });
+
+      const req = await request(app)
+        .get(`/api/shop/${tc.shop.id}/groups`)
+        .set(...(await gt({ sat: "ADMIN" })))
+        .send();
+
+      expect(req.status).toBe(200);
+      const found = req.body.groups.find((g) => g.id === group.id);
+      expect(found.balance).toBe(100);
     });
 
     it("returns 400 if a shop id is not provided", async () => {

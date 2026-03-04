@@ -426,8 +426,8 @@ export const Jobs = () => {
                 {
                   label: "Affordability",
                   accessor: "totalCost",
-                  render: (d) =>
-                    d > userShop.balance ? (
+                  render: (d, context) =>
+                    d > (context.billingAccount?.balance ?? 0) ? (
                       <Badge color="red" soft>
                         Insufficient Funds
                       </Badge>

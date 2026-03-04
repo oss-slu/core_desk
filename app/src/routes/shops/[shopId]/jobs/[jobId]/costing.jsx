@@ -39,6 +39,7 @@ export const JobCostingPage = () => {
     user?.admin ||
     userShop?.accountType === "ADMIN" ||
     userShop?.accountType === "OPERATOR";
+  const payerBalance = job?.billingAccount?.balance ?? userShop?.balance ?? 0;
 
   const { confirm, ConfirmModal: ConfirmFinalizeModal } = useConfirm({
     title: "Finalize job",
@@ -107,15 +108,15 @@ export const JobCostingPage = () => {
               </Link>
             </>
           ) : (
-            calculateTotalCostOfJob(job) > userShop?.balance &&
+            calculateTotalCostOfJob(job) > payerBalance &&
             userIsPrivileged && (
               <>
                 <Util.Spacer size={1} />
                 <span className="text-danger">
                   <Icon i="alert-triangle" /> Insufficient balance: This job
-                  will put the customer's account into a negative balance. You
-                  can still finalize the job, but the customer will need to
-                  refill their account before they can place another order.
+                  will put the billing account into a negative balance. You can
+                  still finalize the job, but the account owner will need to
+                  refill before placing another order.
                 </span>
               </>
             )

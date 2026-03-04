@@ -1,7 +1,8 @@
 import { prisma } from "#prisma";
+import { LedgerItemType } from "#prisma-client";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../../util/docgen/invoice.js";
-import { z } from "zod"
+import { z } from "zod";
 
 const jobSchema = z.object({
   finalized: z.boolean(),
@@ -66,7 +67,7 @@ export const post = [
       return res.status(400).json({ error: "Job already finalized" });
     }
 
-    const { url, key, value } = await generateInvoice(job);
+    const { url, key, value } = await generateInvoice(job, req.user.id, shopId);
 
     const validationResult = jobSchema.safeParse(req.body);
       if (!validationResult.success) {
@@ -92,10 +93,12 @@ export const post = [
       data: {
         shopId,
         jobId,
-        userId: job.userId,
+        userId: job.groupId ? null : job.userId,
+        billingGroupId: job.groupId || null,
         invoiceUrl: url,
         invoiceKey: key,
-        value: value,
+        value: value * -1,
+        type: LedgerItemType.JOB,
       },
     });
 

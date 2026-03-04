@@ -1,4 +1,4 @@
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 

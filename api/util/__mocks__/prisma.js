@@ -1,5 +1,5 @@
 // eslint-disable-next-line no-unused-vars
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "#prisma-client";
 import { beforeEach } from "vitest";
 import { mockDeep, mockReset } from "vitest-mock-extended";
 

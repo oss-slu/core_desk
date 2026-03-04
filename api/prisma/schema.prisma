@@ -1,11 +1,10 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl"]
+  provider = "prisma-client"
+  output   = "./generated"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model user {
@@ -296,7 +295,8 @@ model Job {
 
 model LedgerItem {
   id         String         @id @default(cuid())
-  userId     String
+  userId     String?
+  billingGroupId String?
   shopId     String
   jobId      String?        @unique
   type       LedgerItemType
@@ -307,8 +307,12 @@ model LedgerItem {
   updatedAt  DateTime       @updatedAt
   job        Job?           @relation(fields: [jobId], references: [id], onDelete: Cascade)
   shop       Shop           @relation(fields: [shopId], references: [id])
-  user       user           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       user?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billingGroup BillingGroup? @relation(fields: [billingGroupId], references: [id], onDelete: Cascade)
   logs       logs[]
+
+  @@index([shopId, userId])
+  @@index([shopId, billingGroupId])
 }
 
 model JobComment {
@@ -426,6 +430,7 @@ model BillingGroup {
   shop                 Shop                         @relation(fields: [shopId], references: [id])
   invitationLinks      BillingGroupInvitationLink[]
   jobs                 Job[]
+  ledgerItems          LedgerItem[]
   users                UserBillingGroup[]
   logs                 logs[]
 }

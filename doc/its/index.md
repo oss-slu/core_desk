@@ -7,11 +7,13 @@
   - [Deployment Architecture](#deployment-architecture)
   - [Security](#security)
   - [Code Quality and Testing](#code-quality-and-testing)
+  - [The relationship between SLU Open Source (SLU-OSS) and SLU Center for Additive Manufacturing (SLU-CAM)](#the-relationship-between-slu-open-source-slu-oss-and-slu-center-for-additive-manufacturing-slu-cam)
 
 ## Changelog
 
 - **2024-11-15**: Initial draft
 - **2024-11-18**: Added code quality and testing section
+- **2025-10-03**: Updated deployment architecture & added information on the relationship between SLU Open Source and SLU Center for Additive Manufacturing
 
 ## Project Overview
 CoreDesk is a tool built by a collaboration between the Saint Louis University Center for Additive Manufacturing and SLU Open Source. It is a platform for managing and tracking jobs to be submitted to shops across the SLU community. It is designed to be a simple one-stop-shop for shops to manage their workloads and to serve as a hub for users to submit jobs to these shops. Shops can recieve jobs from single users, or from billing groups of users that allow users to submit jobs to a shop, but to have their billing handled by a separate entity, like a department or lab.
@@ -32,12 +34,13 @@ The application is composed of the following high-level components:
 There are also a few external services that the application interacts with:
 
 - **Okta**: Used for initial authentication and authorization.
-- **UploadThing**: A managed file uploading & hosting provider. Uploads to UploadThing are done directly from the frontend with authorization handled by the backend. UploadThing provides a URL to the uploaded file via webhook that is stored in the database and provided to the frontend.
+- **S3**: Used to store uploaded files. Files in S3 are encrypted at rest and behind strong access control limitations.
 - **Postmark**: A managed email sending service. Postmark is used to send transactional emails to users regarding their account and jobs. Postmark is only accessed by the backend.
 - **Sentry**: A managed error tracking service. Sentry is used to track errors occuring on the frontend (client-facing) application. It has access to sourcemap files provided by the build step. Sentry does not have access to any user data, files, or otherwise sensitive information not directly provided to the client.
-- **Cloudflare**: Cloudflare is part of the current stack because I personally use it for DNS management and SSL certificates. It is not a critical part of the application and can be replaced with any other DNS provider and SSL certificate provider.
 
 The application is deployed using a Docker container. It currently runs off of a DigitalOcean App Platform instance (DigitalOcean's managed kubernetes solution), but can be deployed to any solution capable of running Docker containers. The dockerized application is ephemeral and stateless, allowing for a complete failure of the application without significant data loss and immediate recovery.
+
+The application is automatically built and deployed from the `main` branch of every push to the SLU Open Source-controlled repository.
 
 ## Deployment Architecture
 
@@ -53,7 +56,7 @@ The application is deployed using a Docker container. It currently runs off of a
 
 - **Authentication & Authorization**: Authentication is handled by Okta. Once authenticated, the frontend and backend communicate using JWT tokens. JWT tokens are only valid for 3 hours before requiring the user to re-authenticate with their Okta credentials. JWT tokens are stored in LocalStorage and are not accessible by any other domain. JWT tokens are only sent over HTTPS and are compared against a user's IP address and user agent to prevent token theft. JWT tokens are signed and verified using a secret key stored in the backend. In the event of a security issue, the secret key can be rotated to invalidate all existing tokens and require every user to re-authenticate. If a user's token expires, they are redirected to a login page and subsequent or in-flight requests are rejected.
 - **Data Protection**: All data is stored in a Postgres database. The database is accessed using Prisma, which provides type-safe access to the database. Prisma automatically sanitizes all inputs to prevent SQL injection attacks. The database is hosted on a managed service that provides security, backups, and scaling. The database is configured to only allow requests from recognized IP addresses and to require a password for access. Unauthorized requests are logged and reported.
-- **File Uploads**: File uploads are handled by UploadThing. UploadThing provides a secure URL for the uploaded file that is stored in the database. File uploads are initiated by the frontend and authorized by the backend. As per [UploadThing's terms of service](https://uploadthing.com/info/terms-of-service), files are only accessible by CoreDesk unless otherwise required by law. Files uploaded are not deleted unless a privileged user requests deletion explicitly or via a delete operation in the application.
+- **File Uploads**: File uploads are handled by S3. S3 provides a secure URL for the uploaded file that is stored in the database. File uploads are initiated by the frontend and authorized by the backend. Files are only accessible by CoreDesk unless otherwise required by law. Files uploaded are not deleted unless a privileged user requests deletion explicitly or via a delete operation in the application.
 - **Vulnerability Management**: The application is built using modern technologies and best practices. Dependencies are kept up-to-date using Dependabot, and attack surfaces are minimized by limiting the access scope of each user and verifying permissions before issuing any write commands or returning any sensitive data. The application is monitored using a logging solution and Sentry for error tracking. In the event of a security issue, the offending user can be suspended and reported, and access to the application can be limited by putting the database into a reject-all state.
 - **Disaster recovery and Backup**: Disaster recovery and backup will be dependent on the final deployment solution, but in testing, database backups occur daily and are stored in a secure, read-only location. In the event of catastrophic system failure, the application will automatically roll back to the same image and attempt a restart. After multiple failed restarts, it will revert back to a known stable point. The codebase is tracked by git and all changes are tracked.
 - **Third-party dependencies**: Following is a list of third-party dependencies used by the application, its purpose, and access level.
@@ -61,7 +64,6 @@ The application is deployed using a Docker container. It currently runs off of a
   - **Express**: Web server framework. Express is used to facilitate incoming requests and their responses. Express is a massively popular and well-maintained library with a good track record of bug fixes and security patches.
   - **JSON Web Tokens**: JWT tokens are used to authenticate users. The JWT library is first-party by Auth0 and is given access to only the authentication header of requests.
   - **Puppeteer**: Puppeteer is used for server-side rendering. Puppeteer is a first-party library by Google and is used for rendering static pages (like invoices) to PDF on the server side.
-  - **UploadThing**: The UploadThing library is used for signing file upload requests and for performing delete and modify operations on existing files.
   - **React**: React is used for building the frontend. React is a first-party library by Facebook and is used for rendering the user interface.
   - **React Router**: React Router is used for routing in the frontend.
   - **Remark**: Remark is used for markdown parsing in the frontend. Remark is well tested and is given extremely limited access to data and is situationally isolated from the rest of the application. `<script>` and `<style>` tags are disallowed to prevent JS and CSS injection attacks.
@@ -72,3 +74,7 @@ The application is deployed using a Docker container. It currently runs off of a
 ## Code Quality and Testing
 
 Integration testing is used to ensure consistent and expected behavior across the entire codebase including keeping track of database state. When tests are run, a database instance is spun up and seeded with minimal test data. Tests are run against this database and the database is torn down after the tests are complete. This ensures that tests are isolated and that the database is in a known state before each test run.
+
+## The relationship between SLU Open Source (SLU-OSS) and SLU Center for Additive Manufacturing (SLU-CAM)
+
+Open source is the _product developer_ of CoreDesk, responsible for its development and roadmap under the guidance of SLUCAM, the owner of the _CoreDesk_ IP. SLUCAM is a tenant who is hosting an instance of CoreDesk/SLU Open Project. The instance hosted by SLUCAM is what should be considered the canonical version of CoreDesk/SLU Open Project and is what needs to be made available to the SLU community.

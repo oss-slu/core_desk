@@ -1,0 +1,189 @@
+name: E2E Tests
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+          cache: "npm"
+
+      - name: Install dependencies
+        id: install_deps
+        run: npm ci
+
+      - name: Install PostgreSQL client
+        id: install_psql
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Run E2E tests
+        id: run_e2e
+        shell: bash
+        env:
+          CYPRESS_VIDEO: true
+          CYPRESS_VIDEO_UPLOAD_ON_PASSES: false
+        run: |
+          set +e
+          mkdir -p e2e/cypress
+          npm run test:e2e 2>&1 | tee e2e/cypress/e2e-stdout.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=${status}" >> "$GITHUB_OUTPUT"
+          if [ "${status}" -ne 0 ]; then
+            echo "failed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "failed=false" >> "$GITHUB_OUTPUT"
+          fi
+          exit 0
+
+      - name: Upload Cypress videos
+        if: always()
+        id: upload_videos
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-videos-${{ github.run_id }}
+          path: e2e/cypress/videos
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Upload E2E stdout log
+        if: always()
+        id: upload_stdout
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-stdout-${{ github.run_id }}
+          path: e2e/cypress/e2e-stdout.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Build PR comment body
+        if: always() && github.event_name == 'pull_request'
+        shell: bash
+        env:
+          JOB_STATUS: ${{ job.status }}
+          INSTALL_DEPS_CONCLUSION: ${{ steps.install_deps.conclusion }}
+          INSTALL_PSQL_CONCLUSION: ${{ steps.install_psql.conclusion }}
+          RUN_E2E_CONCLUSION: ${{ steps.run_e2e.conclusion }}
+          E2E_FAILED: ${{ steps.run_e2e.outputs.failed }}
+          VIDEO_ARTIFACT_URL: ${{ steps.upload_videos.outputs.artifact-url }}
+          STDOUT_ARTIFACT_URL: ${{ steps.upload_stdout.outputs.artifact-url }}
+        run: |
+          set -euo pipefail
+
+          LOG_PATH="e2e/cypress/e2e-stdout.log"
+          FAILURE_SNIPPET_PATH="e2e/cypress/e2e-failure-snippet.log"
+          VIDEO_LIST_PATH="e2e/cypress/e2e-video-files.txt"
+          COMMENT_PATH="e2e/cypress/e2e-pr-comment.md"
+          REASON_PATH="e2e/cypress/e2e-status-reason.txt"
+
+          STATUS="Passed"
+          {
+            if [ "${JOB_STATUS}" != "success" ]; then
+              STATUS="Failed"
+            fi
+
+            if [ "${INSTALL_DEPS_CONCLUSION}" != "success" ]; then
+              echo '- `npm ci` failed.'
+            fi
+
+            if [ "${INSTALL_PSQL_CONCLUSION}" != "success" ]; then
+              echo "- PostgreSQL client installation failed."
+            fi
+
+            if [ "${RUN_E2E_CONCLUSION}" = "skipped" ]; then
+              echo "- E2E test step was skipped because an earlier step failed."
+            elif [ "${RUN_E2E_CONCLUSION}" = "failure" ]; then
+              echo "- E2E test step encountered a workflow failure."
+            elif [ "${E2E_FAILED}" = "true" ]; then
+              echo "- Cypress reported failing tests."
+            fi
+          } > "${REASON_PATH}"
+
+          if [ -f "${LOG_PATH}" ]; then
+            tail -n 220 "${LOG_PATH}" > "${FAILURE_SNIPPET_PATH}"
+          else
+            echo "No stdout log found at ${LOG_PATH}" > "${FAILURE_SNIPPET_PATH}"
+          fi
+
+          if [ -d "e2e/cypress/videos" ]; then
+            find e2e/cypress/videos -type f -name "*.mp4" | sed 's#^e2e/cypress/videos/##' | sort > "${VIDEO_LIST_PATH}" || true
+          fi
+
+          {
+            echo "<!-- e2e-tests-report -->"
+            if [ "${STATUS}" = "Failed" ]; then
+              echo "## E2E Tests: Failed"
+            else
+              echo "## E2E Tests: Passed"
+            fi
+            echo
+            echo "- Workflow run: [#${GITHUB_RUN_NUMBER}](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+            if [ -n "${VIDEO_ARTIFACT_URL}" ]; then
+              echo "- Cypress videos artifact: [download](${VIDEO_ARTIFACT_URL})"
+            else
+              echo "- Cypress videos artifact: *(none uploaded)*"
+            fi
+            if [ -n "${STDOUT_ARTIFACT_URL}" ]; then
+              echo "- E2E stdout artifact: [download](${STDOUT_ARTIFACT_URL})"
+            else
+              echo "- E2E stdout artifact: *(none uploaded)*"
+            fi
+            echo
+
+            if [ -s "${VIDEO_LIST_PATH}" ]; then
+              echo "### Video files"
+              echo '```text'
+              cat "${VIDEO_LIST_PATH}"
+              echo '```'
+              echo
+            fi
+
+            if [ "${STATUS}" = "Failed" ] && [ -s "${REASON_PATH}" ]; then
+              echo "### Failure summary"
+              cat "${REASON_PATH}"
+              echo
+            fi
+
+            if [ "${STATUS}" = "Failed" ]; then
+              echo "### Failure stdout (tail)"
+              echo '```text'
+              cat "${FAILURE_SNIPPET_PATH}"
+              echo '```'
+            fi
+          } > "${COMMENT_PATH}"
+
+      - name: Find existing E2E PR comment
+        if: always() && github.event_name == 'pull_request'
+        id: find_comment
+        uses: peter-evans/find-comment@v3
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "<!-- e2e-tests-report -->"
+
+      - name: Create or update E2E PR comment
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body-path: e2e/cypress/e2e-pr-comment.md
+
+      - name: Fail workflow when E2E failed
+        if: steps.run_e2e.outputs.exit_code != '0'
+        run: exit 1
