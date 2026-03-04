@@ -389,6 +389,7 @@ if (process.env.JACK == "true") {
 
       // gets token from html code returned from fetch (matches token characters)
       // basically an extraction (thanks, Gemini)
+      // eslint-disable-next-line max-len
       const t = r.match(/([A-Za-z0-9-_]{20,}\.){2}[A-Za-z0-9-_]{20,}|[A-Za-z0-9]{32,}/);
 
       if (t) {
