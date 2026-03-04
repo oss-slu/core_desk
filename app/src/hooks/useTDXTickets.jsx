@@ -18,7 +18,7 @@ export const useTDXTickets = () => {
     const handleLogin = (shopId) => {
         setLoading(true);
 
-        const relayUrl = `http://localhost:3030/api/tdx-auth?shopId=${shopId}`; // update later
+        const relayUrl = `${import.meta.env.VITE_API_BASE_URL}/api/tdx-auth?shopId=${shopId}`; // update later
         const loginWindow = window.open(relayUrl, "OktaLogin", "width=500,height=600");
 
         const timer = setInterval(() => {
