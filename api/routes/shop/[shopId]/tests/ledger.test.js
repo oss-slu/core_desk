@@ -158,7 +158,7 @@ describe("/shop/[shopId]/ledger", () => {
           OR: [
             {
               type: "MANUAL_DEPOSIT",
-              value: 125,
+              value: 100,
             },
             {
               type: "FUNDS_PURCHASED",
