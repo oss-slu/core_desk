@@ -115,7 +115,7 @@ export const post = [
 
       await prisma.logs.createMany({
         data: createdItems.map((item) => ({
-          type: LogType.LEDGER_ITEM_CREATED_MANUALLY,
+          type: LogType.LEDGER_ITEM_RECTIFIED,
           userId: req.user.id,
           shopId,
           ledgerItemId: item.id,
