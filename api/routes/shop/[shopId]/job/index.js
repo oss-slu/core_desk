@@ -79,6 +79,14 @@ export const post = [
         billingGroupId,
       } = req.body;
 
+      const fallbackDueDate = new Date();
+      fallbackDueDate.setDate(fallbackDueDate.getDate() + 14);
+      fallbackDueDate.setHours(0, 0, 0, 0);
+      const dueDateToUse = dueDate ? new Date(dueDate) : fallbackDueDate;
+      const normalizedDueDate = Number.isNaN(dueDateToUse.getTime())
+        ? fallbackDueDate
+        : dueDateToUse;
+
       if (onBehalfOf) {
         if (
           userShop.accountType !== "ADMIN" &&
@@ -183,7 +191,7 @@ export const post = [
             shop: { connect: { id: shopId } },
             user: { connect: { id: userToCreateJobAs } },
             group: { connect: { id: billingGroupToCreateJobAs?.id } },
-            dueDate: new Date(dueDate),
+            dueDate: normalizedDueDate,
           },
         });
       } else {
@@ -193,7 +201,7 @@ export const post = [
             description,
             shop: { connect: { id: shopId } },
             user: { connect: { id: userToCreateJobAs } },
-            dueDate: new Date(dueDate),
+            dueDate: normalizedDueDate,
           },
         });
       }
