@@ -612,6 +612,7 @@ export const Jobs = () => {
           </>
         )}
         {ModalElement}
+        {TDXModalElement}
       </Page>
     );
   } else {

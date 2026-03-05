@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { authFetch } from "#url";
 import { useModal } from "#modal";
 import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
@@ -177,9 +178,63 @@ const CreateJobModalContent = ({
 const CreateTDXImportModalContent = ({
     onSubmit
   }) => {
-  const { TDXTicketIdInput } = useTDXTickets();
+  const {shopId} = useParams('');
+  const [auth] = useState({ token: localStorage.getItem('tdx_bearer_token') });
+  const [ticketId, setTicketId] = useState('');
+  const { loading, handleLogin, fetchTicket } = useTDXTickets();
+  if (!auth.token) {
+    return (
+      <div>
+          <div>
+              <Button
+                  loading={loading}
+                  onClick={async () => {
+                      handleLogin(shopId);
+                  }}
+              >
+                  Log Into TDNext
+              </Button>
+          </div>
+      </div>
+    )
+  }
   return (
-    <TDXTicketIdInput onSubmit={onSubmit}/>
+    <div className="gap-2 border-b-5 border-b-black">
+        <Input
+            value={ticketId}
+            onChange={(e) => setTicketId(e)}
+            label="TDNext Ticket ID"
+            placeholder="Ticket ID"
+        />
+        <Button 
+            loading={loading}
+            onClick={async () => {
+                const data = await fetchTicket(ticketId);
+                toast.promise(data, {
+                    loading: "Fetching ticket from TDX...",
+                    success: "Successfully imported ticket.",
+                    error: "Error when fetching",
+                });
+                if (data && onSubmit) {
+                    // Call onSubmit with positional arguments to match _createJob
+                    onSubmit(
+                        data.title,
+                        data.description,
+                        data.dueDate,
+                        data.onBehalfOf,
+                        data.onBehalfOfUserId,
+                        data.onBehalfOfUserEmail,
+                        data.onBehalfOfUserFirstName,
+                        data.onBehalfOfUserLastName,
+                        data.onBehalfOfBillingGroup,
+                        data.onBehalfOfBillingGroupId
+                    );
+                }
+            }}
+        >
+            Import Ticket
+        </Button>
+    </div>
   );
 };
 

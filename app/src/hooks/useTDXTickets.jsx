@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { Input, Button } from 'tabler-react-2';
 import { authFetch } from "#url";
 import toast from 'react-hot-toast';
-import { useParams } from 'react-router-dom';
 
 export const useTDXTickets = () => {
-    const {shopId} = useParams();
-    const [auth, setAuth] = useState({ token: localStorage.getItem('bearer_token') });
+    const [auth, setAuth] = useState({ token: localStorage.getItem('tdx_bearer_token') });
     const [ticketId, setTicketId] = useState('');
     const [ticket, setTicket] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -28,7 +25,7 @@ export const useTDXTickets = () => {
                     const token = urlParams.get('token');
 
                     if (token) {
-                        localStorage.setItem('bearer_token', token);
+                        localStorage.setItem('tdx_bearer_token', token);
                         setAuth({ token: token });
                         
                         loginWindow.close();
@@ -89,72 +86,13 @@ export const useTDXTickets = () => {
         }
     };
 
-    const TDXTicketIdInput = ({ onSubmit }) => {
-        if (!auth.token) {
-            return (
-                <div>
-                    <div>
-                        <Button
-                            loading={loading}
-                            onClick={async () => {
-                                handleLogin(shopId);
-                            }}
-                        >
-                            Log Into TDNext
-                        </Button>
-                    </div>
-                </div>
-            )
-        }
-        return (
-            <div>
-                <div className="d-flex align-items-end gap-2 border-b-5 border-b-black">
-                    <Input
-                        value={ticketId}
-                        onChange={(e) => setTicketId(e)}
-                        label="TDNext Ticket ID"
-                        placeholder="Ticket ID"
-                        className="mt-0"
-                    />
-                    <Button 
-                        loading={loading}
-                        onClick={async () => {
-                            const data = await fetchTicket(ticketId);
-                            toast.promise(data, {
-                                loading: "Fetching ticket from TDX...",
-                                success: "Successfully imported ticket.",
-                                error: "Error when fetching",
-                            });
-                            if (data && onSubmit) {
-                                // Call onSubmit with positional arguments to match _createJob
-                                onSubmit(
-                                    data.title,
-                                    data.description,
-                                    data.dueDate,
-                                    data.onBehalfOf,
-                                    data.onBehalfOfUserId,
-                                    data.onBehalfOfUserEmail,
-                                    data.onBehalfOfUserFirstName,
-                                    data.onBehalfOfUserLastName,
-                                    data.onBehalfOfBillingGroup,
-                                    data.onBehalfOfBillingGroupId
-                                );
-                            }
-                        }}
-                    >
-                        Import Ticket
-                    </Button>
-                </div>
-            </div>
-        );
-    };
-
     return {
         ticket,
         ticketId,
         setTicketId,
+        loading,
+        handleLogin,
         fetchTicket,
-        TDXTicketIdInput,
         error
     };
 };
