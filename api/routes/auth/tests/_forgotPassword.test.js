@@ -92,6 +92,7 @@ describe("/api/auth/forgotPassword", () => {
         });
 
 
+
         it("returns status 401, user not found", async () => { //token is valid, but the user doesnt exist with that token
             const fakeUserId = "00000000-0000-0000-0000-000000000000";
 
@@ -108,6 +109,26 @@ describe("/api/auth/forgotPassword", () => {
 
             expect(res.status).toBe(401);
             expect(res.body).toEqual({ error: "Invalid or expired link." });
+
+        });
+
+
+        it("returns status 400, Password must be at least 8 characters.", async () => { //passsword is not 8 charachters
+            const fakeUserId = "00000000-0000-0000-0000-000000000000";
+
+            const token = jwt.sign( //we need the jwt token to verify successfully
+                { id: fakeUserId },
+                process.env.JWT_SECRET
+            );
+            const res = await request(app)
+                .put("/api/auth/forgotPassword")
+                .send({
+                    token: token,
+                    newPassword: "newPass",
+                });
+
+            expect(res.status).toBe(400);
+            expect(res.body).toEqual({ error: "Password must be at least 8 characters." });
 
         });
 

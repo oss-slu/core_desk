@@ -47,7 +47,14 @@ export const put = [
   async (req, res) => {
     const { newPassword, token } = req.body;
 
+
     try {
+
+      if (newPassword.length < 8){
+        return res.status(400).json({error : "Password must be at least 8 characters." });
+      }
+
+      
       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
