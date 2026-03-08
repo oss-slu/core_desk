@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { authFetch } from "#url";
 import toast from 'react-hot-toast';
 
