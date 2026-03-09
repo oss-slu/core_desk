@@ -179,10 +179,10 @@ const CreateTDXImportModalContent = ({
     onSubmit
   }) => {
   const {shopId} = useParams('');
-  const [auth] = useState({ token: localStorage.getItem('tdx_bearer_token') });
+  const [auth] = useState({ tdxToken: localStorage.getItem('tdx_bearer_token') });
   const [ticketId, setTicketId] = useState('');
   const { loading, handleLogin, fetchTicket } = useTDXTickets();
-  if (!auth.token) {
+  if (!auth.tdxToken) {
     return (
       <div>
           <div>

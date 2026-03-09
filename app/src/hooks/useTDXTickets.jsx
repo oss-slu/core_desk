@@ -3,7 +3,7 @@ import { authFetch } from "#url";
 import toast from 'react-hot-toast';
 
 export const useTDXTickets = () => {
-    const [auth, setAuth] = useState({ token: localStorage.getItem('tdx_bearer_token') });
+    const [auth, setAuth] = useState({ tdxToken: localStorage.getItem('tdx_bearer_token') });
     const [ticketId, setTicketId] = useState('');
     const [ticket, setTicket] = useState(null);
     const [loading, setLoading] = useState(false);
@@ -26,12 +26,13 @@ export const useTDXTickets = () => {
 
                     if (token) {
                         localStorage.setItem('tdx_bearer_token', token);
-                        setAuth({ token: token });
+                        setAuth({ tdxToken: token });
                         
                         loginWindow.close();
                         clearInterval(timer);
                         setLoading(false);
                         toast.success("TDX Authenticated");
+                        window.location.reload();
                     }
                 }
             } catch (e) {
@@ -52,7 +53,7 @@ export const useTDXTickets = () => {
         try {
             // Pointing to your proxy endpoint
             try {
-                const r = await authFetch(`/api/tdx-ticket?ticketId=${id}&token=${auth.token}`);
+                const r = await authFetch(`/api/tdx-ticket?ticketId=${id}&token=${auth.tdxToken}`);
                 ticket = await r.json();
                 setTicket(ticket);
             } catch (error) {
