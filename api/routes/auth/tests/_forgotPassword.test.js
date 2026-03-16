@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import prisma from "#prisma";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 import request from "supertest";
 import { app } from "#index";
 import { tc } from "#setup";
