@@ -1,11 +1,11 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "#useAuth";
 import { useShop, useUser } from "#hooks";
 import { Loading } from "#loading";
-import { Typography, Util, Badge } from "tabler-react-2";
+import { Typography, Util, Badge, Button, DropdownInput } from "tabler-react-2";
 import { Table } from "#table";
 import moment from "moment";
 import { Price } from "#renderPrice";
@@ -51,6 +51,79 @@ export const ShopUsersPage = () => {
     includeUsers: true,
   });
   const { user: activeUser } = useUser(user?.id);
+
+
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+
+
+  const filteredUsers = useMemo(() => {
+    if (!searchTerm) return users;
+    return users.filter(
+      (u) =>
+        JSON.stringify(u).toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [users, searchTerm]);
+
+  const handleSort = (key) => {
+    setSortConfig((prev) =>
+      prev.key === key
+        ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
+        : { key, direction: "asc" }
+    );
+  };
+
+  const sortedUsers = useMemo(() => {
+    if (!filteredUsers) {
+      return [];
+    }
+    if (!sortConfig.key) {
+      return filteredUsers;
+    }
+
+    const sorted = [...filteredUsers].sort((a, b) => {
+      const aVal = a[sortConfig.key];
+      const bVal = b[sortConfig.key];
+
+      if (aVal == null) {
+        return 1;
+      }
+      if (bVal == null) {
+        return -1;
+      }
+
+      //dates
+      if (sortConfig.key === "lastLogin" || sortConfig.key === "createdAt") {
+        const aTime = aVal ? new Date(aVal).getTime() : 0;
+        const bTime = bVal ? new Date(bVal).getTime() : 0;
+        return sortConfig.direction === "asc" ? aTime - bTime : bTime - aTime;
+      }
+
+      //numeric comparison
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+      }
+
+      //string comparison
+      return sortConfig.direction === "asc"
+        ? String(aVal).localeCompare(String(bVal))
+        : String(bVal).localeCompare(String(aVal));
+    });
+
+    return sorted;
+  }, [filteredUsers, sortConfig]);
+
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return sortedUsers.slice(start, end);
+  }, [sortedUsers, currentPage, rowsPerPage]);
+
+  const totalPages = Math.ceil((filteredUsers?.length || 0) / rowsPerPage);
 
   if (loading)
     return (
@@ -196,8 +269,50 @@ export const ShopUsersPage = () => {
             render: (createdAt) => moment(createdAt).format("MM/DD/YY"),
           },
         ]}
-        data={users}
+        data={paginatedUsers}
       />
+
+      <Util.Row
+        justify="center"
+        align="center"
+        gap={1}
+        style={{ marginTop: "1rem" }}
+      >
+        <Button
+          disabled={currentPage === 1}
+          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+        >
+          Previous
+        </Button>
+        <span>
+          Page {currentPage} of {totalPages || 1}
+        </span>
+        <Button
+          disabled={currentPage === totalPages || totalPages === 0}
+          onClick={() =>
+            setCurrentPage((p) => Math.min(p + 1, totalPages))
+          }
+        >
+          Next
+        </Button>
+
+        <DropdownInput
+          value={rowsPerPage}
+          onChange={(item) => {
+            setRowsPerPage(Number(item.id));
+            setCurrentPage(1);
+          }}
+          items={[
+            { id: 10, label: "10 per page" },
+            { id: 25, label: "25 per page" },
+            { id: 50, label: "50 per page" },
+            { id: 100, label: "100 per page" },
+          ]}
+          prompt="Rows per page"
+          showSearch={false}
+          style={{ marginLeft: "1rem" }}
+        />
+      </Util.Row>
     </Page>
   );
 };
