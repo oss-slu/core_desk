@@ -1,0 +1,36 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`/auth/forgotPassword/ > GET > returns a user's shop information to admins 1`] = `
+{
+  "accountTitle": null,
+  "accountType": "CUSTOMER",
+  "active": true,
+  "blacklisted": false,
+  "createdAt": Any<String>,
+  "id": Any<String>,
+  "shopId": Any<String>,
+  "updatedAt": Any<String>,
+  "user": {
+    "admin": true,
+    "balance": 0,
+    "createdAt": Any<String>,
+    "email": "test@email.com",
+    "firstName": "TestFirstName",
+    "id": Any<String>,
+    "isMe": true,
+    "jobCounts": {
+      "completedCount": 0,
+      "excludedCount": 0,
+      "inProgressCount": 0,
+      "notStartedCount": 0,
+    },
+    "jobs": [],
+    "lastName": "TestLastName",
+    "simple": true,
+    "suspended": false,
+    "suspensionReason": null,
+    "updatedAt": Any<String>,
+  },
+  "userId": Any<String>,
+}
+`;

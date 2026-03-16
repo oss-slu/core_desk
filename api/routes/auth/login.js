@@ -70,16 +70,16 @@ export const put = [
   async (req, res) => {
     const { userId, password } = req.body;
     try {
-      const user = await prisma.user.findUnique({ where: { userId } });
+      const user = await prisma.user.findUnique({ where: { id: userId } });
 
       if (!user || !user.password) {
         //if there is no user matching the userId
 
         return res
-          .status(404)
+          .status(401)
           .json({ error: "Invalid credentials or SSO required" });
       }
-      const hashedPassword = bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
       await prisma.user.update({
         where: { id: userId },
@@ -88,11 +88,12 @@ export const put = [
       await prisma.logs.create({
         data: { type: LogType.USER_PASSWORD_CHANGE, userId: user.id },
       });
-      return res.status(200);
+      return res.status(200).json({ success: true });
     } catch (error) {
       console.log("Error", error);
-
-      return res.status(500).json({ error: "Internal server error" });
+      return res
+        .status(401)
+        .json({ error: "Invalid credentials or SSO required" });
     }
   },
 ];

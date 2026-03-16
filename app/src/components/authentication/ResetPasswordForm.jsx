@@ -12,6 +12,10 @@ export const ResetPasswordForm = ({ token, setMode }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (newPassword.length < 8) {
+      setError("Password must be at least 8 characters.");
+      return;
+    }
 
     if (newPassword !== confirmPassword) {
       setError("Passwords do not match");

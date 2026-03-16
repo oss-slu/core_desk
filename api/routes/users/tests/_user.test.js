@@ -50,14 +50,14 @@ describe("/users", () => {
         .send();
 
       expect(res.status).toBe(200);
-      expect(res.body.users).toHaveLength(2);
+      expect(res.body.users).toHaveLength(3);
 
       expect(res.body.users[0]).toMatchObject({
         admin: expect.any(Boolean),
         createdAt: expect.any(String),
         email: expect.any(String),
         firstName: expect.any(String),
-        hasPassword: false,
+        hasPassword: expect.any(Boolean), //there is sso user and non-sso user, this will vary
         id: expect.any(String),
         isMe: expect.any(Boolean),
         jobCount: expect.any(Number),

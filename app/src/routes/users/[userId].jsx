@@ -133,13 +133,17 @@ const ChangePassword = ({ user }) => {
 
   const updatePassword = async (user) => {
     try {
-      const r = await authFetch(`/api/routes/login`, {
+      if (password.length < 8){
+        toast.error("Password must be at least 8 characters.");
+        return;
+      }
+      const r = await authFetch(`/api/auth/login`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          userId: user.userId,
+          userId: user.id,
           password: password,
         }),
 
@@ -147,15 +151,17 @@ const ChangePassword = ({ user }) => {
       });
 
       const data = await r.json();
-
-
       if (!r.ok) {
         toast.error(data.error)
         return;
       }
+      toast.success("Password updated!");
     } catch (error) {
-      toast.error(error);
-      //add to sentry later?
+      toast.error(error.message || "Something went wrong.");
+    }
+    finally{
+      setPassword("");
+
     }
   };
 
@@ -169,10 +175,11 @@ const ChangePassword = ({ user }) => {
           fontSize: "0.875rem"
         }}
       >
-        Set New Password for {user.firstName}
+        Set New Password for {user?.firstName} {user?.lastName}
       </label>
 
-      <div style={{ display: "flex", alignItems: "stretch", gap: "0px" }}>
+      <div style={{ display: "flex", alignItems: "stretch", gap: "8px" }}>
+
         <div style={{ flex: 1 }}>
           <Input
             type="password"
@@ -181,7 +188,7 @@ const ChangePassword = ({ user }) => {
             onChange={(val) => setPassword(val)}
             style={{
               borderTopRightRadius: 0,
-              borderBottomRightRadius: 0,
+              borderBottomRightRadius: 0
             }}
           />
         </div>
@@ -189,17 +196,14 @@ const ChangePassword = ({ user }) => {
         <Button
           variant="primary"
           disabled={!password}
+          onClick={() => updatePassword(user)}
           style={{
-            borderTopLeftRadius: 0,
-            borderBottomLeftRadius: 0,
-            whiteSpace: "nowrap"
-          }}
-          onClick={() => {
-            updatePassword(user);
+            height: "100%"
           }}
         >
           Update
         </Button>
+
       </div>
 
       <small
