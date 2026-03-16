@@ -18,8 +18,5 @@
   "devDependencies": {
     "concurrently": "^9.0.0",
     "start-server-and-test": "^2.0.0"
-  },
-  "dependencies": {
-    "bcrypt": "^6.0.0"
   }
 }

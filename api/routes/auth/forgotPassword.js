@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "#prisma";
 import postmark from "postmark";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 
 export const post = [
   async (req, res) => {

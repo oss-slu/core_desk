@@ -2,7 +2,7 @@ import samlConfig from "../../config/saml-config.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { prisma } from "#prisma";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 
 export const get = [
   (req, res) => {
