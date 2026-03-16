@@ -11,6 +11,18 @@ import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
 import { useTDXTickets } from "./useTDXTickets";
 
+const toLocalDateInputValue = (date) => {
+  const localDate = new Date(date);
+  localDate.setMinutes(localDate.getMinutes() - localDate.getTimezoneOffset());
+  return localDate.toISOString().split("T")[0];
+};
+
+const getDefaultDueDate = () => {
+  const dueDate = new Date();
+  dueDate.setDate(dueDate.getDate() + 14);
+  return `${toLocalDateInputValue(dueDate)}T00:00:00`;
+};
+
 const CreateJobModalContent = ({
   onSubmit,
   defaultBillingGroupId = null,
@@ -18,7 +30,7 @@ const CreateJobModalContent = ({
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [dueDate, setDueDate] = useState("");
+  const [dueDate, setDueDate] = useState(getDefaultDueDate);
   const [loading, setLoading] = useState(false);
   const [onBehalfOf, setOnBehalfOf] = useState(false);
   const [onBehalfOfUserId, setOnBehalfOfUserId] = useState(null);
@@ -296,7 +308,7 @@ export const useJobs = (shopId) => {
   const CreateSimpleSubPage = () => {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [dueDate, setDueDate] = useState("");
+    const [dueDate, setDueDate] = useState(getDefaultDueDate);
     const [loading, setLoading] = useState(false);
     const [onBehalfOf] = useState(false);
     const [onBehalfOfUserId] = useState(null);

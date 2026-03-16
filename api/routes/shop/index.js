@@ -1,4 +1,4 @@
-import { LedgerItemType, LogType } from "@prisma/client";
+import { LedgerItemType, LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { SHOP_SELECT, SHOP_SELECT_WITH_LEDGER } from "./shared.js";

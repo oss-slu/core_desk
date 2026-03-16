@@ -20,6 +20,7 @@ export const get = [
             material: true,
             secondaryMaterial: true,
             resource: true,
+            resourceType: true,
           },
         },
         items: {
@@ -27,12 +28,15 @@ export const get = [
             material: true,
             secondaryMaterial: true,
             resource: true,
+            resourceType: true,
           },
         },
       },
     });
 
-    const { url, key } = await generateInvoice(job, userId, shopId);
+    const { url, key } = await generateInvoice(job, userId, shopId, {
+      draft: true,
+    });
 
     return res.json({ url, key });
   },

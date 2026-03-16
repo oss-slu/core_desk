@@ -1,4 +1,4 @@
-# SLU Open Project
+# CoreDesk
 
 [![codecov](https://codecov.io/gh/jackcrane/slu-open-project/graph/badge.svg?token=OUAS5BV7BW)](https://codecov.io/gh/jackcrane/slu-open-project)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/oss-slu/core_desk)
@@ -145,17 +145,20 @@ docker-compose down -v
 ### End-to-End (E2E) tests
 
 Notes:
-- Requires Docker and Docker Compose. The compose stack brings up Postgres, MinIO (S3), the API (serving the app), and a Cypress runner.
+- Requires Docker and Docker Compose. The compose stack brings up Postgres, MinIO (S3), and the app/API container on `http://localhost:3030`.
 - Artifacts (videos/screenshots) are saved under `e2e/cypress/`.
-- On Windows, run the following commands with Git Bash or WSL through VS Code.
-
-On Windows from Git Bash in VS Code, you need to convert the /api-entrypoint.sh file to Unix line endings:
-
-```bash
-cd e2e/docker
-dos2unix api-entrypoint.sh
-```
-If you are not using VS Code, be sure to have dos2unix installed.
+- E2E env vars are defined in `e2e/docker/.env.e2e`:
+  - `DATABASE_URL`
+  - `JWT_SECRET`
+  - `BASE_URL`
+  - `AWS_ACCESS_KEY_ID`
+  - `AWS_SECRET_ACCESS_KEY`
+  - `AWS_REGION`
+  - `AWS_BUCKET`
+  - `AWS_ENDPOINT`
+  - `PROJECT_NAME`
+  - `CLOUDFLARE_RENDER_WORKER_URL=https://stl-renderer.jackcrane.workers.dev`
+  - `CLOUDFLARE_RENDER_WORKER_TOKEN=COREDESK_RENDER_TOKEN`
 
 Quick, isolated runs use Docker (recommended) from the root folder:
 - Run once: `npm run test:e2e`
@@ -168,4 +171,4 @@ Local development runner (without Docker):
 - In another terminal, open Cypress: `npm --workspace e2e run cy:open`
 - Headless run locally: `npm --workspace e2e run cy:run`
 
-Tip: The Cypress base URL defaults to `http://localhost:5173` but can be overridden via `BASE_URL`.
+Tip: The Cypress base URL defaults to `http://localhost:3030` but can be overridden via `BASE_URL`.

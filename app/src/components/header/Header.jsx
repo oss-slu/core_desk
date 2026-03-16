@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "#useAuth";
 import styles from "./Header.module.css";
-import logo from "#sluopLogo";
+import logo from "#coreDeskLogo";
 import { Dropdown } from "tabler-react-2";
 import { UserShopToggle } from "../userShopToggle/UserShopToggle";
 import { Icon } from "#icon";
@@ -12,7 +12,7 @@ import classNames from "classnames";
 
 export const Header = () => {
   const { user, loggedIn, login, logout } = useAuth();
-  const [shopId, setShopId ] = useState("");
+  const [shopId, setShopId] = useState("");
 
   useEffect(() => {
     setInterval(() => {
@@ -26,7 +26,9 @@ export const Header = () => {
   return (
     <header className={styles.header}>
       <div className={styles.headerGroup}>
-        <a href="/"><img src={logo} className={styles.headerLogo} alt="SLUCAM Logo" /></a>
+        <a href="/">
+          <img src={logo} className={styles.headerLogo} alt="CoreDesk Logo" />
+        </a>
         <h1 className={classNames(styles.headerTitle, "hos-600")}>
           {shop?.logo?.location ? (
             <img
@@ -40,13 +42,15 @@ export const Header = () => {
         </h1>
       </div>
       {user?.id && (
-        <div style={{
-          marginLeft: "auto",
-          marginRight: "25px",
-          display: "flex",
-          alignItems: "center",
-          gap: 0,
-        }}>
+        <div
+          style={{
+            marginLeft: "auto",
+            marginRight: "25px",
+            display: "flex",
+            alignItems: "center",
+            gap: 0,
+          }}
+        >
           <UserShopToggle userId={user.id} />
         </div>
       )}

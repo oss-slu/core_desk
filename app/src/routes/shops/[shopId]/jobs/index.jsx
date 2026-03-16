@@ -187,6 +187,7 @@ export const Jobs = () => {
   const columnsOptions = [
     "Title",
     "Submitter",
+    "Payer",
     "Description",
     "Total Cost",
     "Affordability",
@@ -201,6 +202,7 @@ export const Jobs = () => {
   const [columnsToShow, setColumnsToShow] = useState([
     "Title",
     "Submitter",
+    "Payer",
     "Total Cost",
     "Progress",
     "Status",
@@ -418,6 +420,20 @@ export const Jobs = () => {
                   ),
                 },
                 {
+                  label: "Payer",
+                  accessor: "billingAccount.name",
+                  render: (name, context) => (
+                    <Util.Row gap={0.5} align="center">
+                      <span>{name || "N/A"}</span>
+                      {context.billingAccount?.type === "GROUP" && (
+                        <Badge color="blue" soft>
+                          Group
+                        </Badge>
+                      )}
+                    </Util.Row>
+                  ),
+                },
+                {
                   label: "Description",
                   accessor: "description",
                   render: (d) =>
@@ -437,8 +453,8 @@ export const Jobs = () => {
                 {
                   label: "Affordability",
                   accessor: "totalCost",
-                  render: (d) =>
-                    d > userShop.balance ? (
+                  render: (d, context) =>
+                    d > (context.billingAccount?.balance ?? 0) ? (
                       <Badge color="red" soft>
                         Insufficient Funds
                       </Badge>

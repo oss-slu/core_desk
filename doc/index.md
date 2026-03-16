@@ -12,7 +12,6 @@ You will need to set the following environment variables:
 DATABASE_URL="postgresql://(some postgres connection string)"
 JWT_SECRET="(random string)"
 BASE_URL="http://localhost:5173"
-UPLOADTHING_TOKEN='(uploadthing token, soon to be replaced with S3)'
 SERVER_URL="(tunnel to the outside internet. I recommend Bore.sh)"
 SENTRY_AUTH_TOKEN="(sentry auth token)"
 ```

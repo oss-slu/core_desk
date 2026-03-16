@@ -1,11 +1,10 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "linux-musl", "debian-openssl-3.0.x"]
+  provider = "prisma-client"
+  output   = "./generated"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model user {
@@ -245,6 +244,7 @@ model ResourceType {
   id                  String                   @id @default(cuid())
   title               String
   description         String?
+  costingMode         CostingMode              @default(CALCULATE_WITH_RESOURCE_AND_MATERIAL)
   createdAt           DateTime                 @default(now())
   updatedAt           DateTime                 @updatedAt
   active              Boolean                  @default(true)
@@ -296,7 +296,8 @@ model Job {
 
 model LedgerItem {
   id         String         @id @default(cuid())
-  userId     String
+  userId     String?
+  billingGroupId String?
   shopId     String
   jobId      String?        @unique
   type       LedgerItemType
@@ -307,8 +308,12 @@ model LedgerItem {
   updatedAt  DateTime       @updatedAt
   job        Job?           @relation(fields: [jobId], references: [id], onDelete: Cascade)
   shop       Shop           @relation(fields: [shopId], references: [id])
-  user       user           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user       user?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billingGroup BillingGroup? @relation(fields: [billingGroupId], references: [id], onDelete: Cascade)
   logs       logs[]
+
+  @@index([shopId, userId])
+  @@index([shopId, billingGroupId])
 }
 
 model JobComment {
@@ -329,6 +334,8 @@ model AdditionalCostLineItem {
   resourceId           String?
   materialId           String?
   secondaryMaterialId  String?
+  rawValue             Float?
+  amount               Float?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   unitQty              Float?
@@ -350,6 +357,7 @@ model JobItem {
   title  String
   status ProgressStatus @default(NOT_STARTED)
   qty    Float?
+  rawValue Float?
 
   fileId String?
   file   File?   @relation("JobItem_file", fields: [fileId], references: [id], onDelete: Cascade)
@@ -426,6 +434,7 @@ model BillingGroup {
   shop                 Shop                         @relation(fields: [shopId], references: [id])
   invitationLinks      BillingGroupInvitationLink[]
   jobs                 Job[]
+  ledgerItems          LedgerItem[]
   users                UserBillingGroup[]
   logs                 logs[]
 }
@@ -496,6 +505,7 @@ enum LogType {
   COMMENT_CREATED
   LEDGER_ITEM_CREATED
   LEDGER_ITEM_CREATED_MANUALLY
+  LEDGER_ITEM_RECTIFIED
   BILLING_GROUP_CREATED
   BILLING_GROUP_MODIFIED
   BILLING_GROUP_DELETED
@@ -529,6 +539,11 @@ enum SuppliedMaterialLevels {
   SOMETIMES
   NEVER
   SPECIAL
+}
+
+enum CostingMode {
+  CALCULATE_WITH_RESOURCE_AND_MATERIAL
+  RAW_VALUE_ENTRY
 }
 
 enum Color {

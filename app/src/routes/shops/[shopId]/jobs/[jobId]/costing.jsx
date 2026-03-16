@@ -39,6 +39,7 @@ export const JobCostingPage = () => {
     user?.admin ||
     userShop?.accountType === "ADMIN" ||
     userShop?.accountType === "OPERATOR";
+  const payerBalance = job?.billingAccount?.balance ?? userShop?.balance ?? 0;
 
   const { confirm, ConfirmModal: ConfirmFinalizeModal } = useConfirm({
     title: "Finalize job",
@@ -96,26 +97,28 @@ export const JobCostingPage = () => {
           {job.finalized ? (
             <>
               <Link
-                onClick={() =>
+                to="#"
+                onClick={(e) => {
+                  e.preventDefault();
                   downloadFile(
                     job.ledgerItems[0].invoiceUrl,
                     `invoice-${jobId}.pdf`
-                  )
-                }
+                  );
+                }}
               >
                 <Icon i="download" /> Download invoice
               </Link>
             </>
           ) : (
-            calculateTotalCostOfJob(job) > userShop?.balance &&
+            calculateTotalCostOfJob(job) > payerBalance &&
             userIsPrivileged && (
               <>
                 <Util.Spacer size={1} />
                 <span className="text-danger">
                   <Icon i="alert-triangle" /> Insufficient balance: This job
-                  will put the customer's account into a negative balance. You
-                  can still finalize the job, but the customer will need to
-                  refill their account before they can place another order.
+                  will put the billing account into a negative balance. You can
+                  still finalize the job, but the account owner will need to
+                  refill before placing another order.
                 </span>
               </>
             )
@@ -141,8 +144,11 @@ export const JobCostingPage = () => {
           {job.items?.map((item) => {
             if (!item) return null;
             if (!item.resourceTypeId) return null;
-            if (!item.resourceId) return null;
-            if (!item.material) return null;
+            const isRawMode =
+              item.resourceType?.costingMode === "RAW_VALUE_ENTRY";
+            if (!isRawMode && !item.resourceId) return null;
+            if (!isRawMode && !item.material) return null;
+            if (!isRawMode && !item.secondaryMaterial) return null;
             return (
               <ItemCostCard key={item.id} item={item} refetchJob={refetchJob} />
             );

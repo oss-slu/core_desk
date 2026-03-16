@@ -1,13 +1,8 @@
 // eslint-disable-next-line no-unused-vars
-import { LedgerItemType, LogType, Prisma } from "@prisma/client";
+import { LedgerItemType, LogType, Prisma } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";
-import { z } from "zod";
-
-const userSchema = z.object({
-  ledgerItemId: z.string().optional,
-});
 
 /** @type {Prisma.JobInclude} */
 const JOB_INCLUDE = {
@@ -39,6 +34,13 @@ const JOB_INCLUDE = {
           costPerUnit: true,
           unitDescriptor: true,
           title: true,
+        },
+      },
+      resourceType: {
+        select: {
+          id: true,
+          title: true,
+          costingMode: true,
         },
       },
       user: {
@@ -78,11 +80,25 @@ const JOB_INCLUDE = {
           costPerUnit: true,
         },
       },
+      resourceType: {
+        select: {
+          id: true,
+          title: true,
+          costingMode: true,
+        },
+      },
     },
   },
   ledgerItems: {
     where: {
       type: LedgerItemType.JOB,
+    },
+  },
+  user: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
     },
   },
   group: {
@@ -125,6 +141,97 @@ const generateGroupInclude = (userId, userIsPrivileged) => {
   return JOB_GROUP_INCLUDE;
 };
 
+const getUserBillingAccount = async (shopId, userId) => {
+  const [balanceResult, user] = await Promise.all([
+    prisma.ledgerItem.aggregate({
+      where: {
+        shopId,
+        userId,
+      },
+      _sum: {
+        value: true,
+      },
+    }),
+    prisma.user.findFirst({
+      where: {
+        id: userId,
+      },
+      select: {
+        firstName: true,
+        lastName: true,
+      },
+    }),
+  ]);
+
+  return {
+    type: "USER",
+    id: userId,
+    name: user ? `${user.firstName} ${user.lastName}` : "Customer",
+    balance: balanceResult._sum.value || 0,
+  };
+};
+
+const getGroupBillingAccount = async (shopId, groupId) => {
+  const [balanceResult, group] = await Promise.all([
+    prisma.ledgerItem.aggregate({
+      where: {
+        shopId,
+        billingGroupId: groupId,
+      },
+      _sum: {
+        value: true,
+      },
+    }),
+    prisma.billingGroup.findFirst({
+      where: {
+        id: groupId,
+      },
+      select: {
+        title: true,
+      },
+    }),
+  ]);
+
+  return {
+    type: "GROUP",
+    id: groupId,
+    name: group?.title || "Billing Group",
+    balance: balanceResult._sum.value || 0,
+  };
+};
+
+const attachBillingAccount = async (job, shopId) => {
+  if (!job) return job;
+
+  const billingAccount = job.groupId
+    ? await getGroupBillingAccount(shopId, job.groupId)
+    : await getUserBillingAccount(shopId, job.userId);
+
+  return {
+    ...job,
+    billingAccount,
+  };
+};
+
+const ALLOWED_JOB_UPDATE_FIELDS = [
+  "title",
+  "description",
+  "imageUrl",
+  "userId",
+  "materialId",
+  "materialQty",
+  "resourceTypeId",
+  "resourceId",
+  "groupId",
+  "dueDate",
+  "finalized",
+  "finalizedAt",
+  "additionalCostOverride",
+  "status",
+  "secondaryMaterialId",
+  "secondaryMaterialQty",
+];
+
 export const get = [
   verifyAuth,
   async (req, res) => {
@@ -159,7 +266,7 @@ export const get = [
       });
 
       let job;
-      if (initialJob.groupId && !shouldLoadAll) {
+      if (initialJob?.groupId && !shouldLoadAll) {
         const INCLUDE = generateGroupInclude(userId);
 
         // The job is part of a group, so we need to handle different users accessing it.
@@ -203,7 +310,9 @@ export const get = [
         return res.status(404).json({ error: "Not found" });
       }
 
-      return res.json({ job });
+      const jobWithBillingAccount = await attachBillingAccount(job, shopId);
+
+      return res.json({ job: jobWithBillingAccount });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ error: "An error occurred" });
@@ -248,6 +357,7 @@ export const put = [
               material: true,
               secondaryMaterial: true,
               resource: true,
+              resourceType: true,
             },
           },
           items: {
@@ -255,6 +365,7 @@ export const put = [
               material: true,
               secondaryMaterial: true,
               resource: true,
+              resourceType: true,
             },
           },
         },
@@ -264,16 +375,97 @@ export const put = [
         return res.status(404).json({ error: "Not found" });
       }
 
-      delete req.body.id;
-      delete req.body.userId;
-      delete req.body.shopId;
-      delete req.body.createdAt;
-      delete req.body.updatedAt;
-      delete req.body.items;
-      delete req.body.resource;
+      const jobUpdateData = Object.fromEntries(
+        Object.entries(req.body).filter(([key]) =>
+          ALLOWED_JOB_UPDATE_FIELDS.includes(key)
+        )
+      );
+
+      if (jobUpdateData.userId === job.userId) {
+        delete jobUpdateData.userId;
+      }
+
+      const requesterIsBeingUpdated = Object.prototype.hasOwnProperty.call(
+        jobUpdateData,
+        "userId"
+      );
+      if (requesterIsBeingUpdated) {
+        if (!shouldLoadAll) {
+          return res.status(403).json({ error: "Forbidden" });
+        }
+
+        if (
+          !jobUpdateData.userId ||
+          typeof jobUpdateData.userId !== "string"
+        ) {
+          return res.status(400).json({ error: "Invalid requester" });
+        }
+
+        const requesterOnShop = await prisma.userShop.findFirst({
+          where: {
+            userId: jobUpdateData.userId,
+            shopId,
+            active: true,
+          },
+        });
+
+        if (!requesterOnShop) {
+          return res.status(400).json({ error: "Requester is not in this shop" });
+        }
+      }
+
+      if (jobUpdateData.groupId === job.groupId) {
+        delete jobUpdateData.groupId;
+      }
+
+      const groupIsBeingUpdated = Object.prototype.hasOwnProperty.call(
+        jobUpdateData,
+        "groupId"
+      );
+      if (groupIsBeingUpdated) {
+        if (
+          jobUpdateData.groupId !== null &&
+          typeof jobUpdateData.groupId !== "string"
+        ) {
+          return res.status(400).json({ error: "Invalid billing group" });
+        }
+
+        if (jobUpdateData.groupId !== null) {
+          const billingGroup = await prisma.billingGroup.findFirst({
+            where: {
+              id: jobUpdateData.groupId,
+              shopId,
+              active: true,
+            },
+          });
+
+          if (!billingGroup) {
+            return res.status(400).json({ error: "Billing group not found" });
+          }
+
+          if (!shouldLoadAll) {
+            const userBillingGroup = await prisma.userBillingGroup.findFirst({
+              where: {
+                userId: req.user.id,
+                billingGroupId: billingGroup.id,
+                active: true,
+              },
+            });
+
+            const canAssignToGroup =
+              !!userBillingGroup &&
+              (billingGroup.membersCanCreateJobs ||
+                userBillingGroup.role === "ADMIN");
+
+            if (!canAssignToGroup) {
+              return res.status(403).json({ error: "Forbidden" });
+            }
+          }
+        }
+      }
 
       let updatedJob;
-      if (req.body.finalized && !job.finalized) {
+      if (jobUpdateData.finalized && !job.finalized) {
         if (
           !(
             userShop.accountType === "ADMIN" ||
@@ -305,7 +497,8 @@ export const put = [
           data: {
             shopId,
             jobId,
-            userId: job.userId,
+            userId: job.groupId ? null : job.userId,
+            billingGroupId: job.groupId || null,
             invoiceUrl: url,
             invoiceKey: key,
             value: value * -1,
@@ -313,24 +506,16 @@ export const put = [
           },
         });
 
-        const validationResult = userSchema.safeParse(req.body);
-        if (!validationResult.success) {
-          return res.status(400).json({
-            error: "Invalid data",
-            issues: validationResult.error.format(),
+        if (log?.id) {
+          await prisma.logs.update({
+            where: {
+              id: log.id,
+            },
+            data: {
+              ledgerItemId: ledgerItem.id,
+            },
           });
         }
-
-        const validatedData = validationResult.data;
-
-        await prisma.logs.update({
-          where: {
-            id: log.id,
-          },
-          data: {
-            ledgerItemId: validatedData.ledgerItem,
-          },
-        });
 
         await prisma.logs.createMany({
           data: [
@@ -351,13 +536,19 @@ export const put = [
           ],
         });
 
-        // Finalize job
+        updatedJob = await prisma.job.findFirst({
+          where: {
+            id: jobId,
+            shopId,
+          },
+          include: JOB_INCLUDE,
+        });
       } else {
         updatedJob = await prisma.job.update({
           where: {
             id: jobId,
           },
-          data: req.body,
+          data: jobUpdateData,
           include: JOB_INCLUDE,
         });
 
@@ -373,7 +564,12 @@ export const put = [
         });
       }
 
-      return res.json({ job: updatedJob });
+      const updatedJobWithBillingAccount = await attachBillingAccount(
+        updatedJob,
+        shopId
+      );
+
+      return res.json({ job: updatedJobWithBillingAccount });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ error: "An error occurred" });

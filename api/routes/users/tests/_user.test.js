@@ -4,7 +4,7 @@ import { app } from "#index";
 import { gt } from "#gt";
 import { prisma } from "#mock-prisma";
 import { prisma as realPrisma } from "#prisma";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 
 describe("/users", () => {
   describe("GET", () => {

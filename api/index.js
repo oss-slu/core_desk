@@ -7,7 +7,7 @@ import cors from "cors";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { prisma } from "#prisma";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 dotenv.config();
 import path from "path";
 import { fileURLToPath } from "url";
