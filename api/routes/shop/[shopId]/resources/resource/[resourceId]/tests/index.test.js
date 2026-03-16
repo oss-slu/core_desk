@@ -4,7 +4,7 @@ import { app } from "#index";
 import { gt } from "#gt";
 import { prisma } from "#prisma";
 import { tc } from "#setup";
-import { LogType } from "@prisma/client";
+import { LogType } from "#prisma-client";
 
 const setup = async (options) => {
   const resourceOptions = options?.resource || {};

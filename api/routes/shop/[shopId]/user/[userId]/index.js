@@ -1,4 +1,4 @@
-import { LedgerItemType, LogType } from "@prisma/client";
+import { LedgerItemType, LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { calculateTotalCostOfJobByJobId } from "../../../../../util/docgen/invoice.js";

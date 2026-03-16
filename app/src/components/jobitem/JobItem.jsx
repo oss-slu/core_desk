@@ -26,14 +26,30 @@ import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
 export function downloadFile(url, filename) {
+  if (!url) return;
+
   fetch(url)
-    .then((response) => response.blob())
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to download: ${response.status}`);
+      }
+      return response.blob();
+    })
     .then((blob) => {
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = filename;
       link.click();
       URL.revokeObjectURL(link.href); // Clean up
+    })
+    .catch(() => {
+      // Fallback for cross-origin URLs (ex: S3) when fetch is blocked by CORS.
+      const link = document.createElement("a");
+      link.href = url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.download = filename;
+      link.click();
     })
     .catch((error) => {
       console.error("Error downloading file:", error);
@@ -337,48 +353,53 @@ export const JobItem = ({
                           includeNone={true}
                         />
                         {item.resourceTypeId ? (
-                          <>
-                            <MaterialPicker
-                              value={item.materialId}
-                              onChange={(value) =>
-                                updateJobItem({ materialId: value })
-                              }
-                              resourceTypeId={item.resourceTypeId}
-                              opLoading={opLoading}
-                              includeNone={true}
-                              materialType={"Primary"}
-                            />
-                            <MaterialPicker
-                              value={item.secondaryMaterialId}
-                              onChange={(value) =>
-                                updateJobItem({ secondaryMaterialId: value })
-                              }
-                              resourceTypeId={item.resourceTypeId}
-                              opLoading={opLoading}
-                              includeNone={true}
-                              materialType={"Secondary"}
-                            />
-                            {userIsPrivileged ? (
-                              <ResourcePicker
-                                value={item.resourceId}
+                          item.resourceType?.costingMode ===
+                          "RAW_VALUE_ENTRY" ? (
+                            <></>
+                          ) : (
+                            <>
+                              <MaterialPicker
+                                value={item.materialId}
                                 onChange={(value) =>
-                                  updateJobItem({ resourceId: value })
+                                  updateJobItem({ materialId: value })
                                 }
                                 resourceTypeId={item.resourceTypeId}
                                 opLoading={opLoading}
                                 includeNone={true}
+                                materialType={"Primary"}
                               />
-                            ) : (
-                              <Util.Col gap={1}>
-                                <label className="form-label mb-0">
-                                  Resource
-                                </label>
-                                <Badge color="blue" soft>
-                                  {item.resource?.title || "None"}
-                                </Badge>
-                              </Util.Col>
-                            )}
-                          </>
+                              <MaterialPicker
+                                value={item.secondaryMaterialId}
+                                onChange={(value) =>
+                                  updateJobItem({ secondaryMaterialId: value })
+                                }
+                                resourceTypeId={item.resourceTypeId}
+                                opLoading={opLoading}
+                                includeNone={true}
+                                materialType={"Secondary"}
+                              />
+                              {userIsPrivileged ? (
+                                <ResourcePicker
+                                  value={item.resourceId}
+                                  onChange={(value) =>
+                                    updateJobItem({ resourceId: value })
+                                  }
+                                  resourceTypeId={item.resourceTypeId}
+                                  opLoading={opLoading}
+                                  includeNone={true}
+                                />
+                              ) : (
+                                <Util.Col gap={1}>
+                                  <label className="form-label mb-0">
+                                    Resource
+                                  </label>
+                                  <Badge color="blue" soft>
+                                    {item.resource?.title || "None"}
+                                  </Badge>
+                                </Util.Col>
+                              )}
+                            </>
+                          )
                         ) : (
                           <i>Select a resource type to see more options</i>
                         )}
@@ -390,9 +411,11 @@ export const JobItem = ({
                   title: "Costing",
                   content: (
                     <>
-                      {item.materialId &&
-                      item.resourceId &&
-                      item.secondaryMaterialId ? (
+                      {(item.resourceType?.costingMode === "RAW_VALUE_ENTRY" &&
+                        item.resourceTypeId) ||
+                      (item.materialId &&
+                        item.resourceId &&
+                        item.secondaryMaterialId) ? (
                         <EditCosting
                           item={item}
                           onChange={(value) => updateJobItem(value)}

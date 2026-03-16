@@ -23,6 +23,7 @@
 
 .headerLogo {
   height: 100%;
+  max-width: 150px;
 }
 
 .headerGroup {

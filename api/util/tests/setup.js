@@ -1,5 +1,5 @@
 import prisma from "#prisma";
-import { AccountType } from "@prisma/client";
+import { AccountType } from "#prisma-client";
 import { beforeEach } from "vitest";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt"

@@ -1,11 +1,12 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import { LogType } from "@prisma/client";
+import { CostingMode, LogType } from "#prisma-client";
 import { z } from "zod";
 
 const resourceSchema = z.object({
   title: z.string().min(1, "Resouce must have title"),
   shopId: z.string().min(1, "Shop must have ID"),
+  costingMode: z.nativeEnum(CostingMode).optional(),
 });
 
 export const get = [
@@ -98,6 +99,9 @@ export const post = [
       data: {
         title: validatedData.title,
         shopId: validatedData.shopId,
+        costingMode:
+          validatedData.costingMode ||
+          CostingMode.CALCULATE_WITH_RESOURCE_AND_MATERIAL,
       },
     });
 
@@ -144,7 +148,19 @@ export const put = [
       });
     }
 
-    const { title, resourceTypeId: id } = req.body;
+    const { title, resourceTypeId: id, costingMode } = req.body;
+
+    const parsedCostingMode = z
+      .nativeEnum(CostingMode)
+      .optional()
+      .safeParse(costingMode);
+
+    if (!parsedCostingMode.success) {
+      return res.status(400).json({
+        error: "Invalid costing mode",
+        issues: parsedCostingMode.error.format(),
+      });
+    }
 
     const resourceType = await prisma.resourceType.update({
       where: {
@@ -152,6 +168,7 @@ export const put = [
       },
       data: {
         title,
+        costingMode: parsedCostingMode.data,
       },
     });
 

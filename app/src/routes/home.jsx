@@ -8,11 +8,11 @@ import { Typography, Util } from "tabler-react-2";
 import { ShopChooser } from "../components/shopChooser/ShopChooser";
 
 const content = `
-# Welcome to SLU Open Project!
+# Welcome to CoreDesk!
 
 ## About
 
-SLU Open Project is a tool built by a collaboration between the Saint Louis University Center for Additive Manufacturing and SLU Open Source.
+CoreDesk is a tool built by a collaboration between the Saint Louis University Center for Additive Manufacturing and SLU Open Source.
 It is a platform for managing and tracking jobs to be submitted to shops across the SLU community. It is designed to be a simple one-stop-shop
 for shops to manage their workloads and to serve as a hub for users to submit jobs to these shops. Shops can receive jobs from single users, or from
 billing groups of users that allow users to submit jobs to a shop, but to have their billing handled by a separate entity, like a department or lab.
@@ -31,7 +31,7 @@ export const Home = () => {
         <Util.Hr />
         {import.meta.env.VITE_HASH && import.meta.env.VITE_BUILD_DATE && (
           <Typography.Text>
-            SLU Open Project / CoreDesk version {import.meta.env.VITE_HASH} built
+            CoreDesk version {import.meta.env.VITE_HASH} built
             on {new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()}
           </Typography.Text>
         )}

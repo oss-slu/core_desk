@@ -1,26 +1,33 @@
 {
   "name": "e2e",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
-  "devDependencies": {
-    "@prisma/client": "6.16.2",
-    "cypress": "13.17.0",
-    "nodemon": "^3.1.7",
-    "prisma": "6.16.2"
-  },
+  "main": "index.js",
   "scripts": {
-    "prepare:prisma": "prisma generate --schema ../api/prisma/schema.prisma",
-    "cy:open": "npm run prepare:prisma && cypress open --e2e",
-    "cy:run": "npm run prepare:prisma && cypress run --e2e",
-    "cy:watch": "npm run prepare:prisma && nodemon --legacy-watch --watch cypress --watch cypress.config.cjs --ext js,ts,jsx,tsx,cjs,mjs,json --exec \"cypress run --e2e\"",
-    "test": "start-server-and-test \"npm --prefix .. run dev:stack\" http://localhost:5173 \"npm run cy:run\"",
-    "test:docker": "sh -c 'docker compose -f ./docker-compose.yml up --build --exit-code-from cypress; code=$?; docker compose -f ./docker-compose.yml down -v; exit $code'",
-    "test:docker:interactive": "INTERACTIVE=1 docker compose -f ./docker-compose.yml up --build",
-    "test:docker:watch": "WATCH=1 docker compose -f ./docker-compose.yml up --build",
-    "down:docker": "docker compose -f ./docker-compose.yml down -v"
+    "prepare:prisma": "prisma generate --config ../api/prisma.config.ts",
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "docker:up": "docker compose -f docker/docker-compose.yml up -d --build",
+    "docker:wait": "bash docker/wait-for-http.sh http://localhost:3030/health 180",
+    "docker:down": "docker compose -f docker/docker-compose.yml down -v --remove-orphans",
+    "test:docker": "bash docker/run-e2e.sh run",
+    "test:docker:interactive": "bash docker/run-e2e.sh interactive",
+    "test:docker:watch": "bash docker/run-e2e.sh watch",
+    "down:docker": "bash docker/run-e2e.sh down"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@prisma/client": "7.0.0",
+    "cypress": "^15.10.0",
+    "nodemon": "^3.1.7",
+    "prisma": "7.0.0"
   },
   "dependencies": {
-    "jsonwebtoken": "^9.0.2"
+    "cypress-yaml-plugin": "^0.1.14",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.18.0"
   }
 }

@@ -4,7 +4,7 @@ import { app } from "#index";
 import { gt } from "#gt";
 import { tc } from "#setup";
 import { prisma } from "#prisma";
-import { LedgerItemType, LogType } from "@prisma/client";
+import { LedgerItemType, LogType } from "#prisma-client";
 
 describe("/shop/[shopId]", () => {
   describe("GET", () => {

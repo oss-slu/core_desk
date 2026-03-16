@@ -19,7 +19,7 @@ export const useUser = (userId) => {
   const { confirm: unSuspendConfirm, ConfirmModal: UnSuspendConfirmModal } =
     useConfirm({
       title: "Are you sure you want to unsuspend this user?",
-      text: "Unuspending this user will immediately grant them full access to SLU Open Project. They will have access to all their prior content, events, logs, work, roles, and more.",
+      text: "Unuspending this user will immediately grant them full access to CoreDesk. They will have access to all their prior content, events, logs, work, roles, and more.",
       commitText: "Yes",
       cancelText: "No",
     });

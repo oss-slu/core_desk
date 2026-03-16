@@ -24,6 +24,7 @@ import { BillingGroupInvitationPage } from "#billingGroupInvitationPage";
 import { BillingGroupPortal } from "#billingGroupsPortal";
 import { SchedulePage } from "./routes/shops/[shopId]/schedule";
 import { Login } from "./components/authentication/Login";
+import { ShopLedgerPage } from "#shopLedgerPage";
 
 // eslint-disable-next-line
 export default () => {
@@ -70,6 +71,10 @@ export default () => {
                 <Route path="/shops" element={<Shops />} />
                 <Route path="/shops/:shopId" element={<ShopPage />} />
                 <Route path="/shops/:shopId/billing" element={<Billing />} />
+                <Route
+                  path="/shops/:shopId/ledger"
+                  element={<ShopLedgerPage />}
+                />
                 <Route
                   path="/shops/:shopId/users"
                   element={<ShopUsersPage />}
@@ -121,6 +126,7 @@ export default () => {
               <Route
                 path="*"
                 element={ <Login />
+
                 }
               />
             )}

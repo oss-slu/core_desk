@@ -74,7 +74,7 @@ export const BillingGroupInvitationPage = () => {
       </Card>
       <Util.Spacer size={1} />
       <p className="text-secondary">
-        You are using SLU Open Project, a project built by SLUCAM as a unified
+        You are using CoreDesk, a project built by SLUCAM as a unified
         platform for shops to manage projects, billing, and contacts.
       </p>
       <p className="text-secondary">

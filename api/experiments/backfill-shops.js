@@ -1,7 +1,7 @@
 // e2e/scripts/backfill-autojoin.js
 // ES module, named exports, ready to run with: `node e2e/scripts/backfill-autojoin.js`
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "#prisma-client";
 
 const prisma = new PrismaClient();
 

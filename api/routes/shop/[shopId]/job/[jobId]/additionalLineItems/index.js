@@ -44,6 +44,15 @@ export const get = [
           jobId: job.id,
           active: true,
         },
+        include: {
+          resourceType: {
+            select: {
+              id: true,
+              title: true,
+              costingMode: true,
+            },
+          },
+        },
       });
 
       return res.json({ lineItems });
@@ -94,8 +103,17 @@ export const post = [
 
       const lineItem = await prisma.additionalCostLineItem.create({
         data: {
-          ...req.body,
           jobId: job.id,
+          amount: Math.max(Number(req.body?.amount) || 0, 0),
+          resourceTypeId: null,
+          resourceId: null,
+          materialId: null,
+          secondaryMaterialId: null,
+          timeQty: null,
+          processingTimeQty: null,
+          unitQty: null,
+          materialQty: null,
+          secondaryMaterialQty: null,
         },
       });
 
@@ -103,6 +121,15 @@ export const post = [
         where: {
           jobId: job.id,
           active: true,
+        },
+        include: {
+          resourceType: {
+            select: {
+              id: true,
+              title: true,
+              costingMode: true,
+            },
+          },
         },
       });
 

@@ -103,7 +103,11 @@ export const LedgerTable = ({ data, shopId }) => (
         render: (url, context) =>
           url ? (
             <Link
-              onClick={() => downloadFile(url, `invoice-${context.jobId}.pdf`)}
+              to="#"
+              onClick={(e) => {
+                e.preventDefault();
+                downloadFile(url, `invoice-${context.jobId}.pdf`);
+              }}
             >
               Download
             </Link>
