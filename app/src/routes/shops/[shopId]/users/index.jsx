@@ -13,6 +13,7 @@ import { Icon } from "#icon";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
 import { NotFound } from "../../../../components/404/404";
 import { Avatar } from "#avatar";
+import { SearchBar } from "../../../../components/searchBar/SearchBar";
 const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {
@@ -69,6 +70,7 @@ export const ShopUsersPage = () => {
     );
   }, [users, searchTerm]);
 
+
   const handleSort = (key) => {
     setSortConfig((prev) =>
       prev.key === key
@@ -76,39 +78,52 @@ export const ShopUsersPage = () => {
         : { key, direction: "asc" }
     );
   };
-
   const sortedUsers = useMemo(() => {
-    if (!filteredUsers) {
-      return [];
-    }
-    if (!sortConfig.key) {
-      return filteredUsers;
-    }
+    if (!filteredUsers) return [];
+    if (!sortConfig.key) return filteredUsers;
 
     const sorted = [...filteredUsers].sort((a, b) => {
-      const aVal = a[sortConfig.key];
-      const bVal = b[sortConfig.key];
+      let aVal;
+      let bVal;
 
-      if (aVal == null) {
-        return 1;
-      }
-      if (bVal == null) {
-        return -1;
+      switch (sortConfig.key) { //these are within a key value pair 
+        case "balance":
+          aVal = a.user?.balance;
+          bVal = b.user?.balance;
+          break;
+        case "totalJobs":
+          aVal = a.user?.totalJobs;
+          bVal = b.user?.totalJobs;
+          break;
+        case "shopMemberSince":
+          aVal = a.createdAt;
+          bVal = b.createdAt;
+          break;
+        default:
+          aVal = a[sortConfig.key];
+          bVal = b[sortConfig.key];
       }
 
-      //dates
-      if (sortConfig.key === "lastLogin" || sortConfig.key === "createdAt") {
-        const aTime = aVal ? new Date(aVal).getTime() : 0;
-        const bTime = bVal ? new Date(bVal).getTime() : 0;
-        return sortConfig.direction === "asc" ? aTime - bTime : bTime - aTime;
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+
+      // date
+      if (sortConfig.key === "shopMemberSince") {
+        const aTime = new Date(aVal).getTime();
+        const bTime = new Date(bVal).getTime();
+        return sortConfig.direction === "asc"
+          ? aTime - bTime
+          : bTime - aTime;
       }
 
-      //numeric comparison
+      // number
       if (typeof aVal === "number" && typeof bVal === "number") {
-        return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+        return sortConfig.direction === "asc"
+          ? aVal - bVal
+          : bVal - aVal;
       }
 
-      //string comparison
+      // string fallback
       return sortConfig.direction === "asc"
         ? String(aVal).localeCompare(String(bVal))
         : String(bVal).localeCompare(String(aVal));
@@ -142,6 +157,25 @@ export const ShopUsersPage = () => {
 
   if (activeUser?.simple === true) return <NotFound />;
 
+
+  const renderSortableHeader = (label, key) => (
+    <span
+      onClick={() => handleSort(key)}
+      style={{ cursor: "pointer", userSelect: "none" }}
+    >
+      {label}{" "}
+      {sortConfig.key === key ? (
+        sortConfig.direction === "asc" ? (
+          <span>▲</span>
+        ) : (
+          <span>▼</span>
+        )
+      ) : (
+        ""
+      )}
+    </span>
+  );
+
   return (
     <Page
       sidenavItems={shopSidenavItems(
@@ -153,6 +187,15 @@ export const ShopUsersPage = () => {
       )}
     >
       <H1>Shop Users</H1>
+      <Util.Spacer size={2} />
+      <SearchBar
+        onSearch={(value) => {
+          setSearchTerm(value);
+          setCurrentPage(1);
+        }}
+      />
+
+      <Util.Spacer size={2} />
       <Table
         columns={[
           {
@@ -175,12 +218,12 @@ export const ShopUsersPage = () => {
             ),
           },
           {
-            label: "Balance",
+            label: renderSortableHeader("Balance", "balance"),
             accessor: "user.balance",
             render: (balance) => <Price value={balance} icon />,
           },
           {
-            label: "Total jobs",
+            label: renderSortableHeader("Total Jobs", "totalJobs"),
             accessor: "user.totalJobs",
           },
           {
@@ -264,7 +307,7 @@ export const ShopUsersPage = () => {
             render: (type) => switchAccountTypeForBadge(type),
           },
           {
-            label: "Shop member since",
+            label: renderSortableHeader("Shop Member Since", "shopMemberSince"),
             accessor: "createdAt",
             render: (createdAt) => moment(createdAt).format("MM/DD/YY"),
           },
@@ -303,7 +346,7 @@ export const ShopUsersPage = () => {
             setCurrentPage(1);
           }}
           items={[
-            { id: 10, label: "10 per page" },
+            { id: 5, label: "5 per page" },
             { id: 25, label: "25 per page" },
             { id: 50, label: "50 per page" },
             { id: 100, label: "100 per page" },
