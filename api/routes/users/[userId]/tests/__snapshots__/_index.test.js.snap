@@ -12,6 +12,7 @@ exports[`/[userId] > Fetch user profile > should return a full profile if the us
   "createdAt": Any<String>,
   "email": "targetUser@example.com",
   "firstName": "Test",
+  "hasPassword": false,
   "id": Any<String>,
   "isMe": false,
   "jobCount": 0,
@@ -30,6 +31,7 @@ exports[`/[userId] > Fetch user profile > should return a full profile if the us
 exports[`/[userId] > Fetch user profile > should return basic information if the user is not a global admin 1`] = `
 {
   "firstName": "Test",
+  "hasPassword": false,
   "id": Any<String>,
   "lastName": "User",
   "name": "Test User",
@@ -42,6 +44,7 @@ exports[`/[userId] > Fetch user profile > should return logs if includeLogs is t
   "createdAt": Any<String>,
   "email": "targetUser@example.com",
   "firstName": "Test",
+  "hasPassword": false,
   "id": Any<String>,
   "isMe": false,
   "jobCount": 0,

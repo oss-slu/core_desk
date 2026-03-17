@@ -11,13 +11,13 @@ export const get = [
         where: req.user.admin
           ? {}
           : {
-              users: {
-                some: {
-                  userId: req.user.id,
-                  active: true,
-                },
+            users: {
+              some: {
+                userId: req.user.id,
+                active: true,
               },
             },
+          },
         select: SHOP_SELECT,
         take: req.query.limit ? parseInt(req.query.limit) : 20,
         skip: req.query.offset ? parseInt(req.query.offset) : 0,
@@ -27,13 +27,13 @@ export const get = [
         where: req.user.admin
           ? {}
           : {
-              users: {
-                some: {
-                  userId: req.user.id,
-                  active: true,
-                },
+            users: {
+              some: {
+                userId: req.user.id,
+                active: true,
               },
             },
+          },
       });
 
       res.json({
@@ -94,12 +94,12 @@ export const post = [
           ledgerItems:
             startingDeposit > 0
               ? {
-                  create: {
-                    userId: req.user.id,
-                    type: LedgerItemType.INITIAL,
-                    value: startingDeposit,
-                  },
-                }
+                create: {
+                  userId: req.user.id,
+                  type: LedgerItemType.INITIAL,
+                  value: startingDeposit,
+                },
+              }
               : undefined,
         },
         select: startingDeposit ? SHOP_SELECT_WITH_LEDGER : SHOP_SELECT,
