@@ -10,7 +10,7 @@ import {
   useMaterials,
   useUser,
 } from "#hooks";
-import { Typography, Util, Button, Card, useConfirm } from "tabler-react-2";
+import { Typography, Util, Button, Card, useConfirm, Dropdown } from "tabler-react-2";
 import { Loading } from "#loading";
 import { Icon } from "#icon";
 import { Table } from "#table";
@@ -39,6 +39,12 @@ export const ResourcesPage = () => {
 
   const { ModalElement: CreateMaterialModalElement, createMaterial } =
     useMaterials(shopId);
+
+  const equipmentItems = [
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createResource}><Icon i="tool" /> Add Resource</p> },
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createResourceType}><Icon i="tools" /> Add Resource Type</p> },
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createMaterial}><Icon i="sandbox" /> Add Material</p> },
+  ];
 
   if (loading || resourceTypesLoading)
     return (
@@ -70,21 +76,17 @@ export const ResourcesPage = () => {
       <Util.Responsive threshold={600} justify="between" align="center">
         <H1>Resources</H1>
         {(user.admin || userShop.accountType === "ADMIN") && (
-          <Util.Row gap={1} justify="start">
-            <Button onClick={createResourceType}>
-              <Icon i="tools" /> Add Resource Type
-            </Button>
-            {CreateResourceTypeModalElement}
-            <Button onClick={createMaterial}>
-              <Icon i="sandbox" /> Add Material
-            </Button>
-            {CreateMaterialModalElement}
-            <Button onClick={createResource}>
-              <Icon i="tool" /> Add Resource
-            </Button>
-            {CreateResourceModalElement}
-          </Util.Row>
+          <Dropdown 
+            prompt="Add Equipment"
+            items={equipmentItems.map((item) => ({
+              type: "item",
+              text: item.label,
+            }))}
+          />
         )}
+        {CreateResourceTypeModalElement}
+        {CreateMaterialModalElement}
+        {CreateResourceModalElement}
       </Util.Responsive>
 
       <Util.Spacer size={1} />
@@ -142,6 +144,15 @@ const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
     resourceType.costingMode
   );
 
+  const resourceItems = [
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={editResourceType}><Icon i="tools" /> Edit Resource Type</p> },
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createMaterial}><Icon i="sandbox" /> Add Material</p> },
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createResource}><Icon i="tool" /> Add Resource</p> },
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={async () => {
+      if (await confirm()) onDelete(resourceType.id);
+    }}><Icon i="trash" /> Delete Resource Type</p> }
+  ];
+
   return (
     <div>
       {CreateMaterialModalElement}
@@ -151,26 +162,15 @@ const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
       <Util.Row justify="between">
         <H2 id={resourceType.id}>{resourceType.title}</H2>
         {admin && (
-          <Util.Row gap={1}>
-            <Button onClick={editResourceType}>
-              <Icon i="tools" /> Edit Resource Type
-            </Button>
-            {EditResourceTypeModalElement}
-            <Button onClick={createMaterial}>
-              <Icon i="sandbox" /> Add Material
-            </Button>
-            <Button onClick={createResource}>
-              <Icon i="tool" /> Add Resource
-            </Button>
-            <Button
-              onClick={async () => {
-                if (await confirm()) onDelete(resourceType.id);
-              }}
-            >
-              <Icon i="trash" /> Delete Resource Type
-            </Button>
-          </Util.Row>
+          <Dropdown 
+            prompt="Edit Resource"
+            items={resourceItems.map((item) => ({
+              type: "item",
+              text: item.label,
+            }))}
+          />
         )}
+        {EditResourceTypeModalElement}
       </Util.Row>
       <Util.Spacer size={1} />
       <Util.Row gap={1} wrap>
