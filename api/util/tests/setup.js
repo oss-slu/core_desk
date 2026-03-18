@@ -1,6 +1,8 @@
 import prisma from "#prisma";
 import { AccountType } from "#prisma-client";
 import { beforeEach } from "vitest";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt"
 
 export let tc = {};
 
@@ -42,6 +44,7 @@ beforeEach(async () => {
     await prisma.$executeRawUnsafe("SET session_replication_role = 'origin';");
 
     // Create an initial user
+    
     const globalUser = await prisma.user.create({
       data: {
         firstName: "TestFirstName",
@@ -52,6 +55,27 @@ beforeEach(async () => {
 
     tc.globalUser = globalUser;
     tc.user = globalUser;
+
+
+    const hashedPassword = await bcrypt.hash("TestPassword", 10);
+    const globalLocalUser = await prisma.user.create({
+      data: {
+        firstName: "TestFirstName",
+        lastName: "TestLastName",
+        email: "localtest@email.com", //needs to be lowercase
+        password: hashedPassword,
+      },
+    });
+
+
+    const token = jwt.sign(
+      { id: globalLocalUser.id },
+      process.env.JWT_SECRET
+    );
+    tc.token = token
+
+    tc.globalLocalUser = globalLocalUser;
+
 
     const targetUser = await prisma.user.create({
       data: {

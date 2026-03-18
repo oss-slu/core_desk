@@ -41,34 +41,26 @@ export const Header = () => {
           )}
         </h1>
       </div>
-      {user?.id && (
-        <div
-          style={{
-            marginLeft: "auto",
-            marginRight: "25px",
-            display: "flex",
-            alignItems: "center",
-            gap: 0,
-          }}
-        >
-          <UserShopToggle userId={user.id} />
-        </div>
-      )}
       <div className={styles.headerGroup}>
-        <a
-          className="btn"
-          href="https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog"
-          style={{
-            height: 36,
-          }}
-        >
-          Feedback
-        </a>
         <Dropdown
           prompt={loggedIn ? user?.firstName + " " + user?.lastName : "Account"}
           items={
             loggedIn
               ? [
+                  {
+                    text: <a className="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog" style={{height: 36,}}>Feedback</a>,
+                    type: "item",
+                  },
+                  {
+                    type: "divider",
+                  },
+                  {
+                    text: <UserShopToggle userId={user.id} />,
+                    type: "item"
+                  },
+                  {
+                    type: "divider",
+                  },
                   {
                     text: "Log Out",
                     onclick: logout,

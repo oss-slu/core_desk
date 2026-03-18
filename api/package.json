@@ -22,6 +22,7 @@
     "@scalenc/stl-to-png": "^1.2.0",
     "@vitest/coverage-c8": "^0.33.0",
     "@vitest/coverage-istanbul": "^2.1.5",
+    "bcrypt": "^6.0.0",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "cuid": "^3.0.0",

@@ -52,7 +52,7 @@ export const UsersPage = () => {
     if (!filteredUsers) {
       return [];
     }
-    if (!sortConfig.key){
+    if (!sortConfig.key) {
       return filteredUsers;
     }
 

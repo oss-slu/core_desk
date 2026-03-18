@@ -40,16 +40,28 @@ export const get = [
 
       fs.writeFileSync("users.json", JSON.stringify(users));
 
-      users = users.map((user) => ({
-        ...user,
-        name: `${user.firstName} ${user.lastName}`,
-        isMe: user.id === req.user.id,
-        shopCount: user._count.shops,
-        jobCount: user._count.jobs,
-        _count: undefined,
-        lastLogin: user.logs[0]?.createdAt,
-        logs: undefined,
-      }));
+
+      users = users.map((user) => {
+        const fullName = `${user.firstName} ${user.lastName}`;
+        const lastLoginDate = user.logs[0]?.createdAt;
+        const hasPassword = !!user.password;
+
+
+        delete user.password;
+
+        return {
+          ...user,
+          name: fullName,
+          hasPassword: hasPassword,
+          isMe: user.id === req.user.id,
+          shopCount: user._count.shops,
+          jobCount: user._count.jobs,
+          _count: undefined,
+
+          lastLogin: lastLoginDate,
+          logs: undefined,
+        };
+      });
       fs.writeFileSync("mapped-users.json", JSON.stringify(users));
 
       // Remove undefined values
