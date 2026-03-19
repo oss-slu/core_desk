@@ -5,15 +5,13 @@ import { Link, useParams } from "react-router-dom";
 import { useAuth } from "#useAuth";
 import { useShop, useUser } from "#hooks";
 import { Loading } from "#loading";
-import { Typography, Util, Badge, Button, DropdownInput } from "tabler-react-2";
-import { Table } from "#table";
+import { Typography, Util, Badge } from "tabler-react-2";;
 import moment from "moment";
 import { Price } from "#renderPrice";
-import { Icon } from "#icon";
-import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
 import { NotFound } from "../../../../components/404/404";
 import { Avatar } from "#avatar";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
+import { TableV2 } from "tabler-react-2";
 const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {
@@ -53,40 +51,32 @@ export const ShopUsersPage = () => {
   });
   const { user: activeUser } = useUser(user?.id);
 
-
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(50);
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(25);
+  const [sorting, setSorting] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-
 
 
   const filteredUsers = useMemo(() => {
     if (!searchTerm) return users;
-    return users.filter(
-      (u) =>
-        JSON.stringify(u).toLowerCase().includes(searchTerm.toLowerCase())
+
+    return users.filter((u) =>
+      JSON.stringify(u).toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [users, searchTerm]);
 
 
-  const handleSort = (key) => {
-    setSortConfig((prev) =>
-      prev.key === key
-        ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
-        : { key, direction: "asc" }
-    );
-  };
-  const sortedUsers = useMemo(() => {
-    if (!filteredUsers) return [];
-    if (!sortConfig.key) return filteredUsers;
+
+  const ordered = useMemo(() => {
+    if (!sorting.length) return filteredUsers;
+
+    const { id, desc } = sorting[0];
 
     const sorted = [...filteredUsers].sort((a, b) => {
       let aVal;
       let bVal;
 
-      switch (sortConfig.key) { //these are within a key value pair 
+      switch (id) {
         case "balance":
           aVal = a.user?.balance;
           bVal = b.user?.balance;
@@ -95,50 +85,87 @@ export const ShopUsersPage = () => {
           aVal = a.user?.totalJobs;
           bVal = b.user?.totalJobs;
           break;
-        case "shopMemberSince":
+        case "name":
+          aVal = a.user?.name;
+          bVal = b.user?.name;
+          break;
+        case "createdAt":
           aVal = a.createdAt;
           bVal = b.createdAt;
           break;
         default:
-          aVal = a[sortConfig.key];
-          bVal = b[sortConfig.key];
+          return 0;
       }
 
       if (aVal == null) return 1;
       if (bVal == null) return -1;
 
-      // date
-      if (sortConfig.key === "shopMemberSince") {
-        const aTime = new Date(aVal).getTime();
-        const bTime = new Date(bVal).getTime();
-        return sortConfig.direction === "asc"
-          ? aTime - bTime
-          : bTime - aTime;
+      if (id === "createdAt") {
+        return new Date(aVal) - new Date(bVal);
       }
 
-      // number
-      if (typeof aVal === "number" && typeof bVal === "number") {
-        return sortConfig.direction === "asc"
-          ? aVal - bVal
-          : bVal - aVal;
+      if (!isNaN(aVal) && !isNaN(bVal)) {
+        return Number(aVal) - Number(bVal);
       }
-
-      // string fallback
-      return sortConfig.direction === "asc"
-        ? String(aVal).localeCompare(String(bVal))
-        : String(bVal).localeCompare(String(aVal));
+      return String(aVal).localeCompare(String(bVal));
     });
 
-    return sorted;
-  }, [filteredUsers, sortConfig]);
+    return desc ? sorted.reverse() : sorted;
+  }, [filteredUsers, sorting]);
 
-  const paginatedUsers = useMemo(() => {
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    return sortedUsers.slice(start, end);
-  }, [sortedUsers, currentPage, rowsPerPage]);
 
-  const totalPages = Math.ceil((filteredUsers?.length || 0) / rowsPerPage);
+
+
+  const pageData = useMemo(() => {
+    const start = (page - 1) * size;
+    return ordered.slice(start, start + size);
+  }, [ordered, page, size]);
+
+  const columns = useMemo(() => [
+    {
+      id: "name",
+      header: "Name",
+      accessorFn: (row) => row.user?.name,
+      cell: ({ row }) => {
+        const context = row.original;
+        return (
+          <Util.Row gap={0.5} align="center">
+            <Avatar size="sm" dicebear initials={context.user.id} />
+            <Util.Col align="start">
+              <Link to={`/shops/${shopId}/users/${context.user.id}`}>
+                {context.user.name}
+              </Link>
+            </Util.Col>
+          </Util.Row>
+        );
+      },
+    },
+    {
+      id: "balance",
+      header: "Balance",
+      accessorFn: (row) => row.user?.balance,
+      cell: ({ getValue }) => <Price value={getValue()} icon />,
+    },
+    {
+      id: "totalJobs",
+      header: "Total Jobs",
+      accessorFn: (row) => row.user?.totalJobs,
+    },
+    {
+      accessorKey: "accountType",
+      header: "Account Type",
+      cell: ({ getValue }) => switchAccountTypeForBadge(getValue()),
+      enableSorting: false,
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Shop Member Since",
+      cell: ({ getValue }) => moment(getValue()).format("MM/DD/YY"),
+    },
+  ], [shopId]);
+
+
+
 
   if (loading)
     return (
@@ -158,24 +185,6 @@ export const ShopUsersPage = () => {
   if (activeUser?.simple === true) return <NotFound />;
 
 
-  const renderSortableHeader = (label, key) => (
-    <span
-      onClick={() => handleSort(key)}
-      style={{ cursor: "pointer", userSelect: "none" }}
-    >
-      {label}{" "}
-      {sortConfig.key === key ? (
-        sortConfig.direction === "asc" ? (
-          <span>▲</span>
-        ) : (
-          <span>▼</span>
-        )
-      ) : (
-        ""
-      )}
-    </span>
-  );
-
   return (
     <Page
       sidenavItems={shopSidenavItems(
@@ -191,171 +200,28 @@ export const ShopUsersPage = () => {
       <SearchBar
         onSearch={(value) => {
           setSearchTerm(value);
-          setCurrentPage(1);
+          setPage(1);
         }}
       />
 
       <Util.Spacer size={2} />
-      <Table
-        columns={[
-          {
-            label: "Name",
-            accessor: "user.name",
-            render: (name, context) => (
-              <Util.Row gap={0.5} align="center">
-                <Avatar size="sm" dicebear initials={context.user.id} />
-                <Util.Col align="start">
-                  <Link to={`/shops/${shopId}/users/${context.user.id}`}>
-                    {name}
-                  </Link>
-                  {context.user.id === user.id && (
-                    <Badge color="green" soft>
-                      You
-                    </Badge>
-                  )}
-                </Util.Col>
-              </Util.Row>
-            ),
-          },
-          {
-            label: renderSortableHeader("Balance", "balance"),
-            accessor: "user.balance",
-            render: (balance) => <Price value={balance} icon />,
-          },
-          {
-            label: renderSortableHeader("Total Jobs", "totalJobs"),
-            accessor: "user.totalJobs",
-          },
-          {
-            label: "Jobs",
-            accessor: "user.jobCounts",
-            render: (counts, _) => (
-              <Util.Row gap={1} align="center" data-dash={JSON.stringify(_)}>
-                <Util.Col justify="between" gap={1}>
-                  {/* Prevent line break at all */}
-                  <span
-                    style={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    }}
-                  >
-                    <Icon i="sum" size={14} />
-                    {_.user.totalJobs}
-                  </span>
-                  {_.user.totalJobs === 0 ? (
-                    <PieProgressChart
-                      complete={0}
-                      inProgress={0}
-                      notStarted={0}
-                      exclude={1}
-                    />
-                  ) : (
-                    <PieProgressChart
-                      complete={counts.completedCount / _.user.totalJobs}
-                      inProgress={counts.inProgressCount / _.user.totalJobs}
-                      notStarted={counts.notStartedCount / _.user.totalJobs}
-                      exclude={counts.excludedCount / _.user.totalJobs}
-                    />
-                  )}
-                  <div className="sos-600">
-                    <span className="text-success">
-                      {counts.completedCount}
-                    </span>
-                    <span className="text-yellow">
-                      {counts.inProgressCount}
-                    </span>
-                    <span className="text-danger">
-                      {counts.notStartedCount}
-                    </span>
-                    <span className="text-gray-400">
-                      {counts.excludedCount}
-                    </span>
-                  </div>
-                </Util.Col>
-                <div style={{ fontSize: 10 }} className="hos-600">
-                  <span className="text-success">
-                    <Icon i="circle-check" size={10} /> {counts.completedCount}{" "}
-                    / {_.user.totalJobs}
-                    <span className="hos-900"> Completed</span>
-                  </span>
-                  <br />
-                  <span className="text-yellow">
-                    <Icon i="progress" size={10} /> {counts.inProgressCount} /{" "}
-                    {_.user.totalJobs}
-                    <span className="hos-900"> In Progress</span>
-                  </span>
-                  <br />
-                  <span className="text-danger">
-                    <Icon i="minus" size={10} /> {counts.notStartedCount} /{" "}
-                    {_.user.totalJobs}
-                    <span className="hos-900"> Not Started</span>
-                  </span>
-                  <br />
-                  <span className="text-gray-400">
-                    <Icon i="x" size={10} /> {counts.excludedCount} /{" "}
-                    {_.user.totalJobs}
-                    <span className="hos-900"> Excluded</span>
-                  </span>
-                </div>
-              </Util.Row>
-            ),
-          },
-          {
-            label: "Account Type",
-            accessor: "accountType",
-            render: (type) => switchAccountTypeForBadge(type),
-          },
-          {
-            label: renderSortableHeader("Shop Member Since", "shopMemberSince"),
-            accessor: "createdAt",
-            render: (createdAt) => moment(createdAt).format("MM/DD/YY"),
-          },
-        ]}
-        data={paginatedUsers}
+      <TableV2
+        columns={columns}
+        data={pageData}
+        totalRows={users.length}
+        page={page}
+        size={size}
+        onPageChange={setPage}
+        onSizeChange={(n) => {
+          setPage(1);
+          setSize(n);
+        }}
+        sorting={sorting}
+        onSortingChange={(next) => {
+          setPage(1);
+          setSorting(next);
+        }}
       />
-
-      <Util.Row
-        justify="center"
-        align="center"
-        gap={1}
-        style={{ marginTop: "1rem" }}
-      >
-        <Button
-          disabled={currentPage === 1}
-          onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-        >
-          Previous
-        </Button>
-        <span>
-          Page {currentPage} of {totalPages || 1}
-        </span>
-        <Button
-          disabled={currentPage === totalPages || totalPages === 0}
-          onClick={() =>
-            setCurrentPage((p) => Math.min(p + 1, totalPages))
-          }
-        >
-          Next
-        </Button>
-
-        <DropdownInput
-          value={rowsPerPage}
-          onChange={(item) => {
-            setRowsPerPage(Number(item.id));
-            setCurrentPage(1);
-          }}
-          items={[
-            { id: 5, label: "5 per page" },
-            { id: 25, label: "25 per page" },
-            { id: 50, label: "50 per page" },
-            { id: 100, label: "100 per page" },
-          ]}
-          prompt="Rows per page"
-          showSearch={false}
-          style={{ marginLeft: "1rem" }}
-        />
-      </Util.Row>
     </Page>
   );
 };
