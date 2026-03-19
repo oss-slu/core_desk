@@ -163,7 +163,7 @@ const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
         <H2 id={resourceType.id}>{resourceType.title}</H2>
         {admin && (
           <Dropdown 
-            prompt="Edit Resource"
+            prompt="Resource options"
             items={resourceItems.map((item) => ({
               type: "item",
               text: item.label,
