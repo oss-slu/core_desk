@@ -77,7 +77,7 @@ export const ResourcesPage = () => {
         <H1>Resources</H1>
         {(user.admin || userShop.accountType === "ADMIN") && (
           <Dropdown 
-            prompt="Add Equipment"
+            prompt="Add..."
             items={equipmentItems.map((item) => ({
               type: "item",
               text: item.label,
