@@ -4,7 +4,14 @@ import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
 import { shopSidenavItems } from "../../[shopId]/index";
 import { useAuth } from "#useAuth";
-import { Typography, Util, Input, Badge, Dropdown, SegmentedControl } from "tabler-react-2";
+import {
+  Typography,
+  Util,
+  Input,
+  Badge,
+  Dropdown,
+  SegmentedControl,
+} from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { useUser } from "../../../../hooks/useUser";
@@ -90,6 +97,147 @@ export const switchStatusForBadge = (status) => {
 { id: "WAITING", label: "Waiting" },
 */
 
+const NEWFilters = ({
+  statusOptions,
+  handleStatusToggle,
+  statusFilter,
+  activeUser,
+  userShop,
+  submitterFilter,
+  setSubmitterFilter,
+  startDateFilter,
+  setStartDateFilter,
+  endDateFilter,
+  setEndDateFilter,
+  columnsOptions,
+  handleColumnToggle,
+  columnsToShow,
+  handleFinalizedToggle,
+  finalizedFilter,
+  finalizedOptions,
+}) => (
+  <div>
+    <Util.Row justify="between" align="start">
+      <Util.Row gap={1}>
+        <Util.Col gap={0}>
+          <H4>Status</H4>
+          <Dropdown
+            prompt="Select Status"
+            items={statusOptions.map(({ id, label }) => ({
+              text: (
+                <div key={id} onClick={() => handleStatusToggle(id)}>
+                  <Util.Row justify="between" gap={0.5}>
+                    {statusFilter.includes(id) ? (
+                      <Icon i="square-check" />
+                    ) : (
+                      <Icon i="square" />
+                    )}
+                    {label}
+                  </Util.Row>
+                </div>
+              ),
+            }))}
+            showSearch={false}
+          />
+        </Util.Col>
+        {(activeUser?.admin ||
+          userShop.accountType === "ADMIN" ||
+          userShop.accountType === "OPERATOR") && (
+          <Util.Col gap={0}>
+            <H4>Submitter</H4>
+            <ShopUserPicker
+              value={submitterFilter}
+              onChange={setSubmitterFilter}
+              includeNone={true}
+            />
+          </Util.Col>
+        )}
+        <Util.Col gap={0}>
+          <H4>Due Date Range</H4>
+          <Util.Row gap={0.5}>
+            <Input
+              type="date"
+              onChange={(e) => setStartDateFilter(e + "T00:00:00")}
+              value={startDateFilter?.split("T")[0]}
+              icon={startDateFilter && <Icon i="x" />}
+              iconPos="trailing"
+              separated={!!startDateFilter}
+              appendedLinkOnClick={() => setStartDateFilter(null)}
+            />
+            <h2> - </h2>
+            <Input
+              type="date"
+              onChange={(e) => setEndDateFilter(e + "T00:00:00")}
+              value={endDateFilter?.split("T")[0]}
+              icon={endDateFilter && <Icon i="x" />}
+              iconPos="trailing"
+              separated={!!endDateFilter}
+              appendedLinkOnClick={() => setEndDateFilter(null)}
+            />
+          </Util.Row>
+        </Util.Col>
+        <Util.Col gap={0}>
+          <h4>Columns</h4>
+          <Dropdown
+            prompt="Select Columns"
+            items={columnsOptions.map((id) => ({
+              text: (
+                <div
+                  key={id}
+                  onClick={() => {
+                    handleColumnToggle(id);
+                  }}
+                >
+                  <Util.Row justify="between" gap={0.5}>
+                    {columnsToShow.includes(id) ? (
+                      <Icon i="square-check" />
+                    ) : (
+                      <Icon i="square" />
+                    )}
+                    {id}
+                  </Util.Row>
+                </div>
+              ),
+            }))}
+            showSearch={false}
+            multiple={true}
+            selectedItems={columnsToShow.map((id) => ({
+              text: id,
+              label: id,
+            }))}
+          />
+        </Util.Col>
+      </Util.Row>
+    </Util.Row>
+    <Util.Col>
+      <>
+        <SegmentedControl
+          value={finalizedFilter}
+          items={finalizedOptions.map(({ id, label, style }) => ({
+            id,
+            label,
+            style,
+          }))}
+          onChange={(newFilter) => handleFinalizedToggle(newFilter.id)}
+          style={{
+            minWidth: 150,
+            marginBottom: -17,
+            alignSelf: "flex-end",
+          }}
+          buttonStyle={{
+            color: "black",
+            fontFamily: "inherit",
+            fontWeight: "inherit",
+            borderRadius: 0,
+            borderBottom: "1px solid rgb(218 223 228)",
+          }}
+          buttonClassName="btn"
+        />
+      </>
+    </Util.Col>
+  </div>
+);
+
 export const Jobs = () => {
   const { user: activeUser } = useAuth();
   const { shopId } = useParams();
@@ -130,12 +278,12 @@ export const Jobs = () => {
     {
       id: "IN_PROGRESS",
       label: "In Progress",
-      // color: "yellow" 
+      // color: "yellow"
     },
     {
       id: "COMPLETED",
       label: "Completed",
-      // color: "green" 
+      // color: "green"
     },
     {
       id: "WAITING",
@@ -145,7 +293,7 @@ export const Jobs = () => {
     {
       id: "CANCELLED",
       label: "Cancelled",
-      // color: "secondary" 
+      // color: "secondary"
     },
     {
       id: "WONT_DO",
@@ -170,8 +318,8 @@ export const Jobs = () => {
       style: {
         borderColor: finalizedFilter === "true" ? "black" : "lightgray",
         borderTopLeftRadius: 4,
-        borderBottom: finalizedFilter === "true" ? "#F8FAFC" : "lightgray"
-      }
+        borderBottom: finalizedFilter === "true" ? "#F8FAFC" : "lightgray",
+      },
     },
     {
       id: "false",
@@ -179,8 +327,8 @@ export const Jobs = () => {
       style: {
         borderColor: finalizedFilter === "false" ? "black" : "lightgray",
         borderTopRightRadius: 4,
-        borderBottom: finalizedFilter === "false" ? "#F8FAFC" : "lightgray"
-      }
+        borderBottom: finalizedFilter === "false" ? "#F8FAFC" : "lightgray",
+      },
     },
   ];
 
@@ -188,7 +336,7 @@ export const Jobs = () => {
     setStatusFilter(
       statusFilter.includes(id)
         ? statusFilter.filter((s) => s !== id)
-        : [...statusFilter, id]
+        : [...statusFilter, id],
     );
   };
 
@@ -225,13 +373,12 @@ export const Jobs = () => {
     setColumnsToShow(
       columnsToShow.includes(id)
         ? columnsToShow.filter((s) => s !== id)
-        : [...columnsToShow, id]
+        : [...columnsToShow, id],
     );
   };
 
   // Apply filters to jobs
   const filteredJobs = jobs.filter((job) => {
-
     const searchMatches =
       !searchTerm ||
       JSON.stringify(job).toLowerCase().includes(searchTerm.toLowerCase());
@@ -263,138 +410,137 @@ export const Jobs = () => {
       finalizedMatches
     );
   });
-  const columns = useMemo(() => [
-    {
-      id: "title",
-      header: "Title",
-      accessorFn: (row) => row.title,
-      cell: ({ row }) => (
-        <Link to={`/shops/${shopId}/jobs/${row.original.id}`}>
-          {row.original.title}
-        </Link>
-      ),
-      enableSorting: true,
-    },
-    {
-      id: "submitter",
-      header: "Submitter",
-      accessorFn: (row) => row.user?.name,
-      cell: ({ row, getValue }) => {
-        const context = row.original;
-        return (
-          <Util.Row gap={0.5} align="center">
-            <Util.Col align="start">
-              {getValue()}
-              {context.user.id === activeUser?.id && (
-                <Badge color="green" soft>
-                  You
+  const columns = useMemo(
+    () => [
+      {
+        id: "title",
+        header: "Title",
+        accessorFn: (row) => row.title,
+        cell: ({ row }) => (
+          <Link to={`/shops/${shopId}/jobs/${row.original.id}`}>
+            {row.original.title}
+          </Link>
+        ),
+        enableSorting: true,
+      },
+      {
+        id: "submitter",
+        header: "Submitter",
+        accessorFn: (row) => row.user?.name,
+        cell: ({ row, getValue }) => {
+          const context = row.original;
+          return (
+            <Util.Row gap={0.5} align="center">
+              <Util.Col align="start">
+                {getValue()}
+                {context.user.id === activeUser?.id && (
+                  <Badge color="green" soft>
+                    You
+                  </Badge>
+                )}
+              </Util.Col>
+            </Util.Row>
+          );
+        },
+        enableSorting: false,
+      },
+      {
+        id: "payer",
+        header: "Payer",
+        accessorFn: (row) => row.billingAccount?.name,
+        cell: ({ row, getValue }) => {
+          const context = row.original;
+          return (
+            <Util.Row gap={0.5} align="center">
+              <span>{getValue() || "N/A"}</span>
+              {context.billingAccount?.type === "GROUP" && (
+                <Badge color="blue" soft>
+                  Group
                 </Badge>
               )}
-            </Util.Col>
-          </Util.Row>
-        );
+            </Util.Row>
+          );
+        },
+        enableSorting: false,
       },
-      enableSorting: false,
-    },
-    {
-      id: "payer",
-      header: "Payer",
-      accessorFn: (row) => row.billingAccount?.name,
-      cell: ({ row, getValue }) => {
-        const context = row.original;
-        return (
-          <Util.Row gap={0.5} align="center">
-            <span>{getValue() || "N/A"}</span>
-            {context.billingAccount?.type === "GROUP" && (
-              <Badge color="blue" soft>
-                Group
-              </Badge>
-            )}
-          </Util.Row>
-        );
+      {
+        id: "totalCost",
+        header: "Total Cost",
+        accessorFn: (row) => row.totalCost,
+        cell: ({ row, getValue }) => {
+          const context = row.original;
+          return (
+            <Util.Row gap={0.25}>
+              <Price value={getValue()} icon />
+              {!context.finalized && "*"}
+            </Util.Row>
+          );
+        },
+        enableSorting: true,
       },
-      enableSorting: false,
-    },
-    {
-      id: "totalCost",
-      header: "Total Cost",
-      accessorFn: (row) => row.totalCost,
-      cell: ({ row, getValue }) => {
-        const context = row.original;
-        return (
-          <Util.Row gap={0.25}>
-            <Price value={getValue()} icon />
-            {!context.finalized && "*"}
-          </Util.Row>
-        );
+      {
+        id: "progress",
+        header: "Progress",
+        accessorFn: (row) => row.progress,
+        cell: ({ row, getValue }) => {
+          const context = row.original;
+          const d = getValue();
+
+          return (
+            <Util.Row gap={1} align="center">
+              {context.itemsCount === 0 ? (
+                <PieProgressChart
+                  complete={0}
+                  inProgress={0}
+                  notStarted={0}
+                  exclude={1}
+                />
+              ) : (
+                <PieProgressChart
+                  complete={d.completedCount / context.itemsCount}
+                  inProgress={d.inProgressCount / context.itemsCount}
+                  notStarted={d.notStartedCount / context.itemsCount}
+                  exclude={d.excludedCount / context.itemsCount}
+                />
+              )}
+            </Util.Row>
+          );
+        },
+        enableSorting: false,
       },
-      enableSorting: true,
-    },
-    {
-      id: "progress",
-      header: "Progress",
-      accessorFn: (row) => row.progress,
-      cell: ({ row, getValue }) => {
-        const context = row.original;
-        const d = getValue();
-
-        return (
-          <Util.Row gap={1} align="center">
-            {context.itemsCount === 0 ? (
-              <PieProgressChart
-                complete={0}
-                inProgress={0}
-                notStarted={0}
-                exclude={1}
-              />
-            ) : (
-              <PieProgressChart
-                complete={d.completedCount / context.itemsCount}
-                inProgress={d.inProgressCount / context.itemsCount}
-                notStarted={d.notStartedCount / context.itemsCount}
-                exclude={d.excludedCount / context.itemsCount}
-              />
-            )}
-          </Util.Row>
-        );
+      {
+        id: "status",
+        header: "Status",
+        accessorFn: (row) => row.status,
+        cell: ({ getValue }) => switchStatusForBadge(getValue()),
+        enableSorting: true,
       },
-      enableSorting: false,
-    },
-    {
-      id: "status",
-      header: "Status",
-      accessorFn: (row) => row.status,
-      cell: ({ getValue }) => switchStatusForBadge(getValue()),
-      enableSorting: true,
-    },
-    {
-      id: "dueDate",
-      header: "Due Date",
-      accessorFn: (row) => row.dueDate,
-      cell: ({ row, getValue }) => {
-        const context = row.original;
-        const d = getValue();
-        const now = new Date();
+      {
+        id: "dueDate",
+        header: "Due Date",
+        accessorFn: (row) => row.dueDate,
+        cell: ({ row, getValue }) => {
+          const context = row.original;
+          const d = getValue();
+          const now = new Date();
 
-        return (
-          <>
-            {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()})
-            {new Date(d) < now &&
-              new Date(d).toDateString() !== now.toDateString() &&
-              !context.finalized && <Badge color="red">Overdue</Badge>}
-            {new Date(d).toDateString() === now.toDateString() && (
-              <Badge color="yellow">Due Today</Badge>
-            )}
-          </>
-        );
+          return (
+            <>
+              {moment(d).format("MM/DD/YY")} ({moment(d).fromNow()})
+              {new Date(d) < now &&
+                new Date(d).toDateString() !== now.toDateString() &&
+                !context.finalized && <Badge color="red">Overdue</Badge>}
+              {new Date(d).toDateString() === now.toDateString() && (
+                <Badge color="yellow">Due Today</Badge>
+              )}
+            </>
+          );
+        },
+        enableSorting: true,
       },
-      enableSorting: true,
-
-    }
-
-  ], [shopId, activeUser]);
-
-
+    ],
+    [shopId, activeUser],
+  );
 
   const ordered = useMemo(() => {
     if (!sorting.length) return filteredJobs;
@@ -446,121 +592,14 @@ export const Jobs = () => {
     return desc ? sorted.reverse() : sorted;
   }, [filteredJobs, sorting]);
 
-
   const pageData = useMemo(() => {
     const start = (page - 1) * size;
     return ordered.slice(start, start + size);
   }, [ordered, page, size]);
 
-
   if (jobsLoading) {
     return <Loading />;
   }
-
-  const NEWFilters = () => (
-    <div>
-      <Util.Row justify="between" align="start">
-        <Util.Row gap={1}>
-          <Util.Col gap={0}>
-            <H4>Status</H4>
-            <Dropdown prompt="Select Status" items={statusOptions.map(({ id, label }) => ({
-              text:
-                <div
-                  key={id}
-                  onClick={() => handleStatusToggle(id)}
-                >
-                  <Util.Row justify="between" gap={0.5}>
-                    {statusFilter.includes(id) ? (
-                      <Icon i="square-check" />
-                    ) : (
-                      <Icon i="square" />
-                    )}
-                    {label}
-                  </Util.Row>
-                </div>
-            }))}
-              showSearch={false} />
-          </Util.Col>
-          {(activeUser?.admin ||
-            userShop.accountType === "ADMIN" ||
-            userShop.accountType === "OPERATOR") && (
-              <Util.Col gap={0}>
-                <H4>Submitter</H4>
-                <ShopUserPicker
-                  value={submitterFilter}
-                  onChange={setSubmitterFilter}
-                  includeNone={true}
-                />
-              </Util.Col>
-            )}
-          <Util.Col gap={0}>
-            <H4>Due Date Range</H4>
-            <Util.Row gap={0.5}>
-              <Input
-                type="date"
-                onChange={(e) => setStartDateFilter(e + "T00:00:00")}
-                value={startDateFilter?.split("T")[0]}
-                icon={startDateFilter && <Icon i="x" />}
-                iconPos="trailing"
-                separated={!!startDateFilter}
-                appendedLinkOnClick={() => setStartDateFilter(null)}
-              />
-              <h2> - </h2>
-              <Input
-                type="date"
-                onChange={(e) => setEndDateFilter(e + "T00:00:00")}
-                value={endDateFilter?.split("T")[0]}
-                icon={endDateFilter && <Icon i="x" />}
-                iconPos="trailing"
-                separated={!!endDateFilter}
-                appendedLinkOnClick={() => setEndDateFilter(null)}
-              />
-            </Util.Row>
-          </Util.Col>
-          <Util.Col gap={0}>
-            <h4>Columns</h4>
-            <Dropdown
-              prompt="Select Columns"
-              items={columnsOptions.map((id) => ({
-                text:
-                  <div
-                    key={id}
-                    onClick={() => { handleColumnToggle(id); }}
-                  >
-                    <Util.Row justify="between" gap={0.5}>
-                      {columnsToShow.includes(id) ? (
-                        <Icon i="square-check" />
-                      ) : (
-                        <Icon i="square" />
-                      )}
-                      {id}
-                    </Util.Row>
-                  </div>
-              }))}
-              showSearch={false}
-              multiple={true}
-              selectedItems={columnsToShow.map((id) => ({ text: id, label: id }))}
-            />
-          </Util.Col>
-        </Util.Row>
-      </Util.Row>
-      <Util.Col>
-        <>
-
-          <SegmentedControl
-            value={finalizedFilter}
-            items={finalizedOptions.map(({ id, label, style }) => ({ id, label, style }))}
-            onChange={(newFilter) => handleFinalizedToggle(newFilter.id)}
-            style={{ minWidth: 150, marginBottom: -17, alignSelf: "flex-end" }}
-            buttonStyle={{ color: "black", fontFamily: "inherit", fontWeight: "inherit", borderRadius: 0, borderBottom: "1px solid rgb(218 223 228)" }}
-            buttonClassName="btn"
-          />
-
-        </>
-
-      </Util.Col>
-    </div>
-  );
 
   if (user?.simple === false) {
     return (
@@ -570,7 +609,7 @@ export const Jobs = () => {
           shopId,
           activeUser?.admin,
           userShop.accountType,
-          userShop.balance < 0
+          userShop.balance < 0,
         )}
       >
         <Util.Row justify="between" align="center">
@@ -581,7 +620,13 @@ export const Jobs = () => {
         </Util.Row>
         <Util.Spacer size={1} />
 
-        <div style={{ padding: 16, borderBottom: "1px solid rgb(218 223 228)", backgroundColor: "#F8FAFC" }}>
+        <div
+          style={{
+            padding: 16,
+            borderBottom: "1px solid rgb(218 223 228)",
+            backgroundColor: "#F8FAFC",
+          }}
+        >
           <H3>Filters</H3>
           <SearchBar
             onSearch={(value) => {
@@ -589,7 +634,27 @@ export const Jobs = () => {
               setPage(1);
             }}
           />
-          <NEWFilters />
+          <NEWFilters
+            {...{
+              statusOptions,
+              handleStatusToggle,
+              statusFilter,
+              activeUser,
+              userShop,
+              submitterFilter,
+              setSubmitterFilter,
+              startDateFilter,
+              setStartDateFilter,
+              endDateFilter,
+              setEndDateFilter,
+              columnsOptions,
+              handleColumnToggle,
+              columnsToShow,
+              handleFinalizedToggle,
+              finalizedFilter,
+              finalizedOptions,
+            }}
+          />
         </div>
         {/* <Util.Spacer size={2} /> */}
 
@@ -607,7 +672,6 @@ export const Jobs = () => {
               page={page}
               size={size}
               totalRows={filteredJobs.length}
-
               onPageChange={setPage}
               onSizeChange={(n) => {
                 setPage(1);
@@ -618,13 +682,12 @@ export const Jobs = () => {
                 setPage(1);
                 setSorting(next);
               }}
-
             />
             <Util.Spacer size={1} />
             <i className="text-secondary">
-              * Total cost is an estimate reflecting the current state of the job.
-              Because the job is not finalized, the cost may change as the job
-              progresses.
+              * Total cost is an estimate reflecting the current state of the
+              job. Because the job is not finalized, the cost may change as the
+              job progresses.
             </i>
           </>
         )}
