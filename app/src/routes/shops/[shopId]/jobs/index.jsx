@@ -251,14 +251,13 @@ export const Jobs = () => {
     const submitterId = job.user.id;
     const submitterMatches =
       !submitterFilter || submitterId === submitterFilter;
-
     const finalizedMatches =
-      finalizedFilter.length === 0 ||
-      finalizedFilter.includes(job.finalized ? "true" : "false");
+      !finalizedFilter ||
+      finalizedFilter === (job.finalized ? "true" : "false");
 
     // Return true if all conditions are met
     return (
-      searchTerm &&
+      searchMatches &&
       statusMatches &&
       startDateMatches &&
       endDateMatches &&
@@ -266,10 +265,6 @@ export const Jobs = () => {
       finalizedMatches
     );
   });
-
-
-
-
 
   const columns = useMemo(() => [
     {
@@ -322,15 +317,6 @@ export const Jobs = () => {
       },
     },
     {
-      id: "description",
-      header: "Description",
-      accessorFn: (row) => row.description,
-      cell: ({ getValue }) => {
-        const d = getValue() || "";
-        return d.slice(0, 35) + (d.length > 35 ? "..." : "");
-      },
-    },
-    {
       id: "totalCost",
       header: "Total Cost",
       accessorFn: (row) => row.totalCost,
@@ -343,30 +329,6 @@ export const Jobs = () => {
           </Util.Row>
         );
       },
-      enableSorting: true,
-    },
-    {
-      id: "affordability",
-      header: "Affordability",
-      accessorFn: (row) => row.totalCost,
-      cell: ({ row, getValue }) => {
-        const context = row.original;
-        return getValue() > (context.billingAccount?.balance ?? 0) ? (
-          <Badge color="red" soft>
-            Insufficient Funds
-          </Badge>
-        ) : (
-          <Badge color="green" soft>
-            Sufficient Funds
-          </Badge>
-        );
-      },
-      enableSorting: false, // usually better off disabled
-    },
-    {
-      id: "itemsCount",
-      header: "Items",
-      accessorFn: (row) => row.itemsCount,
       enableSorting: true,
     },
     {
@@ -407,30 +369,6 @@ export const Jobs = () => {
       enableSorting: true,
     },
     {
-      id: "finalized",
-      header: "Finalized",
-      accessorFn: (row) => row.finalized,
-      cell: ({ getValue }) =>
-        getValue() ? (
-          <Badge color="green" soft>
-            Yes
-          </Badge>
-        ) : (
-          <Badge color="red" soft>
-            No
-          </Badge>
-        ),
-      enableSorting: true,
-    },
-    {
-      id: "finalizedAt",
-      header: "Finalized At",
-      accessorFn: (row) => row.finalizedAt,
-      cell: ({ getValue }) =>
-        getValue() ? moment(getValue()).format("MM/DD/YY") : "N/A",
-      enableSorting: true,
-    },
-    {
       id: "dueDate",
       header: "Due Date",
       accessorFn: (row) => row.dueDate,
@@ -451,18 +389,9 @@ export const Jobs = () => {
           </>
         );
       },
-      enableSorting: true,
-    },
-    {
-      id: "createdAt",
-      header: "Created At",
-      accessorFn: (row) => row.createdAt,
-      cell: ({ getValue }) => (
-        <>
-          {moment(getValue()).format("MM/DD/YY")} ({moment(getValue()).fromNow()})
-        </>
-      ),
-    },
+
+    }
+
   ], [shopId, activeUser]);
 
 
@@ -489,29 +418,13 @@ export const Jobs = () => {
           aVal = a.totalCost;
           bVal = b.totalCost;
           break;
-        case "itemsCount":
-          aVal = a.itemsCount;
-          bVal = b.itemsCount;
-          break;
         case "status":
           aVal = a.status;
           bVal = b.status;
           break;
-        case "finalized":
-          aVal = a.finalized;
-          bVal = b.finalized;
-          break;
-        case "finalizedAt":
-          aVal = a.finalizedAt;
-          bVal = b.finalizedAt;
-          break;
         case "dueDate":
           aVal = a.dueDate;
           bVal = b.dueDate;
-          break;
-        case "createdAt":
-          aVal = a.createdAt;
-          bVal = b.createdAt;
           break;
         default:
           return 0;
@@ -521,7 +434,7 @@ export const Jobs = () => {
       if (bVal == null) return -1;
 
       // dates
-      if (["dueDate", "createdAt", "finalizedAt"].includes(id)) {
+      if (["dueDate"].includes(id)) {
         return new Date(aVal) - new Date(bVal);
       }
 
@@ -538,13 +451,10 @@ export const Jobs = () => {
   }, [filteredJobs, sorting]);
 
 
-    const pageData = useMemo(() => {
+  const pageData = useMemo(() => {
     const start = (page - 1) * size;
     return ordered.slice(start, start + size);
   }, [ordered, page, size]);
-
-
-
 
 
   const NEWFilters = () => (
@@ -635,14 +545,19 @@ export const Jobs = () => {
         </Util.Row>
       </Util.Row>
       <Util.Col>
-        <SegmentedControl
-          value={finalizedFilter}
-          items={finalizedOptions.map(({ id, label, style }) => ({ id, label, style }))}
-          onChange={(newFilter) => handleFinalizedToggle(newFilter.id)}
-          style={{ minWidth: 150, marginBottom: -17, alignSelf: "flex-end" }}
-          buttonStyle={{ color: "black", fontFamily: "inherit", fontWeight: "inherit", borderRadius: 0, borderBottom: "1px solid rgb(218 223 228)" }}
-          buttonClassName="btn"
-        />
+        <>
+
+          <SegmentedControl
+            value={finalizedFilter}
+            items={finalizedOptions.map(({ id, label, style }) => ({ id, label, style }))}
+            onChange={(newFilter) => handleFinalizedToggle(newFilter.id)}
+            style={{ minWidth: 150, marginBottom: -17, alignSelf: "flex-end" }}
+            buttonStyle={{ color: "black", fontFamily: "inherit", fontWeight: "inherit", borderRadius: 0, borderBottom: "1px solid rgb(218 223 228)" }}
+            buttonClassName="btn"
+          />
+
+        </>
+
       </Util.Col>
     </div>
   );
@@ -673,24 +588,33 @@ export const Jobs = () => {
 
         <div style={{ padding: 16, borderBottom: "1px solid rgb(218 223 228)", backgroundColor: "#F8FAFC" }}>
           <H3>Filters</H3>
+          <SearchBar
+            onSearch={(value) => {
+              setSearchTerm(value);
+              setPage(1);
+            }}
+          />
+
+
           <NEWFilters />
         </div>
         {/* <Util.Spacer size={2} /> */}
 
         {/* Jobs Table */}
         {filteredJobs.length === 0 ? (
-          <i>
-            No jobs found. Adjust your filters or click the "Create Job" button
-            above to create a new job.
-          </i>
+          <>
+            <i>
+
+              No jobs found. Adjust your filters or click the "Create Job" button
+              above to create a new job.
+            </i>
+
+
+          </>
+
+
         ) : (
           <>
-            <SearchBar
-              onSearch={(value) => {
-                setSearchTerm(value);
-                setPage(1);
-              }}
-            />
             <TableV2
               columns={columns}
               data={pageData}
