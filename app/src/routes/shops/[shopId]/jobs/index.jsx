@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Page } from "#page";
 import { useShop } from "../../../../hooks/useShop";
@@ -9,7 +9,6 @@ const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
 import { useUser } from "../../../../hooks/useUser";
 import { Button } from "#button";
-import { TableV2 } from "tabler-react-2";
 import moment from "moment";
 import { Loading } from "#loading";
 import { PieProgressChart } from "../../../../components/piechart/PieProgressChart";
@@ -17,6 +16,7 @@ import { Icon } from "#icon";
 import { ShopUserPicker } from "#shopUserPicker";
 import { Price } from "#renderPrice";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
+import { TableV2 } from "tabler-react-2";
 
 export const switchStatusForBadge = (status) => {
   switch (status) {
@@ -103,12 +103,6 @@ export const Jobs = () => {
   } = useJobs(shopId);
   const { user } = useUser(activeUser.id);
 
-
-
-  const [page, setPage] = useState(1);
-  const [size, setSize] = useState(25);
-  const [sorting, setSorting] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
     "NOT_STARTED",
@@ -121,6 +115,11 @@ export const Jobs = () => {
   const [endDateFilter, setEndDateFilter] = useState(null);
   const [submitterFilter, setSubmitterFilter] = useState(null);
   const [finalizedFilter, setFinalizedFilter] = useState("false");
+
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(25);
+  const [sorting, setSorting] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const statusOptions = [
     {
@@ -230,7 +229,6 @@ export const Jobs = () => {
     );
   };
 
-
   // Apply filters to jobs
   const filteredJobs = jobs.filter((job) => {
 
@@ -265,7 +263,6 @@ export const Jobs = () => {
       finalizedMatches
     );
   });
-
   const columns = useMemo(() => [
     {
       id: "title",
@@ -297,6 +294,7 @@ export const Jobs = () => {
           </Util.Row>
         );
       },
+      enableSorting: false,
     },
     {
       id: "payer",
@@ -315,6 +313,7 @@ export const Jobs = () => {
           </Util.Row>
         );
       },
+      enableSorting: false,
     },
     {
       id: "totalCost",
@@ -389,6 +388,7 @@ export const Jobs = () => {
           </>
         );
       },
+      enableSorting: true,
 
     }
 
@@ -409,10 +409,6 @@ export const Jobs = () => {
         case "title":
           aVal = a.title;
           bVal = b.title;
-          break;
-        case "submitter":
-          aVal = a.user?.name;
-          bVal = b.user?.name;
           break;
         case "totalCost":
           aVal = a.totalCost;
@@ -456,6 +452,10 @@ export const Jobs = () => {
     return ordered.slice(start, start + size);
   }, [ordered, page, size]);
 
+
+  if (jobsLoading) {
+    return <Loading />;
+  }
 
   const NEWFilters = () => (
     <div>
@@ -562,11 +562,6 @@ export const Jobs = () => {
     </div>
   );
 
-
-  if (jobsLoading) {
-    return <Loading />;
-  }
-
   if (user?.simple === false) {
     return (
       <Page
@@ -594,25 +589,16 @@ export const Jobs = () => {
               setPage(1);
             }}
           />
-
-
           <NEWFilters />
         </div>
         {/* <Util.Spacer size={2} /> */}
 
         {/* Jobs Table */}
         {filteredJobs.length === 0 ? (
-          <>
-            <i>
-
-              No jobs found. Adjust your filters or click the "Create Job" button
-              above to create a new job.
-            </i>
-
-
-          </>
-
-
+          <i>
+            No jobs found. Adjust your filters or click the "Create Job" button
+            above to create a new job.
+          </i>
         ) : (
           <>
             <TableV2
