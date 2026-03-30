@@ -35,7 +35,7 @@ export const EditCosting = ({
       secondaryMaterialQty,
       resource,
       material,
-      secondaryMaterial = null,
+      secondaryMaterial,
       qty,
     } = newItem;
     if (!resource) return 0;
@@ -220,7 +220,7 @@ export const EditCosting = ({
           />
           {secondaryMaterial && (
             <QuantityInput
-              label={`Secondary material quantity in ${newItem.secondaryMaterial.unitDescriptor}s`}
+              label={`Secondary material quantity in ${newItem.secondaryMaterial?.unitDescriptor}s`}
               helpText={HELP_TEXT.secondaryMaterial}
               quantity={newItem.secondaryMaterialQty}
               costPerUnit={newItem.secondaryMaterial?.costPerUnit}
