@@ -46,6 +46,51 @@ const formatQuantity = (value) => {
   return value.toFixed(2).replace(/\.?0+$/, "");
 };
 
+const getEntityDisplayName = (entity) => {
+  if (!entity) return "";
+
+  if (typeof entity.name === "string" && entity.name.trim()) {
+    return entity.name.trim();
+  }
+
+  return [entity.firstName, entity.lastName].filter(Boolean).join(" ").trim();
+};
+
+export const selectInvoiceCustomer = ({
+  billingGroup,
+  payerAccount,
+  requester,
+} = {}) => {
+  const billingGroupName = billingGroup?.title || billingGroup?.name || "";
+  if (billingGroupName) {
+    return {
+      name: billingGroupName,
+      email: "",
+    };
+  }
+
+  const payerName = getEntityDisplayName(payerAccount);
+  if (payerName || payerAccount?.email) {
+    return {
+      name: payerName || payerAccount?.email || "Customer",
+      email: payerAccount?.email || "",
+    };
+  }
+
+  const requesterName = getEntityDisplayName(requester);
+  if (requesterName || requester?.email) {
+    return {
+      name: requesterName || requester?.email || "Customer",
+      email: requester?.email || "",
+    };
+  }
+
+  return {
+    name: "Customer",
+    email: "",
+  };
+};
+
 export const calculateTotalCostOfJob = (data) => {
   let totalCost = 0;
 
@@ -349,7 +394,18 @@ export const generateInvoice = async (
     throw new Error("Job not found while generating invoice");
   }
 
-  const [shop, customer] = await Promise.all([
+  const billingGroupId =
+    job.groupId ||
+    (data?.billingAccount?.type === "GROUP" ? data.billingAccount.id : null);
+  const payerUserId = billingGroupId
+    ? null
+    : data?.billingAccount?.type === "USER"
+      ? data.billingAccount.id
+      : job.userId;
+  const requesterUserId = job.userId;
+  const userIds = [...new Set([payerUserId, requesterUserId].filter(Boolean))];
+
+  const [shop, billingGroup, users] = await Promise.all([
     prisma.shop.findFirst({
       where: {
         id: shopId,
@@ -360,34 +416,53 @@ export const generateInvoice = async (
         phone: true,
       },
     }),
-    prisma.user.findFirst({
-      where: {
-        id: job.userId,
-      },
-      select: {
-        firstName: true,
-        lastName: true,
-        email: true,
-      },
-    }),
+    billingGroupId
+      ? prisma.billingGroup.findFirst({
+          where: {
+            id: billingGroupId,
+          },
+          select: {
+            title: true,
+          },
+        })
+      : null,
+    userIds.length
+      ? prisma.user.findMany({
+          where: {
+            id: {
+              in: userIds,
+            },
+          },
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+          },
+        })
+      : [],
   ]);
 
   if (!shop) {
     throw new Error("Shop not found while generating invoice");
   }
 
+  const usersById = Object.fromEntries(users.map((user) => [user.id, user]));
+
   const rows = buildInvoiceRows(job);
   const total = calculateTotalCostOfJob(job);
+  const customer = selectInvoiceCustomer({
+    billingGroup,
+    payerAccount:
+      (payerUserId && usersById[payerUserId]) || data?.billingAccount || null,
+    requester:
+      (requesterUserId && usersById[requesterUserId]) || data?.user || null,
+  });
 
   const pdf = await drawInvoicePdf({
     job,
     shop,
-    customer: {
-      name: customer
-        ? `${customer.firstName} ${customer.lastName}`.trim()
-        : "Customer",
-      email: customer?.email || "",
-    },
+    customer,
     rows,
     total,
     draft,

@@ -14,6 +14,7 @@ import { useModal } from "#modal";
 import { NotFound } from "../../../../components/404/404";
 import toast from "react-hot-toast";
 import styles from "./SchedulePage.module.css";
+import { shopSidenavItems } from "..";
 
 const { H1 } = Typography;
 
@@ -317,7 +318,7 @@ export const SchedulePage = () => {
   if (activeUser?.simple === true) return <NotFound />;
 
   return (
-    <Page sidenavItems={sidenavItems("Shops", user?.admin)}>
+    <Page sidenavItems={shopSidenavItems("Schedule", shopId, user?.admin, userShop?.accountType, userShop?.balance < 0)}>
       <Util.Col gap={3}>
         <div className={styles.headerRow}>
           <H1>Resource Availability</H1>

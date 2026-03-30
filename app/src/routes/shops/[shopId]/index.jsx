@@ -71,6 +71,13 @@ export const shopSidenavItems = (
       href: `/shops/${shopId}/resources`,
       icon: <Icon i="brand-databricks" size={18} />,
     },
+    {
+      type: "item",
+      text: "Schedule",
+      active: activeText === "Schedule",
+      href: `/shops/${shopId}/schedule`,
+      icon: <Icon i="calendar" size={18} />,
+    }
   ].filter(Boolean);
 
   if (accountType !== "CUSTOMER" || isGlobalAdmin) {
