@@ -23,7 +23,7 @@ export const post = [
         },
       });
 
-      if (!req.user.admin || userShop.accountType === "CUSTOMER") {
+      if (!req.user.admin && userShop.accountType !== "ADMIN") {
         return res.sendStatus(400);
       }
 

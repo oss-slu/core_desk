@@ -124,6 +124,75 @@ describe("/shop/[shopId]/job/[jobId]", () => {
     expect(ledgerItem.type).toBe("JOB");
   });
 
+  it("regenerates the invoice for a finalized job without changing the charge", async () => {
+    const job = await prisma.job.create({
+      data: {
+        title: "Finalized Job",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+        finalized: true,
+        finalizedAt: new Date(),
+      },
+    });
+
+    await prisma.ledgerItem.create({
+      data: {
+        shopId: tc.shop.id,
+        jobId: job.id,
+        userId: tc.user.id,
+        billingGroupId: null,
+        invoiceUrl: "https://example.com/original-invoice.pdf",
+        invoiceKey: "original-invoice-key",
+        value: -33,
+        type: "JOB",
+      },
+    });
+
+    const invoiceLog = await mockInvoiceForJob(job.id, 44);
+
+    const res = await request(app)
+      .post(`/api/shop/${tc.shop.id}/job/${job.id}/regenerate-invoice`)
+      .set(...(await gt({ sat: "ADMIN" })));
+
+    expect(res.status).toBe(200);
+    expect(res.body.url).toBe("https://example.com/invoice.pdf");
+    expect(res.body.key).toBe("invoice-key");
+
+    const ledgerItem = await prisma.ledgerItem.findUnique({
+      where: {
+        jobId: job.id,
+      },
+    });
+
+    expect(ledgerItem.invoiceUrl).toBe("https://example.com/invoice.pdf");
+    expect(ledgerItem.invoiceKey).toBe("invoice-key");
+    expect(ledgerItem.value).toBe(-33);
+
+    const updatedInvoiceLog = await prisma.logs.findUnique({
+      where: {
+        id: invoiceLog.id,
+      },
+    });
+    expect(updatedInvoiceLog.ledgerItemId).toBe(ledgerItem.id);
+  });
+
+  it("does not regenerate the invoice for a non-finalized job", async () => {
+    const job = await prisma.job.create({
+      data: {
+        title: "Not Yet Finalized",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+      },
+    });
+
+    const res = await request(app)
+      .post(`/api/shop/${tc.shop.id}/job/${job.id}/regenerate-invoice`)
+      .set(...(await gt({ sat: "ADMIN" })));
+
+    expect(res.status).toBe(400);
+    expect(res.body.error).toContain("finalized");
+  });
+
   it("allows privileged users to change the requester", async () => {
     await prisma.userShop.create({
       data: {
