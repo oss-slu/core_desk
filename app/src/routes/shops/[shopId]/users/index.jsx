@@ -208,7 +208,7 @@ export const ShopUsersPage = () => {
       <TableV2
         columns={columns}
         data={pageData}
-        totalRows={users.length}
+        totalRows={filteredUsers.length}
         page={page}
         size={size}
         onPageChange={setPage}
