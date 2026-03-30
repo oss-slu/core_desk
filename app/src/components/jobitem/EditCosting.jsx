@@ -41,7 +41,7 @@ export const EditCosting = ({
     } = newItem;
     if (!resource) return 0;
     if (!material) return 0;
-    // if (!secondaryMaterial) return 0;
+    
 
     return (
       ((timeQty * resource.costPerTime || 0) +
