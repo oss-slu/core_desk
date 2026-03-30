@@ -21,6 +21,7 @@ export const EditCosting = ({
   }, [item]);
 
   const isRawMode = newItem?.resourceType?.costingMode === "RAW_VALUE_ENTRY";
+  const hasSecondaryMaterial = Boolean(newItem?.secondaryMaterial);
 
   const calculateTotalCost = (includeQty = true) => {
     if (isRawMode) {
@@ -35,7 +36,7 @@ export const EditCosting = ({
       secondaryMaterialQty,
       resource,
       material,
-      secondaryMaterial,
+      secondaryMaterial = null,
       qty,
     } = newItem;
     if (!resource) return 0;
@@ -115,18 +116,20 @@ export const EditCosting = ({
               <Icon i="weight" />
               <span>{newItem.materialQty || 0}</span>
             </Util.Row>
-            <Util.Row gap={1} align="center" justify="between">
-              <label className="form-label">Secondary Material quantity</label>
-              <div
-                style={{
-                  flex: 1,
-                  height: 2,
-                  backgroundColor: "var(--tblr-border-color)",
-                }}
-              />
-              <Icon i="weight" />
-              <span>{newItem.secondaryMaterialQty || 0}</span>
-            </Util.Row>
+            {hasSecondaryMaterial && (
+              <Util.Row gap={1} align="center" justify="between">
+                <label className="form-label">Secondary Material quantity</label>
+                <div
+                  style={{
+                    flex: 1,
+                    height: 2,
+                    backgroundColor: "var(--tblr-border-color)",
+                  }}
+                />
+                <Icon i="weight" />
+                <span>{newItem.secondaryMaterialQty || 0}</span>
+              </Util.Row>
+            )}
           </>
         )}
         <Util.Row gap={1} align="center" justify="between">
@@ -218,12 +221,12 @@ export const EditCosting = ({
             modal={modal}
             showInput={userIsPrivileged}
           />
-          {secondaryMaterial && (
+          {hasSecondaryMaterial && (
             <QuantityInput
-              label={`Secondary material quantity in ${newItem.secondaryMaterial?.unitDescriptor}s`}
+              label={`Secondary material quantity in ${newItem.secondaryMaterial.unitDescriptor}s`}
               helpText={HELP_TEXT.secondaryMaterial}
               quantity={newItem.secondaryMaterialQty}
-              costPerUnit={newItem.secondaryMaterial?.costPerUnit}
+              costPerUnit={newItem.secondaryMaterial.costPerUnit}
               icon={<Icon i="weight" />}
               onChange={(value) =>
                 setNewItem({ ...newItem, secondaryMaterialQty: value })

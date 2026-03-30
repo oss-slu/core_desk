@@ -157,7 +157,6 @@ export const JobCostingPage = () => {
               item.resourceType?.costingMode === "RAW_VALUE_ENTRY";
             if (!isRawMode && !item.resourceId) return null;
             if (!isRawMode && !item.material) return null;
-            // if (!isRawMode && !item.secondaryMaterial) return null; -> commented out for now to see if it works before fully removing line
             return (
               <ItemCostCard key={item.id} item={item} refetchJob={refetchJob} />
             );
