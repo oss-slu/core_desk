@@ -30,6 +30,8 @@ export const JobCostingPage = () => {
     ConfirmModal,
     downloadDraftInvoice,
     draftInvoiceLoading,
+    regenerateInvoice,
+    regenerateInvoiceLoading,
   } = useJob(shopId, jobId);
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
@@ -124,8 +126,15 @@ export const JobCostingPage = () => {
             )
           )}
           <Util.Spacer size={1} />
-          <Button onClick={downloadDraftInvoice} loading={draftInvoiceLoading}>
-            Download draft invoice
+          <Button
+            onClick={job.finalized ? regenerateInvoice : downloadDraftInvoice}
+            loading={
+              job.finalized
+                ? regenerateInvoiceLoading
+                : draftInvoiceLoading
+            }
+          >
+            {job.finalized ? "Regenerate invoice" : "Download draft invoice"}
           </Button>
         </Card>
       </Util.Responsive>

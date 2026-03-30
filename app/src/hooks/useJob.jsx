@@ -9,6 +9,8 @@ export const useJob = (shopId, jobId) => {
   const [error, setError] = useState(null);
   const [job, setJob] = useState({});
   const [draftInvoiceLoading, setDraftInvoiceLoading] = useState(false);
+  const [regenerateInvoiceLoading, setRegenerateInvoiceLoading] =
+    useState(false);
 
   const fetchJob = async (shouldSetLoading = true) => {
     try {
@@ -76,12 +78,45 @@ export const useJob = (shopId, jobId) => {
         `/api/shop/${shopId}/job/${jobId}/draft-invoice`
       );
       const data = await r.json();
-      console.log(data);
+      if (!r.ok) {
+        toast.error(data.error || "Failed to download draft invoice");
+        return;
+      }
       window.open(data.url, "_blank");
-      setDraftInvoiceLoading(false);
     } catch (error) {
       setError(error);
+      toast.error("Failed to download draft invoice");
+    } finally {
       setDraftInvoiceLoading(false);
+    }
+  };
+
+  const regenerateInvoice = async () => {
+    try {
+      setRegenerateInvoiceLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/job/${jobId}/regenerate-invoice`,
+        {
+          method: "POST",
+        }
+      );
+      const data = await r.json();
+
+      if (!r.ok) {
+        toast.error(data.error || "Failed to regenerate invoice");
+        return;
+      }
+
+      if (data.url) {
+        window.open(data.url, "_blank");
+      }
+
+      await fetchJob(false);
+    } catch (error) {
+      setError(error);
+      toast.error("Failed to regenerate invoice");
+    } finally {
+      setRegenerateInvoiceLoading(false);
     }
   };
 
@@ -99,5 +134,7 @@ export const useJob = (shopId, jobId) => {
     ConfirmModal,
     downloadDraftInvoice,
     draftInvoiceLoading,
+    regenerateInvoice,
+    regenerateInvoiceLoading,
   };
 };
