@@ -13,7 +13,7 @@ export const calculateTotalCostOfJob = (data) => {
       return;
     }
 
-    if (!cost.resource || !cost.material || !cost.secondaryMaterial) return;
+    if (!cost.resource || !cost.material) return;
 
     totalCost += (cost.unitQty || 0) * (cost.resource.costPerUnit || 0);
     totalCost += (cost.timeQty || 0) * (cost.resource.costPerTime || 0);
@@ -21,7 +21,7 @@ export const calculateTotalCostOfJob = (data) => {
       (cost.processingTimeQty || 0) *
       (cost.resource.costPerProcessingTime || 0);
     totalCost += (cost.materialQty || 0) * (cost.material.costPerUnit || 0);
-    totalCost += (cost.secondaryMaterialQty || 0) * (cost.secondaryMaterial.costPerUnit || 0);
+    totalCost += (cost.secondaryMaterialQty || 0) * (cost.secondaryMaterial?.costPerUnit || 0);
   });
 
   // if additionalCostOverride is true, return totalCost
@@ -34,7 +34,7 @@ export const calculateTotalCostOfJob = (data) => {
       return;
     }
 
-    if (!item.resource || !item.material || !item.secondaryMaterial) return;
+    if (!item.resource || !item.material) return;
 
     let localTotalCost = 0;
 
@@ -46,7 +46,7 @@ export const calculateTotalCostOfJob = (data) => {
     localTotalCost +=
       (item.materialQty || 0) * (item.material.costPerUnit || 0);
     localTotalCost +=
-      (item.secondaryMaterialQty || 0) * (item.secondaryMaterial.costPerUnit || 0);
+      (item.secondaryMaterialQty || 0) * (item.secondaryMaterial?.costPerUnit || 0);
 
     totalCost += localTotalCost * (item.qty ?? 1);
   });

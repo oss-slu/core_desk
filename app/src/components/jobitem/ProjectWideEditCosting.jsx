@@ -365,19 +365,17 @@ const CostCard = ({
             </Util.Col>
           ) : localLineItem.resourceTypeId &&
             localLineItem.resourceId &&
-            localLineItem.materialId &&
-            localLineItem.secondaryMaterialId ? (
+            localLineItem.materialId ? (
             <>
               {materialLoading ||
               secondaryMaterialLoading ||
               resourceLoading ? (
                 <Spinner />
-              ) : !resource || !material || !secondaryMaterial ? (
+              ) : !resource || !material ? (
                 <span>
                   <Badge color="danger" soft>
                     <Icon i="coin-off" />
-                    Costing unavailable without material, secondary material and
-                    resource
+                    Costing unavailable without material and resource
                   </Badge>
                 </span>
               ) : (
@@ -424,9 +422,9 @@ const CostCard = ({
                     showInput={userIsPrivileged}
                   />
                   <QuantityInput
-                    label={`Secondary material quantity in ${secondaryMaterial.unitDescriptor}s`}
+                    label={`Secondary material quantity in ${secondaryMaterial?.unitDescriptor}s`}
                     quantity={localLineItem.secondaryMaterialQty || 0}
-                    costPerUnit={secondaryMaterial.costPerUnit || 0}
+                    costPerUnit={secondaryMaterial?.costPerUnit || 0}
                     icon={<Icon i="weight" />}
                     onChange={(value) =>
                       setLocalLineItem({

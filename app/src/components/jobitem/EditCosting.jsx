@@ -35,19 +35,19 @@ export const EditCosting = ({
       secondaryMaterialQty,
       resource,
       material,
-      secondaryMaterial,
+      secondaryMaterial = null,
       qty,
     } = newItem;
     if (!resource) return 0;
     if (!material) return 0;
-    if (!secondaryMaterial) return 0;
+    // if (!secondaryMaterial) return 0;
 
     return (
       ((timeQty * resource.costPerTime || 0) +
         (processingTimeQty * resource.costPerProcessingTime || 0) +
         (unitQty * resource.costPerUnit || 0) +
         (materialQty * material.costPerUnit || 0) +
-        (secondaryMaterialQty * secondaryMaterial.costPerUnit || 0)) *
+        (secondaryMaterialQty * secondaryMaterial?.costPerUnit || 0)) *
       (includeQty ? (qty ?? 1) : 1)
     );
   };
@@ -218,18 +218,19 @@ export const EditCosting = ({
             modal={modal}
             showInput={userIsPrivileged}
           />
-          <QuantityInput
-            label={`Secondary material quantity in ${newItem.secondaryMaterial.unitDescriptor}s`}
-            helpText={HELP_TEXT.secondaryMaterial}
-            quantity={newItem.secondaryMaterialQty}
-            costPerUnit={newItem.secondaryMaterial.costPerUnit}
-            icon={<Icon i="weight" />}
-            onChange={(value) =>
-              setNewItem({ ...newItem, secondaryMaterialQty: value })
-            }
-            modal={modal}
-            showInput={userIsPrivileged}
-          />
+          {secondaryMaterial && (
+            <QuantityInput
+              label={`Secondary material quantity in ${newItem.secondaryMaterial.unitDescriptor}s`}
+              helpText={HELP_TEXT.secondaryMaterial}
+              quantity={newItem.secondaryMaterialQty}
+              costPerUnit={newItem.secondaryMaterial?.costPerUnit}
+              icon={<Icon i="weight" />}
+              onChange={(value) =>
+                setNewItem({ ...newItem, secondaryMaterialQty: value })
+              }
+              modal={modal}
+              showInput={userIsPrivileged}
+          />)}
         </>
       )}
       <Util.Row gap={1} align="center" justify="between">
