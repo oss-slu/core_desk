@@ -57,6 +57,9 @@ export const get = [
                 },
               },
               jobs: {
+                where: {
+                  shopId: shopId,
+                },
                 select: {
                   status: true,
                   id: true,
@@ -199,17 +202,16 @@ export const post = [
             userId: userId,
             shopId: shopId,
             to: JSON.stringify(connectionExists),
-            message: `Reconnected user to shop as a${
-              req.body.role === "CUSTOMER"
+            message: `Reconnected user to shop as a${req.body.role === "CUSTOMER"
                 ? " customer"
                 : req.body.role === "OPERATOR"
-                ? "n operator"
-                : req.body.role === "ADMIN"
-                ? "n admin"
-                : req.body.role === "GROUP_ADMIN"
-                ? "n group admin"
-                : ""
-            }`,
+                  ? "n operator"
+                  : req.body.role === "ADMIN"
+                    ? "n admin"
+                    : req.body.role === "GROUP_ADMIN"
+                      ? "n group admin"
+                      : ""
+              }`,
             type: LogType.USER_CONNECTED_TO_SHOP,
           },
         });
@@ -450,17 +452,16 @@ export const put = [
           userId: userId,
           shopId: shopId,
           to: JSON.stringify(connection),
-          message: `Updated user role in the shop to a${
-            req.body.role === "CUSTOMER"
+          message: `Updated user role in the shop to a${req.body.role === "CUSTOMER"
               ? " customer"
               : req.body.role === "OPERATOR"
-              ? "n operator"
-              : req.body.role === "ADMIN"
-              ? "n admin"
-              : req.body.role === "GROUP_ADMIN"
-              ? "n group admin"
-              : ""
-          }`,
+                ? "n operator"
+                : req.body.role === "ADMIN"
+                  ? "n admin"
+                  : req.body.role === "GROUP_ADMIN"
+                    ? "n group admin"
+                    : ""
+            }`,
           type: LogType.USER_SHOP_ROLE_CHANGED,
         },
       });

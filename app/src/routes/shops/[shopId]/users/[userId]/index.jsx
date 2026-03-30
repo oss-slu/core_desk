@@ -94,7 +94,6 @@ export const ShopUserPage = () => {
   const { ledger, ledgerLoading, balance, postLedgerItem, opLoading } =
     useLedger(shopId, userId);
   const { user: activeUser } = useUser(currentUser?.id);
-
   const { modal: addBalance, ModalElement: AddBalanceModal } = useModal({
     title: "Post ledger item",
     text: (
