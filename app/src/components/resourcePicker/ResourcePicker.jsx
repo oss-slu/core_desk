@@ -18,36 +18,32 @@ export const ResourcePicker = ({
 
   return (
     <>
-    <Sentry.ErrorBoundary
-      fallback={({ error }) => (
-        <ErrorBoundaries
-          error={error}
-        />
-      )}
-    >
-    <Util.Col>  
-      <LoadableDropdownInput
-        loading={loading || opLoading}
-        value={value}
-        onChange={(v) => onChange(v.id)}
-        values={[
-          ...resources.map((m) => ({
-            id: m.id,
-            label: m.title,
-          })),
-          includeNone
-            ? {
-                id: null,
-                label: "Select a resource",
-                dropdownText: "None",
-              }
-            : null,
-        ].filter((v) => v)}
-        prompt="Select Resource"
-        label="Resource"
-      />
-    </Util.Col>
-    </Sentry.ErrorBoundary>
+      <Sentry.ErrorBoundary
+        fallback={({ error }) => <ErrorBoundaries error={error} />}
+      >
+        <Util.Col>
+          <LoadableDropdownInput
+            loading={loading || opLoading}
+            value={value}
+            onChange={(v) => onChange(v.id)}
+            values={[
+              ...(resources || []).map((m) => ({
+                id: m.id,
+                label: m.title,
+              })),
+              includeNone
+                ? {
+                    id: null,
+                    label: "Select a resource",
+                    dropdownText: "None",
+                  }
+                : null,
+            ].filter((v) => v)}
+            prompt="Select Resource"
+            label="Resource"
+          />
+        </Util.Col>
+      </Sentry.ErrorBoundary>
     </>
   );
 };
