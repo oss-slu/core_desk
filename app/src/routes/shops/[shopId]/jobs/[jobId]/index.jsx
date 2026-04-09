@@ -6,7 +6,6 @@ import {
   Typography,
   Util,
   Input,
-  Card,
   Button,
   Badge,
   Spinner,
@@ -260,9 +259,64 @@ export const JobPage = () => {
                   Save
                 </Button>
               ) : (
-                <Button loading={opLoading} onClick={() => setEditing(true)}>
-                  Edit
-                </Button>
+                <Util.Row gap={1} align="center" justify="around">
+                  <Util.Col gap={1} align="start">
+                    <Util.Row gap={1} align="end" className="mr-2">
+                      <H3>Status</H3>
+                      {userIsPrivileged ? (
+                        <LoadableDropdownInput
+                          loading={opLoading}
+                          prompt={"Select a status"}
+                          values={[
+                            { id: "IN_PROGRESS", label: "In Progress" },
+                            { id: "COMPLETED", label: "Completed" },
+                            { id: "NOT_STARTED", label: "Not Started" },
+                            { id: "CANCELLED", label: "Cancelled" },
+                            { id: "WONT_DO", label: "Won't Do" },
+                            { id: "WAITING", label: "Waiting" },
+                            {
+                              id: "WAITING_FOR_PICKUP",
+                              label: "Waiting for Pickup",
+                            },
+                            {
+                              id: "WAITING_FOR_PAYMENT",
+                              label: "Waiting for Payment",
+                            },
+                          ]}
+                          value={job.status}
+                          onChange={(value) => {
+                            updateJob({ status: value.id });
+                          }}
+                          doTheColorThing={true}
+                        />
+                      ) : (
+                        <Badge color={switchStatusToUI(job.status)[1]} soft>
+                          {switchStatusToUI(job.status)[0]}
+                        </Badge>
+                      )}
+                    </Util.Row>
+                    <Util.Row gap={1} align="center">
+                      <H3>Upcoming Deadline</H3>
+                      <p>
+                        {moment(job.dueDate).format("MM/DD/YY")} (
+                        {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
+                        {new Date(job.dueDate) < new Date() &&
+                          !(
+                            new Date(job.dueDate).toDateString() ===
+                            new Date().toDateString()
+                          ) && <Badge color="red">Overdue</Badge>}
+                        {/* Today warning */}{" "}
+                        {new Date(job.dueDate).toDateString() ===
+                          new Date().toDateString() && (
+                          <Badge color="yellow">Due Today</Badge>
+                        )}
+                      </p>
+                    </Util.Row>
+                  </Util.Col>
+                  <Button loading={opLoading} onClick={() => setEditing(true)}>
+                    Edit
+                  </Button>
+                </Util.Row>
               )}
             </Util.Row>
             {editing ? (
@@ -287,59 +341,6 @@ export const JobPage = () => {
             ) : (
               <>
                 <p>{job.description}</p>
-                <Util.Row gap={2} align="start">
-                  <div>
-                    <H3>Status</H3>
-                    {userIsPrivileged ? (
-                      <LoadableDropdownInput
-                        loading={opLoading}
-                        prompt={"Select a status"}
-                        values={[
-                          { id: "IN_PROGRESS", label: "In Progress" },
-                          { id: "COMPLETED", label: "Completed" },
-                          { id: "NOT_STARTED", label: "Not Started" },
-                          { id: "CANCELLED", label: "Cancelled" },
-                          { id: "WONT_DO", label: "Won't Do" },
-                          { id: "WAITING", label: "Waiting" },
-                          {
-                            id: "WAITING_FOR_PICKUP",
-                            label: "Waiting for Pickup",
-                          },
-                          {
-                            id: "WAITING_FOR_PAYMENT",
-                            label: "Waiting for Payment",
-                          },
-                        ]}
-                        value={job.status}
-                        onChange={(value) => {
-                          updateJob({ status: value.id });
-                        }}
-                        doTheColorThing={true}
-                      />
-                    ) : (
-                      <Badge color={switchStatusToUI(job.status)[1]} soft>
-                        {switchStatusToUI(job.status)[0]}
-                      </Badge>
-                    )}
-                  </div>
-                  <div>
-                    <H3>Upcoming Deadline</H3>
-                    <p>
-                      {moment(job.dueDate).format("MM/DD/YY")} (
-                      {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
-                      {new Date(job.dueDate) < new Date() &&
-                        !(
-                          new Date(job.dueDate).toDateString() ===
-                          new Date().toDateString()
-                        ) && <Badge color="red">Overdue</Badge>}
-                      {/* Today warning */}{" "}
-                      {new Date(job.dueDate).toDateString() ===
-                        new Date().toDateString() && (
-                        <Badge color="yellow">Due Today</Badge>
-                      )}
-                    </p>
-                  </div>
-                </Util.Row>
                 <Util.Spacer size={2} />
                 <H3>Project Defaults</H3>
                 <Util.Row gap={1} wrap>
@@ -457,52 +458,43 @@ export const JobPage = () => {
               </>
             )}
           </div>
-          <div style={{ flex: 1, width: "100%" }}>
-            <Card
-              tabs={[
-                {
-                  title: "Upload items",
-                  content: (
-                    <UploadDropzone
-                      scope={"job.fileupload"}
-                      metadata={{
-                        jobId,
-                        shopId,
-                      }}
-                      onUploadComplete={() => {
-                        refetchJobs(false);
-                      }}
-                      useNewDropzone={true}
-                      endpoint={`/api/shop/${shopId}/job/${jobId}/upload`}
-                    />
-                  ),
-                },
-                {
-                  title: "Comments",
-                  content: <Comments jobId={jobId} shopId={shopId} />,
-                },
-              ]}
-            />
-          </div>
         </Util.Responsive>
         <Util.Spacer size={1} />
+        <hr />
         <H2>Items</H2>
+        <UploadDropzone
+          scope={"job.fileupload"}
+          metadata={{
+            jobId,
+            shopId,
+          }}
+          onUploadComplete={() => {
+            refetchJobs(false);
+          }}
+          useNewDropzone={true}
+          endpoint={`/api/shop/${shopId}/job/${jobId}/upload`}
+        />
         {job.items?.length === 0 ? (
           <i>
             This job has no items. You can attach files in the dropzone above
           </i>
         ) : (
-          <Util.Col gap={0.5}>
-            {job.items?.map((item) => (
-              <JobItem
-                key={item.id}
-                item={item}
-                refetchJobs={refetchJobs}
-                userIsPrivileged={userIsPrivileged}
-                group={job.group}
-              />
-            ))}
-          </Util.Col>
+          <div>
+            <Util.Col gap={0.5}>
+              {job.items?.map((item) => (
+                <JobItem
+                  key={item.id}
+                  item={item}
+                  refetchJobs={refetchJobs}
+                  userIsPrivileged={userIsPrivileged}
+                  group={job.group}
+                />
+              ))}
+            </Util.Col>
+            <Util.Spacer size={1} />
+            <hr />
+            <Comments jobId={jobId} shopId={shopId} />
+          </div>
         )}
       </Page>
     );
