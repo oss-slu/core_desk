@@ -13,7 +13,7 @@ const shopSchema = z.object({
   description: z.string().nullable().optional(),
   imageUrl: z.string().url("Invalid image URL").nullable().optional(),
   color: z
-    .enum([ 
+    .enum([
       "RED",
       "BLUE",
       "GREEN",
@@ -91,6 +91,14 @@ export const get = [
           return res.status(403).json({ error: "Unauthorized" });
         }
 
+
+
+        const totalJobsToShop = await prisma.job.count({ //specific to that shop
+          where: {
+            shopId: shop.id,
+          },
+        });
+
         users = await prisma.userShop.findMany({
           where: {
             shopId: shop.id,
@@ -151,7 +159,7 @@ export const get = [
                 0
               ),
               jobCounts,
-              totalJobs: userShop.user.jobs.length,
+              totalJobs: totalJobsToShop,
               ledgerItems: undefined,
               jobs: undefined,
             },
@@ -227,7 +235,7 @@ export const put = [
           imageUrl: validatedData.imageUrl,
           color: validatedData.color,
           startingDeposit: validatedData.startingDeposit,
-          autoJoin: req.user.admin? validatedData.autoJoin : undefined,
+          autoJoin: req.user.admin ? validatedData.autoJoin : undefined,
         },
         select: SHOP_SELECT,
       });
