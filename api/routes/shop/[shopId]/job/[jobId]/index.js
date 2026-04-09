@@ -126,13 +126,9 @@ const JOB_INCLUDE = {
 };
 
 /** @type {Prisma.JobInclude} */
-const generateGroupInclude = (userId, userIsPrivileged) => {
+const generateGroupInclude = (userIsPrivileged) => {
   /** @type {Prisma.JobInclude} */
   const JOB_GROUP_INCLUDE = JSON.parse(JSON.stringify(JOB_INCLUDE));
-  JOB_GROUP_INCLUDE.items.where = {
-    active: true,
-    userId,
-  };
   if (!userIsPrivileged) {
     JOB_GROUP_INCLUDE.additionalCosts = undefined;
     JOB_GROUP_INCLUDE.ledgerItems = undefined;
@@ -267,7 +263,7 @@ export const get = [
 
       let job;
       if (initialJob?.groupId && !shouldLoadAll) {
-        const INCLUDE = generateGroupInclude(userId);
+        const INCLUDE = generateGroupInclude(shouldLoadAll);
 
         // The job is part of a group, so we need to handle different users accessing it.
 
