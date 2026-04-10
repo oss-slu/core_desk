@@ -237,7 +237,7 @@ export const JobPage = () => {
         )}
         <Util.Responsive gap={1} align="start" threshold={800}>
           <div style={{ flex: 1, width: "100%" }}>
-            <Util.Row justify="between" align="center" gap={1} wrap>
+            <Util.Row align="start" gap={1} wrap>
               {editing ? (
                 <Input
                   value={job.title}
@@ -245,7 +245,7 @@ export const JobPage = () => {
                   onChange={(e) => setJob({ ...job, title: e })}
                 />
               ) : (
-                <H1>{job.title}</H1>
+                <></>
               )}
               {editing ? (
                 <Button
@@ -259,10 +259,22 @@ export const JobPage = () => {
                   Save
                 </Button>
               ) : (
-                <Util.Row gap={1} align="center" justify="around">
-                  <Util.Col gap={1} align="start">
-                    <Util.Row gap={1} align="end" className="mr-2">
-                      <H3>Status</H3>
+                <Util.Row
+                  align="start"
+                  style={{ width: "100%", height: "60px" }}
+                  wrap
+                >
+                  <Util.Col gap={1} align="start" style={{ width: "50%" }}>
+                    <H1>{job.title}</H1>
+                    <p>{job.description}</p>
+                  </Util.Col>
+                  <Util.Col
+                    gap={0.5}
+                    align="start"
+                    style={{ width: "40%" }}
+                  >
+                    <Util.Row gap={1} align="center" wrap>
+                      <H3 style={{marginTop: "10px"}}>Status</H3>
                       {userIsPrivileged ? (
                         <LoadableDropdownInput
                           loading={opLoading}
@@ -295,9 +307,9 @@ export const JobPage = () => {
                         </Badge>
                       )}
                     </Util.Row>
-                    <Util.Row gap={1} align="center">
-                      <H3>Upcoming Deadline</H3>
-                      <p>
+                    <Util.Row gap={1} align="end">
+                      <H3 style={{ margin: 0, lineHeight: "1.5" }}>Upcoming Deadline</H3>
+                      <span style={{lineHeight: "1.5"}}>
                         {moment(job.dueDate).format("MM/DD/YY")} (
                         {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
                         {new Date(job.dueDate) < new Date() &&
@@ -310,15 +322,21 @@ export const JobPage = () => {
                           new Date().toDateString() && (
                           <Badge color="yellow">Due Today</Badge>
                         )}
-                      </p>
+                      </span>
                     </Util.Row>
                   </Util.Col>
-                  <Button loading={opLoading} onClick={() => setEditing(true)}>
-                    Edit
-                  </Button>
+                  <div style={{ width: "10%", display: "flex", justifyContent: "flex-end", alignSelf: "flex-start" }}>
+                    <Button
+                      loading={opLoading}
+                      onClick={() => setEditing(true)}
+                    >
+                      Edit
+                    </Button>
+                  </div>
                 </Util.Row>
               )}
             </Util.Row>
+            <hr />
             {editing ? (
               <>
                 <Input
@@ -340,9 +358,7 @@ export const JobPage = () => {
               </>
             ) : (
               <>
-                <p>{job.description}</p>
-                <Util.Spacer size={2} />
-                <H3>Project Defaults</H3>
+                <H2 style={{ marginTop: -10 }}>Project Defaults</H2>
                 <Util.Row gap={1} wrap>
                   <ResourceTypePicker
                     loading={opLoading}
@@ -405,8 +421,8 @@ export const JobPage = () => {
                     </i>
                   )}
                 </Util.Row>
-                <Util.Spacer size={2} />
-                <H3>Current Billing Account</H3>
+                <hr />
+                <H2 style={{ marginTop: -10 }}>Current Billing Account</H2>
                 {job.group ? (
                   <Link to={`/shops/${shopId}/billing-groups/${job.group.id}`}>
                     {job.group.title}
@@ -459,9 +475,8 @@ export const JobPage = () => {
             )}
           </div>
         </Util.Responsive>
-        <Util.Spacer size={1} />
         <hr />
-        <H2>Items</H2>
+        <H2 style={{ marginTop: -10 }}>Items</H2>
         <UploadDropzone
           scope={"job.fileupload"}
           metadata={{
@@ -491,9 +506,8 @@ export const JobPage = () => {
                 />
               ))}
             </Util.Col>
-            <Util.Spacer size={1} />
             <hr />
-            <Comments jobId={jobId} shopId={shopId} />
+            <Comments jobId={jobId} shopId={shopId}  style={{ marginTop: -10 }}/>
           </div>
         )}
       </Page>
