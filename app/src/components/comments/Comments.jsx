@@ -6,11 +6,9 @@ import { Button } from "#button";
 import { Avatar } from "#avatar";
 import moment from "moment";
 import { useAuth } from "#hooks";
-const { H4 } = Typography;
+const { H2, H4 } = Typography;
 import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
-
-
 
 export const Comments = ({ jobId, shopId }) => {
   const { comments, postComment, opLoading, loading } = useComments(
@@ -38,10 +36,10 @@ export const Comments = ({ jobId, shopId }) => {
     <div>
       <Util.Col gap={1} style={{ maxHeight: 600, overflowY: "auto" }}>
         <div>
+          <H2>Comments</H2>
           <Input
             value={newCommentMessage}
             onChange={setNewCommentMessage}
-            label="Comment Text"
             placeholder="Enter your comment here. Comments are permanent and cannot be deleted."
           />
           <Button
