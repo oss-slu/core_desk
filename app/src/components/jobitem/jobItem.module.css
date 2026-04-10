@@ -9,6 +9,8 @@
   margin-top: 8px;
   margin-right: -8px;
   text-align: right;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .callout {
@@ -38,16 +40,16 @@
 }
 
 .secondaryColumn {
-  flex: 0 0 20%;
-  max-width: 20%;
+  flex: 0 0 30%;
+  max-width: 30%;
   min-width: 0;
   border-left: 1px solid var(--tblr-border-color);
   padding-left: 2rem;
 }
 
 .tertiaryColumn {
-  flex: 0 0 35%;
-  max-width: 35%;
+  flex: 0 0 25%;
+  max-width: 25%;
   min-width: 0;
   border-left: 1px solid var(--tblr-border-color);
   padding-left: 2rem;
@@ -58,16 +60,99 @@
   height: 100%;
 }
 
+.compactSection {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.summaryRow {
+  width: 100%;
+  min-width: 0;
+  padding: 0.75rem 0;
+}
+
+.summaryText {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.popupPanel {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  z-index: 20;
+  width: min(40rem, calc(100vw - 2rem));
+  min-width: 18rem;
+  max-width: 100%;
+  min-height: 3rem;
+  padding: 1rem;
+  border: 1px solid var(--tblr-border-color);
+  border-radius: var(--tblr-border-radius-lg);
+  background: var(--tblr-bg-surface);
+  box-shadow: 0 1rem 2.5rem rgba(0, 0, 0, 0.16);
+}
+
+.costingInputRow {
+  min-width: 0;
+}
+
+.costSection {
+  width: 100%;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.costingInputGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.costingDivider {
+  min-width: 1rem;
+}
+
+.costingValueGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
 @media screen and (max-width: 1200px) {
   .primaryColumn,
-  .secondaryColumn {
+  .secondaryColumn,
+  .tertiaryColumn {
     width: 100%;
     max-width: unset;
     flex-basis: 100%;
   }
 
-  .secondaryColumn {
+  .secondaryColumn,
+  .tertiaryColumn {
     border-left: none;
     padding-left: 0;
+  }
+
+  .tertiaryColumn {
+    padding-right: 0;
+  }
+
+  .popupPanel {
+    left: 0;
+    right: auto;
+    width: min(36rem, 100%);
+  }
+
+  .costingDivider {
+    display: none;
+  }
+
+  .costSection {
+    padding-bottom: 0.75rem;
   }
 }

@@ -21,7 +21,14 @@ import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
 
 import { EditCosting } from "./EditCosting";
-import { useAuth, useBillingGroupUser, useJobItem } from "#hooks";
+import {
+  useAuth,
+  useBillingGroupUser,
+  useJobItem,
+  useMaterials,
+  useResources,
+  useResourceTypes,
+} from "#hooks";
 import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
@@ -109,9 +116,92 @@ export const JobItem = ({
 
   const { billingGroupUser, loading: billingGroupUserLoading } =
     useBillingGroupUser(shopId, group?.id, activeUser?.id);
+  const { materials = [] } = useMaterials(shopId, item?.resourceTypeId);
+  const { resources = [] } = useResources(shopId, item?.resourceTypeId);
+  const { resourceTypes = [] } = useResourceTypes(shopId);
   const [localQty, setLocalQty] = useState(item?.qty);
+  const [resourceEditorOpen, setResourceEditorOpen] = useState(false);
+  const [costEditorOpen, setCostEditorOpen] = useState(false);
 
   if (!item) return null;
+
+  const isRawMode = item.resourceType?.costingMode === "RAW_VALUE_ENTRY";
+  const costingAvailable =
+    (isRawMode && item.resourceTypeId) || (item.materialId && item.resourceId);
+
+  const calculateTotalCost = (includeQty = true) => {
+    if (isRawMode) {
+      return (item.rawValue || 0) * (includeQty ? (item.qty ?? 1) : 1);
+    }
+
+    if (!item.resource || !item.material) return 0;
+
+    return (
+      ((item.timeQty * item.resource.costPerTime || 0) +
+        (item.processingTimeQty * item.resource.costPerProcessingTime || 0) +
+        (item.unitQty * item.resource.costPerUnit || 0) +
+        (item.materialQty * item.material.costPerUnit || 0) +
+        (item.secondaryMaterialQty * item.secondaryMaterial?.costPerUnit || 0)) *
+      (includeQty ? (item.qty ?? 1) : 1)
+    );
+  };
+
+  const resolvedResourceTypeTitle =
+    item.resourceType?.title ||
+    resourceTypes.find((resourceType) => resourceType.id === item.resourceTypeId)
+      ?.title ||
+    "Resource type";
+
+  const resolvedResourceTitle =
+    item.resource?.title ||
+    resources.find((resource) => resource.id === item.resourceId)?.title ||
+    "No resource";
+
+  const resolvedPrimaryMaterialTitle =
+    item.material?.title ||
+    materials.find((material) => material.id === item.materialId)?.title ||
+    "No primary material";
+
+  const resolvedSecondaryMaterialTitle =
+    item.secondaryMaterial?.title ||
+    materials.find((material) => material.id === item.secondaryMaterialId)?.title ||
+    "No secondary material";
+
+  const resourceSummary = item.resourceTypeId ? (
+    isRawMode ? (
+      <>
+        <div>{resolvedResourceTypeTitle}</div>
+        <div>Raw value entry</div>
+      </>
+    ) : (
+      <>
+        <div>
+          <strong>{resolvedResourceTypeTitle}: </strong>
+          {resolvedResourceTitle}
+        </div>
+        <div>
+          <strong>Primary material: </strong>
+          {resolvedPrimaryMaterialTitle}
+        </div>
+        <div>
+          <strong>Secondary material: </strong>
+          {resolvedSecondaryMaterialTitle}
+        </div>
+      </>
+    )
+  ) : (
+    "No resource or material setup selected"
+  );
+
+  const totalCostSummary = costingAvailable
+    ? (
+      <>
+        <strong>Total cost: </strong>
+        ${calculateTotalCost().toFixed(2)}
+      </>
+    ) : (
+      "Total cost unavailable"
+    );
 
   const resourceConfigurationContent = (
     <div className={styles.sectionCard}>
@@ -170,22 +260,19 @@ export const JobItem = ({
     </div>
   );
 
-  const costingContent =
-    (item.resourceType?.costingMode === "RAW_VALUE_ENTRY" &&
-      item.resourceTypeId) ||
-    (item.materialId && item.resourceId) ? (
-      <EditCosting
-        item={item}
-        onChange={(value) => updateJobItem(value)}
-        loading={opLoading}
-        userIsPrivileged={userIsPrivileged}
-      />
-    ) : (
-      <Badge color="red" soft>
-        <Icon i="coin-off" />
-        Costing unavailable without material and resource
-      </Badge>
-    );
+  const costingContent = costingAvailable ? (
+    <EditCosting
+      item={item}
+      onChange={(value) => updateJobItem(value)}
+      loading={opLoading}
+      userIsPrivileged={userIsPrivileged}
+    />
+  ) : (
+    <Badge color="red" soft>
+      <Icon i="coin-off" />
+      Costing unavailable without material and resource
+    </Badge>
+  );
 
   return (
     <Sentry.ErrorBoundary
@@ -405,11 +492,53 @@ export const JobItem = ({
             </Util.Responsive>
           </div>
           <div className={styles.secondaryColumn}>
-            {resourceConfigurationContent}
+            <div className={styles.compactSection}>
+              <Util.Row
+                gap={1}
+                align="start"
+                justify="between"
+                className={styles.summaryRow}
+              >
+                <div className={styles.summaryText}>{resourceSummary}</div>
+                <Button
+                  size="sm"
+                  outline
+                  onClick={() => setResourceEditorOpen((value) => !value)}
+                >
+                  {resourceEditorOpen ? "Close" : "Edit"}
+                </Button>
+              </Util.Row>
+              {resourceEditorOpen && (
+                <div className={styles.popupPanel}>
+                  {resourceConfigurationContent}
+                </div>
+              )}
+            </div>
           </div>
           <div className={styles.tertiaryColumn}>
-            <H4>Costing</H4>
-            {costingContent}
+            <div className={styles.compactSection}>
+              <Util.Row
+                gap={1}
+                align="start"
+                justify="between"
+                className={styles.summaryRow}
+              >
+                <div className={styles.summaryText}>{totalCostSummary}</div>
+                <Button
+                  size="sm"
+                  outline
+                  onClick={() => setCostEditorOpen((value) => !value)}
+                >
+                  {costEditorOpen ? "Close" : "Edit"}
+                </Button>
+              </Util.Row>
+              {costEditorOpen && (
+                <div className={styles.popupPanel}>
+                  <H4>Costing</H4>
+                  {costingContent}
+                </div>
+              )}
+            </div>
           </div>
         </Util.Responsive>
       </Card>
