@@ -21,7 +21,7 @@ import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
 
 import { EditCosting } from "./EditCosting";
-import { useAuth, useBillingGroupUser, useJobItem, useUser } from "#hooks";
+import { useAuth, useBillingGroupUser, useJobItem } from "#hooks";
 import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
@@ -87,7 +87,6 @@ export const JobItem = ({
 }) => {
   const { shopId, jobId } = useParams();
   const { user: activeUser } = useAuth();
-  const { user } = useUser(activeUser?.id);
 
   const { item, opLoading, updateJobItem, deleteJobItem } = useJobItem(
     shopId,
