@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { Page, sidenavItems } from "#page";
 import { useAuth } from "#useAuth";
-import { Typography, Util, Badge, Button, DropdownInput } from "tabler-react-2";
+import { Typography, Util, Badge } from "tabler-react-2";
 import { useModal } from "#modal";
-import { Table } from "#table";
 import { useUser, useUsers } from "#hooks";
 import { Spinner } from "#spinner";
 import { Avatar } from "#avatar";
@@ -12,6 +11,7 @@ import { Link } from "react-router-dom";
 import moment from "moment";
 import { SearchBar } from "../../components/searchBar/SearchBar";
 import { NotFound } from "../../components/404/404";
+import { TableV2 } from "tabler-react-2";
 
 const { H1 } = Typography;
 
@@ -20,10 +20,12 @@ export const UsersPage = () => {
   const { users, loading: usersLoading } = useUsers();
   const { user: activeUser } = useUser(user?.id);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(50);
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+  const [page, setPage] = useState(1);
+  const [size, setSize] = useState(25);
+  const [sorting, setSorting] = useState([]);
+  
 
   const { modal, ModalElement } = useModal({
     title: "Admin Only page",
@@ -39,80 +41,163 @@ export const UsersPage = () => {
         JSON.stringify(u).toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [users, searchTerm]);
+  
 
-  const handleSort = (key) => {
-    setSortConfig((prev) =>
-      prev.key === key
-        ? { key, direction: prev.direction === "asc" ? "desc" : "asc" }
-        : { key, direction: "asc" }
-    );
-  };
 
-  const sortedUsers = useMemo(() => {
-    if (!filteredUsers) {
-      return [];
-    }
-    if (!sortConfig.key) {
-      return filteredUsers;
-    }
+  const ordered = useMemo(() => {
+    if (!sorting.length) return filteredUsers;
+
+    const { id, desc } = sorting[0];
 
     const sorted = [...filteredUsers].sort((a, b) => {
-      const aVal = a[sortConfig.key];
-      const bVal = b[sortConfig.key];
+      let aVal;
+      let bVal;
 
-      if (aVal == null) {
-        return 1;
-      }
-      if (bVal == null) {
-        return -1;
+      switch (id) {
+        case "jobCount":
+          aVal = a.jobCount;
+          bVal = b.jobCount;
+          break;
+
+        case "shopCount":
+          aVal = a.shopCount;
+          bVal = b.shopCount;
+          break;
+
+        case "name":
+          aVal = `${a.firstName ?? ""} ${a.lastName ?? ""}`.trim();
+          bVal = `${b.firstName ?? ""} ${b.lastName ?? ""}`.trim();
+          break;
+
+        case "email":
+          aVal = a.email;
+          bVal = b.email;
+          break;
+
+        case "createdAt":
+          aVal = a.createdAt;
+          bVal = b.createdAt;
+          break;
+
+        case "updatedAt":
+          aVal = a.updatedAt;
+          bVal = b.updatedAt;
+          break;
+
+        default:
+          return 0;
       }
 
-      //dates
-      if (sortConfig.key === "lastLogin" || sortConfig.key === "createdAt") {
-        const aTime = aVal ? new Date(aVal).getTime() : 0;
-        const bTime = bVal ? new Date(bVal).getTime() : 0;
-        return sortConfig.direction === "asc" ? aTime - bTime : bTime - aTime;
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+
+      if (id === "createdAt" || id === "updatedAt") {
+        return new Date(aVal) - new Date(bVal);
       }
 
-      //numeric comparison
-      if (typeof aVal === "number" && typeof bVal === "number") {
-        return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+      if (!isNaN(aVal) && !isNaN(bVal)) {
+        return Number(aVal) - Number(bVal);
       }
 
-      //string comparison
-      return sortConfig.direction === "asc"
-        ? String(aVal).localeCompare(String(bVal))
-        : String(bVal).localeCompare(String(aVal));
+      return String(aVal).localeCompare(String(bVal));
     });
 
-    return sorted;
-  }, [filteredUsers, sortConfig]);
+    return desc ? sorted.reverse() : sorted;
+  }, [filteredUsers, sorting]);
 
-  const paginatedUsers = useMemo(() => {
-    const start = (currentPage - 1) * rowsPerPage;
-    const end = start + rowsPerPage;
-    return sortedUsers.slice(start, end);
-  }, [sortedUsers, currentPage, rowsPerPage]);
 
-  const totalPages = Math.ceil((filteredUsers?.length || 0) / rowsPerPage);
+  const pageData = useMemo(() => {
+    const start = (page - 1) * size;
+    return ordered.slice(start, start + size);
+  }, [ordered, page, size]);
 
-  const renderSortableHeader = (label, key) => (
-    <span
-      onClick={() => handleSort(key)}
-      style={{ cursor: "pointer", userSelect: "none" }}
-    >
-      {label}{" "}
-      {sortConfig.key === key ? (
-        sortConfig.direction === "asc" ? (
-          <span>▲</span>
-        ) : (
-          <span>▼</span>
-        )
-      ) : (
-        ""
-      )}
-    </span>
-  );
+  console.log(filteredUsers[0]);
+
+  const columns = useMemo(() => [
+    {
+      id: "id",
+      header: "",
+      cell: ({ row }) => {
+        const id = row.original.id;
+        return <Avatar size="xs" dicebear initials={id} />;
+      },
+    },
+
+    {
+      id: "name",
+      header: "Name",
+      accessorFn: (row) =>
+        `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim(),
+      cell: ({ getValue, row }) => {
+        const name = getValue();
+        const context = row.original;
+
+        return (
+          <>
+            <Link to={`/users/${context.id}`}>{name}</Link>{" "}
+            {context.isMe && (
+              <Badge color="green" soft>(Your account)</Badge>
+            )}
+            {context.suspended && (
+              <Badge color="red" soft>Suspended</Badge>
+            )}
+          </>
+        );
+      },
+    },
+
+    {
+      id: "email",
+      header: "Email",
+      accessorFn: (row) => row.email,
+    },
+
+    {
+      id: "updatedAt",
+      header: "updated At",
+      accessorFn: (row) => row.updatedAt,
+      cell: ({ getValue }) => {
+        const value = getValue();
+        return value ? moment(value).format("MM/DD/YY, h:mm a") : "-";
+      },
+    },
+
+    {
+      id: "shopCount",
+      header: "Shops",
+      accessorFn: (row) => row.shopCount,
+    },
+
+    {
+      id: "jobCount",
+      header: "Jobs",
+      accessorFn: (row) => row.jobCount,
+    },
+
+    {
+      id: "createdAt",
+      header: "Created At",
+      accessorFn: (row) => row.createdAt,
+      cell: ({ getValue }) => {
+        const value = getValue();
+        return value ? moment(value).format("MM/DD/YY, h:mm a") : "-";
+      },
+    },
+
+    {
+      id: "actions",
+      header: "Actions",
+      cell: ({ row }) => {
+        const id = row.original.id;
+        return (
+          <Link to={`/users/${id}`}>
+            <Icon i="edit" /> Edit user
+          </Link>
+        );
+      },
+    },
+  ], []);
+
 
   if (activeUser?.simple === true) return <NotFound />;
 
@@ -127,7 +212,7 @@ export const UsersPage = () => {
       <SearchBar
         onSearch={(value) => {
           setSearchTerm(value);
-          setCurrentPage(1);
+          setPage(1);
         }}
       />
 
@@ -137,109 +222,26 @@ export const UsersPage = () => {
         <Spinner />
       ) : (
         <>
-          <Table
-            columns={[
-              {
-                label: "",
-                accessor: "id",
-                render: (id) => <Avatar size="xs" dicebear initials={id} />,
-              },
-              {
-                label: renderSortableHeader("Name", "name"),
-                accessor: "name",
-                render: (name, context) => (
-                  <>
-                    <Link to={`/users/${context.id}`}>{name}</Link>{" "}
-                    {context.isMe && (
-                      <Badge color="green" soft>
-                        (Your account)
-                      </Badge>
-                    )}
-                    {context.suspended && (
-                      <Badge color="red" soft>
-                        Suspended
-                      </Badge>
-                    )}
-                  </>
-                ),
-              },
-              {
-                label: renderSortableHeader("Email", "email"),
-                accessor: "email",
-              },
-              {
-                label: renderSortableHeader("Last Login", "lastLogin"),
-                accessor: "lastLogin",
-                render: (v) =>
-                  v ? moment(v).format("MM/DD/YY, h:mm a") : "-",
-              },
-              {
-                label: renderSortableHeader("Shops", "shopCount"),
-                accessor: "shopCount",
-              },
-              {
-                label: renderSortableHeader("Jobs", "jobCount"),
-                accessor: "jobCount",
-              },
-              {
-                label: renderSortableHeader("Created At", "createdAt"),
-                accessor: "createdAt",
-                render: (v) => moment(v).format("MM/DD/YY, h:mm a"),
-              },
-              {
-                label: "Actions",
-                accessor: "id",
-                render: (id) => (
-                  <Link to={`/users/${id}`}>
-                    <Icon i="edit" /> Edit user
-                  </Link>
-                ),
-              },
-            ]}
-            data={paginatedUsers}
+          <TableV2
+            columns={columns}
+            data={pageData}
+            totalRows={filteredUsers.length}
+            page={page}
+            size={size}
+            onPageChange={setPage}
+            onSizeChange={(n) => {
+              setPage(1);
+              setSize(n);
+            }}
+            sorting={sorting}
+            onSortingChange={(next) => {
+              setPage(1);
+              setSorting(next);
+            }}
+
+
           />
 
-          <Util.Row
-            justify="center"
-            align="center"
-            gap={1}
-            style={{ marginTop: "1rem" }}
-          >
-            <Button
-              disabled={currentPage === 1}
-              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
-            >
-              Previous
-            </Button>
-            <span>
-              Page {currentPage} of {totalPages || 1}
-            </span>
-            <Button
-              disabled={currentPage === totalPages || totalPages === 0}
-              onClick={() =>
-                setCurrentPage((p) => Math.min(p + 1, totalPages))
-              }
-            >
-              Next
-            </Button>
-
-            <DropdownInput
-              value={rowsPerPage}
-              onChange={(item) => {
-                setRowsPerPage(Number(item.id));
-                setCurrentPage(1);
-              }}
-              items={[
-                { id: 10, label: "10 per page" },
-                { id: 25, label: "25 per page" },
-                { id: 50, label: "50 per page" },
-                { id: 100, label: "100 per page" },
-              ]}
-              prompt="Rows per page"
-              showSearch={false}
-              style={{ marginLeft: "1rem" }}
-            />
-          </Util.Row>
         </>
       )}
 
