@@ -238,109 +238,107 @@ export const JobPage = () => {
         )}
         <Util.Responsive gap={1} align="start" threshold={800}>
           <div className={styles.pageSection}>
-            <Util.Row align="start" gap={1} wrap>
-              {editing ? (
-                <Input
-                  value={job.title}
-                  label="Title"
-                  onChange={(e) => setJob({ ...job, title: e })}
-                />
-              ) : (
-                <></>
-              )}
-              {editing ? (
-                <Button
-                  loading={opLoading}
-                  onClick={async () => {
-                    await updateJob(job);
-                    setEditing(false);
-                  }}
-                  variant="primary"
-                >
-                  Save
-                </Button>
-              ) : (
-                <Util.Row
-                  align="start"
-                  className={styles.jobHeader}
-                  gap={1.5}
-                  wrap
-                >
-                  <Util.Col gap={1} align="start" className={styles.jobOverview}>
-                    <H1>{job.title}</H1>
-                    <p>{job.description}</p>
-                  </Util.Col>
-                  <Util.Col gap={0.5} align="start" className={styles.jobMeta}>
-                    <Util.Row gap={1} align="center" wrap className={styles.statusRow}>
-                      <H3 className={styles.statusHeading}>Status</H3>
-                      {userIsPrivileged ? (
-                        <div className={styles.statusControl}>
-                          <LoadableDropdownInput
-                            loading={opLoading}
-                            prompt={"Select a status"}
-                            values={[
-                              { id: "IN_PROGRESS", label: "In Progress" },
-                              { id: "COMPLETED", label: "Completed" },
-                              { id: "NOT_STARTED", label: "Not Started" },
-                              { id: "CANCELLED", label: "Cancelled" },
-                              { id: "WONT_DO", label: "Won't Do" },
-                              { id: "WAITING", label: "Waiting" },
-                              {
-                                id: "WAITING_FOR_PICKUP",
-                                label: "Waiting for Pickup",
-                              },
-                              {
-                                id: "WAITING_FOR_PAYMENT",
-                                label: "Waiting for Payment",
-                              },
-                            ]}
-                            value={job.status}
-                            onChange={(value) => {
-                              updateJob({ status: value.id });
-                            }}
-                            doTheColorThing={true}
-                          />
-                        </div>
-                      ) : (
-                        <Badge color={switchStatusToUI(job.status)[1]} soft>
-                          {switchStatusToUI(job.status)[0]}
-                        </Badge>
+            {editing ? (
+              <Input
+                value={job.title}
+                label="Title"
+                onChange={(e) => setJob({ ...job, title: e })}
+              />
+            ) : (
+              <></>
+            )}
+            {editing ? (
+              <Button
+                loading={opLoading}
+                onClick={async () => {
+                  await updateJob(job);
+                  setEditing(false);
+                }}
+                variant="primary"
+              >
+                Save
+              </Button>
+            ) : (
+              <Util.Row
+                align="start"
+                className={styles.jobHeader}
+                gap={1.5}
+                wrap
+              >
+                <Util.Col gap={1} align="start" className={styles.jobOverview}>
+                  <H1>{job.title}</H1>
+                  <p>{job.description}</p>
+                </Util.Col>
+                <Util.Col gap={0.5} align="start" className={styles.jobMeta}>
+                  <Util.Row gap={1} align="center" wrap className={styles.statusRow}>
+                    <H3 className={styles.statusHeading}>Status</H3>
+                    {userIsPrivileged ? (
+                      <div className={styles.statusControl}>
+                        <LoadableDropdownInput
+                          loading={opLoading}
+                          prompt={"Select a status"}
+                          values={[
+                            { id: "IN_PROGRESS", label: "In Progress" },
+                            { id: "COMPLETED", label: "Completed" },
+                            { id: "NOT_STARTED", label: "Not Started" },
+                            { id: "CANCELLED", label: "Cancelled" },
+                            { id: "WONT_DO", label: "Won't Do" },
+                            { id: "WAITING", label: "Waiting" },
+                            {
+                              id: "WAITING_FOR_PICKUP",
+                              label: "Waiting for Pickup",
+                            },
+                            {
+                              id: "WAITING_FOR_PAYMENT",
+                              label: "Waiting for Payment",
+                            },
+                          ]}
+                          value={job.status}
+                          onChange={(value) => {
+                            updateJob({ status: value.id });
+                          }}
+                          doTheColorThing={true}
+                        />
+                      </div>
+                    ) : (
+                      <Badge color={switchStatusToUI(job.status)[1]} soft>
+                        {switchStatusToUI(job.status)[0]}
+                      </Badge>
+                    )}
+                  </Util.Row>
+                  <Util.Row
+                    gap={1}
+                    align="end"
+                    wrap
+                    className={styles.deadlineRow}
+                  >
+                    <H3 className={styles.deadlineHeading}>Upcoming Deadline</H3>
+                    <span className={styles.deadlineText}>
+                      {moment(job.dueDate).format("MM/DD/YY")} (
+                      {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
+                      {new Date(job.dueDate) < new Date() &&
+                        !(
+                          new Date(job.dueDate).toDateString() ===
+                          new Date().toDateString()
+                        ) && <Badge color="red">Overdue</Badge>}
+                      {/* Today warning */}{" "}
+                      {new Date(job.dueDate).toDateString() ===
+                        new Date().toDateString() && (
+                        <Badge color="yellow">Due Today</Badge>
                       )}
-                    </Util.Row>
-                    <Util.Row
-                      gap={1}
-                      align="end"
-                      wrap
-                      className={styles.deadlineRow}
-                    >
-                      <H3 className={styles.deadlineHeading}>Upcoming Deadline</H3>
-                      <span className={styles.deadlineText}>
-                        {moment(job.dueDate).format("MM/DD/YY")} (
-                        {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
-                        {new Date(job.dueDate) < new Date() &&
-                          !(
-                            new Date(job.dueDate).toDateString() ===
-                            new Date().toDateString()
-                          ) && <Badge color="red">Overdue</Badge>}
-                        {/* Today warning */}{" "}
-                        {new Date(job.dueDate).toDateString() ===
-                          new Date().toDateString() && (
-                          <Badge color="yellow">Due Today</Badge>
-                        )}
-                      </span>
-                    </Util.Row>
-                  </Util.Col>
-                  <div className={styles.editAction}>
-                    <Button
-                      loading={opLoading}
-                      onClick={() => setEditing(true)}
-                    >
-                      Edit
-                    </Button>
-                  </div>
-                </Util.Row>
-              )}
-            </Util.Row>
+                    </span>
+                  </Util.Row>
+                </Util.Col>
+                <div className={styles.editAction}>
+                  <Button
+                    loading={opLoading}
+                    onClick={() => setEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                </div>
+              </Util.Row>
+            )}
             <hr />
             {editing ? (
               <>
