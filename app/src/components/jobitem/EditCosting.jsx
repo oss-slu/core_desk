@@ -159,7 +159,7 @@ export const EditCosting = ({
       {ModalElement}
       {isRawMode ? (
         <>
-          <Util.Col gap={0.5} align="start">
+          <Util.Col gap={0.5} align="start" className={styles.costSection}>
             <label className="form-label mb-0">Raw value</label>
             <Input
               value={newItem.rawValue || 0}
@@ -296,18 +296,24 @@ export const TimeInput = ({
   showInput = true,
 }) => (
   <>
-    <Util.Col gap={0.5} align="start">
+    <Util.Col gap={0.5} align="start" className={styles.costSection}>
       <label className="form-label" style={{ marginBottom: 0 }}>
         {label} {helpText && <Help text={helpText} modal={modal} />}
       </label>
-      <Util.Row gap={1} align="center" style={{ width: "100%" }}>
+      <Util.Row
+        gap={1}
+        align="center"
+        wrap
+        className={styles.costingInputRow}
+        style={{ width: "100%" }}
+      >
         {showInput && (
-          <>
+          <div className={styles.costingInputGroup}>
             <Input
               size="sm"
               noMargin
               placeholder="Hr"
-              style={{ minWidth: 40, maxWidth: 41 }}
+              style={{ width: 56 }}
               value={Math.floor(timeQty || 0)}
               onChange={(e) => {
                 const decimalPart = timeQty % 1 || 0;
@@ -323,7 +329,7 @@ export const TimeInput = ({
               size="sm"
               noMargin
               placeholder="Min"
-              style={{ minWidth: 40, maxWidth: 41 }}
+              style={{ width: 56 }}
               value={Math.round((timeQty % 1 || 0) * 60)}
               onChange={(e) => {
                 const hours = Math.floor(timeQty || 0);
@@ -335,20 +341,23 @@ export const TimeInput = ({
               type="number"
               min={0}
             />
-          </>
+          </div>
         )}
         <div
+          className={styles.costingDivider}
           style={{
             flex: 1,
             height: 2,
             backgroundColor: "var(--tblr-border-color)",
           }}
         />
-        <Time value={timeQty} icon />
-        <Icon i="x" />
-        <Price value={costPerTime} icon />
-        <Icon i="equal" />
-        <Price value={timeQty * costPerTime} icon />
+        <div className={styles.costingValueGroup}>
+          <Time value={timeQty} icon />
+          <Icon i="x" />
+          <Price value={costPerTime} icon />
+          <Icon i="equal" />
+          <Price value={timeQty * costPerTime} icon />
+        </div>
       </Util.Row>
     </Util.Col>
     <Util.Spacer size={1} />
@@ -366,11 +375,17 @@ export const QuantityInput = ({
   showInput = true,
 }) => (
   <>
-    <Util.Col gap={0.5} align="start">
+    <Util.Col gap={0.5} align="start" className={styles.costSection}>
       <label className="form-label" style={{ marginBottom: 0 }}>
         {label} {helpText && <Help text={helpText} modal={modal} />}
       </label>
-      <Util.Row gap={1} align="center" style={{ width: "100%" }}>
+      <Util.Row
+        gap={1}
+        align="center"
+        wrap
+        className={styles.costingInputRow}
+        style={{ width: "100%" }}
+      >
         {showInput && (
           <Input
             size="sm"
@@ -383,22 +398,25 @@ export const QuantityInput = ({
             }}
             type="number"
             min={0}
-            style={{ minWidth: 100, maxWidth: 101 }}
+            style={{ width: 112 }}
           />
         )}
         <div
+          className={styles.costingDivider}
           style={{
             flex: 1,
             height: 2,
             backgroundColor: "var(--tblr-border-color)",
           }}
         />
-        {icon}
-        <span>{quantity || 0}</span>
-        <Icon i="x" />
-        <Price value={costPerUnit} icon />
-        <Icon i="equal" />
-        <Price value={quantity * costPerUnit} icon />
+        <div className={styles.costingValueGroup}>
+          {icon}
+          <span>{quantity || 0}</span>
+          <Icon i="x" />
+          <Price value={costPerUnit} icon />
+          <Icon i="equal" />
+          <Price value={quantity * costPerUnit} icon />
+        </div>
       </Util.Row>
     </Util.Col>
     <Util.Spacer size={1} />

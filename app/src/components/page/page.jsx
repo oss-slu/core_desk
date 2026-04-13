@@ -57,7 +57,7 @@ export const sidenavItems = (activeText, userIsAdmin) => {
         text: `Users`,
         active: activeText === "Users",
         icon: <Icon i="users" size={18} />,
-      }
+      },
     );
   }
 
@@ -84,7 +84,7 @@ export const Page = ({ children, sidenavItems: _sidenavItems }) => {
       }}
     >
       <Sidenav items={_sidenavItems} />
-      <div style={{ width: "100%", overflowX: "hidden", marginBottom: 100 }}>
+      <div style={{ width: "100%", overflowX: "visible", marginBottom: 100 }}>
         {children}
       </div>
     </div>

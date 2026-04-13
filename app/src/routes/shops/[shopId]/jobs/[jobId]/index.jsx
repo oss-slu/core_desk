@@ -6,7 +6,6 @@ import {
   Typography,
   Util,
   Input,
-  Card,
   Button,
   Badge,
   Spinner,
@@ -29,6 +28,7 @@ import { Comments } from "../../../../../components/comments/Comments";
 import { Alert } from "#alert";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../../../../../components/billingGroupPicker/BillingGroupPicker";
+import styles from "./index.module.css";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {
@@ -237,34 +237,109 @@ export const JobPage = () => {
           </Alert>
         )}
         <Util.Responsive gap={1} align="start" threshold={800}>
-          <div style={{ flex: 1, width: "100%" }}>
-            <Util.Row justify="between" align="center" gap={1} wrap>
-              {editing ? (
-                <Input
-                  value={job.title}
-                  label="Title"
-                  onChange={(e) => setJob({ ...job, title: e })}
-                />
-              ) : (
-                <H1>{job.title}</H1>
-              )}
-              {editing ? (
-                <Button
-                  loading={opLoading}
-                  onClick={async () => {
-                    await updateJob(job);
-                    setEditing(false);
-                  }}
-                  variant="primary"
-                >
-                  Save
-                </Button>
-              ) : (
-                <Button loading={opLoading} onClick={() => setEditing(true)}>
-                  Edit
-                </Button>
-              )}
-            </Util.Row>
+          <div className={styles.pageSection}>
+            {editing ? (
+              <Input
+                value={job.title}
+                label="Title"
+                onChange={(e) => setJob({ ...job, title: e })}
+              />
+            ) : (
+              <></>
+            )}
+            {editing ? (
+              <Button
+                loading={opLoading}
+                onClick={async () => {
+                  await updateJob(job);
+                  setEditing(false);
+                }}
+                variant="primary"
+              >
+                Save
+              </Button>
+            ) : (
+              <Util.Row
+                align="start"
+                className={styles.jobHeader}
+                gap={1.5}
+                wrap
+              >
+                <Util.Col gap={1} align="start" className={styles.jobOverview}>
+                  <H1>{job.title}</H1>
+                  <p>{job.description}</p>
+                </Util.Col>
+                <Util.Col gap={0.5} align="start" className={styles.jobMeta}>
+                  <Util.Row gap={1} align="center" wrap className={styles.statusRow}>
+                    <H3 className={styles.statusHeading}>Status</H3>
+                    {userIsPrivileged ? (
+                      <div className={styles.statusControl}>
+                        <LoadableDropdownInput
+                          loading={opLoading}
+                          prompt={"Select a status"}
+                          values={[
+                            { id: "IN_PROGRESS", label: "In Progress" },
+                            { id: "COMPLETED", label: "Completed" },
+                            { id: "NOT_STARTED", label: "Not Started" },
+                            { id: "CANCELLED", label: "Cancelled" },
+                            { id: "WONT_DO", label: "Won't Do" },
+                            { id: "WAITING", label: "Waiting" },
+                            {
+                              id: "WAITING_FOR_PICKUP",
+                              label: "Waiting for Pickup",
+                            },
+                            {
+                              id: "WAITING_FOR_PAYMENT",
+                              label: "Waiting for Payment",
+                            },
+                          ]}
+                          value={job.status}
+                          onChange={(value) => {
+                            updateJob({ status: value.id });
+                          }}
+                          doTheColorThing={true}
+                        />
+                      </div>
+                    ) : (
+                      <Badge color={switchStatusToUI(job.status)[1]} soft>
+                        {switchStatusToUI(job.status)[0]}
+                      </Badge>
+                    )}
+                  </Util.Row>
+                  <Util.Row
+                    gap={1}
+                    align="end"
+                    wrap
+                    className={styles.deadlineRow}
+                  >
+                    <H3 className={styles.deadlineHeading}>Upcoming Deadline</H3>
+                    <span className={styles.deadlineText}>
+                      {moment(job.dueDate).format("MM/DD/YY")} (
+                      {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
+                      {new Date(job.dueDate) < new Date() &&
+                        !(
+                          new Date(job.dueDate).toDateString() ===
+                          new Date().toDateString()
+                        ) && <Badge color="red">Overdue</Badge>}
+                      {/* Today warning */}{" "}
+                      {new Date(job.dueDate).toDateString() ===
+                        new Date().toDateString() && (
+                        <Badge color="yellow">Due Today</Badge>
+                      )}
+                    </span>
+                  </Util.Row>
+                </Util.Col>
+                <div className={styles.editAction}>
+                  <Button
+                    loading={opLoading}
+                    onClick={() => setEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                </div>
+              </Util.Row>
+            )}
+            <hr />
             {editing ? (
               <>
                 <Input
@@ -286,107 +361,60 @@ export const JobPage = () => {
               </>
             ) : (
               <>
-                <p>{job.description}</p>
-                <Util.Row gap={2} align="start">
-                  <div>
-                    <H3>Status</H3>
-                    {userIsPrivileged ? (
-                      <LoadableDropdownInput
-                        loading={opLoading}
-                        prompt={"Select a status"}
-                        values={[
-                          { id: "IN_PROGRESS", label: "In Progress" },
-                          { id: "COMPLETED", label: "Completed" },
-                          { id: "NOT_STARTED", label: "Not Started" },
-                          { id: "CANCELLED", label: "Cancelled" },
-                          { id: "WONT_DO", label: "Won't Do" },
-                          { id: "WAITING", label: "Waiting" },
-                          {
-                            id: "WAITING_FOR_PICKUP",
-                            label: "Waiting for Pickup",
-                          },
-                          {
-                            id: "WAITING_FOR_PAYMENT",
-                            label: "Waiting for Payment",
-                          },
-                        ]}
-                        value={job.status}
-                        onChange={(value) => {
-                          updateJob({ status: value.id });
-                        }}
-                        doTheColorThing={true}
-                      />
-                    ) : (
-                      <Badge color={switchStatusToUI(job.status)[1]} soft>
-                        {switchStatusToUI(job.status)[0]}
-                      </Badge>
-                    )}
+                <H2 style={{ marginTop: -10 }}>Project Defaults</H2>
+                <Util.Row gap={1} wrap className={styles.defaultsRow}>
+                  <div className={styles.pickerField}>
+                    <ResourceTypePicker
+                      loading={opLoading}
+                      value={job.resourceTypeId}
+                      onChange={(value) => {
+                        updateJob({ resourceTypeId: value });
+                      }}
+                      shopId={shopId}
+                      opLoading={opLoading}
+                      includeNone={true}
+                    />
                   </div>
-                  <div>
-                    <H3>Upcoming Deadline</H3>
-                    <p>
-                      {moment(job.dueDate).format("MM/DD/YY")} (
-                      {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
-                      {new Date(job.dueDate) < new Date() &&
-                        !(
-                          new Date(job.dueDate).toDateString() ===
-                          new Date().toDateString()
-                        ) && <Badge color="red">Overdue</Badge>}
-                      {/* Today warning */}{" "}
-                      {new Date(job.dueDate).toDateString() ===
-                        new Date().toDateString() && (
-                        <Badge color="yellow">Due Today</Badge>
-                      )}
-                    </p>
-                  </div>
-                </Util.Row>
-                <Util.Spacer size={2} />
-                <H3>Project Defaults</H3>
-                <Util.Row gap={1} wrap>
-                  <ResourceTypePicker
-                    loading={opLoading}
-                    value={job.resourceTypeId}
-                    onChange={(value) => {
-                      updateJob({ resourceTypeId: value });
-                    }}
-                    shopId={shopId}
-                    opLoading={opLoading}
-                    includeNone={true}
-                  />
                   {job.resourceTypeId ? (
                     <>
-                      <MaterialPicker
-                        value={job.materialId}
-                        onChange={(value) => {
-                          updateJob({ materialId: value });
-                        }}
-                        resourceTypeId={job.resourceTypeId}
-                        opLoading={opLoading}
-                        includeNone={true}
-                        materialType={"Primary"}
-                      />
-                      <MaterialPicker
-                        value={job.secondaryMaterialId}
-                        onChange={(value) => {
-                          updateJob({ secondaryMaterialId: value });
-                        }}
-                        resourceTypeId={job.resourceTypeId}
-                        opLoading={opLoading}
-                        includeNone={true}
-                        materialType={"Secondary"}
-                      />
-                      {userIsPrivileged ? (
-                        <ResourcePicker
-                          value={job.resourceId}
+                      <div className={styles.pickerField}>
+                        <MaterialPicker
+                          value={job.materialId}
                           onChange={(value) => {
-                            updateJob({ resourceId: value });
+                            updateJob({ materialId: value });
                           }}
                           resourceTypeId={job.resourceTypeId}
                           opLoading={opLoading}
                           includeNone={true}
+                          materialType={"Primary"}
                         />
+                      </div>
+                      <div className={styles.pickerField}>
+                        <MaterialPicker
+                          value={job.secondaryMaterialId}
+                          onChange={(value) => {
+                            updateJob({ secondaryMaterialId: value });
+                          }}
+                          resourceTypeId={job.resourceTypeId}
+                          opLoading={opLoading}
+                          includeNone={true}
+                          materialType={"Secondary"}
+                        />
+                      </div>
+                      {userIsPrivileged ? (
+                        <div className={styles.pickerField}>
+                          <ResourcePicker
+                            value={job.resourceId}
+                            onChange={(value) => {
+                              updateJob({ resourceId: value });
+                            }}
+                            resourceTypeId={job.resourceTypeId}
+                            opLoading={opLoading}
+                            includeNone={true}
+                          />
+                        </div>
                       ) : (
-                        <Util.Col>
+                        <Util.Col className={styles.pickerField}>
                           <label className="form-label">Resource</label>
                           <Badge color="blue" soft>
                             {job.resource?.title || "Not set"}
@@ -404,8 +432,8 @@ export const JobPage = () => {
                     </i>
                   )}
                 </Util.Row>
-                <Util.Spacer size={2} />
-                <H3>Current Billing Account</H3>
+                <hr />
+                <H2 style={{ marginTop: -10 }}>Current Billing Account</H2>
                 {job.group ? (
                   <Link to={`/shops/${shopId}/billing-groups/${job.group.id}`}>
                     {job.group.title}
@@ -416,8 +444,8 @@ export const JobPage = () => {
                   </p>
                 )}
                 <Util.Spacer size={1} />
-                <Util.Row gap={1} wrap align="end">
-                  <Util.Col gap={0}>
+                <Util.Row gap={1} wrap align="end" className={styles.billingRow}>
+                  <Util.Col gap={0} className={styles.pickerField}>
                     <label className="form-label">Requested By</label>
                     {userIsPrivileged ? (
                       <ShopUserPicker
@@ -433,7 +461,7 @@ export const JobPage = () => {
                       </p>
                     )}
                   </Util.Col>
-                  <Util.Col gap={0}>
+                  <Util.Col gap={0} className={styles.pickerField}>
                     <label className="form-label">Billing Group</label>
                     {userIsPrivileged ? (
                       <BillingGroupPicker
@@ -457,52 +485,43 @@ export const JobPage = () => {
               </>
             )}
           </div>
-          <div style={{ flex: 1, width: "100%" }}>
-            <Card
-              tabs={[
-                {
-                  title: "Upload items",
-                  content: (
-                    <UploadDropzone
-                      scope={"job.fileupload"}
-                      metadata={{
-                        jobId,
-                        shopId,
-                      }}
-                      onUploadComplete={() => {
-                        refetchJobs(false);
-                      }}
-                      useNewDropzone={true}
-                      endpoint={`/api/shop/${shopId}/job/${jobId}/upload`}
-                    />
-                  ),
-                },
-                {
-                  title: "Comments",
-                  content: <Comments jobId={jobId} shopId={shopId} />,
-                },
-              ]}
-            />
-          </div>
         </Util.Responsive>
-        <Util.Spacer size={1} />
-        <H2>Items</H2>
+        <hr />
+        <H2 style={{ marginTop: -10 }}>Items</H2>
+        <UploadDropzone
+          scope={"job.fileupload"}
+          metadata={{
+            jobId,
+            shopId,
+          }}
+          onUploadComplete={() => {
+            refetchJobs(false);
+          }}
+          useNewDropzone={true}
+          endpoint={`/api/shop/${shopId}/job/${jobId}/upload`}
+        />
         {job.items?.length === 0 ? (
           <i>
             This job has no items. You can attach files in the dropzone above
           </i>
         ) : (
-          <Util.Col gap={0.5}>
-            {job.items?.map((item) => (
-              <JobItem
-                key={item.id}
-                item={item}
-                refetchJobs={refetchJobs}
-                userIsPrivileged={userIsPrivileged}
-                group={job.group}
-              />
-            ))}
-          </Util.Col>
+          <div>
+            <Util.Col gap={0.5}>
+              {job.items?.map((item) => (
+                <JobItem
+                  key={item.id}
+                  item={item}
+                  refetchJobs={refetchJobs}
+                  userIsPrivileged={userIsPrivileged}
+                  group={job.group}
+                />
+              ))}
+            </Util.Col>
+            <hr />
+            <div className={styles.commentsSection}>
+              <Comments jobId={jobId} shopId={shopId} />
+            </div>
+          </div>
         )}
       </Page>
     );

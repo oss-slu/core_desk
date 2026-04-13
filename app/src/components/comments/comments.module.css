@@ -1,0 +1,40 @@
+.commentsList {
+  max-height: 37.5rem;
+  overflow-y: auto;
+}
+
+.commentComposer {
+  width: 100%;
+  min-width: 0;
+}
+
+.commentButton {
+  margin-top: 0.75rem;
+}
+
+.commentHeader {
+  width: 100%;
+  min-width: 0;
+}
+
+.commentAuthor {
+  min-width: 0;
+  flex: 1 1 16rem;
+}
+
+.commentTimestamp {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.commentTimestamp span {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media screen and (max-width: 700px) {
+  .commentTimestamp {
+    width: 100%;
+  }
+}
