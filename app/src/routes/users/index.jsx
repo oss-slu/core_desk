@@ -23,11 +23,10 @@ export const UsersPage = () => {
 
   const [searchTerm, setSearchTerm] = useState("");
 
-
-
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(25);
   const [sorting, setSorting] = useState([]);
+  
 
   const { modal, ModalElement } = useModal({
     title: "Admin Only page",
@@ -44,9 +43,6 @@ export const UsersPage = () => {
     );
   }, [users, searchTerm]);
   
-
-
-  console.log(filteredUsers);
 
 
   const ordered = useMemo(() => {
@@ -84,9 +80,9 @@ export const UsersPage = () => {
           bVal = b.createdAt;
           break;
 
-        case "lastLogin":
-          aVal = a.lastLogin;
-          bVal = b.lastLogin;
+        case "updatedAt":
+          aVal = a.updatedAt;
+          bVal = b.updatedAt;
           break;
 
         default:
@@ -96,7 +92,7 @@ export const UsersPage = () => {
       if (aVal == null) return 1;
       if (bVal == null) return -1;
 
-      if (id === "createdAt") {
+      if (id === "createdAt" || id === "updatedAt") {
         return new Date(aVal) - new Date(bVal);
       }
 
@@ -158,9 +154,9 @@ export const UsersPage = () => {
     },
 
     {
-      id: "lastLogin",
-      header: "Last Login",
-      accessorFn: (row) => row.lastLogin,
+      id: "updatedAt",
+      header: "updated At",
+      accessorFn: (row) => row.updatedAt,
       cell: ({ getValue }) => {
         const value = getValue();
         return value ? moment(value).format("MM/DD/YY, h:mm a") : "-";
@@ -217,7 +213,7 @@ export const UsersPage = () => {
       <SearchBar
         onSearch={(value) => {
           setSearchTerm(value);
-          setCurrentPage(1);
+          setPage(1);
         }}
       />
 
