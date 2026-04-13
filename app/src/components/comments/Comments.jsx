@@ -9,6 +9,7 @@ import { useAuth } from "#hooks";
 const { H2, H4 } = Typography;
 import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import styles from "./comments.module.css";
 
 export const Comments = ({ jobId, shopId }) => {
   const { comments, postComment, opLoading, loading } = useComments(
@@ -34,8 +35,8 @@ export const Comments = ({ jobId, shopId }) => {
     
   
     <div>
-      <Util.Col gap={1} style={{ maxHeight: 600, overflowY: "auto" }}>
-        <div>
+      <Util.Col gap={1} className={styles.commentsList}>
+        <div className={styles.commentComposer}>
           <H2>Comments</H2>
           <Input
             value={newCommentMessage}
@@ -45,6 +46,7 @@ export const Comments = ({ jobId, shopId }) => {
           <Button
             onClick={() => postComment({ message: newCommentMessage })}
             loading={opLoading}
+            className={styles.commentButton}
           >
             Post Comment
           </Button>
@@ -81,9 +83,10 @@ const Comment = ({ comment }) => {
           align="center"
           justify="between"
           gap={1}
-          style={{ width: "100%" }}
+          wrap
+          className={styles.commentHeader}
         >
-          <Util.Row align="center" gap={1}>
+          <Util.Row align="center" gap={1} wrap className={styles.commentAuthor}>
             <Avatar size="xs" dicebear initials={comment.user.id} />
             <H4 style={{ marginBottom: 0 }}>
               {comment.user.firstName} {comment.user.lastName}
@@ -101,7 +104,7 @@ const Comment = ({ comment }) => {
               </Badge>
             )}
           </Util.Row>
-          <Util.Col>
+          <Util.Col className={styles.commentTimestamp}>
             <span className={"text-secondary"}>
               {moment(comment.createdAt).fromNow()} (
               {moment(comment.createdAt).format("MM/DD/YY, h:mm a")})

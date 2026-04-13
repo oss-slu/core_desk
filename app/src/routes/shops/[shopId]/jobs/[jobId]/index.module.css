@@ -1,0 +1,90 @@
+.pageSection {
+  width: 100%;
+  min-width: 0;
+}
+
+.jobHeader {
+  width: 100%;
+  min-height: 3.75rem;
+}
+
+.jobOverview {
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 22rem;
+}
+
+.jobMeta {
+  width: 100%;
+  min-width: 0;
+  flex: 1 1 18rem;
+}
+
+.editAction {
+  flex: 0 0 auto;
+  width: auto;
+  display: flex;
+  justify-content: flex-end;
+  align-self: flex-start;
+}
+
+.statusRow,
+.deadlineRow {
+  width: 100%;
+  min-width: 0;
+}
+
+.statusHeading,
+.deadlineHeading {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.statusControl {
+  min-width: 14rem;
+  max-width: 100%;
+  flex: 1 1 14rem;
+}
+
+.deadlineText {
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.defaultsRow,
+.billingRow {
+  width: 100%;
+  min-width: 0;
+}
+
+.pickerField {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.commentsSection {
+  margin-top: 0.75rem;
+}
+
+@media screen and (max-width: 1000px) {
+  .editAction {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  .jobHeader {
+    gap: 0.75rem;
+  }
+
+  .jobOverview,
+  .jobMeta,
+  .editAction,
+  .pickerField,
+  .statusControl {
+    width: 100%;
+    max-width: none;
+    flex-basis: 100%;
+  }
+}

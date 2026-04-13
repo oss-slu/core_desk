@@ -205,7 +205,7 @@ export const JobItem = ({
 
   const resourceConfigurationContent = (
     <div className={styles.sectionCard}>
-      <Util.Row gap={1} align="start" wrap>
+      <Util.Col gap={1} align="start" wrap>
         <ResourceTypePicker
           value={item.resourceTypeId}
           loading={opLoading}
@@ -216,7 +216,7 @@ export const JobItem = ({
           item.resourceType?.costingMode === "RAW_VALUE_ENTRY" ? (
             <></>
           ) : (
-            <Util.Col gap={1} align="start">
+            <>
               <MaterialPicker
                 value={item.materialId}
                 onChange={(value) => updateJobItem({ materialId: value })}
@@ -251,12 +251,12 @@ export const JobItem = ({
                   </Badge>
                 </Util.Col>
               )}
-            </Util.Col>
+            </>
           )
         ) : (
           <i>Select a resource type to see more options</i>
         )}
-      </Util.Row>
+      </Util.Col>
     </div>
   );
 
@@ -296,14 +296,14 @@ export const JobItem = ({
                 threshold={1200}
                 style={{ flex: 1 }}
               >
-                <div style={{ maxWidth: 280 }}>
+                <div className={styles.itemDetails}>
                   <Util.Row gap={1}>
                     <H3 className="mb-0" style={{ wordBreak: "break-all" }}>
                       {item.title}
                     </H3>
                   </Util.Row>
                   {item.activeUser?.id && (
-                    <span>
+                    <span className={styles.metaRow}>
                       <Icon i="user" />
                       <Link to={`/shops/${shopId}/users/${item.activeUser.id}`}>
                         {item.activeUser.firstName} {item.activeUser.lastName}
@@ -313,13 +313,13 @@ export const JobItem = ({
                   {item.stlBoundingBoxX ? (
                     <>
                       <Util.Row gap={1}>
-                        <span>
+                        <span className={styles.metaRow}>
                           <Icon i="cube-3d-sphere" />
                           {item.stlBoundingBoxX.toFixed(2)} x{" "}
                           {item.stlBoundingBoxY.toFixed(2)} x{" "}
                           {item.stlBoundingBoxZ.toFixed(2)} cm
                         </span>
-                        <span>
+                        <span className={styles.metaRow}>
                           {item.stlIsWatertight ? (
                             <>
                               <Icon i="droplet" color="green" />
@@ -336,15 +336,13 @@ export const JobItem = ({
                       <Util.Spacer size={0.5} />
                     </>
                   ) : (
-                    <Util.Spacer size={1} />
+                      <Util.Spacer size={1} />
                   )}
-                  <Util.Row gap={1} align="center">
-                    <>
+                  <Util.Row gap={1} align="center" wrap className={styles.controlsRow}>
+                    <div className={styles.iconActions}>
                       <Button
                         onClick={modal}
-                        style={{
-                          padding: "0.4375rem",
-                        }}
+                        className={styles.iconButton}
                       >
                         <Icon i="cube" size={16} />
                       </Button>
@@ -355,9 +353,7 @@ export const JobItem = ({
                             item.title
                           );
                         }}
-                        style={{
-                          padding: "0.4375rem",
-                        }}
+                        className={styles.iconButton}
                         download
                       >
                         <Icon i="download" size={16} />
@@ -367,44 +363,44 @@ export const JobItem = ({
                           onClick={(e) => {
                             deleteJobItem(refetchJobs, e);
                           }}
-                          style={{
-                            padding: "0.4375rem",
-                          }}
+                          className={styles.iconButton}
                           variant="danger"
                           outline
                         >
                           <Icon i="trash" size={16} />
                         </Button>
                       )}
-                    </>
+                    </div>
                     {userIsPrivileged ? (
                       opLoading ? (
                         <Spinner />
                       ) : (
-                        <DropdownInput
-                          values={[
-                            { id: "IN_PROGRESS", label: "In Progress" },
-                            { id: "COMPLETED", label: "Completed" },
-                            { id: "NOT_STARTED", label: "Not Started" },
-                            { id: "CANCELLED", label: "Cancelled" },
-                            { id: "WONT_DO", label: "Won't Do" },
-                            { id: "WAITING", label: "Waiting" },
-                            {
-                              id: "WAITING_FOR_PICKUP",
-                              label: "Waiting for Pickup",
-                            },
-                            {
-                              id: "WAITING_FOR_PAYMENT",
-                              label: "Waiting for Payment",
-                            },
-                          ]}
-                          value={item.status}
-                          onChange={(value) => {
-                            updateJobItem({ status: value.id });
-                          }}
-                          color={switchStatusToUI(item.status)[1]}
-                          outline
-                        />
+                        <div className={styles.statusControl}>
+                          <DropdownInput
+                            values={[
+                              { id: "IN_PROGRESS", label: "In Progress" },
+                              { id: "COMPLETED", label: "Completed" },
+                              { id: "NOT_STARTED", label: "Not Started" },
+                              { id: "CANCELLED", label: "Cancelled" },
+                              { id: "WONT_DO", label: "Won't Do" },
+                              { id: "WAITING", label: "Waiting" },
+                              {
+                                id: "WAITING_FOR_PICKUP",
+                                label: "Waiting for Pickup",
+                              },
+                              {
+                                id: "WAITING_FOR_PAYMENT",
+                                label: "Waiting for Payment",
+                              },
+                            ]}
+                            value={item.status}
+                            onChange={(value) => {
+                              updateJobItem({ status: value.id });
+                            }}
+                            color={switchStatusToUI(item.status)[1]}
+                            outline
+                          />
+                        </div>
                       )
                     ) : (
                       <Badge color={switchStatusToUI(item.status)[1]} soft>
@@ -413,12 +409,12 @@ export const JobItem = ({
                     )}
                   </Util.Row>
                   <Util.Spacer size={1} />
-                  <Util.Row gap={0.5} align="center" style={{ width: 200 }}>
+                  <Util.Row gap={0.5} align="center" wrap className={styles.qtyRow}>
                     <Input
                       placeholder="0"
                       value={localQty}
                       noMargin
-                      style={{ float: 1, marginBottom: 0 }}
+                      className={styles.qtyInput}
                       onChange={(e) => setLocalQty(e)}
                       prependedText="Qty"
                       type="number"
@@ -435,7 +431,7 @@ export const JobItem = ({
                         </Button>
                       )}
                   </Util.Row>
-                  <Util.Row gap={1}>
+                  <Util.Row gap={1} wrap className={styles.approvalRow}>
                     {!billingGroupUserLoading &&
                     billingGroupUser.role === "ADMIN" ? (
                       <div className={item.approved === null && styles.callout}>

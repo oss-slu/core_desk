@@ -28,6 +28,7 @@ import { Comments } from "../../../../../components/comments/Comments";
 import { Alert } from "#alert";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../../../../../components/billingGroupPicker/BillingGroupPicker";
+import styles from "./index.module.css";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {
@@ -236,7 +237,7 @@ export const JobPage = () => {
           </Alert>
         )}
         <Util.Responsive gap={1} align="start" threshold={800}>
-          <div style={{ flex: 1, width: "100%" }}>
+          <div className={styles.pageSection}>
             <Util.Row align="start" gap={1} wrap>
               {editing ? (
                 <Input
@@ -261,55 +262,59 @@ export const JobPage = () => {
               ) : (
                 <Util.Row
                   align="start"
-                  style={{ width: "100%", height: "60px" }}
+                  className={styles.jobHeader}
+                  gap={1.5}
                   wrap
                 >
-                  <Util.Col gap={1} align="start" style={{ width: "50%" }}>
+                  <Util.Col gap={1} align="start" className={styles.jobOverview}>
                     <H1>{job.title}</H1>
                     <p>{job.description}</p>
                   </Util.Col>
-                  <Util.Col
-                    gap={0.5}
-                    align="start"
-                    style={{ width: "40%" }}
-                  >
-                    <Util.Row gap={1} align="center" wrap>
-                      <H3 style={{marginTop: "10px"}}>Status</H3>
+                  <Util.Col gap={0.5} align="start" className={styles.jobMeta}>
+                    <Util.Row gap={1} align="center" wrap className={styles.statusRow}>
+                      <H3 className={styles.statusHeading}>Status</H3>
                       {userIsPrivileged ? (
-                        <LoadableDropdownInput
-                          loading={opLoading}
-                          prompt={"Select a status"}
-                          values={[
-                            { id: "IN_PROGRESS", label: "In Progress" },
-                            { id: "COMPLETED", label: "Completed" },
-                            { id: "NOT_STARTED", label: "Not Started" },
-                            { id: "CANCELLED", label: "Cancelled" },
-                            { id: "WONT_DO", label: "Won't Do" },
-                            { id: "WAITING", label: "Waiting" },
-                            {
-                              id: "WAITING_FOR_PICKUP",
-                              label: "Waiting for Pickup",
-                            },
-                            {
-                              id: "WAITING_FOR_PAYMENT",
-                              label: "Waiting for Payment",
-                            },
-                          ]}
-                          value={job.status}
-                          onChange={(value) => {
-                            updateJob({ status: value.id });
-                          }}
-                          doTheColorThing={true}
-                        />
+                        <div className={styles.statusControl}>
+                          <LoadableDropdownInput
+                            loading={opLoading}
+                            prompt={"Select a status"}
+                            values={[
+                              { id: "IN_PROGRESS", label: "In Progress" },
+                              { id: "COMPLETED", label: "Completed" },
+                              { id: "NOT_STARTED", label: "Not Started" },
+                              { id: "CANCELLED", label: "Cancelled" },
+                              { id: "WONT_DO", label: "Won't Do" },
+                              { id: "WAITING", label: "Waiting" },
+                              {
+                                id: "WAITING_FOR_PICKUP",
+                                label: "Waiting for Pickup",
+                              },
+                              {
+                                id: "WAITING_FOR_PAYMENT",
+                                label: "Waiting for Payment",
+                              },
+                            ]}
+                            value={job.status}
+                            onChange={(value) => {
+                              updateJob({ status: value.id });
+                            }}
+                            doTheColorThing={true}
+                          />
+                        </div>
                       ) : (
                         <Badge color={switchStatusToUI(job.status)[1]} soft>
                           {switchStatusToUI(job.status)[0]}
                         </Badge>
                       )}
                     </Util.Row>
-                    <Util.Row gap={1} align="end">
-                      <H3 style={{ margin: 0, lineHeight: "1.5" }}>Upcoming Deadline</H3>
-                      <span style={{lineHeight: "1.5"}}>
+                    <Util.Row
+                      gap={1}
+                      align="end"
+                      wrap
+                      className={styles.deadlineRow}
+                    >
+                      <H3 className={styles.deadlineHeading}>Upcoming Deadline</H3>
+                      <span className={styles.deadlineText}>
                         {moment(job.dueDate).format("MM/DD/YY")} (
                         {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
                         {new Date(job.dueDate) < new Date() &&
@@ -325,7 +330,7 @@ export const JobPage = () => {
                       </span>
                     </Util.Row>
                   </Util.Col>
-                  <div style={{ width: "10%", display: "flex", justifyContent: "flex-end", alignSelf: "flex-start" }}>
+                  <div className={styles.editAction}>
                     <Button
                       loading={opLoading}
                       onClick={() => setEditing(true)}
@@ -359,51 +364,59 @@ export const JobPage = () => {
             ) : (
               <>
                 <H2 style={{ marginTop: -10 }}>Project Defaults</H2>
-                <Util.Row gap={1} wrap>
-                  <ResourceTypePicker
-                    loading={opLoading}
-                    value={job.resourceTypeId}
-                    onChange={(value) => {
-                      updateJob({ resourceTypeId: value });
-                    }}
-                    shopId={shopId}
-                    opLoading={opLoading}
-                    includeNone={true}
-                  />
+                <Util.Row gap={1} wrap className={styles.defaultsRow}>
+                  <div className={styles.pickerField}>
+                    <ResourceTypePicker
+                      loading={opLoading}
+                      value={job.resourceTypeId}
+                      onChange={(value) => {
+                        updateJob({ resourceTypeId: value });
+                      }}
+                      shopId={shopId}
+                      opLoading={opLoading}
+                      includeNone={true}
+                    />
+                  </div>
                   {job.resourceTypeId ? (
                     <>
-                      <MaterialPicker
-                        value={job.materialId}
-                        onChange={(value) => {
-                          updateJob({ materialId: value });
-                        }}
-                        resourceTypeId={job.resourceTypeId}
-                        opLoading={opLoading}
-                        includeNone={true}
-                        materialType={"Primary"}
-                      />
-                      <MaterialPicker
-                        value={job.secondaryMaterialId}
-                        onChange={(value) => {
-                          updateJob({ secondaryMaterialId: value });
-                        }}
-                        resourceTypeId={job.resourceTypeId}
-                        opLoading={opLoading}
-                        includeNone={true}
-                        materialType={"Secondary"}
-                      />
-                      {userIsPrivileged ? (
-                        <ResourcePicker
-                          value={job.resourceId}
+                      <div className={styles.pickerField}>
+                        <MaterialPicker
+                          value={job.materialId}
                           onChange={(value) => {
-                            updateJob({ resourceId: value });
+                            updateJob({ materialId: value });
                           }}
                           resourceTypeId={job.resourceTypeId}
                           opLoading={opLoading}
                           includeNone={true}
+                          materialType={"Primary"}
                         />
+                      </div>
+                      <div className={styles.pickerField}>
+                        <MaterialPicker
+                          value={job.secondaryMaterialId}
+                          onChange={(value) => {
+                            updateJob({ secondaryMaterialId: value });
+                          }}
+                          resourceTypeId={job.resourceTypeId}
+                          opLoading={opLoading}
+                          includeNone={true}
+                          materialType={"Secondary"}
+                        />
+                      </div>
+                      {userIsPrivileged ? (
+                        <div className={styles.pickerField}>
+                          <ResourcePicker
+                            value={job.resourceId}
+                            onChange={(value) => {
+                              updateJob({ resourceId: value });
+                            }}
+                            resourceTypeId={job.resourceTypeId}
+                            opLoading={opLoading}
+                            includeNone={true}
+                          />
+                        </div>
                       ) : (
-                        <Util.Col>
+                        <Util.Col className={styles.pickerField}>
                           <label className="form-label">Resource</label>
                           <Badge color="blue" soft>
                             {job.resource?.title || "Not set"}
@@ -433,8 +446,8 @@ export const JobPage = () => {
                   </p>
                 )}
                 <Util.Spacer size={1} />
-                <Util.Row gap={1} wrap align="end">
-                  <Util.Col gap={0}>
+                <Util.Row gap={1} wrap align="end" className={styles.billingRow}>
+                  <Util.Col gap={0} className={styles.pickerField}>
                     <label className="form-label">Requested By</label>
                     {userIsPrivileged ? (
                       <ShopUserPicker
@@ -450,7 +463,7 @@ export const JobPage = () => {
                       </p>
                     )}
                   </Util.Col>
-                  <Util.Col gap={0}>
+                  <Util.Col gap={0} className={styles.pickerField}>
                     <label className="form-label">Billing Group</label>
                     {userIsPrivileged ? (
                       <BillingGroupPicker
@@ -507,7 +520,9 @@ export const JobPage = () => {
               ))}
             </Util.Col>
             <hr />
-            <Comments jobId={jobId} shopId={shopId}  style={{ marginTop: -10 }}/>
+            <div className={styles.commentsSection}>
+              <Comments jobId={jobId} shopId={shopId} />
+            </div>
           </div>
         )}
       </Page>
