@@ -1,9 +1,8 @@
 import React, { useState, useMemo } from "react";
 import { Page, sidenavItems } from "#page";
 import { useAuth } from "#useAuth";
-import { Typography, Util, Badge, Button, DropdownInput } from "tabler-react-2";
+import { Typography, Util, Badge } from "tabler-react-2";
 import { useModal } from "#modal";
-import { Table } from "#table";
 import { useUser, useUsers } from "#hooks";
 import { Spinner } from "#spinner";
 import { Avatar } from "#avatar";
