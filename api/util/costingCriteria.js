@@ -119,7 +119,10 @@ export const validateCostingCriteria = (criteria, costingMode) => {
 export const isCostingCriterionEnabled = (resourceType, key) => {
   if (!resourceType) return false;
 
-  if (!Array.isArray(resourceType.costingCriteria)) {
+  if (
+    !Array.isArray(resourceType.costingCriteria) ||
+    resourceType.costingCriteria.length === 0
+  ) {
     return resourceType.costingMode
       ? resourceType.costingMode === CostingMode.RAW_VALUE_ENTRY
         ? key === CostingCriterionKey.RAW_VALUE
