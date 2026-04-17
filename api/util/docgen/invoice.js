@@ -1,7 +1,8 @@
 import { prisma } from "#prisma";
-import { LogType } from "#prisma-client";
+import { CostingCriterionKey, LogType } from "#prisma-client";
 import { uploadFile } from "#upload";
 import PDFDocument from "pdfkit";
+import { isCostingCriterionEnabled } from "../costingCriteria.js";
 
 const buildCostingCriteriaSnapshot = (job) => {
   const resourceTypesById = new Map();
@@ -145,17 +146,50 @@ export const calculateTotalCostOfJob = (data) => {
       return;
     }
 
-    if (!cost.resource || !cost.material || !cost.secondaryMaterial) return;
-
-    totalCost += (cost.unitQty || 0) * (cost.resource.costPerUnit || 0);
-    totalCost += (cost.timeQty || 0) * (cost.resource.costPerTime || 0);
-    totalCost +=
-      (cost.processingTimeQty || 0) *
-      (cost.resource.costPerProcessingTime || 0);
-    totalCost += (cost.materialQty || 0) * (cost.material.costPerUnit || 0);
-    totalCost +=
-      (cost.secondaryMaterialQty || 0) *
-      (cost.secondaryMaterial.costPerUnit || 0);
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionKey.UNIT_RUNS
+      )
+    ) {
+      totalCost += (cost.unitQty || 0) * (cost.resource?.costPerUnit || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionKey.RESOURCE_TIME
+      )
+    ) {
+      totalCost += (cost.timeQty || 0) * (cost.resource?.costPerTime || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionKey.PROCESSING_TIME
+      )
+    ) {
+      totalCost +=
+        (cost.processingTimeQty || 0) *
+        (cost.resource?.costPerProcessingTime || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionKey.PRIMARY_MATERIAL
+      )
+    ) {
+      totalCost += (cost.materialQty || 0) * (cost.material?.costPerUnit || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionKey.SECONDARY_MATERIAL
+      )
+    ) {
+      totalCost +=
+        (cost.secondaryMaterialQty || 0) *
+        (cost.secondaryMaterial?.costPerUnit || 0);
+    }
   });
 
   // if additionalCostOverride is true, return totalCost
@@ -168,20 +202,53 @@ export const calculateTotalCostOfJob = (data) => {
       return;
     }
 
-    if (!item.resource || !item.material || !item.secondaryMaterial) return;
-
     let localTotalCost = 0;
 
-    localTotalCost += (item.timeQty || 0) * (item.resource.costPerTime || 0);
-    localTotalCost +=
-      (item.processingTimeQty || 0) *
-      (item.resource.costPerProcessingTime || 0);
-    localTotalCost += (item.unitQty || 0) * (item.resource.costPerUnit || 0);
-    localTotalCost +=
-      (item.materialQty || 0) * (item.material.costPerUnit || 0);
-    localTotalCost +=
-      (item.secondaryMaterialQty || 0) *
-      (item.secondaryMaterial.costPerUnit || 0);
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionKey.RESOURCE_TIME
+      )
+    ) {
+      localTotalCost += (item.timeQty || 0) * (item.resource?.costPerTime || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionKey.PROCESSING_TIME
+      )
+    ) {
+      localTotalCost +=
+        (item.processingTimeQty || 0) *
+        (item.resource?.costPerProcessingTime || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionKey.UNIT_RUNS
+      )
+    ) {
+      localTotalCost += (item.unitQty || 0) * (item.resource?.costPerUnit || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionKey.PRIMARY_MATERIAL
+      )
+    ) {
+      localTotalCost +=
+        (item.materialQty || 0) * (item.material?.costPerUnit || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionKey.SECONDARY_MATERIAL
+      )
+    ) {
+      localTotalCost +=
+        (item.secondaryMaterialQty || 0) *
+        (item.secondaryMaterial?.costPerUnit || 0);
+    }
 
     totalCost += localTotalCost * (item.qty ?? 1);
   });
@@ -194,17 +261,48 @@ const calculateJobItemLinePrice = (item) => {
     return item.rawValue || 0;
   }
 
-  if (!item.resource || !item.material || !item.secondaryMaterial) return 0;
-
   let linePrice = 0;
-  linePrice += (item.timeQty || 0) * (item.resource.costPerTime || 0);
-  linePrice +=
-    (item.processingTimeQty || 0) * (item.resource.costPerProcessingTime || 0);
-  linePrice += (item.unitQty || 0) * (item.resource.costPerUnit || 0);
-  linePrice += (item.materialQty || 0) * (item.material.costPerUnit || 0);
-  linePrice +=
-    (item.secondaryMaterialQty || 0) *
-    (item.secondaryMaterial.costPerUnit || 0);
+  if (
+    isCostingCriterionEnabled(
+      item.resourceType,
+      CostingCriterionKey.RESOURCE_TIME
+    )
+  ) {
+    linePrice += (item.timeQty || 0) * (item.resource?.costPerTime || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      item.resourceType,
+      CostingCriterionKey.PROCESSING_TIME
+    )
+  ) {
+    linePrice +=
+      (item.processingTimeQty || 0) *
+      (item.resource?.costPerProcessingTime || 0);
+  }
+  if (
+    isCostingCriterionEnabled(item.resourceType, CostingCriterionKey.UNIT_RUNS)
+  ) {
+    linePrice += (item.unitQty || 0) * (item.resource?.costPerUnit || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      item.resourceType,
+      CostingCriterionKey.PRIMARY_MATERIAL
+    )
+  ) {
+    linePrice += (item.materialQty || 0) * (item.material?.costPerUnit || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      item.resourceType,
+      CostingCriterionKey.SECONDARY_MATERIAL
+    )
+  ) {
+    linePrice +=
+      (item.secondaryMaterialQty || 0) *
+      (item.secondaryMaterial?.costPerUnit || 0);
+  }
 
   return linePrice;
 };
@@ -218,17 +316,48 @@ const calculateAdditionalCostLinePrice = (cost) => {
     return cost.amount;
   }
 
-  if (!cost.resource || !cost.material || !cost.secondaryMaterial) return 0;
-
   let linePrice = 0;
-  linePrice += (cost.unitQty || 0) * (cost.resource.costPerUnit || 0);
-  linePrice += (cost.timeQty || 0) * (cost.resource.costPerTime || 0);
-  linePrice +=
-    (cost.processingTimeQty || 0) * (cost.resource.costPerProcessingTime || 0);
-  linePrice += (cost.materialQty || 0) * (cost.material.costPerUnit || 0);
-  linePrice +=
-    (cost.secondaryMaterialQty || 0) *
-    (cost.secondaryMaterial.costPerUnit || 0);
+  if (
+    isCostingCriterionEnabled(cost.resourceType, CostingCriterionKey.UNIT_RUNS)
+  ) {
+    linePrice += (cost.unitQty || 0) * (cost.resource?.costPerUnit || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      cost.resourceType,
+      CostingCriterionKey.RESOURCE_TIME
+    )
+  ) {
+    linePrice += (cost.timeQty || 0) * (cost.resource?.costPerTime || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      cost.resourceType,
+      CostingCriterionKey.PROCESSING_TIME
+    )
+  ) {
+    linePrice +=
+      (cost.processingTimeQty || 0) *
+      (cost.resource?.costPerProcessingTime || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      cost.resourceType,
+      CostingCriterionKey.PRIMARY_MATERIAL
+    )
+  ) {
+    linePrice += (cost.materialQty || 0) * (cost.material?.costPerUnit || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      cost.resourceType,
+      CostingCriterionKey.SECONDARY_MATERIAL
+    )
+  ) {
+    linePrice +=
+      (cost.secondaryMaterialQty || 0) *
+      (cost.secondaryMaterial?.costPerUnit || 0);
+  }
 
   return linePrice;
 };

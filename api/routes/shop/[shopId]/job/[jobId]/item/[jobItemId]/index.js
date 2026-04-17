@@ -1,6 +1,7 @@
 import { LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
+import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../../../../util/costingCriteria.js";
 import { z } from "zod";
 
 export const jobItemUpdateSchema = z.object({
@@ -73,6 +74,7 @@ export const get = [
               id: true,
               title: true,
               costingMode: true,
+              ...RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
             },
           },
           file: true,
@@ -215,6 +217,7 @@ export const put = [
               id: true,
               title: true,
               costingMode: true,
+              ...RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
             },
           },
           file: true,

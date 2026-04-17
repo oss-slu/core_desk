@@ -1,6 +1,10 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { CostingMode, LogType } from "#prisma-client";
+import {
+  getDefaultCostingCriteria,
+  RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+} from "../../../../../util/costingCriteria.js";
 import { z } from "zod";
 
 const resourceSchema = z.object({
@@ -14,7 +18,7 @@ export const get = [
   async (req, res) => {
     const { shopId } = req.params;
 
-    const userShop = prisma.userShop.findFirst({
+    const userShop = await prisma.userShop.findFirst({
       where: {
         userId: req.user.id,
         shopId: shopId,
@@ -34,6 +38,7 @@ export const get = [
         active: true,
       },
       include: {
+        ...RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
         resources: {
           where: {
             active: true,
@@ -61,7 +66,7 @@ export const post = [
   async (req, res) => {
     const { shopId } = req.params;
 
-    const userShop = prisma.userShop.findFirst({
+    const userShop = await prisma.userShop.findFirst({
       where: {
         userId: req.user.id,
         shopId: shopId,
@@ -95,14 +100,22 @@ export const post = [
 
     const validatedData = validationResult.data;
 
+    const costingModeToUse =
+      validatedData.costingMode ||
+      CostingMode.CALCULATE_WITH_RESOURCE_AND_MATERIAL;
+
     const resourceType = await prisma.resourceType.create({
       data: {
         title: validatedData.title,
         shopId: validatedData.shopId,
-        costingMode:
-          validatedData.costingMode ||
-          CostingMode.CALCULATE_WITH_RESOURCE_AND_MATERIAL,
+        costingMode: costingModeToUse,
+        costingCriteria: {
+          createMany: {
+            data: getDefaultCostingCriteria(costingModeToUse),
+          },
+        },
       },
+      include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
     });
 
     await prisma.logs.create({
@@ -124,7 +137,7 @@ export const put = [
   async (req, res) => {
     const { shopId } = req.params;
 
-    const userShop = prisma.userShop.findFirst({
+    const userShop = await prisma.userShop.findFirst({
       where: {
         userId: req.user.id,
         shopId: shopId,
@@ -170,6 +183,7 @@ export const put = [
         title,
         costingMode: parsedCostingMode.data,
       },
+      include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
     });
 
     await prisma.logs.create({

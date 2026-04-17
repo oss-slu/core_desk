@@ -3,6 +3,7 @@ import { LedgerItemType, LogType, Prisma } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";
+import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../../util/costingCriteria.js";
 
 /** @type {Prisma.JobInclude} */
 const JOB_INCLUDE = {
@@ -41,6 +42,7 @@ const JOB_INCLUDE = {
           id: true,
           title: true,
           costingMode: true,
+          ...RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
         },
       },
       user: {
@@ -85,6 +87,7 @@ const JOB_INCLUDE = {
           id: true,
           title: true,
           costingMode: true,
+          ...RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
         },
       },
     },
@@ -353,7 +356,9 @@ export const put = [
               material: true,
               secondaryMaterial: true,
               resource: true,
-              resourceType: true,
+              resourceType: {
+                include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+              },
             },
           },
           items: {
@@ -361,7 +366,9 @@ export const put = [
               material: true,
               secondaryMaterial: true,
               resource: true,
-              resourceType: true,
+              resourceType: {
+                include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+              },
             },
           },
         },
@@ -473,11 +480,8 @@ export const put = [
         }
 
         console.log("Generating Invoice");
-        const { url, key, value, log } = await generateInvoice(
-          job,
-          userId,
-          shopId
-        );
+        const { url, key, value, log, costingCriteriaSnapshot } =
+          await generateInvoice(job, userId, shopId);
         console.log("Generated Invoice", url);
         await prisma.job.update({
           where: {
@@ -497,6 +501,7 @@ export const put = [
             billingGroupId: job.groupId || null,
             invoiceUrl: url,
             invoiceKey: key,
+            costingCriteriaSnapshot,
             value: value * -1,
             type: LedgerItemType.JOB,
           },
