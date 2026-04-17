@@ -47,6 +47,15 @@ export const post = [
             material: true,
             secondaryMaterial: true,
             resource: true,
+            resourceType: {
+              include: {
+                costingCriteria: {
+                  orderBy: {
+                    displayOrder: "asc",
+                  },
+                },
+              },
+            },
           },
         },
         items: {
@@ -54,6 +63,15 @@ export const post = [
             material: true,
             secondaryMaterial: true,
             resource: true,
+            resourceType: {
+              include: {
+                costingCriteria: {
+                  orderBy: {
+                    displayOrder: "asc",
+                  },
+                },
+              },
+            },
           },
         },
       },
@@ -67,7 +85,11 @@ export const post = [
       return res.status(400).json({ error: "Job already finalized" });
     }
 
-    const { url, key, value } = await generateInvoice(job, req.user.id, shopId);
+    const { url, key, value, costingCriteriaSnapshot } = await generateInvoice(
+      job,
+      req.user.id,
+      shopId
+    );
 
     const validationResult = jobSchema.safeParse(req.body);
       if (!validationResult.success) {
@@ -97,6 +119,7 @@ export const post = [
         billingGroupId: job.groupId || null,
         invoiceUrl: url,
         invoiceKey: key,
+        costingCriteriaSnapshot,
         value: value * -1,
         type: LedgerItemType.JOB,
       },

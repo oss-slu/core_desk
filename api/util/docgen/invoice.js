@@ -3,6 +3,37 @@ import { LogType } from "#prisma-client";
 import { uploadFile } from "#upload";
 import PDFDocument from "pdfkit";
 
+const buildCostingCriteriaSnapshot = (job) => {
+  const resourceTypesById = new Map();
+
+  const attachResourceType = (resourceType) => {
+    if (!resourceType?.id || resourceTypesById.has(resourceType.id)) return;
+
+    const criteria = Array.isArray(resourceType.costingCriteria)
+      ? resourceType.costingCriteria
+          .filter((criterion) => criterion?.enabled)
+          .map((criterion) => ({
+            key: criterion.key,
+            label: criterion.label,
+            displayOrder: criterion.displayOrder,
+          }))
+          .sort((a, b) => a.displayOrder - b.displayOrder)
+      : [];
+
+    resourceTypesById.set(resourceType.id, {
+      resourceTypeId: resourceType.id,
+      criteria,
+    });
+  };
+
+  (job.items || []).forEach((item) => attachResourceType(item.resourceType));
+  (job.additionalCosts || []).forEach((cost) =>
+    attachResourceType(cost.resourceType)
+  );
+
+  return Array.from(resourceTypesById.values());
+};
+
 export const calculateTotalCostOfJobByJobId = async (jobId) => {
   const data = await prisma.job.findFirst({
     where: {
@@ -14,7 +45,11 @@ export const calculateTotalCostOfJobByJobId = async (jobId) => {
           resource: true,
           material: true,
           secondaryMaterial: true,
-          resourceType: true,
+          resourceType: {
+            include: {
+              costingCriteria: true,
+            },
+          },
         },
       },
       additionalCosts: {
@@ -22,7 +57,11 @@ export const calculateTotalCostOfJobByJobId = async (jobId) => {
           resource: true,
           material: true,
           secondaryMaterial: true,
-          resourceType: true,
+          resourceType: {
+            include: {
+              costingCriteria: true,
+            },
+          },
         },
       },
     },
@@ -357,7 +396,7 @@ export const generateInvoice = async (
   data,
   userId,
   shopId,
-  { draft = false } = {}
+  { draft = false, costingCriteriaSnapshot = null } = {}
 ) => {
   const job = await prisma.job.findFirst({
     where: {
@@ -373,7 +412,15 @@ export const generateInvoice = async (
           material: true,
           secondaryMaterial: true,
           resource: true,
-          resourceType: true,
+          resourceType: {
+            include: {
+              costingCriteria: {
+                orderBy: {
+                  displayOrder: "asc",
+                },
+              },
+            },
+          },
         },
       },
       items: {
@@ -384,7 +431,15 @@ export const generateInvoice = async (
           material: true,
           secondaryMaterial: true,
           resource: true,
-          resourceType: true,
+          resourceType: {
+            include: {
+              costingCriteria: {
+                orderBy: {
+                  displayOrder: "asc",
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -451,6 +506,7 @@ export const generateInvoice = async (
 
   const rows = buildInvoiceRows(job);
   const total = calculateTotalCostOfJob(job);
+  const snapshot = costingCriteriaSnapshot || buildCostingCriteriaSnapshot(job);
   const customer = selectInvoiceCustomer({
     billingGroup,
     payerAccount:
@@ -498,6 +554,7 @@ export const generateInvoice = async (
     url: uploaded.location,
     key: uploaded.key,
     value: total,
+    costingCriteriaSnapshot: snapshot,
     log,
   };
 };

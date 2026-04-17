@@ -36,6 +36,10 @@ ADD CONSTRAINT "ResourceTypeCostingCriterion_resourceTypeId_fkey"
 FOREIGN KEY ("resourceTypeId") REFERENCES "ResourceType"("id")
 ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- AlterTable
+ALTER TABLE "LedgerItem"
+ADD COLUMN "costingCriteriaSnapshot" JSONB;
+
 -- Seed defaults for existing calculated resource types
 INSERT INTO "ResourceTypeCostingCriterion" (
     "id",
