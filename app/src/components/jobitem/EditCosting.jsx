@@ -27,12 +27,17 @@ export const EditCosting = ({
 
   const enabledCriteria = getEnabledCostingCriteria(newItem?.resourceType);
   const isRawMode = isRawValueMode(newItem?.resourceType);
+  const parsedQty = Number.parseFloat(newItem?.qty);
+  const normalizedQty = Number.isFinite(parsedQty) && parsedQty > 0 ? parsedQty : 1;
 
   const calculateTotalCost = (includeQty = true) => {
     return (
-      calculateConfiguredSubtotal(newItem) * (includeQty ? (newItem.qty ?? 1) : 1)
+      calculateConfiguredSubtotal(newItem) * (includeQty ? normalizedQty : 1)
     );
   };
+
+  const subtotalCost = calculateTotalCost(false);
+  const totalCost = calculateTotalCost(true);
 
   const renderReadOnlyCriterion = (criterion) => {
     switch (criterion.key) {
@@ -239,17 +244,17 @@ export const EditCosting = ({
           <span className={styles.bottomLine}>
             <Util.Row gap={1} justify="end">
               Subtotal
-              <Price value={calculateTotalCost(false)} icon />{" "}
-              {item.qty > 1 && (
+              <Price value={subtotalCost} icon />{" "}
+              {normalizedQty > 1 && (
                 <>
                   <Icon i="x" />
-                  {item.qty}
+                  {normalizedQty}
                 </>
               )}
             </Util.Row>
             <Util.Row gap={1} justify="end">
               Total:
-              <Price value={calculateTotalCost()} icon />
+              <Price value={totalCost} icon />
             </Util.Row>
           </span>
         </Util.Row>
@@ -280,17 +285,17 @@ export const EditCosting = ({
         <span className={styles.bottomLine}>
           <Util.Row gap={1} justify="end">
             Subtotal
-            <Price value={calculateTotalCost(false)} icon />{" "}
-            {item.qty > 1 && (
+            <Price value={subtotalCost} icon />{" "}
+            {normalizedQty > 1 && (
               <>
                 <Icon i="x" />
-                {item.qty}
+                {normalizedQty}
               </>
             )}
           </Util.Row>
           <Util.Row gap={1} justify="end">
             Total:
-            <Price value={calculateTotalCost()} icon />
+            <Price value={totalCost} icon />
           </Util.Row>
         </span>
       </Util.Row>

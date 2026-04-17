@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Util,
@@ -23,8 +23,6 @@ import {
   calculateConfiguredSubtotal,
   hasRequiredCostingSelections,
   isRawValueMode,
-  needsPrimaryMaterialSelection,
-  needsResourceSelection,
   needsSecondaryMaterialSelection,
 } from "../../util/costingCriteria";
 
@@ -133,25 +131,48 @@ export const JobItem = ({
 
   if (!item) return null;
 
-  const isRawMode = isRawValueMode(item.resourceType);
-  const costingAvailable = hasRequiredCostingSelections(item);
-  const showResourcePicker = needsResourceSelection(item.resourceType);
-  const showPrimaryMaterialPicker = needsPrimaryMaterialSelection(
-    item.resourceType
-  );
+  useEffect(() => {
+    setLocalQty(item?.qty);
+  }, [item?.qty]);
+
+  const resolvedResourceType =
+    item.resourceType ||
+    resourceTypes.find((resourceType) => resourceType.id === item.resourceTypeId) ||
+    null;
+
+  const isRawMode = isRawValueMode(resolvedResourceType);
+  const costingAvailable = hasRequiredCostingSelections({
+    ...item,
+    resourceType: resolvedResourceType,
+  });
+  const showResourcePicker = !isRawMode;
+  const showPrimaryMaterialPicker = !isRawMode;
   const showSecondaryMaterialPicker = needsSecondaryMaterialSelection(
-    item.resourceType
+    resolvedResourceType
   );
+
+  const parsedLocalQty = Number.parseFloat(localQty);
+  const parsedItemQty = Number.parseFloat(item.qty);
+  const normalizedQty =
+    Number.isFinite(parsedLocalQty) && parsedLocalQty > 0
+      ? parsedLocalQty
+      : Number.isFinite(parsedItemQty) && parsedItemQty > 0
+        ? parsedItemQty
+        : 1;
 
   const calculateTotalCost = (includeQty = true) => {
-    return calculateConfiguredSubtotal(item) * (includeQty ? (item.qty ?? 1) : 1);
+    return (
+      calculateConfiguredSubtotal({
+        ...item,
+        resourceType: resolvedResourceType,
+      }) * (includeQty ? normalizedQty : 1)
+    );
   };
 
+  const totalCost = calculateTotalCost(true);
+
   const resolvedResourceTypeTitle =
-    item.resourceType?.title ||
-    resourceTypes.find((resourceType) => resourceType.id === item.resourceTypeId)
-      ?.title ||
-    "Resource type";
+    resolvedResourceType?.title || "Resource type";
 
   const resolvedResourceTitle =
     item.resource?.title ||
@@ -200,15 +221,13 @@ export const JobItem = ({
     "No resource or material setup selected"
   );
 
-  const totalCostSummary = costingAvailable
-    ? (
-      <>
-        <strong>Total cost: </strong>
-        ${calculateTotalCost().toFixed(2)}
-      </>
-    ) : (
-      "Total cost unavailable"
-    );
+  const totalCostSummary = costingAvailable ? (
+    <>
+      <strong>Total cost: </strong>${totalCost.toFixed(2)}
+    </>
+  ) : (
+    "Total cost unavailable"
+  );
 
   const resourceConfigurationContent = (
     <div className={styles.sectionCard}>
@@ -220,7 +239,7 @@ export const JobItem = ({
           includeNone={true}
         />
         {item.resourceTypeId ? (
-          item.resourceType?.costingMode === "RAW_VALUE_ENTRY" ? (
+          isRawMode ? (
             <></>
           ) : (
             <>

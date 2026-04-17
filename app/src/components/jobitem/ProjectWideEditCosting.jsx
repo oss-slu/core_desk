@@ -25,8 +25,6 @@ import {
   getEnabledCostingCriteria,
   hasRequiredCostingSelections,
   isRawValueMode,
-  needsPrimaryMaterialSelection,
-  needsResourceSelection,
   needsSecondaryMaterialSelection,
 } from "../../util/costingCriteria";
 
@@ -145,9 +143,8 @@ const CostCard = ({
 
   const isRawMode = isRawValueMode(selectedResourceType);
   const enabledCriteria = getEnabledCostingCriteria(selectedResourceType);
-  const showResourcePicker = needsResourceSelection(selectedResourceType);
-  const showPrimaryMaterialPicker =
-    needsPrimaryMaterialSelection(selectedResourceType);
+  const showResourcePicker = !isRawMode;
+  const showPrimaryMaterialPicker = !isRawMode;
   const showSecondaryMaterialPicker =
     needsSecondaryMaterialSelection(selectedResourceType);
 
