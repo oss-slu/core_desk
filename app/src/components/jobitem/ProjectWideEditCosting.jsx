@@ -25,6 +25,8 @@ import {
   getEnabledCostingCriteria,
   hasRequiredCostingSelections,
   isRawValueMode,
+  needsPrimaryMaterialSelection,
+  needsResourceSelection,
   needsSecondaryMaterialSelection,
 } from "../../util/costingCriteria";
 
@@ -145,7 +147,11 @@ const CostCard = ({
   const enabledCriteria = getEnabledCostingCriteria(selectedResourceType);
   const showResourcePicker = !isRawMode;
   const showPrimaryMaterialPicker = !isRawMode;
-  const showSecondaryMaterialPicker =
+  const showSecondaryMaterialPicker = !isRawMode;
+  const requiresResource = needsResourceSelection(selectedResourceType);
+  const requiresPrimaryMaterial =
+    needsPrimaryMaterialSelection(selectedResourceType);
+  const requiresSecondaryMaterial =
     needsSecondaryMaterialSelection(selectedResourceType);
 
   const { loading: materialLoading, material } = useMaterial(
@@ -399,15 +405,17 @@ const CostCard = ({
               resourceType: selectedResourceType,
             }) ? (
             <>
-              {materialLoading ||
-              secondaryMaterialLoading ||
-              resourceLoading ? (
+              {(requiresPrimaryMaterial && materialLoading) ||
+              (requiresSecondaryMaterial && secondaryMaterialLoading) ||
+              (requiresResource && resourceLoading) ? (
                 <Spinner />
-              ) : !resource || !material ? (
+              ) : (requiresResource && !resource) ||
+                (requiresPrimaryMaterial && !material) ||
+                (requiresSecondaryMaterial && !secondaryMaterial) ? (
                 <span>
                   <Badge color="danger" soft>
                     <Icon i="coin-off" />
-                    Costing unavailable without material and resource
+                    Costing unavailable without the required selections
                   </Badge>
                 </span>
               ) : (

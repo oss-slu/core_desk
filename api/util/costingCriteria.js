@@ -141,16 +141,13 @@ export const isCostingCriterionEnabled = (resourceType, key) => {
   );
 };
 
-const COSTING_FIELDS_BY_KEY = {
+const COSTING_VALUE_FIELDS_BY_KEY = {
   [CostingCriterionKey.RAW_VALUE]: ["rawValue"],
   [CostingCriterionKey.RESOURCE_TIME]: ["timeQty"],
   [CostingCriterionKey.PROCESSING_TIME]: ["processingTimeQty"],
   [CostingCriterionKey.UNIT_RUNS]: ["unitQty"],
-  [CostingCriterionKey.PRIMARY_MATERIAL]: ["materialId", "materialQty"],
-  [CostingCriterionKey.SECONDARY_MATERIAL]: [
-    "secondaryMaterialId",
-    "secondaryMaterialQty",
-  ],
+  [CostingCriterionKey.PRIMARY_MATERIAL]: ["materialQty"],
+  [CostingCriterionKey.SECONDARY_MATERIAL]: ["secondaryMaterialQty"],
 };
 
 export const sanitizeCostingInputForResourceType = (input, resourceType) => {
@@ -160,15 +157,23 @@ export const sanitizeCostingInputForResourceType = (input, resourceType) => {
 
   const sanitized = { ...input };
 
-  Object.entries(COSTING_FIELDS_BY_KEY).forEach(([criterionKey, fields]) => {
-    const enabled = isCostingCriterionEnabled(resourceType, criterionKey);
+  Object.entries(COSTING_VALUE_FIELDS_BY_KEY).forEach(
+    ([criterionKey, fields]) => {
+      const enabled = isCostingCriterionEnabled(resourceType, criterionKey);
 
-    if (enabled) return;
+      if (enabled) return;
 
-    fields.forEach((field) => {
-      delete sanitized[field];
-    });
-  });
+      fields.forEach((field) => {
+        delete sanitized[field];
+      });
+    }
+  );
+
+  if (resourceType.costingMode === CostingMode.RAW_VALUE_ENTRY) {
+    delete sanitized.resourceId;
+    delete sanitized.materialId;
+    delete sanitized.secondaryMaterialId;
+  }
 
   return sanitized;
 };

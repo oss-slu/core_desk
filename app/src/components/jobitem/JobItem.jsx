@@ -150,6 +150,7 @@ export const JobItem = ({
   const showSecondaryMaterialPicker = needsSecondaryMaterialSelection(
     resolvedResourceType
   );
+  const showSecondaryMaterialConfig = !isRawMode;
 
   const parsedLocalQty = Number.parseFloat(localQty);
   const parsedItemQty = Number.parseFloat(item.qty);
@@ -253,7 +254,7 @@ export const JobItem = ({
                   materialType={"Primary"}
                 />
               )}
-              {showSecondaryMaterialPicker && (
+              {showSecondaryMaterialConfig && (
                 <MaterialPicker
                   value={item.secondaryMaterialId}
                   onChange={(value) =>

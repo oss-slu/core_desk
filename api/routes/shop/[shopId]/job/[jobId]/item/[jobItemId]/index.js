@@ -62,12 +62,16 @@ export const get = [
           },
           material: {
             select: {
+              id: true,
+              title: true,
               costPerUnit: true,
               unitDescriptor: true,
             },
           },
           secondaryMaterial: {
             select: {
+              id: true,
+              title: true,
               costPerUnit: true,
               unitDescriptor: true,
             },
@@ -226,12 +230,16 @@ export const put = [
           },
           material: {
             select: {
+              id: true,
+              title: true,
               costPerUnit: true,
               unitDescriptor: true,
             },
           },
           secondaryMaterial: {
             select: {
+              id: true,
+              title: true,
               costPerUnit: true,
               unitDescriptor: true,
             },

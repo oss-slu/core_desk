@@ -9,6 +9,12 @@ export const useResource = (shopId, resourceId) => {
   const [error, setError] = useState(null);
 
   const fetchResource = async () => {
+    if (!shopId || !resourceId) {
+      setResource(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const r = await authFetch(
