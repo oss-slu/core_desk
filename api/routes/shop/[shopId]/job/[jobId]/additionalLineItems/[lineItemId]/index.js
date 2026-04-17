@@ -1,6 +1,9 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../../../../util/costingCriteria.js";
+import {
+  RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+  sanitizeCostingInputForResourceType,
+} from "../../../../../../../util/costingCriteria.js";
 
 export const get = [
   verifyAuth,
@@ -198,11 +201,32 @@ export const put = [
         }
       }
 
+      const nextResourceTypeId =
+        updatedData.resourceTypeId !== undefined
+          ? updatedData.resourceTypeId
+          : lineItem.resourceTypeId;
+
+      const selectedResourceType = nextResourceTypeId
+        ? await prisma.resourceType.findFirst({
+            where: {
+              id: nextResourceTypeId,
+              shopId,
+              active: true,
+            },
+            include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+          })
+        : null;
+
+      const sanitizedData = sanitizeCostingInputForResourceType(
+        updatedData,
+        selectedResourceType
+      );
+
       const updatedLineItem = await prisma.additionalCostLineItem.update({
         where: {
           id: lineItem.id,
         },
-        data: updatedData,
+        data: sanitizedData,
         include: {
           resourceType: {
             select: {

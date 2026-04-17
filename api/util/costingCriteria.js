@@ -130,3 +130,35 @@ export const isCostingCriterionEnabled = (resourceType, key) => {
     (criterion) => criterion.key === key && criterion.enabled
   );
 };
+
+const COSTING_FIELDS_BY_KEY = {
+  [CostingCriterionKey.RAW_VALUE]: ["rawValue"],
+  [CostingCriterionKey.RESOURCE_TIME]: ["timeQty"],
+  [CostingCriterionKey.PROCESSING_TIME]: ["processingTimeQty"],
+  [CostingCriterionKey.UNIT_RUNS]: ["unitQty"],
+  [CostingCriterionKey.PRIMARY_MATERIAL]: ["materialId", "materialQty"],
+  [CostingCriterionKey.SECONDARY_MATERIAL]: [
+    "secondaryMaterialId",
+    "secondaryMaterialQty",
+  ],
+};
+
+export const sanitizeCostingInputForResourceType = (input, resourceType) => {
+  if (!resourceType || !input || typeof input !== "object") {
+    return input;
+  }
+
+  const sanitized = { ...input };
+
+  Object.entries(COSTING_FIELDS_BY_KEY).forEach(([criterionKey, fields]) => {
+    const enabled = isCostingCriterionEnabled(resourceType, criterionKey);
+
+    if (enabled) return;
+
+    fields.forEach((field) => {
+      delete sanitized[field];
+    });
+  });
+
+  return sanitized;
+};

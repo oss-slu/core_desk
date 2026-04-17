@@ -3,7 +3,10 @@ import { LedgerItemType, LogType, Prisma } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";
-import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../../util/costingCriteria.js";
+import {
+  RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+  sanitizeCostingInputForResourceType,
+} from "../../../../../util/costingCriteria.js";
 
 /** @type {Prisma.JobInclude} */
 const JOB_INCLUDE = {
@@ -421,22 +424,43 @@ export const put = [
         delete jobUpdateData.groupId;
       }
 
-      const groupIsBeingUpdated = Object.prototype.hasOwnProperty.call(
+      const nextResourceTypeId =
+        jobUpdateData.resourceTypeId !== undefined
+          ? jobUpdateData.resourceTypeId
+          : job.resourceTypeId;
+
+      const selectedResourceType = nextResourceTypeId
+        ? await prisma.resourceType.findFirst({
+            where: {
+              id: nextResourceTypeId,
+              shopId,
+              active: true,
+            },
+            include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+          })
+        : null;
+
+      const sanitizedJobUpdateData = sanitizeCostingInputForResourceType(
         jobUpdateData,
+        selectedResourceType
+      );
+
+      const groupIsBeingUpdated = Object.prototype.hasOwnProperty.call(
+        sanitizedJobUpdateData,
         "groupId"
       );
       if (groupIsBeingUpdated) {
         if (
-          jobUpdateData.groupId !== null &&
-          typeof jobUpdateData.groupId !== "string"
+          sanitizedJobUpdateData.groupId !== null &&
+          typeof sanitizedJobUpdateData.groupId !== "string"
         ) {
           return res.status(400).json({ error: "Invalid billing group" });
         }
 
-        if (jobUpdateData.groupId !== null) {
+        if (sanitizedJobUpdateData.groupId !== null) {
           const billingGroup = await prisma.billingGroup.findFirst({
             where: {
-              id: jobUpdateData.groupId,
+              id: sanitizedJobUpdateData.groupId,
               shopId,
               active: true,
             },
@@ -468,7 +492,7 @@ export const put = [
       }
 
       let updatedJob;
-      if (jobUpdateData.finalized && !job.finalized) {
+      if (sanitizedJobUpdateData.finalized && !job.finalized) {
         if (
           !(
             userShop.accountType === "ADMIN" ||
@@ -549,7 +573,7 @@ export const put = [
           where: {
             id: jobId,
           },
-          data: jobUpdateData,
+          data: sanitizedJobUpdateData,
           include: JOB_INCLUDE,
         });
 
