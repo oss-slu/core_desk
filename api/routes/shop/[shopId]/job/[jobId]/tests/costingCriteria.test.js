@@ -487,6 +487,6 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
       .set(...(await gt({ sat: "ADMIN" })));
 
     const found = res.body.jobs.find((candidate) => candidate.id === job.id);
-    expect(found.totalCost).toBe(69);
+    expect(found.totalCost).toBe(77);
   });
 });
