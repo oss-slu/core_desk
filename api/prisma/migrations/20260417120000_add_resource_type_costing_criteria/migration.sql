@@ -35,3 +35,60 @@ ALTER TABLE "ResourceTypeCostingCriterion"
 ADD CONSTRAINT "ResourceTypeCostingCriterion_resourceTypeId_fkey"
 FOREIGN KEY ("resourceTypeId") REFERENCES "ResourceType"("id")
 ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Seed defaults for existing calculated resource types
+INSERT INTO "ResourceTypeCostingCriterion" (
+    "id",
+    "resourceTypeId",
+    "key",
+    "label",
+    "enabled",
+    "displayOrder",
+    "createdAt",
+    "updatedAt"
+)
+SELECT
+    md5("ResourceType"."id" || ':' || seeded."key"::text),
+    "ResourceType"."id",
+    seeded."key",
+    seeded."label",
+    seeded."enabled",
+    seeded."displayOrder",
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM "ResourceType"
+JOIN (
+    VALUES
+        ('RESOURCE_TIME'::"CostingCriterionKey", 'Resource Time', true, 0),
+        ('PROCESSING_TIME'::"CostingCriterionKey", 'Processing Time', true, 1),
+        ('UNIT_RUNS'::"CostingCriterionKey", 'Unit runs', true, 2),
+        ('PRIMARY_MATERIAL'::"CostingCriterionKey", 'Material quantity', true, 3),
+        ('SECONDARY_MATERIAL'::"CostingCriterionKey", 'Secondary Material quantity', false, 4)
+) AS seeded("key", "label", "enabled", "displayOrder")
+    ON true
+WHERE "ResourceType"."costingMode" = 'CALCULATE_WITH_RESOURCE_AND_MATERIAL'
+ON CONFLICT ("resourceTypeId", "key") DO NOTHING;
+
+-- Seed defaults for existing raw-value resource types
+INSERT INTO "ResourceTypeCostingCriterion" (
+    "id",
+    "resourceTypeId",
+    "key",
+    "label",
+    "enabled",
+    "displayOrder",
+    "createdAt",
+    "updatedAt"
+)
+SELECT
+    md5("ResourceType"."id" || ':RAW_VALUE'),
+    "ResourceType"."id",
+    'RAW_VALUE'::"CostingCriterionKey",
+    'Raw value',
+    true,
+    0,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
+FROM "ResourceType"
+WHERE "ResourceType"."costingMode" = 'RAW_VALUE_ENTRY'
+ON CONFLICT ("resourceTypeId", "key") DO NOTHING;
