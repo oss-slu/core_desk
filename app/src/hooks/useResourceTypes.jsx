@@ -155,6 +155,30 @@ export const useResourceTypes = (shopId) => {
     }
   };
 
+  const updateCostingCriteria = async (resourceTypeId, criteria) => {
+    try {
+      setOpLoading(true);
+      const r = await authFetch(
+        `/api/shop/${shopId}/resources/type/${resourceTypeId}/costingCriteria`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ criteria }),
+        }
+      );
+      const data = await r.json();
+      if (data.resourceType) {
+        await mutate();
+        return data.resourceType;
+      }
+      throw data.error || "Failed to update costing criteria";
+    } finally {
+      setOpLoading(false);
+    }
+  };
+
   const { modal: createModal, ModalElement: createModalElement } = useModal({
     title: "Create a new Resource Type",
     text: (
@@ -222,5 +246,6 @@ export const useResourceTypes = (shopId) => {
     // ModalElement: modal,
     deleteResourceType,
     createModalElement,
+    updateCostingCriteria,
   };
 };

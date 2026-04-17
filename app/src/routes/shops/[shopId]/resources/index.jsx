@@ -1,21 +1,35 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
 import {
-  useShop,
-  useAuth,
-  useResources,
-  useResourceTypes,
+    useShop,
+    useAuth,
+    useResources,
+    useResourceTypes,
   useMaterials,
   useUser,
 } from "#hooks";
-import { Typography, Util, Card, useConfirm, Dropdown } from "tabler-react-2";
+import {
+  Typography,
+  Util,
+  Card,
+  useConfirm,
+  Dropdown,
+  Input,
+  Badge,
+  Button,
+} from "tabler-react-2";
 import { Loading } from "#loading";
 import { Icon } from "#icon";
 import { Table } from "#table";
 import { Spinner } from "#spinner";
 import { NotFound } from "../../../../components/404/404";
+import toast from "react-hot-toast";
+import {
+  getEditableCostingCriteria,
+  moveArrayItem,
+} from "../../../../util/costingCriteria";
 const { H1, H2, H3 } = Typography;
 
 export const ResourcesPage = () => {
@@ -35,6 +49,8 @@ export const ResourcesPage = () => {
     createModalElement: CreateResourceTypeModalElement,
     createResourceType,
     deleteResourceType,
+    updateCostingCriteria,
+    opLoading: resourceTypesOpLoading,
   } = useResourceTypes(shopId);
 
   const { ModalElement: CreateMaterialModalElement, createMaterial } =
@@ -103,6 +119,8 @@ export const ResourcesPage = () => {
           shopId={shopId}
           admin={user.admin || userShop.accountType === "ADMIN"}
           onDelete={deleteResourceType}
+          updateCostingCriteria={updateCostingCriteria}
+          opLoading={resourceTypesOpLoading}
         />
       ))}
 
@@ -117,7 +135,14 @@ export const ResourcesPage = () => {
   );
 };
 
-const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
+const ResourceType = ({
+  resourceType,
+  shopId,
+  admin,
+  onDelete,
+  updateCostingCriteria,
+  opLoading,
+}) => {
   const {
     materials,
     loading: materialsLoading,
@@ -172,6 +197,13 @@ const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
         )}
         {EditResourceTypeModalElement}
       </Util.Row>
+      <CostingCriteriaEditor
+        resourceType={resourceType}
+        admin={admin}
+        updateCostingCriteria={updateCostingCriteria}
+        loading={opLoading}
+      />
+      <Util.Spacer size={1} />
       <Util.Spacer size={1} />
       <Util.Row gap={1} wrap>
         {resourceType.resources.map((resource) => (
@@ -220,6 +252,170 @@ const ResourceType = ({ resourceType, shopId, admin, onDelete }) => {
             },
           ]}
         />
+      )}
+    </div>
+  );
+};
+
+const CostingCriteriaEditor = ({
+  resourceType,
+  admin,
+  updateCostingCriteria,
+  loading,
+}) => {
+  const [criteria, setCriteria] = useState(getEditableCostingCriteria(resourceType));
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setCriteria(getEditableCostingCriteria(resourceType));
+  }, [resourceType]);
+
+  const enabledCriteria = criteria.filter((criterion) => criterion.enabled);
+  const disabledCriteria = criteria.filter((criterion) => !criterion.enabled);
+  const changed =
+    JSON.stringify(criteria) !==
+    JSON.stringify(getEditableCostingCriteria(resourceType));
+
+  const setCriterion = (key, nextValues) => {
+    setCriteria((currentCriteria) =>
+      currentCriteria.map((criterion) =>
+        criterion.key === key ? { ...criterion, ...nextValues } : criterion
+      )
+    );
+  };
+
+  const toggleCriterion = (key, enabled) => {
+    setCriteria((currentCriteria) => {
+      const nextCriteria = currentCriteria.map((criterion) =>
+        criterion.key === key ? { ...criterion, enabled } : criterion
+      );
+      const nextEnabled = nextCriteria.filter((criterion) => criterion.enabled);
+      const nextDisabled = nextCriteria.filter((criterion) => !criterion.enabled);
+      return [...nextEnabled, ...nextDisabled];
+    });
+  };
+
+  const moveEnabledCriterion = (index, direction) => {
+    setCriteria((currentCriteria) => {
+      const currentEnabled = currentCriteria.filter((criterion) => criterion.enabled);
+      const currentDisabled = currentCriteria.filter(
+        (criterion) => !criterion.enabled
+      );
+      const movedEnabled = moveArrayItem(
+        currentEnabled,
+        index,
+        index + direction
+      );
+      return [...movedEnabled, ...currentDisabled];
+    });
+  };
+
+  const saveCriteria = async () => {
+    try {
+      setSaving(true);
+      await updateCostingCriteria(
+        resourceType.id,
+        criteria.map((criterion) => ({
+          key: criterion.key,
+          label: criterion.label,
+          enabled: criterion.enabled,
+        }))
+      );
+      toast.success("Costing criteria updated");
+    } catch (error) {
+      toast.error(error?.toString?.() || "Failed to update costing criteria");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const renderCriterionRow = (criterion, index, enabledList = false) => (
+    <Util.Row
+      key={criterion.key}
+      gap={1}
+      align="center"
+      wrap
+      style={{
+        padding: "10px 12px",
+        border: "1px solid var(--tblr-border-color)",
+        borderRadius: 12,
+      }}
+    >
+      <Input
+        label={enabledList ? "Enabled criterion" : "Available criterion"}
+        value={criterion.label}
+        onChange={(value) => setCriterion(criterion.key, { label: value })}
+        disabled={!admin}
+      />
+      <label className="form-label" style={{ marginBottom: 0 }}>
+        {criterion.enabled ? "Enabled" : "Disabled"}
+      </label>
+      {admin ? (
+        <input
+          type="checkbox"
+          checked={criterion.enabled}
+          onChange={(event) => toggleCriterion(criterion.key, event.target.checked)}
+        />
+      ) : (
+        <Badge soft color={criterion.enabled ? "green" : "secondary"}>
+          {criterion.enabled ? "Enabled" : "Disabled"}
+        </Badge>
+      )}
+      {admin && enabledList ? (
+        <Util.Row gap={0.5}>
+          <button
+            type="button"
+            disabled={index === 0}
+            onClick={() => moveEnabledCriterion(index, -1)}
+          >
+            <Icon i="arrow-up" />
+          </button>
+          <button
+            type="button"
+            disabled={index === enabledCriteria.length - 1}
+            onClick={() => moveEnabledCriterion(index, 1)}
+          >
+            <Icon i="arrow-down" />
+          </button>
+        </Util.Row>
+      ) : null}
+    </Util.Row>
+  );
+
+  return (
+    <div>
+      <H3>Costing Criteria</H3>
+      <p style={{ marginTop: 0 }}>
+        Enabled criteria appear in billing order. Disabled criteria stay here so
+        you can turn them on later without changing the resource type mode.
+      </p>
+      <Util.Col gap={1}>
+        {enabledCriteria.map((criterion, index) =>
+          renderCriterionRow(criterion, index, true)
+        )}
+        {disabledCriteria.length > 0 ? (
+          <>
+            <span className="form-label">Disabled criteria</span>
+            {disabledCriteria.map((criterion, index) =>
+              renderCriterionRow(criterion, index, false)
+            )}
+          </>
+        ) : null}
+      </Util.Col>
+      {admin && (
+        <>
+          <Util.Spacer size={1} />
+          <Util.Row gap={1} align="center">
+            <Button
+              onClick={saveCriteria}
+              loading={saving || loading}
+              disabled={!changed}
+            >
+              Save Costing Criteria
+            </Button>
+            {changed ? <Badge color="red" soft>Unsaved changes</Badge> : null}
+          </Util.Row>
+        </>
       )}
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useResource, useShop, useUser } from "#hooks";
+import { useAuth, useResource, useResourceTypes, useShop, useUser } from "#hooks";
 import { Loading } from "#loading";
 import {
   Typography,
@@ -25,11 +25,16 @@ import { Table } from "#table";
 import { useModal } from "#modal";
 import { NotFound } from "#notFound";
 import { ResourceTypePicker } from "../../../../components/resourceTypePicker/ResourceTypePicker";
+import {
+  isCriterionEnabled,
+  isRawValueMode,
+} from "../../../../util/costingCriteria";
 
 export const ResourcePage = () => {
   const { shopId, resourceId } = useParams();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
+  const { resourceTypes } = useResourceTypes(shopId);
   const {
     resource,
     loading,
@@ -183,6 +188,7 @@ export const ResourcePage = () => {
           updateResource={updateResource}
           setIsEditing={setIsEditing}
           refetch={refetch}
+          resourceTypes={resourceTypes}
         />
       ) : isEditingImages ? (
         <EditGallery
@@ -206,7 +212,13 @@ const objectsAreEqual = (o1, o2) => {
   return JSON.stringify(o1) === JSON.stringify(o2);
 };
 
-const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
+const Edit = ({
+  resource,
+  opLoading,
+  updateResource,
+  setIsEditing,
+  resourceTypes,
+}) => {
   const [cr, setCr] = useState(resource);
 
   useEffect(() => {
@@ -235,6 +247,23 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
       <Icon i="help-circle" color="blue" />
     </a>
   );
+
+  const selectedResourceType =
+    resourceTypes?.find((resourceType) => resourceType.id === cr.resourceTypeId) ||
+    null;
+  const rawValueMode = isRawValueMode(selectedResourceType);
+  const showCostPerUnit = isCriterionEnabled(selectedResourceType, "UNIT_RUNS");
+  const showCostPerTime = isCriterionEnabled(
+    selectedResourceType,
+    "RESOURCE_TIME"
+  );
+  const showCostPerProcessingTime = isCriterionEnabled(
+    selectedResourceType,
+    "PROCESSING_TIME"
+  );
+  const showMaterialSettings =
+    isCriterionEnabled(selectedResourceType, "PRIMARY_MATERIAL") ||
+    isCriterionEnabled(selectedResourceType, "SECONDARY_MATERIAL");
 
   return (
     <div>
@@ -314,65 +343,88 @@ const Edit = ({ resource, opLoading, updateResource, setIsEditing }) => {
       />
       <H3>Resource Costing</H3>
       <Text>All costing information should be in dollars.</Text>
-      <Input
-        label={
-          <>
-            Cost Per Unit <Help text={COSTING.costPerUnit} />
-          </>
-        }
-        value={cr.costPerUnit}
-        onChange={(e) => setCr({ ...cr, costPerUnit: e })}
-        placeholder="What is the cost per unit of this resource?"
-        type="number"
-        onWheel={(e) => e.target.blur()}
-        icon={<Icon i="currency-dollar" />}
-        iconPos="leading"
-      />
-      <Input
-        label={
-          <>
-            Cost Per Time <Help text={COSTING.costPerTime} />
-          </>
-        }
-        value={cr.costPerTime}
-        onChange={(e) => setCr({ ...cr, costPerTime: e })}
-        placeholder="What is the cost per time of this resource?"
-        type="number"
-        onWheel={(e) => e.target.blur()}
-        icon={<Icon i="currency-dollar" />}
-        iconPos="leading"
-      />
-      <label className="form-label">
-        Can customers provide their own materials?
-      </label>
-      <DropdownInput
-        values={[
-          { id: "ALWAYS", label: "Always" },
-          { id: "NEVER", label: "Never" },
-          { id: "SOMETIMES", label: "Sometimes" },
-          { id: "SPECIAL", label: "Only for special cases" },
-        ]}
-        value={cr.userSuppliedMaterial}
-        onChange={(e) => setCr({ ...cr, userSuppliedMaterial: e.id })}
-        prompt="Select an option"
-      />
-      <Util.Spacer size={1} />
-
-      <Input
-        label={
-          <>
-            Cost Per Processing Time{" "}
-            <Help text={COSTING.costPerProcessingTime} />
-          </>
-        }
-        value={cr.costPerProcessingTime}
-        onChange={(e) => setCr({ ...cr, costPerProcessingTime: e })}
-        placeholder="What is the cost per processing time of this resource?"
-        type="number"
-        onWheel={(e) => e.target.blur()}
-        icon={<Icon i="currency-dollar" />}
-        iconPos="leading"
-      />
+      {rawValueMode ? (
+        <Alert variant="primary" title="Raw value resource type">
+          This resource type uses raw value entry, so resource rate inputs are
+          hidden here.
+        </Alert>
+      ) : (
+        <>
+          {showCostPerUnit && (
+            <Input
+              label={
+                <>
+                  Cost Per Unit <Help text={COSTING.costPerUnit} />
+                </>
+              }
+              value={cr.costPerUnit}
+              onChange={(e) => setCr({ ...cr, costPerUnit: e })}
+              placeholder="What is the cost per unit of this resource?"
+              type="number"
+              onWheel={(e) => e.target.blur()}
+              icon={<Icon i="currency-dollar" />}
+              iconPos="leading"
+            />
+          )}
+          {showCostPerTime && (
+            <Input
+              label={
+                <>
+                  Cost Per Time <Help text={COSTING.costPerTime} />
+                </>
+              }
+              value={cr.costPerTime}
+              onChange={(e) => setCr({ ...cr, costPerTime: e })}
+              placeholder="What is the cost per time of this resource?"
+              type="number"
+              onWheel={(e) => e.target.blur()}
+              icon={<Icon i="currency-dollar" />}
+              iconPos="leading"
+            />
+          )}
+          {showCostPerProcessingTime && (
+            <Input
+              label={
+                <>
+                  Cost Per Processing Time{" "}
+                  <Help text={COSTING.costPerProcessingTime} />
+                </>
+              }
+              value={cr.costPerProcessingTime}
+              onChange={(e) => setCr({ ...cr, costPerProcessingTime: e })}
+              placeholder="What is the cost per processing time of this resource?"
+              type="number"
+              onWheel={(e) => e.target.blur()}
+              icon={<Icon i="currency-dollar" />}
+              iconPos="leading"
+            />
+          )}
+          {showMaterialSettings && (
+            <>
+              <label className="form-label">
+                Can customers provide their own materials?
+              </label>
+              <DropdownInput
+                values={[
+                  { id: "ALWAYS", label: "Always" },
+                  { id: "NEVER", label: "Never" },
+                  { id: "SOMETIMES", label: "Sometimes" },
+                  { id: "SPECIAL", label: "Only for special cases" },
+                ]}
+                value={cr.userSuppliedMaterial}
+                onChange={(e) => setCr({ ...cr, userSuppliedMaterial: e.id })}
+                prompt="Select an option"
+              />
+              <Util.Spacer size={1} />
+            </>
+          )}
+          {!showCostPerUnit &&
+          !showCostPerTime &&
+          !showCostPerProcessingTime ? (
+            <i>No rate fields are enabled for this resource type.</i>
+          ) : null}
+        </>
+      )}
 
       <Switch
         label="Should costing information be displayed to customers?"
