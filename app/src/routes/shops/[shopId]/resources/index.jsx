@@ -315,10 +315,12 @@ const CostingCriteriaEditor = ({
       setSaving(true);
       await updateCostingCriteria(
         resourceType.id,
-        criteria.map((criterion) => ({
+        criteria.map((criterion, displayOrder) => ({
+          id: criterion.id,
           key: criterion.key,
           label: criterion.label,
           enabled: criterion.enabled,
+          displayOrder,
         }))
       );
       toast.success("Costing criteria updated");

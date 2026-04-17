@@ -8,9 +8,11 @@ import {
 import { z } from "zod";
 
 const criterionSchema = z.object({
+  id: z.string().optional(),
   key: z.nativeEnum(CostingCriterionKey),
   label: z.string().min(1),
   enabled: z.boolean(),
+  displayOrder: z.number().int().nonnegative(),
 });
 
 const criteriaSchema = z.object({
@@ -64,11 +66,8 @@ export const put = [
         });
       }
 
-      const criteriaWithOrder = parsedBody.data.criteria.map(
-        (criterion, displayOrder) => ({
-          ...criterion,
-          displayOrder,
-        })
+      const criteriaWithOrder = [...parsedBody.data.criteria].sort(
+        (a, b) => a.displayOrder - b.displayOrder
       );
 
       const validationError = validateCostingCriteria(

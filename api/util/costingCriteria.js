@@ -2,6 +2,13 @@ import { CostingCriterionKey, CostingMode } from "#prisma-client";
 
 export const RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE = {
   costingCriteria: {
+    select: {
+      id: true,
+      key: true,
+      label: true,
+      enabled: true,
+      displayOrder: true,
+    },
     orderBy: {
       displayOrder: "asc",
     },
