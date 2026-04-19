@@ -100,7 +100,7 @@ steps:
       placeholder: FDM 3d Printer
 
   - typeText:
-      placeholder: FDM 3d printer
+      placeholder: FDM 3d Printer
       text: Test Resource Type
 
   - tapOn:
