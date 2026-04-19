@@ -114,7 +114,12 @@ steps:
   - tapOn:
       text: Resource options
 
-  - waitFor: 500
+  - waitFor: 1000
+
+  - assertVisible:
+      text : Add Material
+
+  - waitFor : 1000
 
   - tapOn:
       text: Add Material
