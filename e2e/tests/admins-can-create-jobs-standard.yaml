@@ -35,6 +35,7 @@ steps:
       text: E2E Test Job
   - tapOn:
       text: Submit
+      force: true
   - waitFor : 500
   - tapOn: 
       text: Back to jobs
