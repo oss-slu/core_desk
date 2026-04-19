@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
+
 name: Admins can create jobs standard flow
 seedFile: fixtures/users.sql
 
@@ -24,53 +25,45 @@ steps:
   - tapOn:
       text: Submit
 
-  - waitFor: 1000
+  - waitFor: 500
 
   - assertVisible:
-      text: E2E Test Shop
+      text: "E2E Test Shop"
 
   ################################################################################
 
   - tapOn:
       text: E2E Test Shop
 
-  - waitFor: 300
+  - waitFor: 200
 
   - tapOn:
       text: Jobs
 
-  - waitFor: 300
+  - waitFor: 200
 
   - tapOn:
       text: Create Job
 
-  - waitFor: 300
+  - waitFor: 200
 
   - typeText:
       placeholder: e.g. Wind Mill Assembly
       text: E2E Test Job
 
-  # 🧠 IMPORTANT: give UI time to enable Submit
-  - waitFor: 1000
-
-  # sanity check that form is ready
-  - assertVisible:
-      text: Submit
-
   - tapOn:
       text: Submit
+      exact: true
 
-  # 🔥 wait for navigation / API completion
-  - waitFor: 2000
+  - waitFor: 1200
 
-  # confirm success before continuing
   - assertVisible:
       text: Back to jobs
 
   - tapOn:
       text: Back to jobs
 
-  - waitFor: 500
+  - waitFor: 300
 
   - assertVisible:
       text: E2E Test Job
