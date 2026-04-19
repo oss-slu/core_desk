@@ -97,7 +97,7 @@ steps:
 
   # ensure input exists before typing
   - assertVisible:
-      placeholder: FDM 3d printer
+      placeholder: FDM 3d Printer
 
   - typeText:
       placeholder: FDM 3d printer
