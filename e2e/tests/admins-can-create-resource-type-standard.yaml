@@ -1,0 +1,126 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
+
+name: Admins can create resource type within standard flow
+seedFile: fixtures/users.sql
+
+steps:
+  - open: /
+  - setViewport:
+      width: 1280
+      height: 720
+
+  - authenticateUser:
+      email: admin@coredesk-test.slu.edu
+
+  - tapOn:
+      text: Shops
+
+  - tapOn:
+      text: Create Shop
+
+  - typeText:
+      placeholder: e.g. South Campus Shop
+      text: E2E Test Shop
+
+  - tapOn:
+      text: Submit
+
+  - waitFor: 500
+
+  - assertVisible:
+      text: "E2E Test Shop"
+
+  ################################################################################
+
+  - tapOn:
+      text: E2E Test Shop
+
+  - waitFor: 200
+
+  - tapOn:
+      text: Jobs
+
+  - waitFor: 200
+
+  - tapOn:
+      text: Create Job
+
+  - waitFor: 200
+
+  - typeText:
+      placeholder: e.g. Wind Mill Assembly
+      text: E2E Test Job
+
+  - tapOn:
+      text: Submit
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      text: Back to jobs
+
+  - tapOn:
+      text: Back to jobs
+
+  - waitFor: 300
+
+  - assertVisible:
+      text: E2E Test Job
+
+
+  - tapOn: 
+      text: Resources
+
+  - assertVisible:
+      text: Resources
+  
+  - waitFor : 300
+
+  - tapOn:
+      text: Add...
+
+  - waitFor : 300
+
+  - tapOn:
+    text: Add Resource Type
+  
+  - assertVisible:
+    text: Create a new Resource Type
+
+
+  - typeText:
+      placeholder: FDM 3d printer
+      text: Test Resource Type
+
+  - tapOn:
+      text: Submit
+      exact: true
+
+  - waitFor: 1200
+
+
+  - tapOn : 
+      text : Resource options
+  
+  - tapOn : 
+      text : Add Material
+
+
+  - typeText:
+      placeholder: Acrylic, PLA, Pinewood
+      text: Test 
+
+
+  - typeText:
+      placeholder: Stratasys, BASF, Generic
+      text: Generic
+
+  - tapOn:
+      text: Submit
+      exact: true
+
+  - waitFor: 1200
+
+
+  
