@@ -68,26 +68,24 @@ steps:
   - assertVisible:
       text: E2E Test Job
 
-
-  - tapOn: 
+  - tapOn:
       text: Resources
 
   - assertVisible:
       text: Resources
-  
-  - waitFor : 300
+
+  - waitFor: 300
 
   - tapOn:
       text: Add...
 
-  - waitFor : 300
+  - waitFor: 300
 
   - tapOn:
-    text: Add Resource Type
-  
-  - assertVisible:
-    text: Create a new Resource Type
+      text: Add Resource Type
 
+  - assertVisible:
+      text: Create a new Resource Type
 
   - typeText:
       placeholder: FDM 3d printer
@@ -99,18 +97,15 @@ steps:
 
   - waitFor: 1200
 
+  - tapOn:
+      text: Resource options
 
-  - tapOn : 
-      text : Resource options
-  
-  - tapOn : 
-      text : Add Material
-
+  - tapOn:
+      text: Add Material
 
   - typeText:
       placeholder: Acrylic, PLA, Pinewood
-      text: Test 
-
+      text: Test
 
   - typeText:
       placeholder: Stratasys, BASF, Generic
@@ -121,6 +116,3 @@ steps:
       exact: true
 
   - waitFor: 1200
-
-
-  
