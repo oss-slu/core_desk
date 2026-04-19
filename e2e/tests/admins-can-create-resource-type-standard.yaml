@@ -84,9 +84,8 @@ steps:
   - tapOn:
       text: Add...
 
-  - waitFor: 400
+  - waitFor: 500
 
-  # IMPORTANT: ensure modal is fully open before interacting
   - tapOn:
       text: Add Resource Type
 
@@ -95,7 +94,6 @@ steps:
   - assertVisible:
       text: Create a new Resource Type
 
-  # ensure input exists before typing
   - assertVisible:
       placeholder: FDM 3d Printer
 
@@ -109,26 +107,37 @@ steps:
 
   - waitFor: 1200
 
-  # -------------------- MATERIALS --------------------
+  # -------------------- MATERIALS (FIXED SECTION) --------------------
 
   - tapOn:
       text: Resource options
 
-  - waitFor: 1000
+  - waitFor: 1200   # allow dropdown animation/state change
+
+  # safety retry (dropdown sometimes needs second trigger in CI)
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 800
 
   - assertVisible:
-      text : Add Material
-
-  - waitFor : 1000
+      text: Add Material
+      timeout: 8000
 
   - tapOn:
       text: Add Material
 
   - waitFor: 800
 
+  - assertVisible:
+      placeholder: Acrylic, PLA, Pinewood
+
   - typeText:
       placeholder: Acrylic, PLA, Pinewood
       text: Test
+
+  - assertVisible:
+      placeholder: Stratasys, BASF, Generic
 
   - typeText:
       placeholder: Stratasys, BASF, Generic
