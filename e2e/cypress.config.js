@@ -6,7 +6,7 @@ import prisma from "../api/util/prisma.js";
 import jwt from "jsonwebtoken";
 dotenv.config({ path: "./docker/.env.e2e" });
 dotenv.config({ path: "../api/.env" });
-const baseUrl = "http://localhost:5173";
+const baseUrl = "http://localhost:3030";
 import path from "path";
 import fs from "fs";
 import { spawnSync } from "child_process";
@@ -180,8 +180,6 @@ function resolveSqlPath(relativePath) {
 
 export default defineConfig({
   e2e: {
-    video: true,
-    
     setupNodeEvents(on) {
       yamlPreprocessor(on);
       const runSeed = (relativeSqlPath, triggerLabel = "task") => {
