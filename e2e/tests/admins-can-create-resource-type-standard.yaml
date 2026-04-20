@@ -107,7 +107,7 @@ steps:
 
   - waitFor: 1200
 
-  # -------------------- MATERIALS (FIXED SECTION) --------------------
+  # -------------------- MATERIALS  --------------------
 
   - tapOn:
       text: Resource options
@@ -126,17 +126,17 @@ steps:
   - waitFor: 800
 
   - typeText:
-      parent: ".model.show"
+      parent: ".modal.show"
       placeholder: Acrylic, PLA, Pinewood
       text: Pinewood
 
   - typeText:
-      parent: ".model.show"
+      parent: ".modal.show"
       placeholder: Stratasys, BASF, Generic
       text: Generic
 
   - tapOn:
-      parent: ".model.show"
+      parent: ".modal.show"
       text: Submit
       exact: true
 
