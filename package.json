@@ -16,7 +16,7 @@
     "down:e2e": "npm --workspace e2e run down:docker"
   },
   "devDependencies": {
-    "concurrently": "^9.0.0",
+    "concurrently": "^9.2.1",
     "start-server-and-test": "^2.0.0"
   }
 }
