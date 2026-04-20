@@ -1,6 +1,5 @@
 INSERT INTO "user" (id,email,"firstName","lastName",admin,suspended,simple,"createdAt","updatedAt")
-VALUES ('51882c2c-2cb3-49b6-882d-a2d9bf9ee9af','user@coredesk-test.slu.edu','Test','User',false,false,false,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
-
+VALUES ('51882c2c-23b3-49b6-882d-a2d9bf9ee9af','admin@coredesk-test.slu.edu','Test','Admin',true,false,true,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
 
 INSERT INTO "Shop" (id,name,color,"createdAt","updatedAt")
 VALUES ('22222222-2222-2222-2222-222222222222','E2E Simplified Shop','BLUE',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP);
