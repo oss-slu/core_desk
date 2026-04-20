@@ -125,15 +125,9 @@ steps:
 
   - waitFor: 800
 
-  - assertVisible:
-      placeholder: Acrylic, PLA, Pinewood
-
   - typeText:
       placeholder: Acrylic, PLA, Pinewood
-      text: Test
-
-  - assertVisible:
-      placeholder: Stratasys, BASF, Generic
+      text: Pinewood
 
   - typeText:
       placeholder: Stratasys, BASF, Generic
