@@ -115,13 +115,12 @@ steps:
   - waitFor: 1200   # allow dropdown animation/state change
 
   - assertVisible:
-      text: Add Material
-      index: 1
+      parent: ".dropdown-menu.show"
       timeout: 8000
 
   - tapOn:
+      parent: ".dropdown-menu.show"
       text: Add Material
-      index: 1
 
   - waitFor: 800
 
