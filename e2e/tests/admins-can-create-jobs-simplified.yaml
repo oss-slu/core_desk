@@ -21,28 +21,33 @@ steps:
   - tapOn:
       text: Simplified
 
+  - waitFor : 1200
+
   - tapOn:
       text: E2E Simplified Shop
 
-  # -------------------- CREATE JOB --------------------
 
-  - typeText:
-      placeholder: e.g. Wind Mill Assembly
-      text: E2E Test Job
+  - waitFor : 1900
 
-  - tapOn:
-      text: Next
-      exact: true
+  # # -------------------- CREATE JOB --------------------
 
-  - waitFor: 1200
+  # - typeText:
+  #     placeholder: e.g. Wind Mill Assembly
+  #     text: E2E Test Job
 
-  - assertVisible:
-      text: Continue set-up
+  # - tapOn:
+  #     text: Next
+  #     exact: true
 
-  - tapOn:
-      text: Select a type
+  # - waitFor: 1200
 
-  # - waitFor: 500
+  # - assertVisible:
+  #     text: Continue set-up
+
+  # - tapOn:
+  #     text: Select a type
+
+  # # - waitFor: 500
 
   # - assertVisible:
   #     text: E2E Test Job
