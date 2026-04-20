@@ -140,4 +140,68 @@ steps:
       text: Submit
       exact: true
 
+  - waitFor: 800
+
+  - selectFile:
+      selector: 'input[type="file"][name="file"]'
+      filePath: cypress/fixtures/test-image.png
+
+  - tapOn:
+      text: Upload
+      exact: true
+
   - waitFor: 1200
+
+  - assertVisible:
+      selector: "#carousel-sample img"
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
+
+  - assertVisible:
+      parent: ".dropdown-menu.show"
+      text: Add Resource
+      timeout: 8000
+
+  - tapOn:
+      parent: ".dropdown-menu.show"
+      text: Add Resource
+
+  - waitFor: 800
+
+
+  - typeText:
+      parent: ".modal.show"
+      placeholder: Bambu Lab X1C
+      text: Lab X1C
+
+
+  - tapOn:
+      parent: ".modal.show"
+      text: Submit
+      exact: true
+
+
+  - waitFor: 800
+
+  - selectFile:
+      selector: 'input[type="file"][name="file"]'
+      filePath: cypress/fixtures/test-image.png
+
+  - tapOn:
+      text: Upload
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      selector: "#carousel-sample img"
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
