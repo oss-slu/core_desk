@@ -72,6 +72,23 @@ steps:
       text: Next
       exact: true
 
+
+  - selectFile:
+      selector: 'input[type="file"]'
+      filePath: cypress/fixtures/test-image.png
+
+
+  - tapOn:
+      text: Upload
+      exact: true
+
+  - waitFor: 1200
+
+  - tapOn:
+      text: Next
+      exact: true
+
+  - waitFor: 1200
   # # -------------------- RESOURCES --------------------
 
   # - tapOn:
