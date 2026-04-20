@@ -126,14 +126,17 @@ steps:
   - waitFor: 800
 
   - typeText:
+      parent: ".model.show"
       placeholder: Acrylic, PLA, Pinewood
       text: Pinewood
 
   - typeText:
+      parent: ".model.show"
       placeholder: Stratasys, BASF, Generic
       text: Generic
 
   - tapOn:
+      parent: ".model.show"
       text: Submit
       exact: true
 
