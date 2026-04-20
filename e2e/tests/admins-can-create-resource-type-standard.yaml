@@ -116,6 +116,7 @@ steps:
 
   - assertVisible:
       parent: ".dropdown-menu.show"
+      text: Add Material
       timeout: 8000
 
   - tapOn:
