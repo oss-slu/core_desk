@@ -116,10 +116,12 @@ steps:
 
   - assertVisible:
       text: Add Material
+      index: 1
       timeout: 8000
 
   - tapOn:
       text: Add Material
+      index: 1
 
   - waitFor: 800
 
