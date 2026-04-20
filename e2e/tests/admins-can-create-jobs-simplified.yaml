@@ -1,0 +1,196 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
+
+name: Admins can create jobs within simplified flow
+seedFile: fixtures/simplified-flow.sql
+
+steps:
+  - open: /
+
+  - setViewport:
+      width: 1280
+      height: 720
+
+  - authenticateUser:
+      email: admin@coredesk-test.slu.edu
+
+  # -------------------- CREATE SHOP --------------------
+
+  - tapOn:
+      text: Test Admin
+
+  - tapOn:
+      text: Simplified
+
+  - tapOn:
+      text: E2E Simplified Shop
+
+  # -------------------- CREATE JOB --------------------
+
+  - typeText:
+      placeholder: e.g. Wind Mill Assembly
+      text: E2E Test Job
+
+  - tapOn:
+      text: Next
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      text: Continue set-up
+
+  - tapOn:
+      text: Select a type
+
+  # - waitFor: 500
+
+  # - assertVisible:
+  #     text: E2E Test Job
+
+  # # -------------------- RESOURCES --------------------
+
+  # - tapOn:
+  #     text: Resources
+
+  # - waitFor: 400
+
+  # - assertVisible:
+  #     text: Resources
+
+  # - tapOn:
+  #     text: Add...
+
+  # - waitFor: 500
+
+  # - tapOn:
+  #     text: Add Resource Type
+
+  # - waitFor: 800
+
+  # - assertVisible:
+  #     text: Create a new Resource Type
+
+  # - assertVisible:
+  #     placeholder: FDM 3d Printer
+
+  # - typeText:
+  #     placeholder: FDM 3d Printer
+  #     text: Test Resource Type
+
+  # - tapOn:
+  #     text: Submit
+  #     exact: true
+
+  # - waitFor: 1200
+
+  # # -------------------- MATERIALS  --------------------
+
+  # - tapOn:
+  #     text: Resource options
+
+  # - waitFor: 1200   # allow dropdown animation/state change
+
+  # - assertVisible:
+  #     parent: ".dropdown-menu.show"
+  #     text: Add Material
+  #     timeout: 8000
+
+  # - tapOn:
+  #     parent: ".dropdown-menu.show"
+  #     text: Add Material
+
+  # - waitFor: 800
+
+  # - typeText:
+  #     parent: ".modal.show"
+  #     placeholder: Acrylic, PLA, Pinewood
+  #     text: Pinewood
+
+  # - typeText:
+  #     parent: ".modal.show"
+  #     placeholder: Stratasys, BASF, Generic
+  #     text: Generic
+
+  # - tapOn:
+  #     parent: ".modal.show"
+  #     text: Submit
+  #     exact: true
+
+  # - waitFor: 800
+
+  # - selectFile:
+  #     selector: 'input[type="file"]'
+  #     filePath: cypress/fixtures/test-image.png
+
+  # - tapOn:
+  #     text: Upload
+  #     exact: true
+
+  # - waitFor: 1200
+
+  # - assertVisible:
+  #     selector: "#carousel-sample img"
+
+  # - tapOn:
+  #     text: Resources
+
+  # - waitFor: 1200   # allow dropdown animation/state change
+
+
+  # - tapOn:
+  #     text: Resource options
+
+  # - waitFor: 1200   # allow dropdown animation/state change
+
+
+  # - assertVisible:
+  #     parent: ".dropdown-menu.show"
+  #     text: Add Resource
+  #     timeout: 8000
+
+  # - tapOn:
+  #     parent: ".dropdown-menu.show"
+  #     text: Add Resource
+
+  # - waitFor: 800
+
+
+  # - typeText:
+  #     parent: ".modal.show"
+  #     placeholder: Bambu Lab X1C
+  #     text: Lab X1C
+
+
+  # - tapOn:
+  #     parent: ".modal.show"
+  #     text: Submit
+  #     exact: true
+
+
+  # - waitFor: 800
+
+  # - selectFile:
+  #     selector: 'input[type="file"]'
+  #     filePath: cypress/fixtures/test-image.png
+
+  # - tapOn:
+  #     text: Upload
+  #     exact: true
+
+  # - waitFor: 1200
+
+  # - assertVisible:
+  #     selector: "#carousel-sample img"
+
+  # - tapOn:
+  #     text: Resource
+
+  # - waitFor: 1200   # allow dropdown animation/state change
+
+  # - assertVisible:
+  #     text: Pinewood
+
+  # - assertVisible: 
+  #     text: Lab X1C
+   
+
