@@ -156,6 +156,12 @@ steps:
       selector: "#carousel-sample img"
 
   - tapOn:
+      text: Resources
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
+
+  - tapOn:
       text: Resource options
 
   - waitFor: 1200   # allow dropdown animation/state change
@@ -201,7 +207,7 @@ steps:
       selector: "#carousel-sample img"
 
   - tapOn:
-      text: Resource options
+      text: Resource
 
   - waitFor: 1200   # allow dropdown animation/state change
 
