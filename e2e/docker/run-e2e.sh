@@ -7,7 +7,7 @@ E2E_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 ROOT_DIR="$(cd "${E2E_DIR}/.." && pwd)"
 COMPOSE_FILE="${SCRIPT_DIR}/docker-compose.yml"
 ENV_FILE="${SCRIPT_DIR}/.env.e2e"
-APP_BASE_URL="${BASE_URL:-http://localhost:3030}"
+APP_BASE_URL="${BASE_URL:-http://localhost:5173}"
 WAIT_TIMEOUT_SECONDS="${E2E_WAIT_SECONDS:-180}"
 
 load_env_defaults() {

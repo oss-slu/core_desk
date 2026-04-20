@@ -114,12 +114,6 @@ steps:
 
   - waitFor: 1200   # allow dropdown animation/state change
 
-  # safety retry (dropdown sometimes needs second trigger in CI)
-  - tapOn:
-      text: Resource options
-
-  - waitFor: 800
-
   - assertVisible:
       text: Add Material
       timeout: 8000
