@@ -143,7 +143,7 @@ steps:
   - waitFor: 800
 
   - selectFile:
-      selector: 'input[type="file"][name="file"]'
+      selector: 'input[type="file"]'
       filePath: cypress/fixtures/test-image.png
 
   - tapOn:
@@ -188,7 +188,7 @@ steps:
   - waitFor: 800
 
   - selectFile:
-      selector: 'input[type="file"][name="file"]'
+      selector: 'input[type="file"]'
       filePath: cypress/fixtures/test-image.png
 
   - tapOn:
