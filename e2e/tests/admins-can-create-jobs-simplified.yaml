@@ -42,8 +42,35 @@ steps:
 
   - waitFor: 500
 
-  - assertVisible:
-      text: E2E Test Job
+  - tapOn:
+      text: FDM 3D Printer
+  
+  - waitFor: 1200
+
+  - tapOn:
+      text: Select a resource
+
+  - waitFor: 1200
+
+  - tapOn:
+      text: Lab X1C
+
+
+  - waitFor: 1200
+
+
+  - tapOn:
+      text: Select a material
+
+  - tapOn:
+      text: PLA
+
+  - waitFor: 1200
+
+
+  - tapOn:
+      text: Next
+      exact: true
 
   # # -------------------- RESOURCES --------------------
 
