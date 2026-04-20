@@ -211,3 +211,10 @@ steps:
 
   - waitFor: 1200   # allow dropdown animation/state change
 
+  - assertVisible:
+      text: Pinewood
+
+  - assertVisible: 
+      text: Lab X1C
+   
+
