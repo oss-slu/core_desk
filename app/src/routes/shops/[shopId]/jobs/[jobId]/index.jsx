@@ -28,6 +28,7 @@ import { Comments } from "../../../../../components/comments/Comments";
 import { Alert } from "#alert";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../../../../../components/billingGroupPicker/BillingGroupPicker";
+import { useModal } from "#modal";
 import styles from "./index.module.css";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
@@ -81,6 +82,7 @@ export const JobPage = () => {
 
   // 2. Initialize currentIndex using the calculated value.
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [itemTitle, setItemTitle] = useState("");
 
   // ... handleNext, handlePrevious, pages definition are unchanged ...
 
@@ -96,6 +98,21 @@ export const JobPage = () => {
     );
     // Note: Used modulus for safety, although simple decrement to 0 is likely fine here.
   };
+  const { modal: openAddItemModal, ModalElement: AddItemModal } = useModal({
+    title: "Add Item Without File",
+    text: (
+      <Util.Col gap={0.75} align="start">
+        <Input
+          label="Item Name"
+          value={itemTitle}
+          onChange={(value) => setItemTitle(value)}
+          placeholder="e.g. Front panel revision A"
+          required
+        />
+        <Button disabled={!itemTitle?.trim()}>Create Item</Button>
+      </Util.Col>
+    ),
+  });
 
   const pages = [
     <div key={"step3"}>
@@ -226,6 +243,7 @@ export const JobPage = () => {
     return (
       <Page sidenavItems={sidenavItems("jobs", shopId, jobId)}>
         {ConfirmModal}
+        {AddItemModal}
         {job.finalized && (
           <Alert
             variant="danger"
@@ -486,6 +504,16 @@ export const JobPage = () => {
             )}
           </div>
         </Util.Responsive>
+        <hr />
+
+        <H2 style={{ marginTop: -10 }}> Add Item Without File</H2>
+        <Util.Col gap={0.5} align="start">
+          <Button style={{ marginTop: 5 }} onClick={openAddItemModal}>
+            Add Item
+          </Button>
+          <i style = {{ marginTop : 5}}>Create a job item now and attatch a file later</i>
+        </Util.Col>
+
         <hr />
         <H2 style={{ marginTop: -10 }}>Items</H2>
         <UploadDropzone
