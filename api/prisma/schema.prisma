@@ -271,7 +271,7 @@ model ResourceTypeCostingCriterion {
   updatedAt      DateTime            @updatedAt
   resourceType   ResourceType        @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
 
-  @@unique([resourceTypeId, key])
+  @@unique([resourceTypeId, criterionType])
   @@index([resourceTypeId, displayOrder])
 }
 
