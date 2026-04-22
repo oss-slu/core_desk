@@ -1,7 +1,39 @@
 import { prisma } from "#prisma";
-import { LogType } from "#prisma-client";
+import { CostingCriterionType, LogType } from "#prisma-client";
 import { uploadFile } from "#upload";
 import PDFDocument from "pdfkit";
+import { isCostingCriterionEnabled } from "../costingCriteria.js";
+
+const buildCostingCriteriaSnapshot = (job) => {
+  const resourceTypesById = new Map();
+
+  const attachResourceType = (resourceType) => {
+    if (!resourceType?.id || resourceTypesById.has(resourceType.id)) return;
+
+    const criteria = Array.isArray(resourceType.costingCriteria)
+      ? resourceType.costingCriteria
+          .filter((criterion) => criterion?.enabled)
+          .map((criterion) => ({
+            criterionType: criterion.criterionType,
+            label: criterion.label,
+            displayOrder: criterion.displayOrder,
+          }))
+          .sort((a, b) => a.displayOrder - b.displayOrder)
+      : [];
+
+    resourceTypesById.set(resourceType.id, {
+      resourceTypeId: resourceType.id,
+      criteria,
+    });
+  };
+
+  (job.items || []).forEach((item) => attachResourceType(item.resourceType));
+  (job.additionalCosts || []).forEach((cost) =>
+    attachResourceType(cost.resourceType)
+  );
+
+  return Array.from(resourceTypesById.values());
+};
 
 export const calculateTotalCostOfJobByJobId = async (jobId) => {
   const data = await prisma.job.findFirst({
@@ -14,7 +46,11 @@ export const calculateTotalCostOfJobByJobId = async (jobId) => {
           resource: true,
           material: true,
           secondaryMaterial: true,
-          resourceType: true,
+          resourceType: {
+            include: {
+              costingCriteria: true,
+            },
+          },
         },
       },
       additionalCosts: {
@@ -22,7 +58,11 @@ export const calculateTotalCostOfJobByJobId = async (jobId) => {
           resource: true,
           material: true,
           secondaryMaterial: true,
-          resourceType: true,
+          resourceType: {
+            include: {
+              costingCriteria: true,
+            },
+          },
         },
       },
     },
@@ -91,22 +131,6 @@ export const selectInvoiceCustomer = ({
   };
 };
 
-const calculateResourceAndMaterialLinePrice = (line) => {
-  let total = 0;
-
-  total += (line.unitQty || 0) * (line.resource?.costPerUnit || 0);
-  total += (line.timeQty || 0) * (line.resource?.costPerTime || 0);
-  total +=
-    (line.processingTimeQty || 0) *
-    (line.resource?.costPerProcessingTime || 0);
-  total += (line.materialQty || 0) * (line.material?.costPerUnit || 0);
-  total +=
-    (line.secondaryMaterialQty || 0) *
-    (line.secondaryMaterial?.costPerUnit || 0);
-
-  return total;
-};
-
 export const calculateTotalCostOfJob = (data) => {
   let totalCost = 0;
 
@@ -122,7 +146,50 @@ export const calculateTotalCostOfJob = (data) => {
       return;
     }
 
-    totalCost += calculateResourceAndMaterialLinePrice(cost);
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionType.UNIT_RUNS
+      )
+    ) {
+      totalCost += (cost.unitQty || 0) * (cost.resource?.costPerUnit || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionType.RESOURCE_TIME
+      )
+    ) {
+      totalCost += (cost.timeQty || 0) * (cost.resource?.costPerTime || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionType.PROCESSING_TIME
+      )
+    ) {
+      totalCost +=
+        (cost.processingTimeQty || 0) *
+        (cost.resource?.costPerProcessingTime || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionType.PRIMARY_MATERIAL
+      )
+    ) {
+      totalCost += (cost.materialQty || 0) * (cost.material?.costPerUnit || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        cost.resourceType,
+        CostingCriterionType.SECONDARY_MATERIAL
+      )
+    ) {
+      totalCost +=
+        (cost.secondaryMaterialQty || 0) *
+        (cost.secondaryMaterial?.costPerUnit || 0);
+    }
   });
 
   // if additionalCostOverride is true, return totalCost
@@ -135,7 +202,55 @@ export const calculateTotalCostOfJob = (data) => {
       return;
     }
 
-    totalCost += calculateResourceAndMaterialLinePrice(item) * (item.qty ?? 1);
+    let localTotalCost = 0;
+
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionType.RESOURCE_TIME
+      )
+    ) {
+      localTotalCost += (item.timeQty || 0) * (item.resource?.costPerTime || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionType.PROCESSING_TIME
+      )
+    ) {
+      localTotalCost +=
+        (item.processingTimeQty || 0) *
+        (item.resource?.costPerProcessingTime || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionType.UNIT_RUNS
+      )
+    ) {
+      localTotalCost += (item.unitQty || 0) * (item.resource?.costPerUnit || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionType.PRIMARY_MATERIAL
+      )
+    ) {
+      localTotalCost +=
+        (item.materialQty || 0) * (item.material?.costPerUnit || 0);
+    }
+    if (
+      isCostingCriterionEnabled(
+        item.resourceType,
+        CostingCriterionType.SECONDARY_MATERIAL
+      )
+    ) {
+      localTotalCost +=
+        (item.secondaryMaterialQty || 0) *
+        (item.secondaryMaterial?.costPerUnit || 0);
+    }
+
+    totalCost += localTotalCost * (item.qty ?? 1);
   });
 
   return totalCost;
@@ -146,7 +261,50 @@ const calculateJobItemLinePrice = (item) => {
     return item.rawValue || 0;
   }
 
-  return calculateResourceAndMaterialLinePrice(item);
+  let linePrice = 0;
+  if (
+    isCostingCriterionEnabled(
+      item.resourceType,
+      CostingCriterionType.RESOURCE_TIME
+    )
+  ) {
+    linePrice += (item.timeQty || 0) * (item.resource?.costPerTime || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      item.resourceType,
+      CostingCriterionType.PROCESSING_TIME
+    )
+  ) {
+    linePrice +=
+      (item.processingTimeQty || 0) *
+      (item.resource?.costPerProcessingTime || 0);
+  }
+  if (
+    isCostingCriterionEnabled(item.resourceType, CostingCriterionType.UNIT_RUNS)
+  ) {
+    linePrice += (item.unitQty || 0) * (item.resource?.costPerUnit || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      item.resourceType,
+      CostingCriterionType.PRIMARY_MATERIAL
+    )
+  ) {
+    linePrice += (item.materialQty || 0) * (item.material?.costPerUnit || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      item.resourceType,
+      CostingCriterionType.SECONDARY_MATERIAL
+    )
+  ) {
+    linePrice +=
+      (item.secondaryMaterialQty || 0) *
+      (item.secondaryMaterial?.costPerUnit || 0);
+  }
+
+  return linePrice;
 };
 
 const calculateAdditionalCostLinePrice = (cost) => {
@@ -158,7 +316,50 @@ const calculateAdditionalCostLinePrice = (cost) => {
     return cost.amount;
   }
 
-  return calculateResourceAndMaterialLinePrice(cost);
+  let linePrice = 0;
+  if (
+    isCostingCriterionEnabled(cost.resourceType, CostingCriterionType.UNIT_RUNS)
+  ) {
+    linePrice += (cost.unitQty || 0) * (cost.resource?.costPerUnit || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      cost.resourceType,
+      CostingCriterionType.RESOURCE_TIME
+    )
+  ) {
+    linePrice += (cost.timeQty || 0) * (cost.resource?.costPerTime || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      cost.resourceType,
+      CostingCriterionType.PROCESSING_TIME
+    )
+  ) {
+    linePrice +=
+      (cost.processingTimeQty || 0) *
+      (cost.resource?.costPerProcessingTime || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      cost.resourceType,
+      CostingCriterionType.PRIMARY_MATERIAL
+    )
+  ) {
+    linePrice += (cost.materialQty || 0) * (cost.material?.costPerUnit || 0);
+  }
+  if (
+    isCostingCriterionEnabled(
+      cost.resourceType,
+      CostingCriterionType.SECONDARY_MATERIAL
+    )
+  ) {
+    linePrice +=
+      (cost.secondaryMaterialQty || 0) *
+      (cost.secondaryMaterial?.costPerUnit || 0);
+  }
+
+  return linePrice;
 };
 
 const buildInvoiceRows = (job) => {
@@ -324,7 +525,7 @@ export const generateInvoice = async (
   data,
   userId,
   shopId,
-  { draft = false } = {}
+  { draft = false, costingCriteriaSnapshot = null } = {}
 ) => {
   const job = await prisma.job.findFirst({
     where: {
@@ -340,7 +541,15 @@ export const generateInvoice = async (
           material: true,
           secondaryMaterial: true,
           resource: true,
-          resourceType: true,
+          resourceType: {
+            include: {
+              costingCriteria: {
+                orderBy: {
+                  displayOrder: "asc",
+                },
+              },
+            },
+          },
         },
       },
       items: {
@@ -351,7 +560,15 @@ export const generateInvoice = async (
           material: true,
           secondaryMaterial: true,
           resource: true,
-          resourceType: true,
+          resourceType: {
+            include: {
+              costingCriteria: {
+                orderBy: {
+                  displayOrder: "asc",
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -418,6 +635,7 @@ export const generateInvoice = async (
 
   const rows = buildInvoiceRows(job);
   const total = calculateTotalCostOfJob(job);
+  const snapshot = costingCriteriaSnapshot || buildCostingCriteriaSnapshot(job);
   const customer = selectInvoiceCustomer({
     billingGroup,
     payerAccount:
@@ -465,6 +683,7 @@ export const generateInvoice = async (
     url: uploaded.location,
     key: uploaded.key,
     value: total,
+    costingCriteriaSnapshot: snapshot,
     log,
   };
 };
