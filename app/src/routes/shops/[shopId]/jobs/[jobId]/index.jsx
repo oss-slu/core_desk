@@ -25,10 +25,12 @@ import { ResourceTypePicker } from "../../../../../components/resourceTypePicker
 import { MaterialPicker } from "../../../../../components/materialPicker/MaterialPicker";
 import { ResourcePicker } from "../../../../../components/resourcePicker/ResourcePicker";
 import { Comments } from "../../../../../components/comments/Comments";
+import { RenderMedia } from "../../../../../components/media/renderMedia";
 import { Alert } from "#alert";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../../../../../components/billingGroupPicker/BillingGroupPicker";
 import { useModal } from "#modal";
+import { authFetch } from "../../../../../util/url";
 import styles from "./index.module.css";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
@@ -71,6 +73,8 @@ export const JobPage = () => {
   const [editing, setEditing] = useState(false);
   const [job, setJob] = useState(uncontrolledJob);
 
+  const [createItemLoading, setCreateItemLoading] = useState(false);
+
   const userIsPrivileged =
     activeUser.admin ||
     userShop.accountType === "ADMIN" ||
@@ -83,6 +87,12 @@ export const JobPage = () => {
   // 2. Initialize currentIndex using the calculated value.
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [itemTitle, setItemTitle] = useState("");
+  const noFilePreviewDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="280" viewBox="0 0 700 280">
+      <rect width="700" height="280" fill="#f6f8fb" stroke="#dce1e7"/>
+      <text x="350" y="145" text-anchor="middle" font-family="Inter, Arial, sans-serif" font-size="22" fill="#6c757d">No file uploaded</text>
+    </svg>`,
+  )}`;
 
   // ... handleNext, handlePrevious, pages definition are unchanged ...
 
@@ -98,21 +108,74 @@ export const JobPage = () => {
     );
     // Note: Used modulus for safety, although simple decrement to 0 is likely fine here.
   };
-  const { modal: openAddItemModal, ModalElement: AddItemModal } = useModal({
-    title: "Add Item Without File",
-    text: (
-      <Util.Col gap={0.75} align="start">
-        <Input
-          label="Item Name"
-          value={itemTitle}
-          onChange={(value) => setItemTitle(value)}
-          placeholder="e.g. Front panel revision A"
-          required
-        />
-        <Button disabled={!itemTitle?.trim()}>Create Item</Button>
+
+
+  const handleCreateItem = async () => {
+    const title = itemTitle.trim();
+    if (!title) return;
+
+    setCreateItemLoading(true);
+    try {
+      const r = await authFetch(`/api/shop/${shopId}/job/${jobId}/upload`, {
+        method: "POST",
+        body: JSON.stringify({ title }),
+      });
+
+      if (!r.ok) {
+        throw new Error("Failed to create item");
+      }
+
+      setItemTitle("");
+      closeAddItemModal?.();
+      await refetchJobs(false);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setCreateItemLoading(false);
+    }
+  };
+
+
+  const renderAddItemModalContent = () => (
+    <Util.Col gap={0.75} align="start">
+      <Util.Col gap={0.25} align="start" style={{ width: "100%" }}>
+        <label className="form-label mb-0">Preview</label>
+        <RenderMedia mediaUrl={noFilePreviewDataUri} fileType="png" />
       </Util.Col>
-    ),
+      <Input
+        label="Item Name"
+        value={itemTitle}
+        onChange={(value) => setItemTitle(value)}
+        placeholder="e.g. Front panel revision A"
+        required
+      />
+      <Button
+        onClick={handleCreateItem}
+        loading={createItemLoading}
+        disabled={createItemLoading}
+      >
+        Create Item
+      </Button>
+    </Util.Col>
+  );
+
+  const {
+    modal: openAddItemModal,
+    ModalElement: AddItemModal,
+    close: closeAddItemModal,
+    update: updateAddItemModal,
+  } = useModal({
+    title: "Add Item Without File",
+    text: renderAddItemModalContent(),
   });
+
+  useEffect(() => {
+    updateAddItemModal({
+      title: "Add Item Without File",
+      text: renderAddItemModalContent(),
+    });
+  }, [itemTitle, createItemLoading]);
+
 
   const pages = [
     <div key={"step3"}>
@@ -342,8 +405,8 @@ export const JobPage = () => {
                       {/* Today warning */}{" "}
                       {new Date(job.dueDate).toDateString() ===
                         new Date().toDateString() && (
-                        <Badge color="yellow">Due Today</Badge>
-                      )}
+                          <Badge color="yellow">Due Today</Badge>
+                        )}
                     </span>
                   </Util.Row>
                 </Util.Col>
@@ -511,7 +574,7 @@ export const JobPage = () => {
           <Button style={{ marginTop: 5 }} onClick={openAddItemModal}>
             Add Item
           </Button>
-          <i style = {{ marginTop : 5}}>Create a job item now and attatch a file later</i>
+          <i style={{ marginTop: 5 }}>Create a job item now and attatch a file later</i>
         </Util.Col>
 
         <hr />

@@ -6,7 +6,7 @@ export const uploadFileToJob = async ({
   jobId,
   shopId,
   userId,
-  file, // { originalname, location, logId }
+  file = null, // { originalname, location, logId }
   groupId = undefined,
   logging = false,
 }) => {
@@ -21,14 +21,14 @@ export const uploadFileToJob = async ({
 
   const jobItem = await prisma.jobItem.create({
     data: {
-      jobId: job.id,
-      fileId: file.logId,
-      title: file.originalname || "No Name",
+      jobId: job?.id,
+      fileId: file?.logId || null,
+      title: file?.originalname || "No Name",
     },
   });
 
-  const fileType = file.originalname?.split(".")?.pop()?.toLowerCase();
-  if (fileType === "stl") {
+  const fileType = file?.originalname?.split(".")?.pop()?.toLowerCase();
+  if (fileType === "stl" && file.logId && file?.location) {
     logging && console.log("Considering STL render...");
     // Determine file size from File log
     const fileRecord = await prisma.file.findUnique({
