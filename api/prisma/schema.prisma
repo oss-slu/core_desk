@@ -263,7 +263,7 @@ model ResourceType {
 model ResourceTypeCostingCriterion {
   id             String              @id @default(cuid())
   resourceTypeId String
-  key            CostingCriterionKey
+  criterionType  CostingCriterionType
   label          String
   enabled        Boolean             @default(true)
   displayOrder   Int
@@ -569,7 +569,7 @@ enum CostingMode {
   RAW_VALUE_ENTRY
 }
 
-enum CostingCriterionKey {
+enum CostingCriterionType {
   RAW_VALUE
   RESOURCE_TIME
   PROCESSING_TIME
