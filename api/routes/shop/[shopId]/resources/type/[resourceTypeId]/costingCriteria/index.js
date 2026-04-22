@@ -1,6 +1,6 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import { CostingCriterionKey } from "#prisma-client";
+import { CostingCriterionType } from "#prisma-client";
 import {
   RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
   validateCostingCriteria,
@@ -9,7 +9,7 @@ import { z } from "zod";
 
 const criterionSchema = z.object({
   id: z.string().optional(),
-  key: z.nativeEnum(CostingCriterionKey),
+  key: z.nativeEnum(CostingCriterionType),
   label: z.string().min(1),
   enabled: z.boolean(),
   displayOrder: z.number().int().nonnegative(),

@@ -19,11 +19,11 @@ describe("/shop/[shopId]/resources/type", () => {
     expect(migration).toContain(
       `"ResourceType"."costingMode" = 'CALCULATE_WITH_RESOURCE_AND_MATERIAL'`
     );
-    expect(migration).toContain(`'RESOURCE_TIME'::"CostingCriterionKey"`);
-    expect(migration).toContain(`'PROCESSING_TIME'::"CostingCriterionKey"`);
-    expect(migration).toContain(`'UNIT_RUNS'::"CostingCriterionKey"`);
-    expect(migration).toContain(`'PRIMARY_MATERIAL'::"CostingCriterionKey"`);
-    expect(migration).toContain(`'SECONDARY_MATERIAL'::"CostingCriterionKey"`);
+    expect(migration).toContain(`'RESOURCE_TIME'::"CostingCriterionType"`);
+    expect(migration).toContain(`'PROCESSING_TIME'::"CostingCriterionType"`);
+    expect(migration).toContain(`'UNIT_RUNS'::"CostingCriterionType"`);
+    expect(migration).toContain(`'PRIMARY_MATERIAL'::"CostingCriterionType"`);
+    expect(migration).toContain(`'SECONDARY_MATERIAL'::"CostingCriterionType"`);
     expect(migration).toContain(`'Raw value'`);
     expect(migration).toContain(
       `"ResourceType"."costingMode" = 'RAW_VALUE_ENTRY'`

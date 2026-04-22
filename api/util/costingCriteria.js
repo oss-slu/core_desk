@@ -1,4 +1,4 @@
-import { CostingCriterionKey, CostingMode } from "#prisma-client";
+import { CostingCriterionType, CostingMode } from "#prisma-client";
 
 export const RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE = {
   costingCriteria: {
@@ -17,31 +17,31 @@ export const RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE = {
 
 const CALCULATED_DEFAULT_CRITERIA = [
   {
-    key: CostingCriterionKey.RESOURCE_TIME,
+    key: CostingCriterionType.RESOURCE_TIME,
     label: "Resource Time",
     enabled: true,
     displayOrder: 0,
   },
   {
-    key: CostingCriterionKey.PROCESSING_TIME,
+    key: CostingCriterionType.PROCESSING_TIME,
     label: "Processing Time",
     enabled: true,
     displayOrder: 1,
   },
   {
-    key: CostingCriterionKey.UNIT_RUNS,
+    key: CostingCriterionType.UNIT_RUNS,
     label: "Unit runs",
     enabled: true,
     displayOrder: 2,
   },
   {
-    key: CostingCriterionKey.PRIMARY_MATERIAL,
+    key: CostingCriterionType.PRIMARY_MATERIAL,
     label: "Material quantity",
     enabled: true,
     displayOrder: 3,
   },
   {
-    key: CostingCriterionKey.SECONDARY_MATERIAL,
+    key: CostingCriterionType.SECONDARY_MATERIAL,
     label: "Secondary Material quantity",
     enabled: false,
     displayOrder: 4,
@@ -50,7 +50,7 @@ const CALCULATED_DEFAULT_CRITERIA = [
 
 const RAW_VALUE_DEFAULT_CRITERIA = [
   {
-    key: CostingCriterionKey.RAW_VALUE,
+    key: CostingCriterionType.RAW_VALUE,
     label: "Raw value",
     enabled: true,
     displayOrder: 0,
@@ -86,14 +86,14 @@ export const validateCostingCriteria = (criteria, costingMode) => {
 
     if (
       costingMode === CostingMode.RAW_VALUE_ENTRY &&
-      criterion.key !== CostingCriterionKey.RAW_VALUE
+      criterion.key !== CostingCriterionType.RAW_VALUE
     ) {
       return "Raw-value resource types only allow RAW_VALUE";
     }
 
     if (
       costingMode !== CostingMode.RAW_VALUE_ENTRY &&
-      criterion.key === CostingCriterionKey.RAW_VALUE
+      criterion.key === CostingCriterionType.RAW_VALUE
     ) {
       return "Calculated resource types cannot include RAW_VALUE";
     }
@@ -101,8 +101,8 @@ export const validateCostingCriteria = (criteria, costingMode) => {
     if (
       costingMode === CostingMode.RAW_VALUE_ENTRY &&
       [
-        CostingCriterionKey.PRIMARY_MATERIAL,
-        CostingCriterionKey.SECONDARY_MATERIAL,
+        CostingCriterionType.PRIMARY_MATERIAL,
+        CostingCriterionType.SECONDARY_MATERIAL,
       ].includes(criterion.key)
     ) {
       return "Material criteria are only valid for calculated resource types";
@@ -125,13 +125,13 @@ export const isCostingCriterionEnabled = (resourceType, key) => {
   ) {
     return resourceType.costingMode
       ? resourceType.costingMode === CostingMode.RAW_VALUE_ENTRY
-        ? key === CostingCriterionKey.RAW_VALUE
+        ? key === CostingCriterionType.RAW_VALUE
         : [
-            CostingCriterionKey.RESOURCE_TIME,
-            CostingCriterionKey.PROCESSING_TIME,
-            CostingCriterionKey.UNIT_RUNS,
-            CostingCriterionKey.PRIMARY_MATERIAL,
-            CostingCriterionKey.SECONDARY_MATERIAL,
+            CostingCriterionType.RESOURCE_TIME,
+            CostingCriterionType.PROCESSING_TIME,
+            CostingCriterionType.UNIT_RUNS,
+            CostingCriterionType.PRIMARY_MATERIAL,
+            CostingCriterionType.SECONDARY_MATERIAL,
           ].includes(key)
       : false;
   }
@@ -142,12 +142,12 @@ export const isCostingCriterionEnabled = (resourceType, key) => {
 };
 
 const COSTING_VALUE_FIELDS_BY_KEY = {
-  [CostingCriterionKey.RAW_VALUE]: ["rawValue"],
-  [CostingCriterionKey.RESOURCE_TIME]: ["timeQty"],
-  [CostingCriterionKey.PROCESSING_TIME]: ["processingTimeQty"],
-  [CostingCriterionKey.UNIT_RUNS]: ["unitQty"],
-  [CostingCriterionKey.PRIMARY_MATERIAL]: ["materialQty"],
-  [CostingCriterionKey.SECONDARY_MATERIAL]: ["secondaryMaterialQty"],
+  [CostingCriterionType.RAW_VALUE]: ["rawValue"],
+  [CostingCriterionType.RESOURCE_TIME]: ["timeQty"],
+  [CostingCriterionType.PROCESSING_TIME]: ["processingTimeQty"],
+  [CostingCriterionType.UNIT_RUNS]: ["unitQty"],
+  [CostingCriterionType.PRIMARY_MATERIAL]: ["materialQty"],
+  [CostingCriterionType.SECONDARY_MATERIAL]: ["secondaryMaterialQty"],
 };
 
 export const sanitizeCostingInputForResourceType = (input, resourceType) => {

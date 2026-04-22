@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "CostingCriterionKey" AS ENUM (
+CREATE TYPE "CostingCriterionType" AS ENUM (
     'RAW_VALUE',
     'RESOURCE_TIME',
     'PROCESSING_TIME',
@@ -12,7 +12,7 @@ CREATE TYPE "CostingCriterionKey" AS ENUM (
 CREATE TABLE "ResourceTypeCostingCriterion" (
     "id" TEXT NOT NULL,
     "resourceTypeId" TEXT NOT NULL,
-    "key" "CostingCriterionKey" NOT NULL,
+    "key" "CostingCriterionType" NOT NULL,
     "label" TEXT NOT NULL,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
     "displayOrder" INTEGER NOT NULL,
@@ -63,11 +63,11 @@ SELECT
 FROM "ResourceType"
 JOIN (
     VALUES
-        ('RESOURCE_TIME'::"CostingCriterionKey", 'Resource Time', true, 0),
-        ('PROCESSING_TIME'::"CostingCriterionKey", 'Processing Time', true, 1),
-        ('UNIT_RUNS'::"CostingCriterionKey", 'Unit runs', true, 2),
-        ('PRIMARY_MATERIAL'::"CostingCriterionKey", 'Material quantity', true, 3),
-        ('SECONDARY_MATERIAL'::"CostingCriterionKey", 'Secondary Material quantity', false, 4)
+        ('RESOURCE_TIME'::"CostingCriterionType", 'Resource Time', true, 0),
+        ('PROCESSING_TIME'::"CostingCriterionType", 'Processing Time', true, 1),
+        ('UNIT_RUNS'::"CostingCriterionType", 'Unit runs', true, 2),
+        ('PRIMARY_MATERIAL'::"CostingCriterionType", 'Material quantity', true, 3),
+        ('SECONDARY_MATERIAL'::"CostingCriterionType", 'Secondary Material quantity', false, 4)
 ) AS seeded("key", "label", "enabled", "displayOrder")
     ON true
 WHERE "ResourceType"."costingMode" = 'CALCULATE_WITH_RESOURCE_AND_MATERIAL'
@@ -87,7 +87,7 @@ INSERT INTO "ResourceTypeCostingCriterion" (
 SELECT
     md5("ResourceType"."id" || ':RAW_VALUE'),
     "ResourceType"."id",
-    'RAW_VALUE'::"CostingCriterionKey",
+    'RAW_VALUE'::"CostingCriterionType",
     'Raw value',
     true,
     0,
