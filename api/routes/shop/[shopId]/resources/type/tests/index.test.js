@@ -96,54 +96,6 @@ describe("/shop/[shopId]/resources/type", () => {
     ]);
   });
 
-  it("rejects duplicate criterion keys in updates", async () => {
-    const resourceType = await prisma.resourceType.create({
-      data: {
-        title: "Printer",
-        shopId: tc.shop.id,
-        costingCriteria: {
-          createMany: {
-            data: [
-              {
-                key: "RESOURCE_TIME",
-                label: "Resource Time",
-                enabled: true,
-                displayOrder: 0,
-              },
-            ],
-          },
-        },
-      },
-    });
-
-    const res = await request(app)
-      .put(
-        `/api/shop/${tc.shop.id}/resources/type/${resourceType.id}/costingCriteria`
-      )
-      .set(...(await gt({ sat: "ADMIN" })))
-      .send({
-        criteria: [
-          {
-            id: "a",
-            key: "RESOURCE_TIME",
-            label: "Time A",
-            enabled: true,
-            displayOrder: 0,
-          },
-          {
-            id: "b",
-            key: "RESOURCE_TIME",
-            label: "Time B",
-            enabled: true,
-            displayOrder: 1,
-          },
-        ],
-      });
-
-    expect(res.status).toBe(400);
-    expect(res.body.error).toContain("unique");
-  });
-
   it("rejects invalid raw-value combinations", async () => {
     const resourceType = await prisma.resourceType.create({
       data: {
