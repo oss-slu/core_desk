@@ -75,25 +75,25 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
       await createCalculatedBundle({
         criteria: [
           {
-            key: "RESOURCE_TIME",
+            costingCriterionType: "RESOURCE_TIME",
             label: "Resource Time",
             enabled: false,
             displayOrder: 0,
           },
           {
-            key: "UNIT_RUNS",
+            costingCriterionType: "UNIT_RUNS",
             label: "Unit runs",
             enabled: true,
             displayOrder: 1,
           },
           {
-            key: "PRIMARY_MATERIAL",
+            costingCriterionType: "PRIMARY_MATERIAL",
             label: "Material quantity",
             enabled: true,
             displayOrder: 2,
           },
           {
-            key: "SECONDARY_MATERIAL",
+            costingCriterionType: "SECONDARY_MATERIAL",
             label: "Secondary Material quantity",
             enabled: false,
             displayOrder: 3,
@@ -139,25 +139,25 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
       await createCalculatedBundle({
         criteria: [
           {
-            key: "PROCESSING_TIME",
+            costingCriterionType: "PROCESSING_TIME",
             label: "Processing Time",
             enabled: false,
             displayOrder: 0,
           },
           {
-            key: "UNIT_RUNS",
+            costingCriterionType: "UNIT_RUNS",
             label: "Unit runs",
             enabled: true,
             displayOrder: 1,
           },
           {
-            key: "PRIMARY_MATERIAL",
+            costingCriterionType: "PRIMARY_MATERIAL",
             label: "Material quantity",
             enabled: true,
             displayOrder: 2,
           },
           {
-            key: "SECONDARY_MATERIAL",
+            costingCriterionType: "SECONDARY_MATERIAL",
             label: "Secondary Material quantity",
             enabled: false,
             displayOrder: 3,
@@ -206,7 +206,7 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
           createMany: {
             data: [
               {
-                key: "RAW_VALUE",
+                costingCriterionType: "RAW_VALUE",
                 label: "Raw value",
                 enabled: true,
                 displayOrder: 0,
@@ -271,7 +271,7 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
     const { resourceType, resource, material } = await createCalculatedBundle({
       criteria: [
         {
-          key: "UNIT_RUNS",
+          costingCriterionType: "UNIT_RUNS",
           label: "Unit runs",
           enabled: true,
           displayOrder: 0,
@@ -324,7 +324,7 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
         resourceTypeId: "rt_1",
         criteria: [
           {
-            key: "UNIT_RUNS",
+            costingCriterionType: "UNIT_RUNS",
             label: "Build plates",
             displayOrder: 0,
           },
@@ -381,7 +381,7 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
         resourceTypeId: "rt_1",
         criteria: [
           {
-            key: "UNIT_RUNS",
+            costingCriterionType: "UNIT_RUNS",
             label: "Original Label",
             displayOrder: 0,
           },
@@ -420,7 +420,7 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
           resourceTypeId: "rt_1",
           criteria: [
             {
-              key: "UNIT_RUNS",
+              costingCriterionType: "UNIT_RUNS",
               label: "Changed Label",
               displayOrder: 0,
             },
