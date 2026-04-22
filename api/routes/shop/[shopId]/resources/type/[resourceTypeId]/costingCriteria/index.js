@@ -9,7 +9,7 @@ import { z } from "zod";
 
 const criterionSchema = z.object({
   id: z.string().optional(),
-  key: z.nativeEnum(CostingCriterionType),
+  criterionType: z.nativeEnum(CostingCriterionType),
   label: z.string().min(1),
   enabled: z.boolean(),
   displayOrder: z.number().int().nonnegative(),
@@ -89,7 +89,7 @@ export const put = [
         await tx.resourceTypeCostingCriterion.createMany({
           data: criteriaWithOrder.map((criterion) => ({
             resourceTypeId,
-            key: criterion.key,
+            criterionType: criterion.criterionType,
             label: criterion.label,
             enabled: criterion.enabled,
             displayOrder: criterion.displayOrder,
