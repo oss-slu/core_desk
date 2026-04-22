@@ -4,7 +4,7 @@ export const RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE = {
   costingCriteria: {
     select: {
       id: true,
-      criteronType: true,
+      criterionType: true,
       label: true,
       enabled: true,
       displayOrder: true,
@@ -17,31 +17,31 @@ export const RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE = {
 
 const CALCULATED_DEFAULT_CRITERIA = [
   {
-    criteronType: CostingCriterionType.RESOURCE_TIME,
+    criterionType: CostingCriterionType.RESOURCE_TIME,
     label: "Resource Time",
     enabled: true,
     displayOrder: 0,
   },
   {
-    criteronType: CostingCriterionType.PROCESSING_TIME,
+    criterionType: CostingCriterionType.PROCESSING_TIME,
     label: "Processing Time",
     enabled: true,
     displayOrder: 1,
   },
   {
-    criteronType: CostingCriterionType.UNIT_RUNS,
+    criterionType: CostingCriterionType.UNIT_RUNS,
     label: "Unit runs",
     enabled: true,
     displayOrder: 2,
   },
   {
-    criteronType: CostingCriterionType.PRIMARY_MATERIAL,
+    criterionType: CostingCriterionType.PRIMARY_MATERIAL,
     label: "Material quantity",
     enabled: true,
     displayOrder: 3,
   },
   {
-    criteronType: CostingCriterionType.SECONDARY_MATERIAL,
+    criterionType: CostingCriterionType.SECONDARY_MATERIAL,
     label: "Secondary Material quantity",
     enabled: false,
     displayOrder: 4,
@@ -50,7 +50,7 @@ const CALCULATED_DEFAULT_CRITERIA = [
 
 const RAW_VALUE_DEFAULT_CRITERIA = [
   {
-    criteronType: CostingCriterionType.RAW_VALUE,
+    criterionType: CostingCriterionType.RAW_VALUE,
     label: "Raw value",
     enabled: true,
     displayOrder: 0,
@@ -74,11 +74,11 @@ export const validateCostingCriteria = (criteria, costingMode) => {
   let enabledCount = 0;
 
   for (const criterion of criteria) {
-    if (seenKeys.has(criterion.criteronType)) {
+    if (seenKeys.has(criterion.criterionType)) {
       return "Criterion keys must be unique per resource type";
     }
 
-    seenKeys.add(criterion.criteronType);
+    seenKeys.add(criterion.criterionType);
 
     if (criterion.enabled) {
       enabledCount += 1;
@@ -86,14 +86,14 @@ export const validateCostingCriteria = (criteria, costingMode) => {
 
     if (
       costingMode === CostingMode.RAW_VALUE_ENTRY &&
-      criterion.criteronType !== CostingCriterionType.RAW_VALUE
+      criterion.criterionType !== CostingCriterionType.RAW_VALUE
     ) {
       return "Raw-value resource types only allow RAW_VALUE";
     }
 
     if (
       costingMode !== CostingMode.RAW_VALUE_ENTRY &&
-      criterion.criteronType === CostingCriterionType.RAW_VALUE
+      criterion.criterionType === CostingCriterionType.RAW_VALUE
     ) {
       return "Calculated resource types cannot include RAW_VALUE";
     }
@@ -103,7 +103,7 @@ export const validateCostingCriteria = (criteria, costingMode) => {
       [
         CostingCriterionType.PRIMARY_MATERIAL,
         CostingCriterionType.SECONDARY_MATERIAL,
-      ].includes(criterion.criteronType)
+      ].includes(criterion.criterionType)
     ) {
       return "Material criteria are only valid for calculated resource types";
     }
@@ -137,7 +137,7 @@ export const isCostingCriterionEnabled = (resourceType, key) => {
   }
 
   return resourceType.costingCriteria.some(
-    (criterion) => criterion.criteronType === key && criterion.enabled
+    (criterion) => criterion.criterionType === key && criterion.enabled
   );
 };
 
