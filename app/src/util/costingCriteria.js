@@ -1,30 +1,30 @@
 const CALCULATED_DEFAULT_CRITERIA = [
   {
-    costingCriterionType: "RESOURCE_TIME",
+    criteronType: "RESOURCE_TIME",
     label: "Resource Time",
     enabled: true,
     displayOrder: 0,
   },
   {
-    costingCriterionType: "PROCESSING_TIME",
+    criteronType: "PROCESSING_TIME",
     label: "Processing Time",
     enabled: true,
     displayOrder: 1,
   },
   {
-    costingCriterionType: "UNIT_RUNS",
+    criteronType: "UNIT_RUNS",
     label: "Unit runs",
     enabled: true,
     displayOrder: 2,
   },
   {
-    costingCriterionType: "PRIMARY_MATERIAL",
+    criteronType: "PRIMARY_MATERIAL",
     label: "Material quantity",
     enabled: true,
     displayOrder: 3,
   },
   {
-    costingCriterionType: "SECONDARY_MATERIAL",
+    criteronType: "SECONDARY_MATERIAL",
     label: "Secondary Material quantity",
     enabled: false,
     displayOrder: 4,
@@ -33,7 +33,7 @@ const CALCULATED_DEFAULT_CRITERIA = [
 
 const RAW_VALUE_DEFAULT_CRITERIA = [
   {
-    costingCriterionType: "RAW_VALUE",
+    criteronType: "RAW_VALUE",
     label: "Raw value",
     enabled: true,
     displayOrder: 0,
@@ -54,12 +54,12 @@ export const getEditableCostingCriteria = (resourceType) => {
     ? resourceType.costingCriteria
     : [];
   const existingByKey = new Map(
-    existingCriteria.map((criterion) => [criterion.costingCriterionType, criterion])
+    existingCriteria.map((criterion) => [criterion.criteronType, criterion])
   );
 
   const mergedCriteria = supported.map((criterion) => ({
     ...criterion,
-    ...existingByKey.get(criterion.costingCriterionType || ""),
+    ...existingByKey.get(criterion.criteronType || ""),
   }));
 
   const enabledCriteria = mergedCriteria
@@ -74,7 +74,7 @@ export const getEnabledCostingCriteria = (resourceType) =>
   getEditableCostingCriteria(resourceType).filter((criterion) => criterion.enabled);
 
 export const isCriterionEnabled = (resourceType, key) =>
-  getEnabledCostingCriteria(resourceType).some((criterion) => criterion.costingCriterionType === key);
+  getEnabledCostingCriteria(resourceType).some((criterion) => criterion.criteronType === key);
 
 export const isRawValueMode = (resourceType) =>
   resourceType?.costingMode === "RAW_VALUE_ENTRY";
@@ -121,7 +121,7 @@ export const calculateConfiguredSubtotal = (item) => {
   }
 
   return getEnabledCostingCriteria(item?.resourceType).reduce(
-    (total, criterion) => total + calculateCriterionCost(item, criterion.costingCriterionType),
+    (total, criterion) => total + calculateCriterionCost(item, criterion.criteronType),
     0
   );
 };

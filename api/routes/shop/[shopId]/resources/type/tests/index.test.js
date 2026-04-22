@@ -43,31 +43,31 @@ describe("/shop/[shopId]/resources/type", () => {
     expect(res.status).toBe(200);
     expect(res.body.resourceType.costingCriteria).toEqual([
       expect.objectContaining({
-        costingCriterionType: "RESOURCE_TIME",
+        criteronType: "RESOURCE_TIME",
         label: "Resource Time",
         enabled: true,
         displayOrder: 0,
       }),
       expect.objectContaining({
-        costingCriterionType: "PROCESSING_TIME",
+        criteronType: "PROCESSING_TIME",
         label: "Processing Time",
         enabled: true,
         displayOrder: 1,
       }),
       expect.objectContaining({
-        costingCriterionType: "UNIT_RUNS",
+        criteronType: "UNIT_RUNS",
         label: "Unit runs",
         enabled: true,
         displayOrder: 2,
       }),
       expect.objectContaining({
-        costingCriterionType: "PRIMARY_MATERIAL",
+        criteronType: "PRIMARY_MATERIAL",
         label: "Material quantity",
         enabled: true,
         displayOrder: 3,
       }),
       expect.objectContaining({
-        costingCriterionType: "SECONDARY_MATERIAL",
+        criteronType: "SECONDARY_MATERIAL",
         label: "Secondary Material quantity",
         enabled: false,
         displayOrder: 4,
@@ -88,7 +88,7 @@ describe("/shop/[shopId]/resources/type", () => {
     expect(res.status).toBe(200);
     expect(res.body.resourceType.costingCriteria).toEqual([
       expect.objectContaining({
-        costingCriterionType: "RAW_VALUE",
+        criteronType: "RAW_VALUE",
         label: "Raw value",
         enabled: true,
         displayOrder: 0,
@@ -106,7 +106,7 @@ describe("/shop/[shopId]/resources/type", () => {
           createMany: {
             data: [
               {
-                costingCriterionType: "RAW_VALUE",
+                criteronType: "RAW_VALUE",
                 label: "Raw value",
                 enabled: true,
                 displayOrder: 0,
@@ -125,13 +125,13 @@ describe("/shop/[shopId]/resources/type", () => {
       .send({
         criteria: [
           {
-            costingCriterionType: "RAW_VALUE",
+            criteronType: "RAW_VALUE",
             label: "Raw value",
             enabled: true,
             displayOrder: 0,
           },
           {
-            costingCriterionType: "RESOURCE_TIME",
+            criteronType: "RESOURCE_TIME",
             label: "Resource Time",
             enabled: true,
             displayOrder: 1,
@@ -153,7 +153,7 @@ describe("/shop/[shopId]/resources/type", () => {
           createMany: {
             data: [
               {
-                costingCriterionType: "UNIT_RUNS",
+                criteronType: "UNIT_RUNS",
                 label: "Unit runs",
                 enabled: true,
                 displayOrder: 0,
@@ -172,7 +172,7 @@ describe("/shop/[shopId]/resources/type", () => {
       .send({
         criteria: [
           {
-            costingCriterionType: "RAW_VALUE",
+            criteronType: "RAW_VALUE",
             label: "Raw value",
             enabled: true,
             displayOrder: 0,
@@ -191,7 +191,7 @@ describe("/shop/[shopId]/resources/type", () => {
       .send({
         criteria: [
           {
-            costingCriterionType: "UNIT_RUNS",
+            criteronType: "UNIT_RUNS",
             label: "Unit runs",
             enabled: false,
             displayOrder: 0,
