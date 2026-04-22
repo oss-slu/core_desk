@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 // eslint-disable-next-line no-unused-vars
 import express from "express";
+import { recordSpanError, tracer } from "./telemetry.js";
 
 /**
  * Checks if a given file path corresponds to a test file.
@@ -67,6 +68,88 @@ function getRoutePathFromFile(filePath, routesDir) {
  * @param {string} routesDir - The absolute path to the routes directory.
  */
 async function registerRoutes(app, routesDir) {
+  function wrapHandler({ handler, method, routePath, filePath, index }) {
+    if (typeof handler !== "function") {
+      return handler;
+    }
+
+    const handlerName = handler.name || `handler_${index}`;
+
+    return function tracedRouteHandler(req, res, next) {
+      return tracer.startActiveSpan(
+        `express.${method.toLowerCase()} ${routePath}`,
+        {
+          attributes: {
+            "http.request.method": method.toUpperCase(),
+            "http.route": routePath,
+            "code.function": handlerName,
+            "coredesk.route.file": path.relative(process.cwd(), filePath),
+            "coredesk.route.handler_index": index,
+          },
+        },
+        async (span) => {
+          let spanEnded = false;
+
+          const finishSpan = (error) => {
+            if (spanEnded) {
+              return;
+            }
+
+            spanEnded = true;
+            span.setAttribute("http.response.status_code", res.statusCode);
+
+            if (req.user?.id) {
+              span.setAttribute("enduser.id", req.user.id);
+            }
+
+            if (req.params?.shopId) {
+              span.setAttribute("coredesk.shop.id", req.params.shopId);
+            }
+
+            if (error) {
+              recordSpanError(span, error);
+            }
+
+            span.end();
+          };
+
+          const tracedNext = (error) => {
+            finishSpan(error);
+            return next(error);
+          };
+
+          try {
+            const result = handler(req, res, tracedNext);
+
+            if (result && typeof result.then === "function") {
+              return result.then(
+                (value) => {
+                  if (handler.length < 3) {
+                    finishSpan();
+                  }
+                  return value;
+                },
+                (error) => {
+                  finishSpan(error);
+                  throw error;
+                },
+              );
+            }
+
+            if (handler.length < 3) {
+              finishSpan();
+            }
+
+            return result;
+          } catch (error) {
+            finishSpan(error);
+            throw error;
+          }
+        },
+      );
+    };
+  }
+
   async function traverseDir(dir) {
     const files = fs.readdirSync(dir);
     for (const file of files) {
@@ -89,7 +172,18 @@ async function registerRoutes(app, routesDir) {
             const handlers = Array.isArray(routeModule[method])
               ? routeModule[method]
               : [routeModule[method]];
-            app[method](routePath, ...handlers);
+            app[method](
+              routePath,
+              ...handlers.map((handler, index) =>
+                wrapHandler({
+                  handler,
+                  method,
+                  routePath,
+                  filePath,
+                  index,
+                }),
+              ),
+            );
             // console.log(
             //   `Registered route ${method.toUpperCase()} ${routePath}`
             // );
@@ -101,7 +195,18 @@ async function registerRoutes(app, routesDir) {
           const handlers = Array.isArray(routeModule.del)
             ? routeModule.del
             : [routeModule.del];
-          app.delete(routePath, ...handlers);
+          app.delete(
+            routePath,
+            ...handlers.map((handler, index) =>
+              wrapHandler({
+                handler,
+                method: "delete",
+                routePath,
+                filePath,
+                index,
+              }),
+            ),
+          );
           // console.log(`Registered route DELETE ${routePath}`);
         }
       }

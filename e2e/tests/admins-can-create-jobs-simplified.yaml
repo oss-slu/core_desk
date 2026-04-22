@@ -1,0 +1,94 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
+
+name: Admins can create jobs within simplified flow
+seedFile: fixtures/simplified-flow.sql
+
+steps:
+  - open: /
+
+  - setViewport:
+      width: 1280
+      height: 720
+
+  - authenticateUser:
+      email: admin@coredesk-test.slu.edu
+
+
+  - tapOn:
+      text: Test Admin
+
+  - tapOn:
+      text: Simplified
+
+  - waitFor: 1200
+
+  # # -------------------- CREATE JOB --------------------
+
+  - typeText:
+      placeholder: e.g. Wind Mill Assembly
+      text: E2E Test Job
+
+  - tapOn:
+      text: Next
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      text: Continue set-up
+
+  - tapOn:
+      text: Select a type
+
+  - waitFor: 500
+
+  - tapOn:
+      text: FDM 3D Printer
+  
+  - waitFor: 1200
+
+  - tapOn:
+      text: Select a resource
+
+  - waitFor: 1200
+
+  - tapOn:
+      text: Lab X1C
+
+
+  - waitFor: 1200
+
+
+  - tapOn:
+      text: Select a material
+
+  - tapOn:
+      text: PLA
+
+  - waitFor: 1200
+
+
+  - tapOn:
+      text: Next
+      exact: true
+
+
+  - selectFile:
+      selector: 'input[type="file"]'
+      filePath: cypress/fixtures/test-image.png
+
+
+  - tapOn:
+      text: Upload
+      exact: true
+
+  - waitFor: 1200
+
+  - tapOn:
+      text: Next
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      text: We have received your request.

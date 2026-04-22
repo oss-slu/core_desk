@@ -131,6 +131,22 @@ export const selectInvoiceCustomer = ({
   };
 };
 
+const calculateResourceAndMaterialLinePrice = (line) => {
+  let total = 0;
+
+  total += (line.unitQty || 0) * (line.resource?.costPerUnit || 0);
+  total += (line.timeQty || 0) * (line.resource?.costPerTime || 0);
+  total +=
+    (line.processingTimeQty || 0) *
+    (line.resource?.costPerProcessingTime || 0);
+  total += (line.materialQty || 0) * (line.material?.costPerUnit || 0);
+  total +=
+    (line.secondaryMaterialQty || 0) *
+    (line.secondaryMaterial?.costPerUnit || 0);
+
+  return total;
+};
+
 export const calculateTotalCostOfJob = (data) => {
   let totalCost = 0;
 
@@ -190,6 +206,7 @@ export const calculateTotalCostOfJob = (data) => {
         (cost.secondaryMaterialQty || 0) *
         (cost.secondaryMaterial?.costPerUnit || 0);
     }
+    totalCost += calculateResourceAndMaterialLinePrice(cost);
   });
 
   // if additionalCostOverride is true, return totalCost
@@ -251,6 +268,7 @@ export const calculateTotalCostOfJob = (data) => {
     }
 
     totalCost += localTotalCost * (item.qty ?? 1);
+    totalCost += calculateResourceAndMaterialLinePrice(item) * (item.qty ?? 1);
   });
 
   return totalCost;
@@ -304,7 +322,7 @@ const calculateJobItemLinePrice = (item) => {
       (item.secondaryMaterial?.costPerUnit || 0);
   }
 
-  return linePrice;
+  return calculateResourceAndMaterialLinePrice(item);
 };
 
 const calculateAdditionalCostLinePrice = (cost) => {
@@ -359,7 +377,7 @@ const calculateAdditionalCostLinePrice = (cost) => {
       (cost.secondaryMaterial?.costPerUnit || 0);
   }
 
-  return linePrice;
+  return calculateResourceAndMaterialLinePrice(cost);
 };
 
 const buildInvoiceRows = (job) => {

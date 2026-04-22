@@ -6,8 +6,8 @@
   "scripts": {
     "test": "./scripts/run-integration.sh",
     "prisma:generate": "prisma generate --config prisma.config.ts",
-    "start": "npm run prisma:generate && node --import tsx index.js",
-    "dev": "npm run prisma:generate && nodemon --exec \"node --import tsx\" index.js",
+    "start": "npm run prisma:generate && node --import ./telemetry/register.js --import tsx index.js",
+    "dev": "npm run prisma:generate && nodemon --exec \"node --import ./telemetry/register.js --import tsx\" index.js",
     "coverage": "yarn test --coverage --ui",
     "lint": "eslint .",
     "okta": "npm run prisma:generate && node --import tsx util/generateToken.js"
@@ -17,6 +17,11 @@
   "license": "ISC",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.864.0",
+    "@opentelemetry/api": "^1.9.1",
+    "@opentelemetry/auto-instrumentations-node": "^0.73.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.215.0",
+    "@opentelemetry/resources": "^2.7.0",
+    "@opentelemetry/sdk-node": "^0.215.0",
     "@prisma/adapter-pg": "^7.0.0",
     "@prisma/client": "^7.5.0",
     "@scalenc/stl-to-png": "^1.2.0",

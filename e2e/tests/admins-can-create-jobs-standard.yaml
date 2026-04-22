@@ -1,0 +1,69 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
+
+name: Admins can create jobs within standard flow
+seedFile: fixtures/users.sql
+
+steps:
+  - open: /
+  - setViewport:
+      width: 1280
+      height: 720
+
+  - authenticateUser:
+      email: admin@coredesk-test.slu.edu
+
+  - tapOn:
+      text: Shops
+
+  - tapOn:
+      text: Create Shop
+
+  - typeText:
+      placeholder: e.g. South Campus Shop
+      text: E2E Test Shop
+
+  - tapOn:
+      text: Submit
+
+  - waitFor: 500
+
+  - assertVisible:
+      text: "E2E Test Shop"
+
+  ################################################################################
+
+  - tapOn:
+      text: E2E Test Shop
+
+  - waitFor: 200
+
+  - tapOn:
+      text: Jobs
+
+  - waitFor: 200
+
+  - tapOn:
+      text: Create Job
+
+  - waitFor: 200
+
+  - typeText:
+      placeholder: e.g. Wind Mill Assembly
+      text: E2E Test Job
+
+  - tapOn:
+      text: Submit
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      text: Back to jobs
+
+  - tapOn:
+      text: Back to jobs
+
+  - waitFor: 300
+
+  - assertVisible:
+      text: E2E Test Job
