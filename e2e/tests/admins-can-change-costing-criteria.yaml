@@ -1,0 +1,261 @@
+name: Admins can change costing criteria and verify job costing
+seedFile: fixtures/users.sql
+steps:
+  - open: /
+  - setViewport:
+      width: 1280
+      height: 720
+  - authenticateUser:
+      email: admin@coredesk-test.slu.edu
+
+# -------------------- CREATE SHOP --------------------
+
+  - tapOn:
+      text: Shops
+
+  - tapOn:
+      text: Create Shop
+
+  - typeText:
+      placeholder: e.g. South Campus Shop
+      text: E2E Test Shop
+
+  - tapOn:
+      text: Submit
+
+  - waitFor: 800
+
+  - assertVisible:
+      text: E2E Test Shop
+
+# -------------------- ADD RESOURCE TYPE --------------------
+
+  - tapOn:
+      text: E2E Test Shop
+  - waitFor: 300
+  - tapOn:
+      text: Resources
+  - waitFor: 300
+  - tapOn:
+      text: Add...
+  - waitFor: 300
+  - tapOn:
+      text: Create Resource Type
+  - waitFor: 300
+  - typeText:
+      placeholder: e.g. 3D Printer
+      text: E2E Test Resource Type
+  - tapOn:
+      text: Submit
+  - waitFor: 1200
+  - assertVisible:
+      text: E2E Test Resource Type
+
+# -------------------- CREATE RESOURCE --------------------
+
+  - tapOn:
+      text: Resource options
+  - waitFor: 300
+  - tapOn:
+      text: Add Resource
+  - waitFor: 300
+  - typeText:
+      placeholder: e.g. Lab X1C
+      text: E2E Test Resource
+  - tapOn:
+      text: Submit
+  - waitFor: 1200
+  - assertVisible:
+      text: E2E Test Resource
+
+# -------------------- CREATE MATERIAL --------------------
+
+  - tapOn:
+      text: Resource options
+  - waitFor: 300
+  - tapOn:
+      text: Add Material
+  - waitFor: 300
+  - typeText:
+      placeholder: Acrylic, PLA, Pinewood
+      text: E2E Test Material
+  - typeText:
+      placeholder: Stratasys, BASF, Generic
+      text: Generic
+  - tapOn:
+      text: Submit
+  - waitFor: 1200
+  - assertVisible:
+      text: E2E Test Material
+
+# -------------------- OPEN COSTING CRITERIA MODAL --------------------
+
+  - tapOn:
+      text: Resource options
+  - waitFor: 300
+  - tapOn:
+      text: Edit Costing Criteria
+  - waitFor: 300
+  - assertVisible:
+      modal: E2E Test Resource Type Costing Criteria
+
+# -------------------- ADD/EDIT COSTING CRITERION --------------------
+
+  - typeText:
+      placeholder: e.g. Material Cost
+      text: E2E Test Costing Criterion
+  - waitFor: 300
+  - tapOn:
+      text: Save Costing Criteria
+  - waitFor: 1200
+  - assertVisible:
+      text: E2E Test Costing Criterion
+
+# -------------------- VERIFY DEFAULT ENABLED CRITERIA --------------------
+
+  - tapOn:
+      text: Resource options
+  - waitFor: 300
+  - tapOn:
+      text: Edit Costing Criteria
+  - waitFor: 300
+  - assertVisible:
+      text: Resource Time
+  - assertVisible:
+      text: Processing Time
+  - assertVisible:
+      text: Unit runs
+  - assertVisible:
+      text: Material quantity
+  - assertVisible:
+      text: Secondary Material quantity
+
+# -------------------- DISABLE A DEFAULT CRITERION --------------------
+
+  - tapOn:
+      text: Secondary Material quantity
+  - waitFor: 300
+  - tapOn:
+      text: Save Costing Criteria
+  - waitFor: 1200
+  - assertVisible:
+      text: Secondary Material quantity
+
+# -------------------- VERIFY DISABLED CRITERION MOVED TO BOTTOM --------------------
+
+  - tapOn:
+      text: Resource options
+  - waitFor: 300
+  - tapOn:
+      text: Edit Costing Criteria
+  - waitFor: 300
+  # Check that disabled criteria appear after enabled ones
+  - assertVisible:
+      text: Disabled criteria
+  - assertVisible:
+      text: Secondary Material quantity
+
+# -------------------- RE-ENABLE THE CRITERION --------------------
+
+  - tapOn:
+      text: Secondary Material quantity
+  - waitFor: 300
+  - tapOn:
+      text: Save Costing Criteria
+  - waitFor: 1200
+  - assertVisible:
+      text: Secondary Material quantity
+
+# -------------------- VERIFY RE-ENABLED CRITERION MOVED TO TOP --------------------
+
+  - tapOn:
+      text: Resource options
+  - waitFor: 300
+  - tapOn:
+      text: Edit Costing Criteria
+  - waitFor: 300
+  # Should no longer see "Disabled criteria" section
+  - assertNotVisible:
+      text: Disabled criteria
+
+# -------------------- CREATE JOB --------------------
+
+  - tapOn:
+      text: Jobs
+  - waitFor: 300
+  - tapOn:
+      text: Create Job
+  - waitFor: 300
+  - typeText:
+      placeholder: e.g. Wind Mill Assembly
+      text: E2E Test Job
+  - tapOn:
+      text: Submit
+  - waitFor: 1200
+  - assertVisible:
+      text: Back to jobs
+  - tapOn:
+      text: Back to jobs
+  - waitFor: 300
+  - assertVisible:
+      text: E2E Test Job
+
+# -------------------- OPEN JOB COSTING --------------------
+
+  - tapOn:
+      text: E2E Test Job
+  - waitFor: 300
+  - tapOn:
+      text: Costing
+  - waitFor: 300
+  - assertVisible:
+      text: Project-wide costing
+
+# -------------------- VERIFY ENABLED CRITERIA IN COSTING --------------------
+
+  - tapOn:
+      text: Add another additional cost
+  - waitFor: 300
+  - tapOn:
+      text: E2E Test Resource Type
+  - waitFor: 300
+  - tapOn:
+      text: E2E Test Resource
+  - waitFor: 300
+  - tapOn:
+      text: E2E Test Material
+  - waitFor: 300
+  # Note: Only enabled criteria should be visible, but since we disabled the custom one,
+  # we should only see the default enabled criteria like Resource Time, etc.
+  - assertVisible:
+      text: Resource Time
+  - assertVisible:
+      text: Processing Time
+  - assertVisible:
+      text: Unit runs
+  - assertVisible:
+      text: Material quantity
+  # The custom criterion should not be visible since it's disabled
+  - assertNotVisible:
+      text: E2E Test Costing Criterion
+
+# -------------------- ENTER VALUES AND CHECK TOTAL --------------------
+
+  - typeText:
+      selector: 'input[placeholder="Hr"]'
+      text: 1
+  - waitFor: 300
+  - typeText:
+      selector: 'input[placeholder="Min"]'
+      text: 0
+  - waitFor: 300
+  - typeText:
+      selector: 'input[type="number"][style*="width: 112px"]'
+      text: 5
+  - waitFor: 300
+  - typeText:
+      selector: 'input[type="number"][style*="width: 112px"]'
+      text: 10
+  - waitFor: 300
+  - assertVisible:
+      text: $
