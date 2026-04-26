@@ -40,10 +40,10 @@ steps:
       text: Add...
   - waitFor: 300
   - assertVisible:
-      selector: ".dropdown-menu.show .dropdown-item"
+      selector: ".dropdown-menu:visible .dropdown-item"
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
+      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
   - waitFor: 300
   - typeText:
       parent: ".modal.show"
@@ -62,10 +62,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      selector: ".dropdown-menu.show .dropdown-item"
+      selector: ".dropdown-menu:visible .dropdown-item"
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu.show .dropdown-item:nth-child(4)"
+      selector: ".dropdown-menu:visible .dropdown-item:nth-child(4)"
   - waitFor: 300
   - typeText:
       parent: ".modal.show"
@@ -84,10 +84,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      selector: ".dropdown-menu.show .dropdown-item"
+      selector: ".dropdown-menu:visible .dropdown-item"
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu.show .dropdown-item:nth-child(3)"
+      selector: ".dropdown-menu:visible .dropdown-item:nth-child(3)"
   - waitFor: 300
   - typeText:
       parent: ".modal.show"
@@ -110,10 +110,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      selector: ".dropdown-menu.show .dropdown-item"
+      selector: ".dropdown-menu:visible .dropdown-item"
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
+      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -140,10 +140,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      selector: ".dropdown-menu.show .dropdown-item"
+      selector: ".dropdown-menu:visible .dropdown-item"
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
+      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -178,10 +178,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      selector: ".dropdown-menu.show .dropdown-item"
+      selector: ".dropdown-menu:visible .dropdown-item"
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
+      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -210,10 +210,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      selector: ".dropdown-menu.show .dropdown-item"
+      selector: ".dropdown-menu:visible .dropdown-item"
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
+      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
   - waitFor: 300
   - assertNotVisible:
       parent: ".modal.show"
