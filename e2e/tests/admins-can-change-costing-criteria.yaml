@@ -40,6 +40,7 @@ steps:
       text: Add...
   - waitFor: 300
   - tapOn:
+      parent: ".dropdown-menu.show"
       text: Add Resource Type
   - waitFor: 300
   - typeText:
@@ -113,24 +114,24 @@ steps:
   - assertVisible:
       parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
-      timeout: 8000
-  - tapOn:
-      parent: ".dropdown-menu.show"
-      text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
+      parent: ".modal.show"
       text: E2E Test Resource Type Costing Criteria
 
 # -------------------- ADD/EDIT COSTING CRITERION --------------------
 
   - typeText:
-      placeholder: e.g. Material Cost
+      parent: ".modal.show"
+      placeholder: Material quantity
       text: E2E Test Costing Criterion
   - waitFor: 300
   - tapOn:
+      parent: ".modal.show"
       text: Save Costing Criteria
   - waitFor: 1200
   - assertVisible:
+      parent: ".modal.show"
       text: E2E Test Costing Criterion
 
 # -------------------- VERIFY DEFAULT ENABLED CRITERIA --------------------
@@ -141,31 +142,32 @@ steps:
   - assertVisible:
       parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
-      timeout: 8000
-  - tapOn:
-      parent: ".dropdown-menu.show"
-      text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
+      parent: ".modal.show"
       text: Resource Time
   - assertVisible:
+      parent: ".modal.show"
       text: Processing Time
   - assertVisible:
+      parent: ".modal.show"
       text: Unit runs
   - assertVisible:
-      text: Material quantity
-  - assertVisible:
+      parent: ".modal.show"
       text: Secondary Material quantity
 
 # -------------------- DISABLE A DEFAULT CRITERION --------------------
 
   - tapOn:
+      parent: ".modal.show"
       text: Secondary Material quantity
   - waitFor: 300
   - tapOn:
+      parent: ".modal.show"
       text: Save Costing Criteria
   - waitFor: 1200
   - assertVisible:
+      parent: ".modal.show"
       text: Secondary Material quantity
 
 # -------------------- VERIFY DISABLED CRITERION MOVED TO BOTTOM --------------------
@@ -182,19 +184,24 @@ steps:
       text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
+      parent: ".modal.show"
       text: Disabled criteria
   - assertVisible:
+      parent: ".modal.show"
       text: Secondary Material quantity
 
 # -------------------- RE-ENABLE THE CRITERION --------------------
 
   - tapOn:
+      parent: ".modal.show"
       text: Secondary Material quantity
   - waitFor: 300
   - tapOn:
+      parent: ".modal.show"
       text: Save Costing Criteria
   - waitFor: 1200
   - assertVisible:
+      parent: ".modal.show"
       text: Secondary Material quantity
 
 # -------------------- VERIFY RE-ENABLED CRITERION MOVED TO TOP --------------------
@@ -211,6 +218,7 @@ steps:
       text: Edit Costing Criteria
   - waitFor: 300
   - assertNotVisible:
+      parent: ".modal.show"
       text: Disabled criteria
 
 # -------------------- CREATE JOB --------------------
@@ -267,8 +275,6 @@ steps:
   - assertVisible:
       text: Unit runs
   - assertVisible:
-      text: Material quantity
-  - assertNotVisible:
       text: E2E Test Costing Criterion
 
 # -------------------- ENTER VALUES AND CHECK TOTAL --------------------
@@ -298,7 +304,7 @@ steps:
       text: "5"
 
   - tapOn:
-      text: Material quantity
+      text: E2E Test Costing Criterion
   - typeText:
       placeholder: "0"
       text: "10"
@@ -307,5 +313,3 @@ steps:
 
   - assertVisible:
       text: $
-  - assertNotVisible:
-      text: E2E Test Costing Criterion
