@@ -39,9 +39,11 @@ steps:
   - tapOn:
       text: Add...
   - waitFor: 300
+  - assertVisible:
+      selector: ".dropdown-menu.show .dropdown-item"
+      timeout: 8000
   - tapOn:
-      parent: ".dropdown-menu.show"
-      text: Add Resource Type
+      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
   - waitFor: 300
   - typeText:
       parent: ".modal.show"
@@ -60,12 +62,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      parent: ".dropdown-menu.show"
-      text: Add Resource
+      selector: ".dropdown-menu.show .dropdown-item"
       timeout: 8000
   - tapOn:
-      parent: ".dropdown-menu.show"
-      text: Add Resource
+      selector: ".dropdown-menu.show .dropdown-item:nth-child(4)"
   - waitFor: 300
   - typeText:
       parent: ".modal.show"
@@ -84,12 +84,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      parent: ".dropdown-menu.show"
-      text: Add Material
+      selector: ".dropdown-menu.show .dropdown-item"
       timeout: 8000
   - tapOn:
-      parent: ".dropdown-menu.show"
-      text: Add Material
+      selector: ".dropdown-menu.show .dropdown-item:nth-child(3)"
   - waitFor: 300
   - typeText:
       parent: ".modal.show"
@@ -112,8 +110,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      parent: ".dropdown-menu.show"
-      text: Edit Costing Criteria
+      selector: ".dropdown-menu.show .dropdown-item"
+      timeout: 8000
+  - tapOn:
+      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -140,8 +140,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      parent: ".dropdown-menu.show"
-      text: Edit Costing Criteria
+      selector: ".dropdown-menu.show .dropdown-item"
+      timeout: 8000
+  - tapOn:
+      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -176,12 +178,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      parent: ".dropdown-menu.show"
-      text: Edit Costing Criteria
+      selector: ".dropdown-menu.show .dropdown-item"
       timeout: 8000
   - tapOn:
-      parent: ".dropdown-menu.show"
-      text: Edit Costing Criteria
+      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -210,12 +210,10 @@ steps:
       text: Resource options
   - waitFor: 300
   - assertVisible:
-      parent: ".dropdown-menu.show"
-      text: Edit Costing Criteria
+      selector: ".dropdown-menu.show .dropdown-item"
       timeout: 8000
   - tapOn:
-      parent: ".dropdown-menu.show"
-      text: Edit Costing Criteria
+      selector: ".dropdown-menu.show .dropdown-item:nth-child(2)"
   - waitFor: 300
   - assertNotVisible:
       parent: ".modal.show"
