@@ -59,13 +59,7 @@ steps:
 # -------------------- CREATE RESOURCE --------------------
 
   - tapOn:
-      text: Resource options
-  - waitFor: 300
-  - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
-      timeout: 8000
-  - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(4)"
+      text: Add Resource
   - waitFor: 300
   - typeText:
       parent: ".modal.show"
@@ -81,13 +75,7 @@ steps:
 # -------------------- CREATE MATERIAL --------------------
 
   - tapOn:
-      text: Resource options
-  - waitFor: 300
-  - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
-      timeout: 8000
-  - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(3)"
+      text: Add Material
   - waitFor: 300
   - typeText:
       parent: ".modal.show"
@@ -107,13 +95,7 @@ steps:
 # -------------------- OPEN COSTING CRITERIA MODAL --------------------
 
   - tapOn:
-      text: Resource options
-  - waitFor: 300
-  - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
-      timeout: 8000
-  - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
+      text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -137,13 +119,7 @@ steps:
 # -------------------- VERIFY DEFAULT ENABLED CRITERIA --------------------
 
   - tapOn:
-      text: Resource options
-  - waitFor: 300
-  - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
-      timeout: 8000
-  - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
+      text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -175,13 +151,7 @@ steps:
 # -------------------- VERIFY DISABLED CRITERION MOVED TO BOTTOM --------------------
 
   - tapOn:
-      text: Resource options
-  - waitFor: 300
-  - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
-      timeout: 8000
-  - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
+      text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
       parent: ".modal.show"
@@ -207,13 +177,7 @@ steps:
 # -------------------- VERIFY RE-ENABLED CRITERION MOVED TO TOP --------------------
 
   - tapOn:
-      text: Resource options
-  - waitFor: 300
-  - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
-      timeout: 8000
-  - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
+      text: Edit Costing Criteria
   - waitFor: 300
   - assertNotVisible:
       parent: ".modal.show"
