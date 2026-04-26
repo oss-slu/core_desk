@@ -97,7 +97,7 @@ steps:
       text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
-      modal: E2E Test Resource Type Costing Criteria
+      text: E2E Test Resource Type Costing Criteria
 
 # -------------------- ADD/EDIT COSTING CRITERION --------------------
 
