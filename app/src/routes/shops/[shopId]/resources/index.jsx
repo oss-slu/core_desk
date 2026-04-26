@@ -487,7 +487,7 @@ const CostingCriteriaEditor = ({
         )}
         {disabledCriteria.length > 0 ? (
           <>
-            <span className="form-label">Disabled criteria</span>
+            <p className="form-label">Disabled criteria</p>
             {disabledCriteria.map((criterion, index) =>
               renderCriterionRow(criterion, index, false)
             )}
