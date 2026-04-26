@@ -240,31 +240,31 @@ steps:
       text: Resource Time
   - typeText:
       placeholder: Hr
-      text: 1
+      text: "1"
   - typeText:
       placeholder: Min
-      text: 0
+      text: "0"
 
   - tapOn:
       text: Processing Time
   - typeText:
       placeholder: Hr
-      text: 0
+      text: "0"
   - typeText:
       placeholder: Min
-      text: 30
+      text: "30"
 
   - tapOn:
       text: Unit runs
   - typeText:
       placeholder: e.g. 5
-      text: 5
+      text: "5"
 
   - tapOn:
       text: Material quantity
   - typeText:
       placeholder: e.g. 10
-      text: 10
+      text: "10"
 
   - waitFor: 500
 
