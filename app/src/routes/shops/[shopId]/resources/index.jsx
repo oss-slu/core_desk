@@ -276,7 +276,7 @@ const ResourceType = ({
   );
 };
 
-const CostingCriteriaSummary = ({ resourceType, admin, onEdit }) => {
+const CostingCriteriaSummary = ({ resourceType }) => {
   const enabledCriteria = getEnabledCostingCriteria(resourceType);
 
   return (
