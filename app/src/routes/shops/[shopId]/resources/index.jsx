@@ -24,9 +24,11 @@ import { Loading } from "#loading";
 import { Icon } from "#icon";
 import { Table } from "#table";
 import { Spinner } from "#spinner";
+import { useModal } from "#modal";
 import { NotFound } from "../../../../components/404/404";
 import toast from "react-hot-toast";
 import {
+  getEnabledCostingCriteria,
   getEditableCostingCriteria,
   moveArrayItem,
 } from "../../../../util/costingCriteria";
@@ -168,9 +170,26 @@ const ResourceType = ({
     resourceType.title,
     resourceType.costingMode
   );
+  const {
+    modal: openCostingCriteriaModal,
+    ModalElement: CostingCriteriaModalElement,
+    close: closeCostingCriteriaModal,
+  } = useModal({
+    title: `${resourceType.title} Costing Criteria`,
+    text: (
+      <CostingCriteriaEditor
+        resourceType={resourceType}
+        admin={admin}
+        updateCostingCriteria={updateCostingCriteria}
+        loading={opLoading}
+        onSaved={() => closeCostingCriteriaModal()}
+      />
+    ),
+  });
 
   const resourceItems = [
     { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={editResourceType}><Icon i="tools" /> Edit Resource Type</p> },
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={openCostingCriteriaModal}><Icon i="list-check" /> Edit Costing Criteria</p> },
     { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createMaterial}><Icon i="sandbox" /> Add Material</p> },
     { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createResource}><Icon i="tool" /> Add Resource</p> },
     { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={async () => {
@@ -196,12 +215,12 @@ const ResourceType = ({
           />
         )}
         {EditResourceTypeModalElement}
+        {CostingCriteriaModalElement}
       </Util.Row>
-      <CostingCriteriaEditor
+      <CostingCriteriaSummary
         resourceType={resourceType}
         admin={admin}
-        updateCostingCriteria={updateCostingCriteria}
-        loading={opLoading}
+        onEdit={openCostingCriteriaModal}
       />
       <Util.Spacer size={1} />
       <Util.Spacer size={1} />
@@ -257,11 +276,41 @@ const ResourceType = ({
   );
 };
 
+const CostingCriteriaSummary = ({ resourceType, admin, onEdit }) => {
+  const enabledCriteria = getEnabledCostingCriteria(resourceType);
+
+  return (
+    <div>
+      <Util.Row justify="between" align="start" gap={1} wrap>
+        <div>
+          <H3>Costing Criteria</H3>
+          <p style={{ marginTop: 0, marginBottom: 8 }}>
+            {enabledCriteria.length > 0
+              ? "Enabled criteria are shown in billing order."
+              : "No costing criteria are currently enabled."}
+          </p>
+        </div>
+      </Util.Row>
+      <Util.Row gap={0.5} wrap>
+        {enabledCriteria.map((criterion, index) => (
+          <Badge key={criterion.criterionType || criterion.key} soft color="blue">
+            {index + 1}. {criterion.label}
+          </Badge>
+        ))}
+        {enabledCriteria.length === 0 ? (
+          <Badge soft color="secondary">None enabled</Badge>
+        ) : null}
+      </Util.Row>
+    </div>
+  );
+};
+
 const CostingCriteriaEditor = ({
   resourceType,
   admin,
   updateCostingCriteria,
   loading,
+  onSaved,
 }) => {
   const [criteria, setCriteria] = useState(getEditableCostingCriteria(resourceType));
   const [saving, setSaving] = useState(false);
@@ -279,7 +328,9 @@ const CostingCriteriaEditor = ({
   const setCriterion = (key, nextValues) => {
     setCriteria((currentCriteria) =>
       currentCriteria.map((criterion) =>
-        criterion.key === key ? { ...criterion, ...nextValues } : criterion
+        (criterion.key || criterion.criterionType) === key
+          ? { ...criterion, ...nextValues }
+          : criterion
       )
     );
   };
@@ -287,7 +338,9 @@ const CostingCriteriaEditor = ({
   const toggleCriterion = (key, enabled) => {
     setCriteria((currentCriteria) => {
       const nextCriteria = currentCriteria.map((criterion) =>
-        criterion.key === key ? { ...criterion, enabled } : criterion
+        (criterion.key || criterion.criterionType) === key
+          ? { ...criterion, enabled }
+          : criterion
       );
       const nextEnabled = nextCriteria.filter((criterion) => criterion.enabled);
       const nextDisabled = nextCriteria.filter((criterion) => !criterion.enabled);
@@ -317,13 +370,14 @@ const CostingCriteriaEditor = ({
         resourceType.id,
         criteria.map((criterion, displayOrder) => ({
           id: criterion.id,
-          key: criterion.key,
+          criterionType: criterion.key || criterion.criterionType,
           label: criterion.label,
           enabled: criterion.enabled,
           displayOrder,
         }))
       );
       toast.success("Costing criteria updated");
+      onSaved?.();
     } catch (error) {
       toast.error(error?.toString?.() || "Failed to update costing criteria");
     } finally {
@@ -333,7 +387,7 @@ const CostingCriteriaEditor = ({
 
   const renderCriterionRow = (criterion, index, enabledList = false) => (
     <Util.Row
-      key={criterion.key}
+      key={criterion.key || criterion.criterionType}
       gap={1}
       align="center"
       wrap
@@ -346,7 +400,9 @@ const CostingCriteriaEditor = ({
       <Input
         label={enabledList ? "Enabled criterion" : "Available criterion"}
         value={criterion.label}
-        onChange={(value) => setCriterion(criterion.key, { label: value })}
+        onChange={(value) =>
+          setCriterion(criterion.key || criterion.criterionType, { label: value })
+        }
         disabled={!admin}
       />
       <label className="form-label" style={{ marginBottom: 0 }}>
@@ -356,7 +412,12 @@ const CostingCriteriaEditor = ({
         <input
           type="checkbox"
           checked={criterion.enabled}
-          onChange={(event) => toggleCriterion(criterion.key, event.target.checked)}
+          onChange={(event) =>
+            toggleCriterion(
+              criterion.key || criterion.criterionType,
+              event.target.checked
+            )
+          }
         />
       ) : (
         <Badge soft color={criterion.enabled ? "green" : "secondary"}>
@@ -385,7 +446,13 @@ const CostingCriteriaEditor = ({
   );
 
   return (
-    <div>
+    <div
+      style={{
+        maxHeight: "70vh",
+        overflowY: "auto",
+        paddingRight: 4,
+      }}
+    >
       <H3>Costing Criteria</H3>
       <p style={{ marginTop: 0 }}>
         Enabled criteria appear in billing order. Disabled criteria stay here so
