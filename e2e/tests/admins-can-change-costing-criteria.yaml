@@ -26,7 +26,7 @@ steps:
   - waitFor: 800
 
   - assertVisible:
-      text: E2E Test Shop
+      text: "E2E Test Shop"
 
 # -------------------- ADD RESOURCE TYPE --------------------
 
@@ -49,7 +49,7 @@ steps:
       text: Submit
   - waitFor: 1200
   - assertVisible:
-      text: E2E Test Resource Type
+      text: "E2E Test Resource Type"
 
 # -------------------- CREATE RESOURCE --------------------
 
@@ -66,7 +66,7 @@ steps:
       text: Submit
   - waitFor: 1200
   - assertVisible:
-      text: E2E Test Resource
+      text: "E2E Test Resource"
 
 # -------------------- CREATE MATERIAL --------------------
 
@@ -86,7 +86,7 @@ steps:
       text: Submit
   - waitFor: 1200
   - assertVisible:
-      text: E2E Test Material
+      text: "E2E Test Material"
 
 # -------------------- OPEN COSTING CRITERIA MODAL --------------------
 
@@ -97,19 +97,19 @@ steps:
       text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
-      modal: E2E Test Resource Type Costing Criteria
+      modal: "E2E Test Resource Type Costing Criteria"
 
 # -------------------- ADD/EDIT COSTING CRITERION --------------------
 
   - typeText:
       placeholder: e.g. Material Cost
-      text: E2E Test Costing Criterion
+      text: "E2E Test Costing Criterion"
   - waitFor: 300
   - tapOn:
       text: Save Costing Criteria
   - waitFor: 1200
   - assertVisible:
-      text: E2E Test Costing Criterion
+      text: "E2E Test Costing Criterion"
 
 # -------------------- VERIFY DEFAULT ENABLED CRITERIA --------------------
 
@@ -120,15 +120,15 @@ steps:
       text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
-      text: Resource Time
+      text: "Resource Time"
   - assertVisible:
-      text: Processing Time
+      text: "Processing Time"
   - assertVisible:
-      text: Unit runs
+      text: "Unit runs"
   - assertVisible:
-      text: Material quantity
+      text: "Material quantity"
   - assertVisible:
-      text: Secondary Material quantity
+      text: "Secondary Material quantity"
 
 # -------------------- DISABLE A DEFAULT CRITERION --------------------
 
@@ -136,10 +136,10 @@ steps:
       text: Secondary Material quantity
   - waitFor: 300
   - tapOn:
-      text: Save Costing Criteria
+      text: "Save Costing Criteria"
   - waitFor: 1200
   - assertVisible:
-      text: Secondary Material quantity
+      text: "Secondary Material quantity"
 
 # -------------------- VERIFY DISABLED CRITERION MOVED TO BOTTOM --------------------
 
@@ -151,9 +151,9 @@ steps:
   - waitFor: 300
   # Check that disabled criteria appear after enabled ones
   - assertVisible:
-      text: Disabled criteria
+      text: "Disabled criteria"
   - assertVisible:
-      text: Secondary Material quantity
+      text: "Secondary Material quantity"
 
 # -------------------- RE-ENABLE THE CRITERION --------------------
 
@@ -164,7 +164,7 @@ steps:
       text: Save Costing Criteria
   - waitFor: 1200
   - assertVisible:
-      text: Secondary Material quantity
+      text: "Secondary Material quantity"
 
 # -------------------- VERIFY RE-ENABLED CRITERION MOVED TO TOP --------------------
 
@@ -176,7 +176,7 @@ steps:
   - waitFor: 300
   # Should no longer see "Disabled criteria" section
   - assertNotVisible:
-      text: Disabled criteria
+      text: "Disabled criteria"
 
 # -------------------- CREATE JOB --------------------
 
@@ -193,12 +193,12 @@ steps:
       text: Submit
   - waitFor: 1200
   - assertVisible:
-      text: Back to jobs
+      text: "Back to jobs"
   - tapOn:
       text: Back to jobs
   - waitFor: 300
   - assertVisible:
-      text: E2E Test Job
+      text: "E2E Test Job"
 
 # -------------------- OPEN JOB COSTING --------------------
 
@@ -209,7 +209,7 @@ steps:
       text: Costing
   - waitFor: 300
   - assertVisible:
-      text: Project-wide costing
+      text: "Project-wide costing"
 
 # -------------------- VERIFY ENABLED CRITERIA IN COSTING --------------------
 
@@ -228,34 +228,57 @@ steps:
   # Note: Only enabled criteria should be visible, but since we disabled the custom one,
   # we should only see the default enabled criteria like Resource Time, etc.
   - assertVisible:
-      text: Resource Time
+      text: "Resource Time"
   - assertVisible:
-      text: Processing Time
+      text: "Processing Time"
   - assertVisible:
-      text: Unit runs
+      text: "Unit runs"
   - assertVisible:
-      text: Material quantity
+      text: "Material quantity"
   # The custom criterion should not be visible since it's disabled
   - assertNotVisible:
-      text: E2E Test Costing Criterion
+      text: "E2E Test Costing Criterion"
 
 # -------------------- ENTER VALUES AND CHECK TOTAL --------------------
 
+  # Input values for each enabled criterion
+  # Resource Time: 1 hour = 1 * (resource cost per time)
+  - tapOn:
+      text: Resource Time
   - typeText:
-      selector: 'input[placeholder="Hr"]'
+      placeholder: Hr
       text: 1
-  - waitFor: 300
   - typeText:
-      selector: 'input[placeholder="Min"]'
+      placeholder: Min
       text: 0
-  - waitFor: 300
+
+  # Processing Time: 30 minutes = 0.5 * (resource cost per processing time)
+  - tapOn:
+      text: Processing Time
   - typeText:
-      selector: 'input[type="number"][style*="width: 112px"]'
+      placeholder: Hr
+      text: 0
+  - typeText:
+      placeholder: Min
+      text: 30
+
+  # Unit runs: 5 units = 5 * (resource cost per unit)
+  - tapOn:
+      text: Unit runs
+  - typeText:
       text: 5
-  - waitFor: 300
+
+  # Material quantity: 10 units = 10 * (material cost per unit)
+  - tapOn:
+      text: Material quantity
   - typeText:
-      selector: 'input[type="number"][style*="width: 112px"]'
       text: 10
-  - waitFor: 300
+
+  - waitFor: 500
+
+  # Verify that a total is calculated (dollar amount appears)
   - assertVisible:
       text: $
+  # Check that the disabled custom criterion is not included
+  - assertNotVisible:
+      text: E2E Test Costing Criterion
