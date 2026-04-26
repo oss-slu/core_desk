@@ -1,5 +1,8 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
+
 name: Admins can change costing criteria and verify job costing
 seedFile: fixtures/users.sql
+
 steps:
   - open: /
   - setViewport:
@@ -35,16 +38,19 @@ steps:
   - waitFor: 300
   - tapOn:
       text: Resources
-  - waitFor: 300
+  - waitFor: 400
+  - assertVisible:
+      text: Resources
   - tapOn:
       text: Add...
-  - waitFor: 300
-  - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
-      timeout: 8000
+  - waitFor: 500
   - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
-  - waitFor: 300
+      text: Add Resource Type
+  - waitFor: 800
+  - assertVisible:
+      text: Create a new Resource Type
+  - assertVisible:
+      placeholder: FDM 3d Printer
   - typeText:
       parent: ".modal.show"
       placeholder: FDM 3d Printer
@@ -52,6 +58,7 @@ steps:
   - tapOn:
       parent: ".modal.show"
       text: Submit
+      exact: true
   - waitFor: 1200
   - assertVisible:
       text: E2E Test Resource Type
@@ -60,13 +67,15 @@ steps:
 
   - tapOn:
       text: Resource options
-  - waitFor: 300
+  - waitFor: 1200
   - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
+      parent: ".dropdown-menu.show"
+      text: Add Resource
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(4)"
-  - waitFor: 300
+      parent: ".dropdown-menu.show"
+      text: Add Resource
+  - waitFor: 800
   - typeText:
       parent: ".modal.show"
       placeholder: Bambu Lab X1C
@@ -74,6 +83,7 @@ steps:
   - tapOn:
       parent: ".modal.show"
       text: Submit
+      exact: true
   - waitFor: 1200
   - assertVisible:
       text: E2E Test Resource
@@ -82,13 +92,15 @@ steps:
 
   - tapOn:
       text: Resource options
-  - waitFor: 300
+  - waitFor: 1200
   - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
+      parent: ".dropdown-menu.show"
+      text: Add Material
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(3)"
-  - waitFor: 300
+      parent: ".dropdown-menu.show"
+      text: Add Material
+  - waitFor: 800
   - typeText:
       parent: ".modal.show"
       placeholder: Acrylic, PLA, Pinewood
@@ -100,6 +112,7 @@ steps:
   - tapOn:
       parent: ".modal.show"
       text: Submit
+      exact: true
   - waitFor: 1200
   - assertVisible:
       text: E2E Test Material
@@ -108,13 +121,15 @@ steps:
 
   - tapOn:
       text: Resource options
-  - waitFor: 300
+  - waitFor: 1200
   - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
-  - waitFor: 300
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
+  - waitFor: 800
   - assertVisible:
       parent: ".modal.show"
       text: E2E Test Resource Type Costing Criteria
@@ -131,20 +146,21 @@ steps:
       text: Save Costing Criteria
   - waitFor: 1200
   - assertVisible:
-      parent: ".modal.show"
       text: E2E Test Costing Criterion
 
 # -------------------- VERIFY DEFAULT ENABLED CRITERIA --------------------
 
   - tapOn:
       text: Resource options
-  - waitFor: 300
+  - waitFor: 1200
   - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
-  - waitFor: 300
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
+  - waitFor: 800
   - assertVisible:
       parent: ".modal.show"
       text: Resource Time
@@ -176,13 +192,15 @@ steps:
 
   - tapOn:
       text: Resource options
-  - waitFor: 300
+  - waitFor: 1200
   - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
-  - waitFor: 300
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
+  - waitFor: 800
   - assertVisible:
       parent: ".modal.show"
       text: Disabled criteria
@@ -208,13 +226,15 @@ steps:
 
   - tapOn:
       text: Resource options
-  - waitFor: 300
+  - waitFor: 1200
   - assertVisible:
-      selector: ".dropdown-menu:visible .dropdown-item"
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
       timeout: 8000
   - tapOn:
-      selector: ".dropdown-menu:visible .dropdown-item:nth-child(2)"
-  - waitFor: 300
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
+  - waitFor: 800
   - assertNotVisible:
       parent: ".modal.show"
       text: Disabled criteria
@@ -226,12 +246,13 @@ steps:
   - waitFor: 300
   - tapOn:
       text: Create Job
-  - waitFor: 300
+  - waitFor: 500
   - typeText:
       placeholder: e.g. Wind Mill Assembly
       text: E2E Test Job
   - tapOn:
       text: Submit
+      exact: true
   - waitFor: 1200
   - assertVisible:
       text: Back to jobs
