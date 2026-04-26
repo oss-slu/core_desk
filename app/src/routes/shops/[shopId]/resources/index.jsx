@@ -313,16 +313,6 @@ const CostingCriteriaSummary = ({ resourceType, admin, onEdit }) => {
               : "No costing criteria are currently enabled."}
           </p>
         </div>
-        {admin ? (
-          <Button
-            size="sm"
-            outline
-            onClick={onEdit}
-            data-cy={`edit-costing-criteria-${resourceType.id}`}
-          >
-            Edit Costing Criteria
-          </Button>
-        ) : null}
       </Util.Row>
       <Util.Row gap={0.5} wrap>
         {enabledCriteria.map((criterion, index) => (
