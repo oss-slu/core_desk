@@ -142,6 +142,8 @@ const CostCard = ({
   const selectedResourceType =
     resourceTypes?.find((_) => _.id === localLineItem?.resourceTypeId) ||
     localLineItem?.resourceType;
+  const getCriterionKey = (criterion) =>
+    criterion?.key || criterion?.criterionType;
 
   const isRawMode = isRawValueMode(selectedResourceType);
   const enabledCriteria = getEnabledCostingCriteria(selectedResourceType);
@@ -206,18 +208,20 @@ const CostCard = ({
     };
 
     enabledCriteria.forEach((criterion) => {
-      if (criterion.key === "RAW_VALUE") payload.rawValue = localLineItem.rawValue;
-      if (criterion.key === "RESOURCE_TIME") {
+      const criterionKey = getCriterionKey(criterion);
+
+      if (criterionKey === "RAW_VALUE") payload.rawValue = localLineItem.rawValue;
+      if (criterionKey === "RESOURCE_TIME") {
         payload.timeQty = localLineItem.timeQty;
       }
-      if (criterion.key === "PROCESSING_TIME") {
+      if (criterionKey === "PROCESSING_TIME") {
         payload.processingTimeQty = localLineItem.processingTimeQty;
       }
-      if (criterion.key === "UNIT_RUNS") payload.unitQty = localLineItem.unitQty;
-      if (criterion.key === "PRIMARY_MATERIAL") {
+      if (criterionKey === "UNIT_RUNS") payload.unitQty = localLineItem.unitQty;
+      if (criterionKey === "PRIMARY_MATERIAL") {
         payload.materialQty = localLineItem.materialQty;
       }
-      if (criterion.key === "SECONDARY_MATERIAL") {
+      if (criterionKey === "SECONDARY_MATERIAL") {
         payload.secondaryMaterialQty = localLineItem.secondaryMaterialQty;
       }
     });
@@ -421,10 +425,12 @@ const CostCard = ({
               ) : (
                 <Util.Col gap={0}>
                   {enabledCriteria.map((criterion) => {
-                    if (criterion.key === "RESOURCE_TIME") {
+                    const criterionKey = getCriterionKey(criterion);
+
+                    if (criterionKey === "RESOURCE_TIME") {
                       return (
                         <TimeInput
-                          key={criterion.key}
+                          key={criterionKey}
                           label={criterion.label}
                           timeQty={localLineItem.timeQty || 0}
                           costPerTime={resource?.costPerTime || 0}
@@ -435,10 +441,10 @@ const CostCard = ({
                         />
                       );
                     }
-                    if (criterion.key === "PROCESSING_TIME") {
+                    if (criterionKey === "PROCESSING_TIME") {
                       return (
                         <TimeInput
-                          key={criterion.key}
+                          key={criterionKey}
                           label={criterion.label}
                           timeQty={localLineItem.processingTimeQty || 0}
                           costPerTime={resource?.costPerProcessingTime || 0}
@@ -452,10 +458,10 @@ const CostCard = ({
                         />
                       );
                     }
-                    if (criterion.key === "UNIT_RUNS") {
+                    if (criterionKey === "UNIT_RUNS") {
                       return (
                         <QuantityInput
-                          key={criterion.key}
+                          key={criterionKey}
                           label={criterion.label}
                           quantity={localLineItem.unitQty || 0}
                           costPerUnit={resource?.costPerUnit || 0}
@@ -467,10 +473,10 @@ const CostCard = ({
                         />
                       );
                     }
-                    if (criterion.key === "PRIMARY_MATERIAL") {
+                    if (criterionKey === "PRIMARY_MATERIAL") {
                       return (
                         <QuantityInput
-                          key={criterion.key}
+                          key={criterionKey}
                           label={criterion.label}
                           quantity={localLineItem.materialQty || 0}
                           costPerUnit={material?.costPerUnit || 0}
@@ -485,10 +491,10 @@ const CostCard = ({
                         />
                       );
                     }
-                    if (criterion.key === "SECONDARY_MATERIAL") {
+                    if (criterionKey === "SECONDARY_MATERIAL") {
                       return (
                         <QuantityInput
-                          key={criterion.key}
+                          key={criterionKey}
                           label={criterion.label}
                           quantity={localLineItem.secondaryMaterialQty || 0}
                           costPerUnit={secondaryMaterial?.costPerUnit || 0}

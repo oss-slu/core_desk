@@ -29,6 +29,8 @@ export const EditCosting = ({
   const isRawMode = isRawValueMode(newItem?.resourceType);
   const parsedQty = Number.parseFloat(newItem?.qty);
   const normalizedQty = Number.isFinite(parsedQty) && parsedQty > 0 ? parsedQty : 1;
+  const getCriterionKey = (criterion) =>
+    criterion?.key || criterion?.criterionType;
 
   const calculateTotalCost = (includeQty = true) => {
     return (
@@ -40,10 +42,12 @@ export const EditCosting = ({
   const totalCost = calculateTotalCost(true);
 
   const renderReadOnlyCriterion = (criterion) => {
-    switch (criterion.key) {
+    const criterionKey = getCriterionKey(criterion);
+
+    switch (criterionKey) {
       case "RAW_VALUE":
         return (
-          <Util.Row key={criterion.key} gap={1} align="center" justify="between">
+          <Util.Row key={criterionKey} gap={1} align="center" justify="between">
             <label className="form-label">{criterion.label}</label>
             <div
               style={{
@@ -58,7 +62,7 @@ export const EditCosting = ({
       case "RESOURCE_TIME":
       case "PROCESSING_TIME":
         return (
-          <Util.Row key={criterion.key} gap={1} align="center" justify="between">
+          <Util.Row key={criterionKey} gap={1} align="center" justify="between">
             <label className="form-label">{criterion.label}</label>
             <div
               style={{
@@ -69,7 +73,7 @@ export const EditCosting = ({
             />
             <Time
               value={
-                criterion.key === "RESOURCE_TIME"
+                criterionKey === "RESOURCE_TIME"
                   ? newItem.timeQty
                   : newItem.processingTimeQty
               }
@@ -81,7 +85,7 @@ export const EditCosting = ({
       case "PRIMARY_MATERIAL":
       case "SECONDARY_MATERIAL":
         return (
-          <Util.Row key={criterion.key} gap={1} align="center" justify="between">
+          <Util.Row key={criterionKey} gap={1} align="center" justify="between">
             <label className="form-label">{criterion.label}</label>
             <div
               style={{
@@ -92,9 +96,9 @@ export const EditCosting = ({
             />
             <Icon i="weight" />
             <span>
-              {criterion.key === "UNIT_RUNS"
+              {criterionKey === "UNIT_RUNS"
                 ? newItem.unitQty || 0
-                : criterion.key === "PRIMARY_MATERIAL"
+                : criterionKey === "PRIMARY_MATERIAL"
                   ? newItem.materialQty || 0
                   : newItem.secondaryMaterialQty || 0}
             </span>
@@ -106,10 +110,12 @@ export const EditCosting = ({
   };
 
   const renderEditableCriterion = (criterion) => {
-    switch (criterion.key) {
+    const criterionKey = getCriterionKey(criterion);
+
+    switch (criterionKey) {
       case "RAW_VALUE":
         return (
-          <React.Fragment key={criterion.key}>
+          <React.Fragment key={criterionKey}>
             <Util.Col gap={0.5} align="start" className={styles.costSection}>
               <label className="form-label mb-0">{criterion.label}</label>
               <Input
@@ -134,7 +140,7 @@ export const EditCosting = ({
       case "RESOURCE_TIME":
         return (
           <TimeInput
-            key={criterion.key}
+            key={criterionKey}
             label={criterion.label}
             helpText={HELP_TEXT.resourceTime}
             timeQty={newItem.timeQty}
@@ -147,7 +153,7 @@ export const EditCosting = ({
       case "PROCESSING_TIME":
         return (
           <TimeInput
-            key={criterion.key}
+            key={criterionKey}
             label={criterion.label}
             helpText={HELP_TEXT.processingTime}
             timeQty={newItem.processingTimeQty}
@@ -162,7 +168,7 @@ export const EditCosting = ({
       case "UNIT_RUNS":
         return (
           <QuantityInput
-            key={criterion.key}
+            key={criterionKey}
             label={criterion.label}
             helpText={HELP_TEXT.unit}
             quantity={newItem.unitQty}
@@ -176,7 +182,7 @@ export const EditCosting = ({
       case "PRIMARY_MATERIAL":
         return (
           <QuantityInput
-            key={criterion.key}
+            key={criterionKey}
             label={criterion.label}
             helpText={HELP_TEXT.material}
             quantity={newItem.materialQty}
@@ -190,7 +196,7 @@ export const EditCosting = ({
       case "SECONDARY_MATERIAL":
         return (
           <QuantityInput
-            key={criterion.key}
+            key={criterionKey}
             label={criterion.label}
             helpText={HELP_TEXT.secondaryMaterial}
             quantity={newItem.secondaryMaterialQty}
@@ -216,15 +222,17 @@ export const EditCosting = ({
     }
 
     return enabledCriteria.reduce((payload, criterion) => {
-      if (criterion.key === "RESOURCE_TIME") payload.timeQty = newItem.timeQty;
-      if (criterion.key === "PROCESSING_TIME") {
+      const criterionKey = getCriterionKey(criterion);
+
+      if (criterionKey === "RESOURCE_TIME") payload.timeQty = newItem.timeQty;
+      if (criterionKey === "PROCESSING_TIME") {
         payload.processingTimeQty = newItem.processingTimeQty;
       }
-      if (criterion.key === "UNIT_RUNS") payload.unitQty = newItem.unitQty;
-      if (criterion.key === "PRIMARY_MATERIAL") {
+      if (criterionKey === "UNIT_RUNS") payload.unitQty = newItem.unitQty;
+      if (criterionKey === "PRIMARY_MATERIAL") {
         payload.materialQty = newItem.materialQty;
       }
-      if (criterion.key === "SECONDARY_MATERIAL") {
+      if (criterionKey === "SECONDARY_MATERIAL") {
         payload.secondaryMaterialQty = newItem.secondaryMaterialQty;
       }
       return payload;
