@@ -241,7 +241,7 @@ steps:
 
   - typeText:
       parent: ".modal.show"
-      placeholder: Material quantity
+      selector: 'input[value="Material quantity"]'
       text: Test Costing Criterion
 
   - waitFor: 300
