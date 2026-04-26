@@ -40,7 +40,7 @@ steps:
       text: Add...
   - waitFor: 300
   - tapOn:
-      text: Create Resource Type
+      text: Add Resource Type
   - waitFor: 300
   - typeText:
       placeholder: e.g. 3D Printer
