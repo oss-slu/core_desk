@@ -43,9 +43,11 @@ steps:
       text: Add Resource Type
   - waitFor: 300
   - typeText:
+      parent: ".modal.show"
       placeholder: FDM 3d Printer
       text: E2E Test Resource Type
   - tapOn:
+      parent: ".modal.show"
       text: Submit
   - waitFor: 1200
   - assertVisible:
@@ -65,9 +67,11 @@ steps:
       text: Add Resource
   - waitFor: 300
   - typeText:
+      parent: ".modal.show"
       placeholder: Bambu Lab X1C
       text: E2E Test Resource
   - tapOn:
+      parent: ".modal.show"
       text: Submit
   - waitFor: 1200
   - assertVisible:
@@ -87,12 +91,15 @@ steps:
       text: Add Material
   - waitFor: 300
   - typeText:
+      parent: ".modal.show"
       placeholder: Acrylic, PLA, Pinewood
       text: E2E Test Material
   - typeText:
+      parent: ".modal.show"
       placeholder: Stratasys, BASF, Generic
       text: Generic
   - tapOn:
+      parent: ".modal.show"
       text: Submit
   - waitFor: 1200
   - assertVisible:
