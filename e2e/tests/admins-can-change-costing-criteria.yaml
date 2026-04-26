@@ -18,7 +18,7 @@ steps:
 
   - typeText:
       placeholder: e.g. South Campus Shop
-      text: E2E Test Shop
+      text: "E2E Test Shop"
 
   - tapOn:
       text: Submit
@@ -247,32 +247,32 @@ steps:
       text: Resource Time
   - typeText:
       placeholder: Hr
-      text: 1
+      text: "1"
   - typeText:
       placeholder: Min
-      text: 0
+      text: "0"
 
   # Processing Time: 30 minutes = 0.5 * (resource cost per processing time)
   - tapOn:
       text: Processing Time
   - typeText:
       placeholder: Hr
-      text: 0
+      text: "0"
   - typeText:
       placeholder: Min
-      text: 30
+      text: "30"
 
   # Unit runs: 5 units = 5 * (resource cost per unit)
   - tapOn:
       text: Unit runs
   - typeText:
-      text: 5
+      text: "5"
 
   # Material quantity: 10 units = 10 * (material cost per unit)
   - tapOn:
       text: Material quantity
   - typeText:
-      text: 10
+      text: "10"
 
   - waitFor: 500
 
