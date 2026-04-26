@@ -43,7 +43,7 @@ steps:
       text: Add Resource Type
   - waitFor: 300
   - typeText:
-      placeholder: e.g. 3D Printer
+      placeholder: FDM 3d Printer
       text: E2E Test Resource Type
   - tapOn:
       text: Submit
@@ -60,7 +60,7 @@ steps:
       text: Add Resource
   - waitFor: 300
   - typeText:
-      placeholder: e.g. Lab X1C
+      placeholder: Bambu Lab X1C
       text: E2E Test Resource
   - tapOn:
       text: Submit
@@ -212,7 +212,7 @@ steps:
 # -------------------- VERIFY ENABLED CRITERIA IN COSTING --------------------
 
   - tapOn:
-      text: Add another additional cost
+      text: Add additional cost
   - waitFor: 300
   - tapOn:
       text: E2E Test Resource Type
@@ -239,31 +239,31 @@ steps:
   - tapOn:
       text: Resource Time
   - typeText:
-      placeholder: Hr
+      placeholder: "0"
       text: "1"
   - typeText:
-      placeholder: Min
+      placeholder: "0"
       text: "0"
 
   - tapOn:
       text: Processing Time
   - typeText:
-      placeholder: Hr
+      placeholder: "0"
       text: "0"
   - typeText:
-      placeholder: Min
+      placeholder: "0"
       text: "30"
 
   - tapOn:
       text: Unit runs
   - typeText:
-      placeholder: e.g. 5
+      placeholder: "0"
       text: "5"
 
   - tapOn:
       text: Material quantity
   - typeText:
-      placeholder: e.g. 10
+      placeholder: "0"
       text: "10"
 
   - waitFor: 500
