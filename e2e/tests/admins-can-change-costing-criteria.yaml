@@ -21,7 +21,7 @@ steps:
 
   - typeText:
       placeholder: e.g. South Campus Shop
-      text: E2E Test Shop
+      text: Test Shop
 
   - tapOn:
       text: Submit
@@ -29,12 +29,12 @@ steps:
   - waitFor: 800
 
   - assertVisible:
-      text: E2E Test Shop
+      text: Test Shop
 
   # -------------------- CREATE JOB --------------------
 
   - tapOn:
-      text: E2E Test Shop
+      text: Test Shop
 
   - waitFor: 300
 
@@ -50,7 +50,7 @@ steps:
 
   - typeText:
       placeholder: e.g. Wind Mill Assembly
-      text: E2E Test Job
+      text: Test Job
 
   - tapOn:
       text: Submit
@@ -67,7 +67,7 @@ steps:
   - waitFor: 500
 
   - assertVisible:
-      text: E2E Test Job
+      text: Test Job
 
   # -------------------- RESOURCES --------------------
 
@@ -113,12 +113,12 @@ steps:
   - waitFor: 1200   # allow dropdown animation/state change
 
   - assertVisible:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Add Material
       timeout: 8000
 
   - tapOn:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Add Material
 
   - waitFor: 800
@@ -166,12 +166,12 @@ steps:
 
 
   - assertVisible:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Add Resource
       timeout: 8000
 
   - tapOn:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Add Resource
 
   - waitFor: 800
@@ -223,26 +223,26 @@ steps:
   - waitFor: 1200
 
   - assertVisible:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
       timeout: 8000
 
   - tapOn:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
 
   - waitFor: 800
 
   - assertVisible:
       parent: ".modal.show"
-      text: E2E Test Resource Type Costing Criteria
+      text: Test Resource Type Costing Criteria
 
 # -------------------- ADD/EDIT COSTING CRITERION --------------------
 
   - typeText:
       parent: ".modal.show"
       placeholder: Material quantity
-      text: E2E Test Costing Criterion
+      text: Test Costing Criterion
 
   - waitFor: 300
 
@@ -253,7 +253,7 @@ steps:
   - waitFor: 1200
 
   - assertVisible:
-      text: E2E Test Costing Criterion
+      text: Test Costing Criterion
 
 # -------------------- VERIFY DEFAULT ENABLED CRITERIA --------------------
 
@@ -263,12 +263,12 @@ steps:
   - waitFor: 1200
 
   - assertVisible:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
       timeout: 8000
 
   - tapOn:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
 
   - waitFor: 800
@@ -315,12 +315,12 @@ steps:
   - waitFor: 1200
 
   - assertVisible:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
       timeout: 8000
 
   - tapOn:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
 
   - waitFor: 800
@@ -359,12 +359,12 @@ steps:
   - waitFor: 1200
 
   - assertVisible:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
       timeout: 8000
 
   - tapOn:
-      parent: ".dropdown-menu.show:visible"
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
 
   - waitFor: 800
@@ -376,7 +376,7 @@ steps:
 # -------------------- CREATE JOB --------------------
 
   - tapOn:
-      text: E2E Test Shop
+      text: Test Shop
 
   - waitFor: 200
 
@@ -392,7 +392,7 @@ steps:
 
   - typeText:
       placeholder: e.g. Wind Mill Assembly
-      text: E2E Test Job
+      text: Test Job
 
   - tapOn:
       text: Submit
@@ -409,12 +409,12 @@ steps:
   - waitFor: 300
 
   - assertVisible:
-      text: E2E Test Job
+      text: Test Job
 
 # -------------------- OPEN JOB COSTING --------------------
 
   - tapOn:
-      text: E2E Test Job
+      text: Test Job
   - waitFor: 300
   - tapOn:
       text: Costing
@@ -428,13 +428,13 @@ steps:
       text: Add additional cost
   - waitFor: 300
   - tapOn:
-      text: E2E Test Resource Type
+      text: Test Resource Type
   - waitFor: 300
   - tapOn:
-      text: E2E Test Resource
+      text: Test Resource
   - waitFor: 300
   - tapOn:
-      text: E2E Test Material
+      text: Test Material
   - waitFor: 300
   - assertVisible:
       text: Resource Time
@@ -443,7 +443,7 @@ steps:
   - assertVisible:
       text: Unit runs
   - assertVisible:
-      text: E2E Test Costing Criterion
+      text: Test Costing Criterion
 
 # -------------------- ENTER VALUES AND CHECK TOTAL --------------------
 
@@ -472,7 +472,7 @@ steps:
       text: "5"
 
   - tapOn:
-      text: E2E Test Costing Criterion
+      text: Test Costing Criterion
   - typeText:
       placeholder: "0"
       text: "10"
