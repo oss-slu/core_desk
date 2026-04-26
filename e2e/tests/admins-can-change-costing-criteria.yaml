@@ -56,7 +56,12 @@ steps:
   - tapOn:
       text: Resource options
   - waitFor: 300
+  - assertVisible:
+      parent: ".dropdown-menu.show"
+      text: Add Resource
+      timeout: 8000
   - tapOn:
+      parent: ".dropdown-menu.show"
       text: Add Resource
   - waitFor: 300
   - typeText:
@@ -73,7 +78,12 @@ steps:
   - tapOn:
       text: Resource options
   - waitFor: 300
+  - assertVisible:
+      parent: ".dropdown-menu.show"
+      text: Add Material
+      timeout: 8000
   - tapOn:
+      parent: ".dropdown-menu.show"
       text: Add Material
   - waitFor: 300
   - typeText:
@@ -93,7 +103,12 @@ steps:
   - tapOn:
       text: Resource options
   - waitFor: 300
+  - assertVisible:
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
+      timeout: 8000
   - tapOn:
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
@@ -116,7 +131,12 @@ steps:
   - tapOn:
       text: Resource options
   - waitFor: 300
+  - assertVisible:
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
+      timeout: 8000
   - tapOn:
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
@@ -146,7 +166,12 @@ steps:
   - tapOn:
       text: Resource options
   - waitFor: 300
+  - assertVisible:
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
+      timeout: 8000
   - tapOn:
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
   - waitFor: 300
   - assertVisible:
@@ -170,7 +195,12 @@ steps:
   - tapOn:
       text: Resource options
   - waitFor: 300
+  - assertVisible:
+      parent: ".dropdown-menu.show"
+      text: Edit Costing Criteria
+      timeout: 8000
   - tapOn:
+      parent: ".dropdown-menu.show"
       text: Edit Costing Criteria
   - waitFor: 300
   - assertNotVisible:
