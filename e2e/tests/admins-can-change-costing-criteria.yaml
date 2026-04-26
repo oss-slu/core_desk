@@ -11,7 +11,7 @@ steps:
   - authenticateUser:
       email: admin@coredesk-test.slu.edu
 
-# -------------------- CREATE SHOP --------------------
+  # -------------------- CREATE SHOP --------------------
 
   - tapOn:
       text: Shops
@@ -31,105 +31,208 @@ steps:
   - assertVisible:
       text: E2E Test Shop
 
-# -------------------- ADD RESOURCE TYPE --------------------
+  # -------------------- CREATE JOB --------------------
 
   - tapOn:
       text: E2E Test Shop
+
   - waitFor: 300
+
+  - tapOn:
+      text: Jobs
+
+  - waitFor: 300
+
+  - tapOn:
+      text: Create Job
+
+  - waitFor: 500
+
+  - typeText:
+      placeholder: e.g. Wind Mill Assembly
+      text: E2E Test Job
+
+  - tapOn:
+      text: Submit
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      text: Back to jobs
+
+  - tapOn:
+      text: Back to jobs
+
+  - waitFor: 500
+
+  - assertVisible:
+      text: E2E Test Job
+
+  # -------------------- RESOURCES --------------------
+
   - tapOn:
       text: Resources
+
   - waitFor: 400
+
   - assertVisible:
       text: Resources
+
   - tapOn:
       text: Add...
+
   - waitFor: 500
+
   - tapOn:
       text: Add Resource Type
+
   - waitFor: 800
+
   - assertVisible:
       text: Create a new Resource Type
+
   - assertVisible:
       placeholder: FDM 3d Printer
+
   - typeText:
-      parent: ".modal.show"
       placeholder: FDM 3d Printer
-      text: E2E Test Resource Type
+      text: Test Resource Type
+
   - tapOn:
-      parent: ".modal.show"
       text: Submit
       exact: true
-  - waitFor: 1200
-  - assertVisible:
-      text: E2E Test Resource Type
 
-# -------------------- CREATE RESOURCE --------------------
+  - waitFor: 1200
+
+  # -------------------- MATERIALS  --------------------
 
   - tapOn:
       text: Resource options
-  - waitFor: 1200
-  - assertVisible:
-      parent: ".dropdown-menu.show"
-      text: Add Resource
-      timeout: 8000
-  - tapOn:
-      parent: ".dropdown-menu.show"
-      text: Add Resource
-  - waitFor: 800
-  - typeText:
-      parent: ".modal.show"
-      placeholder: Bambu Lab X1C
-      text: E2E Test Resource
-  - tapOn:
-      parent: ".modal.show"
-      text: Submit
-      exact: true
-  - waitFor: 1200
-  - assertVisible:
-      text: E2E Test Resource
 
-# -------------------- CREATE MATERIAL --------------------
+  - waitFor: 1200   # allow dropdown animation/state change
 
-  - tapOn:
-      text: Resource options
-  - waitFor: 1200
   - assertVisible:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Add Material
       timeout: 8000
+
   - tapOn:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Add Material
+
   - waitFor: 800
+
   - typeText:
       parent: ".modal.show"
       placeholder: Acrylic, PLA, Pinewood
-      text: E2E Test Material
+      text: Pinewood
+
   - typeText:
       parent: ".modal.show"
       placeholder: Stratasys, BASF, Generic
       text: Generic
+
   - tapOn:
       parent: ".modal.show"
       text: Submit
       exact: true
+
+  - waitFor: 800
+
+  - selectFile:
+      selector: 'input[type="file"]'
+      filePath: cypress/fixtures/test-image.png
+
+  - tapOn:
+      text: Upload
+      exact: true
+
   - waitFor: 1200
+
   - assertVisible:
-      text: E2E Test Material
+      selector: "#carousel-sample img"
+
+  - tapOn:
+      text: Resources
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
+
+  - assertVisible:
+      parent: ".dropdown-menu.show:visible"
+      text: Add Resource
+      timeout: 8000
+
+  - tapOn:
+      parent: ".dropdown-menu.show:visible"
+      text: Add Resource
+
+  - waitFor: 800
+
+
+  - typeText:
+      parent: ".modal.show"
+      placeholder: Bambu Lab X1C
+      text: Lab X1C
+
+
+  - tapOn:
+      parent: ".modal.show"
+      text: Submit
+      exact: true
+
+
+  - waitFor: 800
+
+  - selectFile:
+      selector: 'input[type="file"]'
+      filePath: cypress/fixtures/test-image.png
+
+  - tapOn:
+      text: Upload
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      selector: "#carousel-sample img"
+
+  - tapOn:
+      text: Resource
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
+  - assertVisible:
+      text: Pinewood
+
+  - assertVisible: 
+      text: Lab X1C
 
 # -------------------- OPEN COSTING CRITERIA MODAL --------------------
 
   - tapOn:
       text: Resource options
+
   - waitFor: 1200
+
   - assertVisible:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Edit Costing Criteria
       timeout: 8000
+
   - tapOn:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Edit Costing Criteria
+
   - waitFor: 800
+
   - assertVisible:
       parent: ".modal.show"
       text: E2E Test Resource Type Costing Criteria
@@ -140,11 +243,15 @@ steps:
       parent: ".modal.show"
       placeholder: Material quantity
       text: E2E Test Costing Criterion
+
   - waitFor: 300
+
   - tapOn:
       parent: ".modal.show"
       text: Save Costing Criteria
+      
   - waitFor: 1200
+
   - assertVisible:
       text: E2E Test Costing Criterion
 
@@ -152,24 +259,32 @@ steps:
 
   - tapOn:
       text: Resource options
+
   - waitFor: 1200
+
   - assertVisible:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Edit Costing Criteria
       timeout: 8000
+
   - tapOn:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Edit Costing Criteria
+
   - waitFor: 800
+
   - assertVisible:
       parent: ".modal.show"
       text: Resource Time
+
   - assertVisible:
       parent: ".modal.show"
       text: Processing Time
+
   - assertVisible:
       parent: ".modal.show"
       text: Unit runs
+
   - assertVisible:
       parent: ".modal.show"
       text: Secondary Material quantity
@@ -179,11 +294,15 @@ steps:
   - tapOn:
       parent: ".modal.show"
       text: Secondary Material quantity
+
   - waitFor: 300
+
   - tapOn:
       parent: ".modal.show"
       text: Save Costing Criteria
+
   - waitFor: 1200
+
   - assertVisible:
       parent: ".modal.show"
       text: Secondary Material quantity
@@ -192,18 +311,24 @@ steps:
 
   - tapOn:
       text: Resource options
+
   - waitFor: 1200
+
   - assertVisible:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Edit Costing Criteria
       timeout: 8000
+
   - tapOn:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Edit Costing Criteria
+
   - waitFor: 800
+
   - assertVisible:
       parent: ".modal.show"
       text: Disabled criteria
+
   - assertVisible:
       parent: ".modal.show"
       text: Secondary Material quantity
@@ -213,11 +338,15 @@ steps:
   - tapOn:
       parent: ".modal.show"
       text: Secondary Material quantity
+
   - waitFor: 300
+
   - tapOn:
       parent: ".modal.show"
       text: Save Costing Criteria
+
   - waitFor: 1200
+
   - assertVisible:
       parent: ".modal.show"
       text: Secondary Material quantity
@@ -226,15 +355,20 @@ steps:
 
   - tapOn:
       text: Resource options
+
   - waitFor: 1200
+
   - assertVisible:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Edit Costing Criteria
       timeout: 8000
+
   - tapOn:
-      parent: ".dropdown-menu.show"
+      parent: ".dropdown-menu.show:visible"
       text: Edit Costing Criteria
+
   - waitFor: 800
+
   - assertNotVisible:
       parent: ".modal.show"
       text: Disabled criteria
@@ -242,23 +376,38 @@ steps:
 # -------------------- CREATE JOB --------------------
 
   - tapOn:
+      text: E2E Test Shop
+
+  - waitFor: 200
+
+  - tapOn:
       text: Jobs
-  - waitFor: 300
+
+  - waitFor: 200
+
   - tapOn:
       text: Create Job
-  - waitFor: 500
+
+  - waitFor: 200
+
   - typeText:
       placeholder: e.g. Wind Mill Assembly
       text: E2E Test Job
+
   - tapOn:
       text: Submit
       exact: true
+
   - waitFor: 1200
+
   - assertVisible:
       text: Back to jobs
+
   - tapOn:
       text: Back to jobs
+
   - waitFor: 300
+
   - assertVisible:
       text: E2E Test Job
 
