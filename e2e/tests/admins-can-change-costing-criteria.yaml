@@ -114,14 +114,12 @@ steps:
 
   - assertVisible:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 2
+      text: Add Material
       timeout: 8000
 
   - tapOn:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 2
+      text: Add Material
 
   - waitFor: 800
 
@@ -169,14 +167,12 @@ steps:
 
   - assertVisible:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 3
+      text: Add Resource
       timeout: 8000
 
   - tapOn:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 3
+      text: Add Resource
 
   - waitFor: 800
 
@@ -228,14 +224,12 @@ steps:
 
   - assertVisible:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 1
+      text: Edit Costing Criteria
       timeout: 8000
 
   - tapOn:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 1
+      text: Edit Costing Criteria
 
   - waitFor: 800
 
@@ -267,14 +261,12 @@ steps:
 
   - assertVisible:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 1
+      text: Edit Costing Criteria
       timeout: 8000
 
   - tapOn:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 1
+      text: Edit Costing Criteria
 
   - waitFor: 800
 
@@ -331,14 +323,12 @@ steps:
 
   - assertVisible:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 1
+      text: Edit Costing Criteria
       timeout: 8000
 
   - tapOn:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 1
+      text: Edit Costing Criteria
 
   - waitFor: 800
 
@@ -374,14 +364,12 @@ steps:
 
   - assertVisible:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 1
+      text: Edit Costing Criteria
       timeout: 8000
 
   - tapOn:
       parent: ".dropdown-menu.show:visible"
-      selector: ".dropdown-item"
-      index: 1
+      text: Edit Costing Criteria
 
   - waitFor: 800
 
