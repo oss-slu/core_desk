@@ -223,6 +223,29 @@ const ResourceType = ({
         onEdit={openCostingCriteriaModal}
       />
       <Util.Spacer size={1} />
+      {admin ? (
+        <>
+          <Util.Row gap={0.5} wrap>
+            <Button
+              size="sm"
+              outline
+              onClick={createMaterial}
+              data-cy={`add-material-${resourceType.id}`}
+            >
+              Add Material
+            </Button>
+            <Button
+              size="sm"
+              outline
+              onClick={createResource}
+              data-cy={`add-resource-${resourceType.id}`}
+            >
+              Add Resource
+            </Button>
+          </Util.Row>
+          <Util.Spacer size={1} />
+        </>
+      ) : null}
       <Util.Spacer size={1} />
       <Util.Row gap={1} wrap>
         {resourceType.resources.map((resource) => (
@@ -276,7 +299,7 @@ const ResourceType = ({
   );
 };
 
-const CostingCriteriaSummary = ({ resourceType }) => {
+const CostingCriteriaSummary = ({ resourceType, admin, onEdit }) => {
   const enabledCriteria = getEnabledCostingCriteria(resourceType);
 
   return (
@@ -290,6 +313,16 @@ const CostingCriteriaSummary = ({ resourceType }) => {
               : "No costing criteria are currently enabled."}
           </p>
         </div>
+        {admin ? (
+          <Button
+            size="sm"
+            outline
+            onClick={onEdit}
+            data-cy={`edit-costing-criteria-${resourceType.id}`}
+          >
+            Edit Costing Criteria
+          </Button>
+        ) : null}
       </Util.Row>
       <Util.Row gap={0.5} wrap>
         {enabledCriteria.map((criterion, index) => (
