@@ -275,25 +275,39 @@ steps:
 
   - assertVisible:
       parent: ".modal.show"
-      text: Resource Time
+      selector: 'input[value="Resource Time"]'
+      allowScroll: true
 
   - assertVisible:
       parent: ".modal.show"
-      text: Processing Time
+      selector: 'input[value="Processing Time"]'
+      allowScroll: true
 
   - assertVisible:
       parent: ".modal.show"
-      text: Unit runs
+      selector: 'input[value="Unit runs"]'
+      allowScroll: true
 
   - assertVisible:
       parent: ".modal.show"
-      text: Secondary Material quantity
+      selector: 'input[value="Test Costing Criterion"]'
+      allowScroll: true
 
-# -------------------- DISABLE A DEFAULT CRITERION --------------------
+  - assertVisible:
+      parent: ".modal.show"
+      text: Disabled criteria
+
+  - assertVisible:
+      parent: ".modal.show"
+      selector: 'input[value="Secondary Material quantity"]'
+      allowScroll: true
+
+# -------------------- DISABLE AN ENABLED CRITERION --------------------
 
   - tapOn:
       parent: ".modal.show"
-      text: Secondary Material quantity
+      selector: 'input[type="checkbox"]'
+      index: 2
 
   - waitFor: 300
 
@@ -304,8 +318,7 @@ steps:
   - waitFor: 1200
 
   - assertVisible:
-      parent: ".modal.show"
-      text: Secondary Material quantity
+      text: Unit runs
 
 # -------------------- VERIFY DISABLED CRITERION MOVED TO BOTTOM --------------------
 
@@ -331,13 +344,14 @@ steps:
 
   - assertVisible:
       parent: ".modal.show"
-      text: Secondary Material quantity
+      selector: 'input[value="Unit runs"]'
 
 # -------------------- RE-ENABLE THE CRITERION --------------------
 
   - tapOn:
       parent: ".modal.show"
-      text: Secondary Material quantity
+      selector: 'input[type="checkbox"]'
+      index: 3
 
   - waitFor: 300
 
@@ -348,10 +362,9 @@ steps:
   - waitFor: 1200
 
   - assertVisible:
-      parent: ".modal.show"
-      text: Secondary Material quantity
+      text: Unit runs
 
-# -------------------- VERIFY RE-ENABLED CRITERION MOVED TO TOP --------------------
+# -------------------- VERIFY RE-ENABLED CRITERION IS AVAILABLE AGAIN --------------------
 
   - tapOn:
       text: Resource options
@@ -369,9 +382,9 @@ steps:
 
   - waitFor: 800
 
-  - assertNotVisible:
+  - assertVisible:
       parent: ".modal.show"
-      text: Disabled criteria
+      selector: 'input[value="Unit runs"]'
 
 # -------------------- CREATE JOB --------------------
 
