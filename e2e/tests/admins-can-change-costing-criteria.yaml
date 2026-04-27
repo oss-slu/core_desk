@@ -417,14 +417,6 @@ steps:
 
 # -------------------- UPLOAD FILE TO JOB --------------------
 
-  - assertVisible:
-      selector: 'button:text("Choose Files")'
-
-  - tapOn:
-      selector: 'button:text("Choose Files")'
-
-  - waitFor: 300
-
   - selectFile:
       selector: 'input[type="file"]'
       filePath: cypress/fixtures/test-image.png
