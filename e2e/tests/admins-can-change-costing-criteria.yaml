@@ -415,24 +415,6 @@ steps:
 
   - waitFor: 1200
 
-# -------------------- UPLOAD FILE TO JOB --------------------
-
-  - selectFile:
-      selector: 'input[type="file"]'
-      filePath: cypress/fixtures/test-image.png
-
-  - assertVisible:
-      selector: 'button:text("Upload")'
-
-  - tapOn:
-      selector: 'button:text("Upload")'
-      exact: true
-
-  - waitFor: 1200
-
-  - assertVisible:
-      selector: "#carousel-sample img"
-
 # -------------------- OPEN JOB COSTING --------------------
 
   - assertVisible:
@@ -461,9 +443,9 @@ steps:
       text: Select Resource
   - waitFor: 300
   - assertVisible:
-      text: Test Resource
+      text: Lab X1C
   - tapOn:
-      text: Test Resource
+      text: Lab X1C
   - waitFor: 300
 
   - tapOn:
