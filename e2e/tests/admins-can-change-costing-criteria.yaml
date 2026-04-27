@@ -410,20 +410,7 @@ steps:
       text: Submit
       exact: true
 
-  - waitFor: 200
-
   - assertVisible:
-      text: Back to jobs
-
-  - tapOn:
-      text: Back to jobs
-
-  - waitFor: 200
-
-  - assertVisible:
-      text: Test Job
-
-  - tapOn:
       text: Test Job
 
   - waitFor: 1200
@@ -431,10 +418,10 @@ steps:
 # -------------------- UPLOAD FILE TO JOB --------------------
 
   - assertVisible:
-      text: Choose Files
+      selector: 'button:text("Choose Files")'
 
   - tapOn:
-      text: Choose Files
+      selector: 'button:text("Choose Files")'
 
   - waitFor: 300
 
@@ -443,10 +430,10 @@ steps:
       filePath: cypress/fixtures/test-image.png
 
   - assertVisible:
-      text: Upload
+      selector: 'button:text("Upload")'
 
   - tapOn:
-      text: Upload
+      selector: 'button:text("Upload")'
       exact: true
 
   - waitFor: 1200
