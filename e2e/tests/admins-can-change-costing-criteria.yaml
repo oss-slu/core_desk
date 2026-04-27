@@ -380,12 +380,17 @@ steps:
       parent: ".modal.show"
       selector: 'input[value="Unit runs"]'
       allowScroll: true
-# -------------------- CREATE JOB --------------------
 
   - tapOn:
+      parent: ".modal.show"
+      text: Save Costing Criteria
+
+  - waitFor: 1200
+
+  - assertVisible:
       text: Test Shop
 
-  - waitFor: 200
+# -------------------- CREATE JOB --------------------
 
   - tapOn:
       text: Jobs
