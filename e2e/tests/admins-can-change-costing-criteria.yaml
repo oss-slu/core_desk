@@ -449,7 +449,7 @@ steps:
   - waitFor: 300
 
   - tapOn:
-      text: Select a resource
+      text: Select Resource
   - waitFor: 300
   - assertVisible:
       text: Test Resource
@@ -458,7 +458,7 @@ steps:
   - waitFor: 300
 
   - tapOn:
-      text: Select a material
+      text: Select Material
   - waitFor: 300
   - assertVisible:
       text: Test Material
