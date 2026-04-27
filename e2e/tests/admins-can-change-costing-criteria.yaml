@@ -466,6 +466,10 @@ steps:
       text: Pinewood
   - waitFor: 300
 
+  - tapOn:
+      text: Save
+  - waitFor: 300
+
   - assertVisible:
       text: Resource Time
   - assertVisible:
