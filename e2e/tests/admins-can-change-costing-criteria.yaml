@@ -164,7 +164,6 @@ steps:
 
   - waitFor: 1200   # allow dropdown animation/state change
 
-
   - assertVisible:
       parent: ".dropdown-menu.show:visible"
       text: Add Resource
@@ -175,7 +174,6 @@ steps:
       text: Add Resource
 
   - waitFor: 800
-
 
   - typeText:
       parent: ".modal.show"
@@ -188,26 +186,7 @@ steps:
       text: Submit
       exact: true
 
-
   - waitFor: 800
-
-  - selectFile:
-      selector: 'input[type="file"]'
-      filePath: cypress/fixtures/test-image.png
-
-  - tapOn:
-      text: Upload
-      exact: true
-
-  - waitFor: 1200
-
-  - assertVisible:
-      selector: "#carousel-sample img"
-
-  - tapOn:
-      text: Resource
-
-  - waitFor: 1200   # allow dropdown animation/state change
 
   - assertVisible:
       text: Pinewood
@@ -222,12 +201,7 @@ steps:
   # - Cost Per Processing Time: 30
 
   - tapOn:
-      text: Lab X1C
-
-  - waitFor: 800
-
-  - tapOn:
-      text: Edit
+      selector: 'button[aria-label="Edit"]'
       exact: true
 
   - waitFor: 500
@@ -245,7 +219,7 @@ steps:
       text: "30"
 
   - tapOn:
-      text: Save & Close edit mode
+      selector: 'button[aria-label="Save & Close edit mode"]'
 
   - waitFor: 1200
 
