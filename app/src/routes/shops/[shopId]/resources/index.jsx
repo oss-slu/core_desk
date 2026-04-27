@@ -190,8 +190,8 @@ const ResourceType = ({
   const resourceItems = [
     { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={editResourceType}><Icon i="tools" /> Edit Resource Type</p> },
     { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={openCostingCriteriaModal}><Icon i="list-check" /> Edit Costing Criteria</p> },
-    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createMaterial}><Icon i="sandbox" /> Add Material</p> },
-    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createResource}><Icon i="tool" /> Add Resource</p> },
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createMaterial} data-cy={`add-material-${resourceType.id}`}><Icon i="sandbox" /> Add Material</p> },
+    { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={createResource} data-cy={`add-resource-${resourceType.id}`}><Icon i="tool" /> Add Resource</p> },
     { label: <p style={{marginTop: 2, marginBottom: 2}} onClick={async () => {
       if (await confirm()) onDelete(resourceType.id);
     }}><Icon i="trash" /> Delete Resource Type</p> }
@@ -222,30 +222,6 @@ const ResourceType = ({
         admin={admin}
         onEdit={openCostingCriteriaModal}
       />
-      <Util.Spacer size={1} />
-      {admin ? (
-        <>
-          <Util.Row gap={0.5} wrap>
-            <Button
-              size="sm"
-              outline
-              onClick={createMaterial}
-              data-cy={`add-material-${resourceType.id}`}
-            >
-              Add Material
-            </Button>
-            <Button
-              size="sm"
-              outline
-              onClick={createResource}
-              data-cy={`add-resource-${resourceType.id}`}
-            >
-              Add Resource
-            </Button>
-          </Util.Row>
-          <Util.Spacer size={1} />
-        </>
-      ) : null}
       <Util.Spacer size={1} />
       <Util.Row gap={1} wrap>
         {resourceType.resources.map((resource) => (
