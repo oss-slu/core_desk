@@ -410,6 +410,22 @@ steps:
       text: Submit
       exact: true
 
+  - waitFor: 200
+
+  - assertVisible:
+      text: Back to jobs
+
+  - tapOn:
+      text: Back to jobs
+
+  - waitFor: 200
+
+  - assertVisible:
+      text: Test Job
+
+  - tapOn:
+      text: Test Job
+
   - waitFor: 1200
 
 # -------------------- UPLOAD FILE TO JOB --------------------
