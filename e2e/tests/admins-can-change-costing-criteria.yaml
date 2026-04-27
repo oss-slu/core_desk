@@ -293,6 +293,7 @@ steps:
   - assertVisible:
       parent: ".modal.show"
       text: Disabled criteria
+      allowScroll: true
 
   - assertVisible:
       parent: ".modal.show"
@@ -335,10 +336,12 @@ steps:
   - assertVisible:
       parent: ".modal.show"
       text: Disabled criteria
+      allowScroll: true
 
   - assertVisible:
       parent: ".modal.show"
       selector: 'input[value="Unit runs"]'
+      allowScroll: true
 
 # -------------------- RE-ENABLE THE CRITERION --------------------
 
@@ -376,7 +379,7 @@ steps:
   - assertVisible:
       parent: ".modal.show"
       selector: 'input[value="Unit runs"]'
-
+      allowScroll: true
 # -------------------- CREATE JOB --------------------
 
   - tapOn:
