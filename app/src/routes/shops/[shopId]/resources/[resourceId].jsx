@@ -111,7 +111,7 @@ export const ResourcePage = () => {
               </Button>
             )}
             {!isEditing && !isEditingImages && (
-              <Button outline onClick={() => setIsEditing(true)}>
+              <Button outline onClick={() => setIsEditing(true)} data-cy="edit-resource-button">
                 <Icon i="pencil" /> Edit
               </Button>
             )}
@@ -279,6 +279,7 @@ const Edit = ({
             await updateResource(cr);
             setIsEditing(false);
           }}
+          data-cy="save-resource-button"
         >
           Save & Close edit mode
         </Button>

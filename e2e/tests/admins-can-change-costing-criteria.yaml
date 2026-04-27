@@ -198,7 +198,7 @@ steps:
   # - Cost Per Processing Time: 30
 
   - tapOn:
-      selector: 'button[aria-label="Edit"]'
+      selector: '[data-cy="edit-resource-button"]'
       exact: true
 
   - waitFor: 500
@@ -216,7 +216,7 @@ steps:
       text: "30"
 
   - tapOn:
-      selector: 'button[aria-label="Save & Close edit mode"]'
+      selector: '[data-cy="save-resource-button"]'
 
   - waitFor: 1200
 
