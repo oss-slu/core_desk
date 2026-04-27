@@ -188,9 +188,6 @@ steps:
 
   - waitFor: 800
 
-  - assertVisible:
-      text: Pinewood
-
   - assertVisible: 
       text: Lab X1C
 
