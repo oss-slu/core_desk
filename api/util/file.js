@@ -96,10 +96,9 @@ export const upload =
       if (err){
         return res.status(400).json({ success: false, message: err.message });
       }
-      if (!req.file)
-        return res
-          .status(400)
-          .json({ success: false, message: "No file uploaded." });
+      if (!req.file) {
+        return next();
+      }
 
       try {
         const { originalname, mimetype, size, key, contentType } = req.file;
@@ -125,7 +124,7 @@ export const upload =
           },
         });
 
-        next();
+        return next();
       } catch (error) {
         console.error("Error logging file upload:", error);
         return res
