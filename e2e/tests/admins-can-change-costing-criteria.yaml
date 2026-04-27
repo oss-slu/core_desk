@@ -415,10 +415,10 @@ steps:
 # -------------------- UPLOAD FILE TO JOB --------------------
 
   - assertVisible:
-      text: Upload File
+      text: Choose Files
 
   - tapOn:
-      text: Upload File
+      text: Choose Files
 
   - waitFor: 300
 
