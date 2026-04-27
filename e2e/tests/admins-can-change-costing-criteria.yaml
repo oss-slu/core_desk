@@ -440,14 +440,32 @@ steps:
       text: Add additional cost
   - waitFor: 300
   - tapOn:
+      text: Select a resource type
+  - waitFor: 300
+  - assertVisible:
+      text: Test Resource Type
+  - tapOn:
       text: Test Resource Type
   - waitFor: 300
+
+  - tapOn:
+      text: Select a resource
+  - waitFor: 300
+  - assertVisible:
+      text: Test Resource
   - tapOn:
       text: Test Resource
   - waitFor: 300
+
+  - tapOn:
+      text: Select a material
+  - waitFor: 300
+  - assertVisible:
+      text: Test Material
   - tapOn:
       text: Test Material
   - waitFor: 300
+
   - assertVisible:
       text: Resource Time
   - assertVisible:
