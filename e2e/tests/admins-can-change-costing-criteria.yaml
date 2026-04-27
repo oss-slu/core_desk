@@ -461,9 +461,9 @@ steps:
       text: Select Material
   - waitFor: 300
   - assertVisible:
-      text: Test Material
+      text: Pinewood
   - tapOn:
-      text: Test Material
+      text: Pinewood
   - waitFor: 300
 
   - assertVisible:
@@ -510,4 +510,4 @@ steps:
   - waitFor: 500
 
   - assertVisible:
-      text: $
+      text: $100.00
