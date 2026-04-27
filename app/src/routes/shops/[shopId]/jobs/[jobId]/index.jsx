@@ -32,6 +32,7 @@ import { BillingGroupPicker } from "../../../../../components/billingGroupPicker
 import { useModal } from "#modal";
 import { authFetch } from "../../../../../util/url";
 import styles from "./index.module.css";
+import toast from "react-hot-toast";
 
 export const sidenavItems = (activePage, shopId, jobId) => [
   {
@@ -56,6 +57,40 @@ export const sidenavItems = (activePage, shopId, jobId) => [
     icon: <Icon i={"currency-dollar"} size={18} />,
   },
 ];
+
+const AddItemModalContent = ({
+  noFilePreviewDataUri,
+  onCreateItem,
+  createItemLoading,
+}) => {
+  const [itemTitle, setItemTitle] = useState("");
+
+  return (
+    <Util.Col gap={0.75} align="start">
+      <Util.Col gap={0.25} align="start" style={{ width: "100%" }}>
+        <label className="form-label mb-0">Preview</label>
+        <RenderMedia mediaUrl={noFilePreviewDataUri} fileType="png" />
+      </Util.Col>
+      <Input
+        label="Item Name"
+        value={itemTitle}
+        onChange={(value) => setItemTitle(value)}
+        placeholder="e.g. Front panel revision A"
+        required
+      />
+      <Button
+        onClick={async () => {
+          const created = await onCreateItem(itemTitle);
+          if (created) setItemTitle("");
+        }}
+        loading={createItemLoading}
+        disabled={createItemLoading}
+      >
+        Create Item
+      </Button>
+    </Util.Col>
+  );
+};
 
 export const JobPage = () => {
   const { shopId, jobId } = useParams();
@@ -86,7 +121,6 @@ export const JobPage = () => {
 
   // 2. Initialize currentIndex using the calculated value.
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [itemTitle, setItemTitle] = useState("");
   const noFilePreviewDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="280" viewBox="0 0 700 280">
       <rect width="700" height="280" fill="#f6f8fb" stroke="#dce1e7"/>
@@ -110,8 +144,8 @@ export const JobPage = () => {
   };
 
 
-  const handleCreateItem = async () => {
-    const title = itemTitle.trim();
+  const handleCreateItem = async (itemTitleValue) => {
+    const title = itemTitleValue.trim();
     if (!title) return;
 
     setCreateItemLoading(true);
@@ -125,39 +159,18 @@ export const JobPage = () => {
         throw new Error("Failed to create item");
       }
 
-      setItemTitle("");
       closeAddItemModal?.();
       await refetchJobs(false);
+      toast.success("Item created successfully");
+      return true;
     } catch (err) {
+      toast.error("Failed to create item");
       console.error(err);
+      return false;
     } finally {
       setCreateItemLoading(false);
     }
   };
-
-
-  const renderAddItemModalContent = () => (
-    <Util.Col gap={0.75} align="start">
-      <Util.Col gap={0.25} align="start" style={{ width: "100%" }}>
-        <label className="form-label mb-0">Preview</label>
-        <RenderMedia mediaUrl={noFilePreviewDataUri} fileType="png" />
-      </Util.Col>
-      <Input
-        label="Item Name"
-        value={itemTitle}
-        onChange={(value) => setItemTitle(value)}
-        placeholder="e.g. Front panel revision A"
-        required
-      />
-      <Button
-        onClick={handleCreateItem}
-        loading={createItemLoading}
-        disabled={createItemLoading}
-      >
-        Create Item
-      </Button>
-    </Util.Col>
-  );
 
   const {
     modal: openAddItemModal,
@@ -166,15 +179,28 @@ export const JobPage = () => {
     update: updateAddItemModal,
   } = useModal({
     title: "Add Item Without File",
-    text: renderAddItemModalContent(),
+    text: (
+      <AddItemModalContent
+        noFilePreviewDataUri={noFilePreviewDataUri}
+        onCreateItem={handleCreateItem}
+        createItemLoading={createItemLoading}
+      />
+    ),
   });
 
-  useEffect(() => {
+  const handleOpenAddItemModal = () => {
     updateAddItemModal({
       title: "Add Item Without File",
-      text: renderAddItemModalContent(),
+      text: (
+        <AddItemModalContent
+          noFilePreviewDataUri={noFilePreviewDataUri}
+          onCreateItem={handleCreateItem}
+          createItemLoading={createItemLoading}
+        />
+      ),
     });
-  }, [itemTitle, createItemLoading]);
+    openAddItemModal();
+  };
 
 
   const pages = [
@@ -571,7 +597,7 @@ export const JobPage = () => {
 
         <H2 style={{ marginTop: -10 }}> Add Item Without File</H2>
         <Util.Col gap={0.5} align="start">
-          <Button style={{ marginTop: 5 }} onClick={openAddItemModal}>
+          <Button style={{ marginTop: 5 }} onClick={handleOpenAddItemModal}>
             Add Item
           </Button>
           <i style={{ marginTop: 5 }}>Create a job item now and attatch a file later</i>
