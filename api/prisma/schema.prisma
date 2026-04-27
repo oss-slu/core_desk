@@ -263,7 +263,7 @@ model ResourceType {
 model ResourceTypeCostingCriterion {
   id             String              @id @default(cuid())
   resourceTypeId String
-  criterionType  CostingCriterionType
+  criterionType  CostingCriterionType?
   label          String
   enabled        Boolean             @default(true)
   displayOrder   Int
