@@ -6,6 +6,11 @@ import styles from "./jobItem.module.css";
 import { Price } from "#renderPrice";
 import { Time } from "../time/RenderTime";
 import { Button } from "#button";
+import {
+  calculateConfiguredSubtotal,
+  getEnabledCostingCriteria,
+  isRawValueMode,
+} from "../../util/costingCriteria";
 
 export const EditCosting = ({
   item,
@@ -20,45 +25,30 @@ export const EditCosting = ({
     setNewItem(item);
   }, [item]);
 
-  const isRawMode = newItem?.resourceType?.costingMode === "RAW_VALUE_ENTRY";
-  const hasSecondaryMaterial = Boolean(newItem?.secondaryMaterial);
+  const enabledCriteria = getEnabledCostingCriteria(newItem?.resourceType);
+  const isRawMode = isRawValueMode(newItem?.resourceType);
+  const parsedQty = Number.parseFloat(newItem?.qty);
+  const normalizedQty = Number.isFinite(parsedQty) && parsedQty > 0 ? parsedQty : 1;
+  const getCriterionKey = (criterion) =>
+    criterion?.key || criterion?.criterionType;
 
   const calculateTotalCost = (includeQty = true) => {
-    if (isRawMode) {
-      return (newItem.rawValue || 0) * (includeQty ? (newItem.qty ?? 1) : 1);
-    }
-
-    const {
-      timeQty,
-      processingTimeQty,
-      unitQty,
-      materialQty,
-      secondaryMaterialQty,
-      resource,
-      material,
-      secondaryMaterial = null,
-      qty,
-    } = newItem;
-    if (!resource) return 0;
-    if (!material) return 0;
-    
-
     return (
-      ((timeQty * resource.costPerTime || 0) +
-        (processingTimeQty * resource.costPerProcessingTime || 0) +
-        (unitQty * resource.costPerUnit || 0) +
-        (materialQty * material.costPerUnit || 0) +
-        (secondaryMaterialQty * secondaryMaterial?.costPerUnit || 0)) *
-      (includeQty ? (qty ?? 1) : 1)
+      calculateConfiguredSubtotal(newItem) * (includeQty ? normalizedQty : 1)
     );
   };
 
-  if (!userIsPrivileged)
-    return (
-      <div style={{ width: "100%" }}>
-        {isRawMode ? (
-          <Util.Row gap={1} align="center" justify="between">
-            <label className="form-label">Raw value</label>
+  const subtotalCost = calculateTotalCost(false);
+  const totalCost = calculateTotalCost(true);
+
+  const renderReadOnlyCriterion = (criterion) => {
+    const criterionKey = getCriterionKey(criterion);
+
+    switch (criterionKey) {
+      case "RAW_VALUE":
+        return (
+          <Util.Row key={criterionKey} gap={1} align="center" justify="between">
+            <label className="form-label">{criterion.label}</label>
             <div
               style={{
                 flex: 1,
@@ -68,86 +58,211 @@ export const EditCosting = ({
             />
             <Price value={newItem.rawValue || 0} icon />
           </Util.Row>
+        );
+      case "RESOURCE_TIME":
+      case "PROCESSING_TIME":
+        return (
+          <Util.Row key={criterionKey} gap={1} align="center" justify="between">
+            <label className="form-label">{criterion.label}</label>
+            <div
+              style={{
+                flex: 1,
+                height: 2,
+                backgroundColor: "var(--tblr-border-color)",
+              }}
+            />
+            <Time
+              value={
+                criterionKey === "RESOURCE_TIME"
+                  ? newItem.timeQty
+                  : newItem.processingTimeQty
+              }
+              icon
+            />
+          </Util.Row>
+        );
+      case "UNIT_RUNS":
+      case "PRIMARY_MATERIAL":
+      case "SECONDARY_MATERIAL":
+        return (
+          <Util.Row key={criterionKey} gap={1} align="center" justify="between">
+            <label className="form-label">{criterion.label}</label>
+            <div
+              style={{
+                flex: 1,
+                height: 2,
+                backgroundColor: "var(--tblr-border-color)",
+              }}
+            />
+            <Icon i="weight" />
+            <span>
+              {criterionKey === "UNIT_RUNS"
+                ? newItem.unitQty || 0
+                : criterionKey === "PRIMARY_MATERIAL"
+                  ? newItem.materialQty || 0
+                  : newItem.secondaryMaterialQty || 0}
+            </span>
+          </Util.Row>
+        );
+      default:
+        return null;
+    }
+  };
+
+  const renderEditableCriterion = (criterion) => {
+    const criterionKey = getCriterionKey(criterion);
+
+    switch (criterionKey) {
+      case "RAW_VALUE":
+        return (
+          <React.Fragment key={criterionKey}>
+            <Util.Col gap={0.5} align="start" className={styles.costSection}>
+              <label className="form-label mb-0">{criterion.label}</label>
+              <Input
+                value={newItem.rawValue || 0}
+                onChange={(value) => {
+                  const parsedValue = parseFloat(value);
+                  setNewItem({
+                    ...newItem,
+                    rawValue:
+                      Number.isNaN(parsedValue) || parsedValue < 0
+                        ? 0
+                        : parsedValue,
+                  });
+                }}
+                type="number"
+                min={0}
+              />
+            </Util.Col>
+            <Util.Spacer size={1} />
+          </React.Fragment>
+        );
+      case "RESOURCE_TIME":
+        return (
+          <TimeInput
+            key={criterionKey}
+            label={criterion.label}
+            helpText={HELP_TEXT.resourceTime}
+            timeQty={newItem.timeQty}
+            costPerTime={newItem.resource?.costPerTime || 0}
+            onChange={(value) => setNewItem({ ...newItem, timeQty: value })}
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+        );
+      case "PROCESSING_TIME":
+        return (
+          <TimeInput
+            key={criterionKey}
+            label={criterion.label}
+            helpText={HELP_TEXT.processingTime}
+            timeQty={newItem.processingTimeQty}
+            costPerTime={newItem.resource?.costPerProcessingTime || 0}
+            onChange={(value) =>
+              setNewItem({ ...newItem, processingTimeQty: value })
+            }
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+        );
+      case "UNIT_RUNS":
+        return (
+          <QuantityInput
+            key={criterionKey}
+            label={criterion.label}
+            helpText={HELP_TEXT.unit}
+            quantity={newItem.unitQty}
+            costPerUnit={newItem.resource?.costPerUnit || 0}
+            icon={<Icon i="refresh" />}
+            onChange={(value) => setNewItem({ ...newItem, unitQty: value })}
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+        );
+      case "PRIMARY_MATERIAL":
+        return (
+          <QuantityInput
+            key={criterionKey}
+            label={criterion.label}
+            helpText={HELP_TEXT.material}
+            quantity={newItem.materialQty}
+            costPerUnit={newItem.material?.costPerUnit || 0}
+            icon={<Icon i="weight" />}
+            onChange={(value) => setNewItem({ ...newItem, materialQty: value })}
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+        );
+      case "SECONDARY_MATERIAL":
+        return (
+          <QuantityInput
+            key={criterionKey}
+            label={criterion.label}
+            helpText={HELP_TEXT.secondaryMaterial}
+            quantity={newItem.secondaryMaterialQty}
+            costPerUnit={newItem.secondaryMaterial?.costPerUnit || 0}
+            icon={<Icon i="weight" />}
+            onChange={(value) =>
+              setNewItem({ ...newItem, secondaryMaterialQty: value })
+            }
+            modal={modal}
+            showInput={userIsPrivileged}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getSavePayload = () => {
+    if (isRawMode) {
+      return {
+        rawValue: newItem.rawValue,
+      };
+    }
+
+    return enabledCriteria.reduce((payload, criterion) => {
+      const criterionKey = getCriterionKey(criterion);
+
+      if (criterionKey === "RESOURCE_TIME") payload.timeQty = newItem.timeQty;
+      if (criterionKey === "PROCESSING_TIME") {
+        payload.processingTimeQty = newItem.processingTimeQty;
+      }
+      if (criterionKey === "UNIT_RUNS") payload.unitQty = newItem.unitQty;
+      if (criterionKey === "PRIMARY_MATERIAL") {
+        payload.materialQty = newItem.materialQty;
+      }
+      if (criterionKey === "SECONDARY_MATERIAL") {
+        payload.secondaryMaterialQty = newItem.secondaryMaterialQty;
+      }
+      return payload;
+    }, {});
+  };
+
+  if (!userIsPrivileged)
+    return (
+      <div style={{ width: "100%" }}>
+        {isRawMode ? (
+          renderReadOnlyCriterion(enabledCriteria[0])
         ) : (
-          <>
-            <Util.Row gap={1} align="center" justify="between">
-              <label className="form-label">Resource Time</label>
-              <div
-                style={{
-                  flex: 1,
-                  height: 2,
-                  backgroundColor: "var(--tblr-border-color)",
-                }}
-              />
-              <Time value={newItem.timeQty} icon />
-            </Util.Row>
-            <Util.Row gap={1} align="center" justify="between">
-              <label className="form-label">Processing Time</label>
-              <div
-                style={{
-                  flex: 1,
-                  height: 2,
-                  backgroundColor: "var(--tblr-border-color)",
-                }}
-              />
-              <Time value={newItem.processingTimeQty} icon />
-            </Util.Row>
-            <Util.Row gap={1} align="center" justify="between">
-              <label className="form-label">Unit runs</label>
-              <div
-                style={{
-                  flex: 1,
-                  height: 2,
-                  backgroundColor: "var(--tblr-border-color)",
-                }}
-              />
-              <Icon i="refresh" />
-              <span>{newItem.unitQty || 0}</span>
-            </Util.Row>
-            <Util.Row gap={1} align="center" justify="between">
-              <label className="form-label">Material quantity</label>
-              <div
-                style={{
-                  flex: 1,
-                  height: 2,
-                  backgroundColor: "var(--tblr-border-color)",
-                }}
-              />
-              <Icon i="weight" />
-              <span>{newItem.materialQty || 0}</span>
-            </Util.Row>
-            {hasSecondaryMaterial && (
-              <Util.Row gap={1} align="center" justify="between">
-                <label className="form-label">Secondary Material quantity</label>
-                <div
-                  style={{
-                    flex: 1,
-                    height: 2,
-                    backgroundColor: "var(--tblr-border-color)",
-                  }}
-                />
-                <Icon i="weight" />
-                <span>{newItem.secondaryMaterialQty || 0}</span>
-              </Util.Row>
-            )}
-          </>
+          <>{enabledCriteria.map((criterion) => renderReadOnlyCriterion(criterion))}</>
         )}
         <Util.Row gap={1} align="center" justify="between">
           <div />
           <span className={styles.bottomLine}>
             <Util.Row gap={1} justify="end">
               Subtotal
-              <Price value={calculateTotalCost(false)} icon />{" "}
-              {item.qty > 1 && (
+              <Price value={subtotalCost} icon />{" "}
+              {normalizedQty > 1 && (
                 <>
                   <Icon i="x" />
-                  {item.qty}
+                  {normalizedQty}
                 </>
               )}
             </Util.Row>
             <Util.Row gap={1} justify="end">
               Total:
-              <Price value={calculateTotalCost()} icon />
+              <Price value={totalCost} icon />
             </Util.Row>
           </span>
         </Util.Row>
@@ -157,102 +272,12 @@ export const EditCosting = ({
   return (
     <div style={{ width: "100%" }}>
       {ModalElement}
-      {isRawMode ? (
-        <>
-          <Util.Col gap={0.5} align="start" className={styles.costSection}>
-            <label className="form-label mb-0">Raw value</label>
-            <Input
-              value={newItem.rawValue || 0}
-              onChange={(value) => {
-                const parsedValue = parseFloat(value);
-                setNewItem({
-                  ...newItem,
-                  rawValue:
-                    Number.isNaN(parsedValue) || parsedValue < 0
-                      ? 0
-                      : parsedValue,
-                });
-              }}
-              type="number"
-              min={0}
-            />
-          </Util.Col>
-          <Util.Spacer size={1} />
-        </>
-      ) : (
-        <>
-          <TimeInput
-            label="Resource Time (hr:mm)"
-            helpText={HELP_TEXT.resourceTime}
-            timeQty={newItem.timeQty}
-            costPerTime={newItem.resource.costPerTime}
-            onChange={(value) => setNewItem({ ...newItem, timeQty: value })}
-            modal={modal}
-            showInput={userIsPrivileged}
-          />
-          <TimeInput
-            label="Processing Time (hr:mm)"
-            helpText={HELP_TEXT.processingTime}
-            timeQty={newItem.processingTimeQty}
-            costPerTime={newItem.resource.costPerProcessingTime}
-            onChange={(value) =>
-              setNewItem({ ...newItem, processingTimeQty: value })
-            }
-            modal={modal}
-            showInput={userIsPrivileged}
-          />
-          <QuantityInput
-            label="Unit runs"
-            helpText={HELP_TEXT.unit}
-            quantity={newItem.unitQty}
-            costPerUnit={newItem.resource.costPerUnit}
-            icon={<Icon i="refresh" />}
-            onChange={(value) => setNewItem({ ...newItem, unitQty: value })}
-            modal={modal}
-            showInput={userIsPrivileged}
-          />
-          <QuantityInput
-            label={`Material quantity in ${newItem.material.unitDescriptor}s`}
-            helpText={HELP_TEXT.material}
-            quantity={newItem.materialQty}
-            costPerUnit={newItem.material.costPerUnit}
-            icon={<Icon i="weight" />}
-            onChange={(value) => setNewItem({ ...newItem, materialQty: value })}
-            modal={modal}
-            showInput={userIsPrivileged}
-          />
-          {hasSecondaryMaterial && (
-            <QuantityInput
-              label={`Secondary material quantity in ${newItem.secondaryMaterial.unitDescriptor}s`}
-              helpText={HELP_TEXT.secondaryMaterial}
-              quantity={newItem.secondaryMaterialQty}
-              costPerUnit={newItem.secondaryMaterial.costPerUnit}
-              icon={<Icon i="weight" />}
-              onChange={(value) =>
-                setNewItem({ ...newItem, secondaryMaterialQty: value })
-              }
-              modal={modal}
-              showInput={userIsPrivileged}
-          />)}
-        </>
-      )}
+      {enabledCriteria.map((criterion) => renderEditableCriterion(criterion))}
       <Util.Row gap={1} align="center" justify="between">
         {JSON.stringify(newItem) !== JSON.stringify(item) ? (
           <Util.Row gap={1} align="center" wrap>
             <Button
-              onClick={() =>
-                isRawMode
-                  ? onChange({
-                      rawValue: newItem.rawValue,
-                    })
-                  : onChange({
-                      timeQty: newItem.timeQty,
-                      processingTimeQty: newItem.processingTimeQty,
-                      unitQty: newItem.unitQty,
-                      materialQty: newItem.materialQty,
-                      secondaryMaterialQty: newItem.secondaryMaterialQty,
-                    })
-              }
+              onClick={() => onChange(getSavePayload())}
               loading={loading}
             >
               Save
@@ -268,17 +293,17 @@ export const EditCosting = ({
         <span className={styles.bottomLine}>
           <Util.Row gap={1} justify="end">
             Subtotal
-            <Price value={calculateTotalCost(false)} icon />{" "}
-            {item.qty > 1 && (
+            <Price value={subtotalCost} icon />{" "}
+            {normalizedQty > 1 && (
               <>
                 <Icon i="x" />
-                {item.qty}
+                {normalizedQty}
               </>
             )}
           </Util.Row>
           <Util.Row gap={1} justify="end">
             Total:
-            <Price value={calculateTotalCost()} icon />
+            <Price value={totalCost} icon />
           </Util.Row>
         </span>
       </Util.Row>

@@ -9,6 +9,12 @@ export const useMaterial = (shopId, resourceTypeId, materialId) => {
   const [material, setMaterial] = useState({});
 
   const fetchMaterial = async (shouldSetLoading = true) => {
+    if (!shopId || !resourceTypeId || !materialId) {
+      setMaterial(null);
+      setLoading(false);
+      return;
+    }
+
     try {
       shouldSetLoading && setLoading(true);
       const r = await authFetch(

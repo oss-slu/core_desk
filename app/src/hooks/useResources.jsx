@@ -79,6 +79,12 @@ export const useResources = (shopId, resourceTypeId) => {
   });
 
   const fetchResources = async () => {
+    if (!shopId) {
+      setResources([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const r = await authFetch(

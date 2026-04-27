@@ -242,21 +242,37 @@ model ResourceImage {
 }
 
 model ResourceType {
-  id                  String                   @id @default(cuid())
+  id                  String                         @id @default(cuid())
   title               String
   description         String?
-  costingMode         CostingMode              @default(CALCULATE_WITH_RESOURCE_AND_MATERIAL)
-  createdAt           DateTime                 @default(now())
-  updatedAt           DateTime                 @updatedAt
-  active              Boolean                  @default(true)
+  costingMode         CostingMode                    @default(CALCULATE_WITH_RESOURCE_AND_MATERIAL)
+  createdAt           DateTime                       @default(now())
+  updatedAt           DateTime                       @updatedAt
+  active              Boolean                        @default(true)
   shopId              String
   additionalCostItems AdditionalCostLineItem[]
   jobs                Job[]
   jobItems            JobItem[]
   materials           Material[]
+  costingCriteria     ResourceTypeCostingCriterion[]
   resources           Resource[]
-  shop                Shop                     @relation(fields: [shopId], references: [id])
+  shop                Shop                           @relation(fields: [shopId], references: [id])
   logs                logs[]
+}
+
+model ResourceTypeCostingCriterion {
+  id             String              @id @default(cuid())
+  resourceTypeId String
+  criterionType  CostingCriterionType
+  label          String
+  enabled        Boolean             @default(true)
+  displayOrder   Int
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  resourceType   ResourceType        @relation(fields: [resourceTypeId], references: [id], onDelete: Cascade)
+
+  @@unique([resourceTypeId, criterionType])
+  @@index([resourceTypeId, displayOrder])
 }
 
 model Job {
@@ -296,22 +312,23 @@ model Job {
 }
 
 model LedgerItem {
-  id         String         @id @default(cuid())
-  userId     String?
+  id             String         @id @default(cuid())
+  userId         String?
   billingGroupId String?
-  shopId     String
-  jobId      String?        @unique
-  type       LedgerItemType
-  invoiceUrl String?
-  invoiceKey String?
-  value      Float
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
-  job        Job?           @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  shop       Shop           @relation(fields: [shopId], references: [id])
-  user       user?          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  billingGroup BillingGroup? @relation(fields: [billingGroupId], references: [id], onDelete: Cascade)
-  logs       logs[]
+  shopId         String
+  jobId          String?        @unique
+  type           LedgerItemType
+  invoiceUrl     String?
+  invoiceKey     String?
+  costingCriteriaSnapshot Json?
+  value          Float
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  job            Job?           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  shop           Shop           @relation(fields: [shopId], references: [id])
+  user           user?          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  billingGroup   BillingGroup?  @relation(fields: [billingGroupId], references: [id], onDelete: Cascade)
+  logs           logs[]
 
   @@index([shopId, userId])
   @@index([shopId, billingGroupId])
@@ -354,10 +371,10 @@ model AdditionalCostLineItem {
 }
 
 model JobItem {
-  id     String         @id @default(cuid())
-  title  String
-  status ProgressStatus @default(NOT_STARTED)
-  qty    Float?
+  id       String         @id @default(cuid())
+  title    String
+  status   ProgressStatus @default(NOT_STARTED)
+  qty      Float?
   rawValue Float?
 
   fileId String?
@@ -465,7 +482,6 @@ model UserBillingGroup {
 }
 
 enum LogType {
-
   USER_LOGIN_LOCAL //local login locally
   USER_PASSWORD_SET
   USER_PASSWORD_SET_FAILURE
@@ -551,6 +567,15 @@ enum SuppliedMaterialLevels {
 enum CostingMode {
   CALCULATE_WITH_RESOURCE_AND_MATERIAL
   RAW_VALUE_ENTRY
+}
+
+enum CostingCriterionType {
+  RAW_VALUE
+  RESOURCE_TIME
+  PROCESSING_TIME
+  UNIT_RUNS
+  PRIMARY_MATERIAL
+  SECONDARY_MATERIAL
 }
 
 enum Color {

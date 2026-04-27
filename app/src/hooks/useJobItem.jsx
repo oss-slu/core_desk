@@ -13,7 +13,21 @@ export const useJobItem = (shopId, jobId, jobItemId, options) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setItem(initialValue);
+    if (!initialValue) return;
+
+    setItem((currentItem) => {
+      if (!currentItem) return initialValue;
+      if (currentItem.id !== initialValue.id) return initialValue;
+
+      const currentUpdatedAt = currentItem.updatedAt
+        ? new Date(currentItem.updatedAt).getTime()
+        : 0;
+      const initialUpdatedAt = initialValue.updatedAt
+        ? new Date(initialValue.updatedAt).getTime()
+        : 0;
+
+      return initialUpdatedAt > currentUpdatedAt ? initialValue : currentItem;
+    });
   }, [initialValue]);
 
   const fetchJobItem = async (_shouldFetchJobItem = true) => {

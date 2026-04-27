@@ -1,6 +1,7 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { CostingMode, LogType } from "#prisma-client";
+import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../../../util/costingCriteria.js";
 import { z } from "zod";
 
 export const get = [
@@ -8,7 +9,7 @@ export const get = [
   async (req, res) => {
     const { shopId, resourceTypeId } = req.params;
 
-    const userShop = prisma.userShop.findFirst({
+    const userShop = await prisma.userShop.findFirst({
       where: {
         userId: req.user.id,
         shopId: shopId,
@@ -33,6 +34,7 @@ export const get = [
         shopId,
         active: shouldLoadAll ? undefined : true,
       },
+      include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
     });
 
     if (!resourceType) {
@@ -58,7 +60,7 @@ export const put = [
   async (req, res) => {
     const { shopId, resourceTypeId } = req.params;
 
-    const userShop = prisma.userShop.findFirst({
+    const userShop = await prisma.userShop.findFirst({
       where: {
         userId: req.user.id,
         shopId: shopId,
@@ -115,6 +117,7 @@ export const put = [
         costingMode: parsedCostingMode.data,
       },
       include: {
+        ...RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
         resources: true,
       },
     });

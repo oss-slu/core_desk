@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   Util,
@@ -19,6 +19,12 @@ import { LoadableDropdownInput } from "#loadableDropdown";
 import { ResourceTypePicker } from "../resourceTypePicker/ResourceTypePicker";
 import { MaterialPicker } from "../materialPicker/MaterialPicker";
 import { ResourcePicker } from "../resourcePicker/ResourcePicker";
+import {
+  calculateConfiguredSubtotal,
+  hasRequiredCostingSelections,
+  isRawValueMode,
+  needsSecondaryMaterialSelection,
+} from "../../util/costingCriteria";
 
 import { EditCosting } from "./EditCosting";
 import {
@@ -125,32 +131,49 @@ export const JobItem = ({
 
   if (!item) return null;
 
-  const isRawMode = item.resourceType?.costingMode === "RAW_VALUE_ENTRY";
-  const costingAvailable =
-    (isRawMode && item.resourceTypeId) || (item.materialId && item.resourceId);
+  useEffect(() => {
+    setLocalQty(item?.qty);
+  }, [item?.qty]);
+
+  const resolvedResourceType =
+    item.resourceType ||
+    resourceTypes.find((resourceType) => resourceType.id === item.resourceTypeId) ||
+    null;
+
+  const isRawMode = isRawValueMode(resolvedResourceType);
+  const costingAvailable = hasRequiredCostingSelections({
+    ...item,
+    resourceType: resolvedResourceType,
+  });
+  const showResourcePicker = !isRawMode;
+  const showPrimaryMaterialPicker = !isRawMode;
+  const showSecondaryMaterialPicker = needsSecondaryMaterialSelection(
+    resolvedResourceType
+  );
+  const showSecondaryMaterialConfig = !isRawMode;
+
+  const parsedLocalQty = Number.parseFloat(localQty);
+  const parsedItemQty = Number.parseFloat(item.qty);
+  const normalizedQty =
+    Number.isFinite(parsedLocalQty) && parsedLocalQty > 0
+      ? parsedLocalQty
+      : Number.isFinite(parsedItemQty) && parsedItemQty > 0
+        ? parsedItemQty
+        : 1;
 
   const calculateTotalCost = (includeQty = true) => {
-    if (isRawMode) {
-      return (item.rawValue || 0) * (includeQty ? (item.qty ?? 1) : 1);
-    }
-
-    if (!item.resource || !item.material) return 0;
-
     return (
-      ((item.timeQty * item.resource.costPerTime || 0) +
-        (item.processingTimeQty * item.resource.costPerProcessingTime || 0) +
-        (item.unitQty * item.resource.costPerUnit || 0) +
-        (item.materialQty * item.material.costPerUnit || 0) +
-        (item.secondaryMaterialQty * item.secondaryMaterial?.costPerUnit || 0)) *
-      (includeQty ? (item.qty ?? 1) : 1)
+      calculateConfiguredSubtotal({
+        ...item,
+        resourceType: resolvedResourceType,
+      }) * (includeQty ? normalizedQty : 1)
     );
   };
 
+  const totalCost = calculateTotalCost(true);
+
   const resolvedResourceTypeTitle =
-    item.resourceType?.title ||
-    resourceTypes.find((resourceType) => resourceType.id === item.resourceTypeId)
-      ?.title ||
-    "Resource type";
+    resolvedResourceType?.title || "Resource type";
 
   const resolvedResourceTitle =
     item.resource?.title ||
@@ -175,33 +198,37 @@ export const JobItem = ({
       </>
     ) : (
       <>
-        <div>
-          <strong>{resolvedResourceTypeTitle}: </strong>
-          {resolvedResourceTitle}
-        </div>
-        <div>
-          <strong>Primary material: </strong>
-          {resolvedPrimaryMaterialTitle}
-        </div>
-        <div>
-          <strong>Secondary material: </strong>
-          {resolvedSecondaryMaterialTitle}
-        </div>
+        {showResourcePicker && (
+          <div>
+            <strong>{resolvedResourceTypeTitle}: </strong>
+            {resolvedResourceTitle}
+          </div>
+        )}
+        {showPrimaryMaterialPicker && (
+          <div>
+            <strong>Primary material: </strong>
+            {resolvedPrimaryMaterialTitle}
+          </div>
+        )}
+        {showSecondaryMaterialPicker && (
+          <div>
+            <strong>Secondary material: </strong>
+            {resolvedSecondaryMaterialTitle}
+          </div>
+        )}
       </>
     )
   ) : (
     "No resource or material setup selected"
   );
 
-  const totalCostSummary = costingAvailable
-    ? (
-      <>
-        <strong>Total cost: </strong>
-        ${calculateTotalCost().toFixed(2)}
-      </>
-    ) : (
-      "Total cost unavailable"
-    );
+  const totalCostSummary = costingAvailable ? (
+    <>
+      <strong>Total cost: </strong>${totalCost.toFixed(2)}
+    </>
+  ) : (
+    "Total cost unavailable"
+  );
 
   const resourceConfigurationContent = (
     <div className={styles.sectionCard}>
@@ -213,44 +240,49 @@ export const JobItem = ({
           includeNone={true}
         />
         {item.resourceTypeId ? (
-          item.resourceType?.costingMode === "RAW_VALUE_ENTRY" ? (
+          isRawMode ? (
             <></>
           ) : (
             <>
-              <MaterialPicker
-                value={item.materialId}
-                onChange={(value) => updateJobItem({ materialId: value })}
-                resourceTypeId={item.resourceTypeId}
-                opLoading={opLoading}
-                includeNone={true}
-                materialType={"Primary"}
-              />
-              <MaterialPicker
-                value={item.secondaryMaterialId}
-                onChange={(value) =>
-                  updateJobItem({ secondaryMaterialId: value })
-                }
-                resourceTypeId={item.resourceTypeId}
-                opLoading={opLoading}
-                includeNone={true}
-                materialType={"Secondary"}
-              />
-              {userIsPrivileged ? (
-                <ResourcePicker
-                  value={item.resourceId}
-                  onChange={(value) => updateJobItem({ resourceId: value })}
+              {showPrimaryMaterialPicker && (
+                <MaterialPicker
+                  value={item.materialId}
+                  onChange={(value) => updateJobItem({ materialId: value })}
                   resourceTypeId={item.resourceTypeId}
                   opLoading={opLoading}
                   includeNone={true}
+                  materialType={"Primary"}
                 />
-              ) : (
-                <Util.Col gap={1}>
-                  <label className="form-label mb-0">Resource</label>
-                  <Badge color="blue" soft>
-                    {item.resource?.title || "None"}
-                  </Badge>
-                </Util.Col>
               )}
+              {showSecondaryMaterialConfig && (
+                <MaterialPicker
+                  value={item.secondaryMaterialId}
+                  onChange={(value) =>
+                    updateJobItem({ secondaryMaterialId: value })
+                  }
+                  resourceTypeId={item.resourceTypeId}
+                  opLoading={opLoading}
+                  includeNone={true}
+                  materialType={"Secondary"}
+                />
+              )}
+              {showResourcePicker &&
+                (userIsPrivileged ? (
+                  <ResourcePicker
+                    value={item.resourceId}
+                    onChange={(value) => updateJobItem({ resourceId: value })}
+                    resourceTypeId={item.resourceTypeId}
+                    opLoading={opLoading}
+                    includeNone={true}
+                  />
+                ) : (
+                  <Util.Col gap={1}>
+                    <label className="form-label mb-0">Resource</label>
+                    <Badge color="blue" soft>
+                      {item.resource?.title || "None"}
+                    </Badge>
+                  </Util.Col>
+                ))}
             </>
           )
         ) : (

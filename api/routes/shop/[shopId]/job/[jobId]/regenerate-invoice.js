@@ -67,13 +67,24 @@ export const post = [
           jobId,
           type: LedgerItemType.JOB,
         },
+        select: {
+          id: true,
+          costingCriteriaSnapshot: true,
+        },
       });
 
       if (!ledgerItem) {
         return res.status(404).json({ error: "Invoice not found" });
       }
 
-      const { url, key, log } = await generateInvoice(job, userId, shopId);
+      const { url, key, log, costingCriteriaSnapshot } = await generateInvoice(
+        job,
+        userId,
+        shopId,
+        {
+          costingCriteriaSnapshot: ledgerItem.costingCriteriaSnapshot,
+        }
+      );
 
       const updatedLedgerItem = await prisma.ledgerItem.update({
         where: {
@@ -82,6 +93,8 @@ export const post = [
         data: {
           invoiceUrl: url,
           invoiceKey: key,
+          costingCriteriaSnapshot:
+            ledgerItem.costingCriteriaSnapshot || costingCriteriaSnapshot,
         },
       });
 

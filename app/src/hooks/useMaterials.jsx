@@ -129,6 +129,12 @@ export const useMaterials = (shopId, resourceTypeId) => {
   });
 
   const fetchMaterials = async () => {
+    if (!shopId || !resourceTypeId) {
+      setMaterials([]);
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await authFetch(

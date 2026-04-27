@@ -1,0 +1,534 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
+
+name: Admins can change costing criteria and verify job costing
+seedFile: fixtures/users.sql
+
+steps:
+  - open: /
+  - setViewport:
+      width: 1280
+      height: 720
+  - authenticateUser:
+      email: admin@coredesk-test.slu.edu
+
+  # -------------------- CREATE SHOP --------------------
+
+  - tapOn:
+      text: Shops
+
+  - tapOn:
+      text: Create Shop
+
+  - typeText:
+      placeholder: e.g. South Campus Shop
+      text: Test Shop
+
+  - tapOn:
+      text: Submit
+
+  - waitFor: 800
+
+  - assertVisible:
+      text: Test Shop
+
+  # -------------------- CREATE JOB --------------------
+
+  - tapOn:
+      text: Test Shop
+
+  - waitFor: 300
+
+  - tapOn:
+      text: Jobs
+
+  - waitFor: 300
+
+  - tapOn:
+      text: Create Job
+
+  - waitFor: 500
+
+  - typeText:
+      placeholder: e.g. Wind Mill Assembly
+      text: Test Job
+
+  - tapOn:
+      text: Submit
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      text: Back to jobs
+
+  - tapOn:
+      text: Back to jobs
+
+  - waitFor: 500
+
+  - assertVisible:
+      text: Test Job
+
+  # -------------------- RESOURCES --------------------
+
+  - tapOn:
+      text: Resources
+
+  - waitFor: 400
+
+  - assertVisible:
+      text: Resources
+
+  - tapOn:
+      text: Add...
+
+  - waitFor: 500
+
+  - tapOn:
+      text: Add Resource Type
+
+  - waitFor: 800
+
+  - assertVisible:
+      text: Create a new Resource Type
+
+  - assertVisible:
+      placeholder: FDM 3d Printer
+
+  - typeText:
+      placeholder: FDM 3d Printer
+      text: Test Resource Type
+
+  - tapOn:
+      text: Submit
+      exact: true
+
+  - waitFor: 1200
+
+  # -------------------- MATERIALS  --------------------
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
+  - assertVisible:
+      parent: ".dropdown-menu.show:visible"
+      text: Add Material
+      timeout: 8000
+
+  - tapOn:
+      parent: ".dropdown-menu.show:visible"
+      text: Add Material
+
+  - waitFor: 800
+
+  - typeText:
+      parent: ".modal.show"
+      placeholder: Acrylic, PLA, Pinewood
+      text: Pinewood
+
+  - typeText:
+      parent: ".modal.show"
+      placeholder: Stratasys, BASF, Generic
+      text: Generic
+
+  - tapOn:
+      parent: ".modal.show"
+      text: Submit
+      exact: true
+
+  - waitFor: 800
+
+  - selectFile:
+      selector: 'input[type="file"]'
+      filePath: cypress/fixtures/test-image.png
+
+  - tapOn:
+      text: Upload
+      exact: true
+
+  - waitFor: 1200
+
+  - assertVisible:
+      selector: "#carousel-sample img"
+
+  - tapOn:
+      text: Resources
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200   # allow dropdown animation/state change
+
+  - assertVisible:
+      parent: ".dropdown-menu.show:visible"
+      text: Add Resource
+      timeout: 8000
+
+  - tapOn:
+      parent: ".dropdown-menu.show:visible"
+      text: Add Resource
+
+  - waitFor: 800
+
+  - typeText:
+      parent: ".modal.show"
+      placeholder: Bambu Lab X1C
+      text: Lab X1C
+
+
+  - tapOn:
+      parent: ".modal.show"
+      text: Submit
+      exact: true
+
+  - waitFor: 800
+
+  - assertVisible: 
+      text: Lab X1C
+
+  # -------------------- SET RESOURCE COSTS --------------------
+  # Resource total for later assertions:
+  # - Cost Per Unit: 10
+  # - Cost Per Time: 20
+  # - Cost Per Processing Time: 30
+
+  - tapOn:
+      selector: '[data-cy="edit-resource-button"]'
+      exact: true
+
+  - waitFor: 500
+
+  - typeText:
+      placeholder: What is the cost per unit of this resource?
+      text: "10"
+
+  - typeText:
+      placeholder: What is the cost per time of this resource?
+      text: "20"
+
+  - typeText:
+      placeholder: What is the cost per processing time of this resource?
+      text: "30"
+
+  - tapOn:
+      selector: '[data-cy="save-resource-button"]'
+
+  - waitFor: 1200
+
+  - tapOn:
+      text: Resources
+
+  - waitFor: 1200
+
+# -------------------- OPEN COSTING CRITERIA MODAL --------------------
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200
+
+  - assertVisible:
+      parent: ".dropdown-menu.show:visible"
+      text: Edit Costing Criteria
+      timeout: 8000
+
+  - tapOn:
+      parent: ".dropdown-menu.show:visible"
+      text: Edit Costing Criteria
+
+  - waitFor: 800
+
+  - assertVisible:
+      parent: ".modal.show"
+      text: Test Resource Type Costing Criteria
+
+# -------------------- ADD/EDIT COSTING CRITERION --------------------
+
+  - typeText:
+      parent: ".modal.show"
+      selector: 'input[value="Material quantity"]'
+      text: Test Costing Criterion
+
+  - waitFor: 300
+
+  - tapOn:
+      parent: ".modal.show"
+      text: Save Costing Criteria
+      
+  - waitFor: 1200
+
+# -------------------- VERIFY DEFAULT ENABLED CRITERIA --------------------
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200
+
+  - assertVisible:
+      parent: ".dropdown-menu.show:visible"
+      text: Edit Costing Criteria
+      timeout: 8000
+
+  - tapOn:
+      parent: ".dropdown-menu.show:visible"
+      text: Edit Costing Criteria
+
+  - waitFor: 800
+
+  - assertVisible:
+      parent: ".modal.show"
+      selector: 'input[value="Resource Time"]'
+      allowScroll: true
+
+  - assertVisible:
+      parent: ".modal.show"
+      selector: 'input[value="Processing Time"]'
+      allowScroll: true
+
+  - assertVisible:
+      parent: ".modal.show"
+      selector: 'input[value="Unit runs"]'
+      allowScroll: true
+
+  - assertVisible:
+      parent: ".modal.show"
+      selector: 'input[value="Test Costing Criterion"]'
+      allowScroll: true
+
+  - assertVisible:
+      parent: ".modal.show"
+      text: Disabled criteria
+      allowScroll: true
+
+  - assertVisible:
+      parent: ".modal.show"
+      selector: 'input[value="Secondary Material quantity"]'
+      allowScroll: true
+
+# -------------------- DISABLE AN ENABLED CRITERION --------------------
+
+  - tapOn:
+      parent: ".modal.show"
+      selector: 'input[type="checkbox"]'
+      index: 2
+
+  - waitFor: 300
+
+  - tapOn:
+      parent: ".modal.show"
+      text: Save Costing Criteria
+
+  - waitFor: 1200
+
+# -------------------- VERIFY DISABLED CRITERION MOVED TO BOTTOM --------------------
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200
+
+  - assertVisible:
+      parent: ".dropdown-menu.show:visible"
+      text: Edit Costing Criteria
+      timeout: 8000
+
+  - tapOn:
+      parent: ".dropdown-menu.show:visible"
+      text: Edit Costing Criteria
+
+  - waitFor: 800
+
+  - assertVisible:
+      parent: ".modal.show"
+      text: Disabled criteria
+      allowScroll: true
+
+  - assertVisible:
+      parent: ".modal.show"
+      selector: 'input[value="Unit runs"]'
+      allowScroll: true
+
+# -------------------- RE-ENABLE THE CRITERION --------------------
+
+  - tapOn:
+      parent: ".modal.show"
+      selector: 'input[type="checkbox"]'
+      index: 3
+
+  - waitFor: 300
+
+  - tapOn:
+      parent: ".modal.show"
+      text: Save Costing Criteria
+
+  - waitFor: 1200
+
+# -------------------- VERIFY RE-ENABLED CRITERION IS AVAILABLE AGAIN --------------------
+
+  - tapOn:
+      text: Resource options
+
+  - waitFor: 1200
+
+  - assertVisible:
+      parent: ".dropdown-menu.show:visible"
+      text: Edit Costing Criteria
+      timeout: 8000
+
+  - tapOn:
+      parent: ".dropdown-menu.show:visible"
+      text: Edit Costing Criteria
+
+  - waitFor: 800
+
+  - assertVisible:
+      parent: ".modal.show"
+      selector: 'input[value="Unit runs"]'
+      allowScroll: true
+
+  - tapOn:
+      parent: ".modal.show"
+      text: Save Costing Criteria
+
+  - waitFor: 1200
+
+  - assertVisible:
+      text: Test Shop
+
+# -------------------- CREATE JOB --------------------
+
+  - tapOn:
+      text: Jobs
+
+  - waitFor: 200
+
+  - tapOn:
+      text: Create Job
+
+  - waitFor: 200
+
+  - typeText:
+      placeholder: e.g. Wind Mill Assembly
+      text: Test Job
+
+  - tapOn:
+      text: Submit
+      exact: true
+
+  - assertVisible:
+      text: Test Job
+
+  - waitFor: 1200
+
+# -------------------- OPEN JOB COSTING --------------------
+
+  - assertVisible:
+      text: Costing
+  - tapOn:
+      text: Costing
+  - waitFor: 300
+  - assertVisible:
+      text: Project-wide costing
+
+# -------------------- VERIFY ENABLED CRITERIA IN COSTING --------------------
+
+  - tapOn:
+      text: Add additional cost
+  - waitFor: 300
+  - tapOn:
+      text: Select a resource type
+  - waitFor: 300
+  - assertVisible:
+      text: Test Resource Type
+  - tapOn:
+      text: Test Resource Type
+  - waitFor: 300
+
+  - tapOn:
+      text: Select Resource
+  - waitFor: 300
+  - assertVisible:
+      text: Lab X1C
+  - tapOn:
+      text: Lab X1C
+  - waitFor: 300
+
+  - tapOn:
+      text: Select Material
+  - waitFor: 300
+  - assertVisible:
+      text: Pinewood
+  - tapOn:
+      text: Pinewood
+  - waitFor: 300
+
+  - tapOn:
+      text: Save
+  - waitFor: 300
+
+  - assertVisible:
+      text: Resource Time
+  - assertVisible:
+      text: Processing Time
+  - assertVisible:
+      text: Unit runs
+  - assertVisible:
+      text: Test Costing Criterion
+
+# -------------------- ENTER VALUES AND CHECK TOTAL --------------------
+
+  # Resource Time = 1 hr 0 min
+  - scrollIntoView:
+      placeholder: Hr
+      index: 0
+  - typeText:
+      placeholder: Hr
+      index: 0
+      text: "1"
+  - typeText:
+      placeholder: Min
+      index: 0
+      text: "0"
+
+  # Processing Time = 0 hr 30 min
+  - scrollIntoView:
+      placeholder: Hr
+      index: 1
+  - typeText:
+      placeholder: Hr
+      index: 1
+      text: "0"
+  - typeText:
+      placeholder: Min
+      index: 1
+      text: "30"
+
+  # Unit runs = 5
+  - scrollIntoView:
+      selector: 'input[type="number"]'
+      index: 4
+  - typeText:
+      selector: 'input[type="number"]'
+      index: 4
+      text: "5"
+
+  # Test Costing Criterion = 10
+  - scrollIntoView:
+      selector: 'input[type="number"]'
+      index: 5
+  - typeText:
+      selector: 'input[type="number"]'
+      index: 5
+      text: "10"
+
+  - waitFor: 500
+
+  # Expected total:
+  # (1 * 20) + (0.5 * 30) + (5 * 10) + (10 * 0) = 115.00
+  - assertVisible:
+      text: $115.00

@@ -2,6 +2,7 @@ import { LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
+import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../util/costingCriteria.js";
 // import client from "#postmark";
 
 const getUserBalanceMap = async (shopId, userIds) => {
@@ -336,6 +337,9 @@ export const get = [
               material: true,
               secondaryMaterial: true,
               resource: true,
+              resourceType: {
+                include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+              },
             },
           },
           user: {
@@ -356,6 +360,9 @@ export const get = [
               material: true,
               secondaryMaterial: true,
               resource: true,
+              resourceType: {
+                include: RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
+              },
             },
           },
         },
