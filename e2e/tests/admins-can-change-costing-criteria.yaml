@@ -215,6 +215,45 @@ steps:
   - assertVisible: 
       text: Lab X1C
 
+  # -------------------- SET RESOURCE COSTS --------------------
+  # Resource total for later assertions:
+  # - Cost Per Unit: 10
+  # - Cost Per Time: 20
+  # - Cost Per Processing Time: 30
+
+  - tapOn:
+      text: Lab X1C
+
+  - waitFor: 800
+
+  - tapOn:
+      text: Edit
+      exact: true
+
+  - waitFor: 500
+
+  - typeText:
+      placeholder: What is the cost per unit of this resource?
+      text: "10"
+
+  - typeText:
+      placeholder: What is the cost per time of this resource?
+      text: "20"
+
+  - typeText:
+      placeholder: What is the cost per processing time of this resource?
+      text: "30"
+
+  - tapOn:
+      text: Save & Close edit mode
+
+  - waitFor: 1200
+
+  - tapOn:
+      text: Resources
+
+  - waitFor: 1200
+
 # -------------------- OPEN COSTING CRITERIA MODAL --------------------
 
   - tapOn:
@@ -472,37 +511,53 @@ steps:
 
 # -------------------- ENTER VALUES AND CHECK TOTAL --------------------
 
-  - tapOn:
-      text: Resource Time
+  # Resource Time = 1 hr 0 min
+  - scrollIntoView:
+      placeholder: Hr
+      index: 0
   - typeText:
-      placeholder: "0"
+      placeholder: Hr
+      index: 0
       text: "1"
   - typeText:
-      placeholder: "0"
+      placeholder: Min
+      index: 0
       text: "0"
 
-  - tapOn:
-      text: Processing Time
+  # Processing Time = 0 hr 30 min
+  - scrollIntoView:
+      placeholder: Hr
+      index: 1
   - typeText:
-      placeholder: "0"
+      placeholder: Hr
+      index: 1
       text: "0"
   - typeText:
-      placeholder: "0"
+      placeholder: Min
+      index: 1
       text: "30"
 
-  - tapOn:
-      text: Unit runs
+  # Unit runs = 5
+  - scrollIntoView:
+      selector: 'input[type="number"]'
+      index: 4
   - typeText:
-      placeholder: "0"
+      selector: 'input[type="number"]'
+      index: 4
       text: "5"
 
-  - tapOn:
-      text: Test Costing Criterion
+  # Test Costing Criterion = 10
+  - scrollIntoView:
+      selector: 'input[type="number"]'
+      index: 5
   - typeText:
-      placeholder: "0"
+      selector: 'input[type="number"]'
+      index: 5
       text: "10"
 
   - waitFor: 500
 
+  # Expected total:
+  # (1 * 20) + (0.5 * 30) + (5 * 10) + (10 * 0) = 85.00
   - assertVisible:
-      text: $100.00
+      text: $85.00
