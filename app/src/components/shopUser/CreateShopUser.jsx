@@ -8,6 +8,8 @@ export const CreateShopUser = ({ onSubmit, opLoading }) => {
     email: "",
   });
 
+  const isValid = data.firstName.trim() && data.lastName.trim() && data.email.trim();
+
   return (
     <div>
       <Input
@@ -27,13 +29,15 @@ export const CreateShopUser = ({ onSubmit, opLoading }) => {
       <Input
         label="Email"
         placeholder="e.g. jane.smith@example.com"
+        type="email"
         value={data.email}
         onChange={(e) => setData({ ...data, email: e })}
       />
       <Util.Spacer size={2} />
       <Button
         loading={opLoading}
-        onClick={() => onSubmit(data)}
+        disabled={!isValid}
+        onClick={() => isValid && onSubmit(data)}
       >
         Create User
       </Button>

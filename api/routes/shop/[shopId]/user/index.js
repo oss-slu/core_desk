@@ -65,6 +65,14 @@ export const post = [
             },
           });
         }
+
+        await prisma.logs.create({
+          data: {
+            userId: user.id,
+            shopId,
+            type: LogType.USER_CONNECTED_TO_SHOP,
+          },
+        });
       } else {
         // Create the new user
         user = await prisma.user.create({
@@ -91,15 +99,15 @@ export const post = [
             active: true,
           },
         });
-      }
 
-      await prisma.logs.create({
-        data: {
-          userId: user.id,
-          shopId,
-          type: LogType.USER_CONNECTED_TO_SHOP,
-        },
-      });
+        await prisma.logs.create({
+          data: {
+            userId: user.id,
+            shopId,
+            type: LogType.USER_CONNECTED_TO_SHOP,
+          },
+        });
+      }
 
       return res.json({ user: { id: user.id, email, firstName, lastName } });
     } catch (e) {
