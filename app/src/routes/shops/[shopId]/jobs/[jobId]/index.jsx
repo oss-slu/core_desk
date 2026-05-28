@@ -420,20 +420,28 @@ export const JobPage = () => {
                     className={styles.deadlineRow}
                   >
                     <H3 className={styles.deadlineHeading}>Upcoming Deadline</H3>
-                    <span className={styles.deadlineText}>
-                      {moment(job.dueDate).format("MM/DD/YY")} (
-                      {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
-                      {new Date(job.dueDate) < new Date() &&
-                        !(
-                          new Date(job.dueDate).toDateString() ===
-                          new Date().toDateString()
-                        ) && <Badge color="red">Overdue</Badge>}
-                      {/* Today warning */}{" "}
-                      {new Date(job.dueDate).toDateString() ===
-                        new Date().toDateString() && (
-                          <Badge color="yellow">Due Today</Badge>
-                        )}
-                    </span>
+                    <Util.Col gap={0}>
+                      <span className={styles.deadlineText}>
+                        {moment(job.dueDate).format("MM/DD/YY")} (
+                        {moment(job.dueDate).fromNow()}) {/* Overdue warning */}
+                        {new Date(job.dueDate) < new Date() &&
+                          !(
+                            new Date(job.dueDate).toDateString() ===
+                            new Date().toDateString()
+                          ) && <Badge color="red">Overdue</Badge>}
+                        {/* Today warning */}{" "}
+                        {new Date(job.dueDate).toDateString() ===
+                          new Date().toDateString() && (
+                            <Badge color="yellow">Due Today</Badge>
+                          )}
+                      </span>
+                      <span className={styles.deadlineText}>
+                        Created At:{" "}
+                        {job.createdAt
+                          ? moment(job.createdAt).format("MM/DD/YY hh:mm a")
+                          : "-"}
+                      </span>
+                    </Util.Col>
                   </Util.Row>
                 </Util.Col>
                 <div className={styles.editAction}>

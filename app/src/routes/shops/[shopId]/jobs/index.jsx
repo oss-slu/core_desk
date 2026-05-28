@@ -367,7 +367,24 @@ export const Jobs = () => {
     "Progress",
     "Status",
     "Due Date",
+    "Created At",
   ]);
+
+  const columnLabelToIdMap = {
+    Title: "title",
+    Submitter: "submitter",
+    Payer: "payer",
+    Description: "description",
+    "Total Cost": "totalCost",
+    Affordability: "affordability",
+    Items: "items",
+    Progress: "progress",
+    Status: "status",
+    Finalized: "finalized",
+    "Finalized At": "finalizedAt",
+    "Due Date": "dueDate",
+    "Created At": "createdAt",
+  };
 
   const handleColumnToggle = (id) => {
     setColumnsToShow(
@@ -538,9 +555,27 @@ export const Jobs = () => {
         },
         enableSorting: true,
       },
+      {
+        id: "createdAt",
+        header: "Created At",
+        accessorFn: (row) => row.createdAt,
+        cell: ({ getValue }) => {
+          const value = getValue();
+          return value ? moment(value).format("MM/DD/YY hh:mm a") : "-";
+        },
+        enableSorting: true,
+      },
     ],
     [shopId, activeUser],
   );
+
+  const visibleColumns = useMemo(() => {
+    const visibleColumnIds = new Set(
+      columnsToShow.map((label) => columnLabelToIdMap[label]).filter(Boolean),
+    );
+
+    return columns.filter((column) => visibleColumnIds.has(column.id));
+  }, [columns, columnsToShow]);
 
   const ordered = useMemo(() => {
     if (!sorting.length) return filteredJobs;
@@ -568,6 +603,10 @@ export const Jobs = () => {
           aVal = a.dueDate;
           bVal = b.dueDate;
           break;
+        case "createdAt":
+          aVal = a.createdAt;
+          bVal = b.createdAt;
+          break;
         default:
           return 0;
       }
@@ -576,7 +615,7 @@ export const Jobs = () => {
       if (bVal == null) return -1;
 
       // dates
-      if (["dueDate"].includes(id)) {
+      if (["dueDate", "createdAt"].includes(id)) {
         return new Date(aVal) - new Date(bVal);
       }
 
@@ -667,7 +706,7 @@ export const Jobs = () => {
         ) : (
           <>
             <TableV2
-              columns={columns}
+              columns={visibleColumns}
               data={pageData}
               page={page}
               size={size}
