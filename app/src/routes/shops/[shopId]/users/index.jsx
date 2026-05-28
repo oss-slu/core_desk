@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
@@ -12,6 +12,11 @@ import { NotFound } from "../../../../components/404/404";
 import { Avatar } from "#avatar";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
 import { TableV2 } from "tabler-react-2";
+import { Button } from "#button";
+import { useModal } from "#modal";
+import { CreateShopUser } from "../../../../components/shopUser/CreateShopUser";
+import { authFetch } from "#url";
+import toast from "react-hot-toast";
 const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {
@@ -46,7 +51,7 @@ const switchAccountTypeForBadge = (type) => {
 export const ShopUsersPage = () => {
   const { shopId } = useParams();
   const { user } = useAuth();
-  const { userShop, loading, users } = useShop(shopId, {
+  const { userShop, loading, users, refetch } = useShop(shopId, {
     includeUsers: true,
   });
   const { user: activeUser } = useUser(user?.id);
@@ -55,6 +60,39 @@ export const ShopUsersPage = () => {
   const [size, setSize] = useState(25);
   const [sorting, setSorting] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [opLoading, setOpLoading] = useState(false);
+
+  const handleCreateUser = async (data) => {
+    setOpLoading(true);
+    try {
+      const r = await authFetch(`/api/shop/${shopId}/user`, {
+        method: "POST",
+        body: JSON.stringify(data),
+      });
+      const result = await r.json();
+      if (r.ok) {
+        toast.success("User created successfully");
+        closeModal();
+        refetch();
+      } else {
+        toast.error(result.error || "Failed to create user");
+      }
+    } catch (e) {
+      toast.error("Failed to create user");
+    }
+    setOpLoading(false);
+  };
+
+  const { modal, ModalElement, close: closeModal, update } = useModal({
+    title: "Create User",
+    text: (
+      <CreateShopUser onSubmit={handleCreateUser} opLoading={opLoading} />
+    ),
+  });
+
+  useEffect(() => {
+    update();
+  }, [opLoading]);
 
 
   const filteredUsers = useMemo(() => {
@@ -195,14 +233,18 @@ export const ShopUsersPage = () => {
         userShop.balance < 0
       )}
     >
+      {ModalElement}
       <H1>Shop Users</H1>
       <Util.Spacer size={2} />
-      <SearchBar
-        onSearch={(value) => {
-          setSearchTerm(value);
-          setPage(1);
-        }}
-      />
+      <Util.Row align="center" justify="between">
+        <SearchBar
+          onSearch={(value) => {
+            setSearchTerm(value);
+            setPage(1);
+          }}
+        />
+        <Button onClick={modal}>Create User</Button>
+      </Util.Row>
 
       <Util.Spacer size={2} />
       <TableV2
