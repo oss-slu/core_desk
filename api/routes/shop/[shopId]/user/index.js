@@ -2,6 +2,15 @@ import { LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 
+const logUserConnectedToShop = (userId, shopId) =>
+  prisma.logs.create({
+    data: {
+      userId,
+      shopId,
+      type: LogType.USER_CONNECTED_TO_SHOP,
+    },
+  });
+
 export const post = [
   verifyAuth,
   async (req, res) => {
@@ -65,14 +74,6 @@ export const post = [
             },
           });
         }
-
-        await prisma.logs.create({
-          data: {
-            userId: user.id,
-            shopId,
-            type: LogType.USER_CONNECTED_TO_SHOP,
-          },
-        });
       } else {
         // Create the new user
         user = await prisma.user.create({
@@ -99,20 +100,17 @@ export const post = [
             active: true,
           },
         });
-
-        await prisma.logs.create({
-          data: {
-            userId: user.id,
-            shopId,
-            type: LogType.USER_CONNECTED_TO_SHOP,
-          },
-        });
       }
+
+      await logUserConnectedToShop(user.id, shopId);
 
       return res.json({ user: { id: user.id, email, firstName, lastName } });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ error: "An error occurred" });
+    }
+  },
+];
     }
   },
 ];

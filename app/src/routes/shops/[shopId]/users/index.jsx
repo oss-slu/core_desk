@@ -92,7 +92,7 @@ export const ShopUsersPage = () => {
 
   useEffect(() => {
     update();
-  }, [opLoading]);
+  }, [opLoading, update]);
 
 
   const filteredUsers = useMemo(() => {

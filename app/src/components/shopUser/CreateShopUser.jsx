@@ -8,7 +8,12 @@ export const CreateShopUser = ({ onSubmit, opLoading }) => {
     email: "",
   });
 
-  const isValid = data.firstName.trim() && data.lastName.trim() && data.email.trim();
+  const isValid =
+    data.firstName.trim() &&
+    data.lastName.trim() &&
+    data.email.trim() &&
+    data.email.includes("@") &&
+    data.email.includes(".");
 
   return (
     <div>
