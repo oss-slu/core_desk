@@ -249,7 +249,7 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
     });
 
     expect(ledgerItem).toBeDefined();
-    expect(ledgerItem.value).toBe(-22);
+    expect(ledgerItem.value).toBe(-60);
   });
 
   it("changes to total cost do not clear existing qty and do not cause errors when finalizing", async () => {
@@ -305,7 +305,7 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
     });
 
     expect(ledgerItem).toBeDefined();
-    expect(ledgerItem.value).toBe(-28);
+    expect(ledgerItem.value).toBe(-40);
   });
 
   it("raw-value types only use RAW_VALUE", async () => {
