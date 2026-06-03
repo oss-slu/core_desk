@@ -196,6 +196,118 @@ describe("/shop/[shopId]/job/[jobId] costing criteria", () => {
     expect(found.totalCost).toBe(16);
   });
 
+  it("changes to qty do not clear existing total costs and do not cause errors when finalizing", async () => {
+    const { resourceType, resource, material } = await createCalculatedBundle({
+      criteria: [
+        {
+          criterionType: "UNIT_RUNS",
+          label: "Unit runs",
+          enabled: true,
+          displayOrder: 0,
+        },
+      ],
+      resourceCostPerUnit: 4,
+      materialCostPerUnit: 1,
+    });
+
+    const job = await prisma.job.create({
+      data: {
+        title: "Qty Change Job",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+      },
+    });
+
+    const jobItem = await prisma.jobItem.create({
+      data: {
+        title: "Qty Change Item",
+        jobId: job.id,
+        resourceTypeId: resourceType.id,
+        resourceId: resource.id,
+        materialId: material.id,
+        qty: 2,
+        unitQty: 3,
+      },
+    });
+
+    await prisma.jobItem.update({
+      where: { id: jobItem.id },
+      data: { qty: 5 },
+    });
+
+    const res = await request(app)
+      .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+      .set(...(await gt({ sat: "ADMIN" })))
+      .send({ finalized: true });
+
+    expect(res.status).toBe(200);
+
+    const ledgerItem = await prisma.ledgerItem.findUnique({
+      where: {
+        jobId: job.id,
+      },
+    });
+
+    expect(ledgerItem).toBeDefined();
+    expect(ledgerItem.value).toBe(-22);
+  });
+
+  it("changes to total cost do not clear existing qty and do not cause errors when finalizing", async () => {
+    const { resourceType, resource, material } = await createCalculatedBundle({
+      criteria: [
+        {
+          criterionType: "UNIT_RUNS",
+          label: "Unit runs",
+          enabled: true,
+          displayOrder: 0,
+        },
+      ],
+      resourceCostPerUnit: 4,
+      materialCostPerUnit: 1,
+    });
+
+    const job = await prisma.job.create({
+      data: {
+        title: "Cost Change Job",
+        shopId: tc.shop.id,
+        userId: tc.user.id,
+      },
+    });
+
+    const jobItem = await prisma.jobItem.create({
+      data: {
+        title: "Cost Change Item",
+        jobId: job.id,
+        resourceTypeId: resourceType.id,
+        resourceId: resource.id,
+        materialId: material.id,
+        qty: 2,
+        unitQty: 3,
+      },
+    });
+
+    await prisma.jobItem.update({
+      where: { id: jobItem.id },
+      data: { unitQty: 5 },
+    });
+
+    const res = await request(app)
+      .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+      .set(...(await gt({ sat: "ADMIN" })))
+      .send({ finalized: true });
+
+    expect(res.status).toBe(200);
+
+    const ledgerItem = await prisma.ledgerItem.findUnique({
+      where: {
+        jobId: job.id,
+      },
+    });
+
+    expect(ledgerItem).toBeDefined();
+    expect(ledgerItem.value).toBe(-28);
+  });
+
   it("raw-value types only use RAW_VALUE", async () => {
     const resourceType = await prisma.resourceType.create({
       data: {
