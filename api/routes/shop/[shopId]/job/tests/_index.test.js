@@ -108,7 +108,7 @@ describe("/shop/[shopId]/job", () => {
                     title: "JobCreationExample Title",
                     description: "JobCreationExample description",
                     dueDate: new Date(),
-                    billingGroupId: group.id,
+                    groupId: group.id,
                 });
 
             expect(res.status).toBe(200);
@@ -119,7 +119,7 @@ describe("/shop/[shopId]/job", () => {
                 shopId: expect.any(String),
                 userId: expect.any(String),
                 dueDate: expect.any(String),
-                billingGroupId: group.id,
+                groupId: group.id,
             });
         });
             
