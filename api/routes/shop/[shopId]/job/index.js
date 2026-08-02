@@ -178,7 +178,7 @@ export const post = [
           billingGroupToCreateJobAs = billingGroup;
         }
 
-        if (userBillingGroup.role === "ADMIN") {
+        if (userBillingGroup?.role === "ADMIN") {
           billingGroupToCreateJobAs = billingGroup;
         }
       }
