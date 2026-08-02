@@ -166,7 +166,7 @@ export const post = [
           },
         });
 
-        if (!userBillingGroup) {
+        if (!(req.user.admin || userShop.accountType === "ADMIN" || userShop.accountType === "OPERATOR") && !userBillingGroup) {
           return res.status(400).json({ error: "Forbidden" });
         }
 
