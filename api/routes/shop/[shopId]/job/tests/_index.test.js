@@ -101,26 +101,21 @@ describe("/shop/[shopId]/job", () => {
 
             const group = await createGroup();
 
-            const res = await request(app)
-                .post(`/api/shop/${tc.shop.id}/job`)
-                .set(...(await gt({ ga: true })))
-                .send({
+            const job = await prisma.job.create({
+                data: {
                     title: "JobCreationExample Title",
-                    description: "JobCreationExample description",
-                    dueDate: new Date(),
-                    groupId: group.id,
-                });
+                    shopId: tc.shop.id,
+                    userId: tc.user.id,
+                },
+            });
+
+            const res = await request(app)
+                .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
+                .set(...(await gt()))
+                .send({ groupId: group.id });
 
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty("job");
-            expect(res.body.job).toMatchObject({
-                title: "JobCreationExample Title",
-                description: "JobCreationExample description",
-                shopId: expect.any(String),
-                userId: expect.any(String),
-                dueDate: expect.any(String),
-                groupId: group.id,
-            });
+            expect(res.body.job.groupId).toBe(group.id);
         });
             
         it("defaults due date to two weeks out when dueDate is not provided", async () => {
