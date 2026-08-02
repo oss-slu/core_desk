@@ -108,7 +108,8 @@ describe("/shop/[shopId]/job", () => {
                 .send(job);
 
             expect(res.status).toBe(200);
-            expect(res.body.job.groupId).toBe(group.id);
+            expect(res.body.job.billingAccount.type).toBe("GROUP");
+            expect(res.body.job.billingAccount.id).toBe(group.id);
         });
             
         it("defaults due date to two weeks out when dueDate is not provided", async () => {
