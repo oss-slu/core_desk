@@ -6,20 +6,6 @@ import { gt } from "#gt";
 import { tc } from "#setup";
 import { prisma } from "#prisma";
 
-const createGroup = async () =>
-    prisma.billingGroup.create({
-        data: {
-            shopId: tc.shop.id,
-            title: "Billing Group Test Group",
-            users: {
-                create: {
-                    userId: tc.user.id,
-                    role: "MEMBER",
-                },
-            },
-        },
-    });
-
 describe("/shop/[shopId]/job", () => {
     describe("POST", () => {
         let findFirstSpy;
@@ -99,23 +85,37 @@ describe("/shop/[shopId]/job", () => {
                 role: "ADMIN",
             });
 
-            const group = await createGroup();
+            const group = await prisma.billingGroup.create({
+                data: {
+                    shopId: tc.shop.id,
+                    title: "Billing Group Test Group",
+                }
+            });
 
             const job = await prisma.job.create({
                 data: {
                     title: "JobCreationExample Title",
+                    dueDate: new Date(),
                     shopId: tc.shop.id,
                     userId: tc.user.id,
-                },
+                    groupId: group.id,
+                }
             });
 
             const res = await request(app)
-                .put(`/api/shop/${tc.shop.id}/job/${job.id}`)
-                .set(...(await gt()))
-                .send({ groupId: group.id });
+                .post(`/api/shop/${tc.shop.id}/job`)
+                .set(...(await gt({ ga: true })))
+                .send(job);
 
             expect(res.status).toBe(200);
-            expect(res.body.job.groupId).toBe(group.id);
+            expect(res.body).toHaveProperty("job");
+            expect(res.body.job).toMatchObject({
+                title: "JobCreationExample Title",
+                shopId: expect.any(String),
+                userId: expect.any(String),
+                dueDate: expect.any(String),
+                groupId: group.id,
+            });
         });
             
         it("defaults due date to two weeks out when dueDate is not provided", async () => {
