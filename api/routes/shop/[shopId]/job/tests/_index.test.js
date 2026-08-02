@@ -77,6 +77,36 @@ describe("/shop/[shopId]/job", () => {
             expect(createLogsSpy).not.toHaveBeenCalled();
         });
 
+        it("allows job creation on behalf of billing group if user is a shop admin", async () => {
+            prisma.userShop.findFirst = findFirstSpy.mockResolvedValue({
+                userId: "example-id",
+                shopId: tc.shop.id,
+                active: true,
+                role: "ADMIN",
+            });
+
+            const res = await request(app)
+                .post(`/api/shop/${tc.shop.id}/job`)
+                .set(...(await gt({ ga: true })))
+                .send({
+                    title: "JobCreationExample Title",
+                    description: "JobCreationExample description",
+                    dueDate: new Date(),
+                    billingGroupId: tc.billingGroup.id,
+                });
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("job");
+            expect(res.body.job).toMatchObject({
+                title: "JobCreationExample Title",
+                description: "JobCreationExample description",
+                shopId: expect.any(String),
+                userId: expect.any(String),
+                dueDate: expect.any(String),
+                billingGroupId: tc.billingGroup.id,
+            });
+        });
+            
         it("defaults due date to two weeks out when dueDate is not provided", async () => {
             prisma.userShop.findFirst = findFirstSpy.mockResolvedValue({
                 userId: "example-id",
