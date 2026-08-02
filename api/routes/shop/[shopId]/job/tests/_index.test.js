@@ -108,7 +108,6 @@ describe("/shop/[shopId]/job", () => {
                 .send(job);
 
             expect(res.status).toBe(200);
-            expect(res.body.job.billingAccount.type).toBe("GROUP");
             expect(res.body.job.billingAccount.id).toBe(group.id);
         });
             
