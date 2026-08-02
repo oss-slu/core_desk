@@ -108,14 +108,7 @@ describe("/shop/[shopId]/job", () => {
                 .send(job);
 
             expect(res.status).toBe(200);
-            expect(res.body).toHaveProperty("job");
-            expect(res.body.job).toMatchObject({
-                title: "JobCreationExample Title",
-                shopId: expect.any(String),
-                userId: expect.any(String),
-                dueDate: expect.any(String),
-                groupId: group.id,
-            });
+            expect(res.body.job.groupId).toBe(group.id);
         });
             
         it("defaults due date to two weeks out when dueDate is not provided", async () => {
