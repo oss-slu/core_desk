@@ -6,6 +6,20 @@ import { gt } from "#gt";
 import { tc } from "#setup";
 import { prisma } from "#prisma";
 
+const createGroup = async () =>
+    prisma.billingGroup.create({
+        data: {
+            shopId: tc.shop.id,
+            title: "Billing Group Test Group",
+            users: {
+                create: {
+                    userId: tc.user.id,
+                    role: "MEMBER",
+                },
+            },
+        },
+    });
+
 describe("/shop/[shopId]/job", () => {
     describe("POST", () => {
         let findFirstSpy;
@@ -85,6 +99,8 @@ describe("/shop/[shopId]/job", () => {
                 role: "ADMIN",
             });
 
+            const group = await createGroup();
+
             const res = await request(app)
                 .post(`/api/shop/${tc.shop.id}/job`)
                 .set(...(await gt({ ga: true })))
@@ -92,7 +108,7 @@ describe("/shop/[shopId]/job", () => {
                     title: "JobCreationExample Title",
                     description: "JobCreationExample description",
                     dueDate: new Date(),
-                    billingGroupId: tc.billingGroup.id,
+                    billingGroupId: group.id,
                 });
 
             expect(res.status).toBe(200);
@@ -103,7 +119,7 @@ describe("/shop/[shopId]/job", () => {
                 shopId: expect.any(String),
                 userId: expect.any(String),
                 dueDate: expect.any(String),
-                billingGroupId: tc.billingGroup.id,
+                billingGroupId: group.id,
             });
         });
             
