@@ -166,7 +166,7 @@ export const post = [
           },
         });
 
-        if (!userBillingGroup) {
+        if (!(req.user.admin || userShop.accountType === "ADMIN" || userShop.accountType === "OPERATOR") && !userBillingGroup) {
           return res.status(400).json({ error: "Forbidden" });
         }
 
@@ -178,7 +178,7 @@ export const post = [
           billingGroupToCreateJobAs = billingGroup;
         }
 
-        if (userBillingGroup.role === "ADMIN") {
+        if (userBillingGroup?.role === "ADMIN") {
           billingGroupToCreateJobAs = billingGroup;
         }
       }
