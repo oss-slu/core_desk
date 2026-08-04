@@ -101,44 +101,53 @@ export const post = [
         }
 
         if (onBehalfOfUserEmail) {
-          const user = await prisma.user.create({
-            data: {
-              email: onBehalfOfUserEmail,
-              firstName: onBehalfOfUserFirstName,
-              lastName: onBehalfOfUserLastName,
-            },
-          });
-
-          const shopsToJoin = await prisma.shop.findMany({
+          let user = await prisma.user.findFirst({
             where: {
-              autoJoin: true,
+              email: onBehalfOfUserEmail,
             },
           });
 
-          for (const shop of shopsToJoin) {
-            await prisma.userShop.create({
+          if (!user) {
+            const user = await prisma.user.create({
               data: {
-                userId: user.id,
-                shopId: shop.id,
-                active: true,
+                email: onBehalfOfUserEmail,
+                firstName: onBehalfOfUserFirstName,
+                lastName: onBehalfOfUserLastName,
               },
             });
+
+
+            const shopsToJoin = await prisma.shop.findMany({
+              where: {
+                autoJoin: true,
+              },
+            });
+
+            for (const shop of shopsToJoin) {
+              await prisma.userShop.create({
+                data: {
+                  userId: user.id,
+                  shopId: shop.id,
+                  active: true,
+                },
+              });
+
+              await prisma.logs.create({
+                data: {
+                  userId: user.id,
+                  type: LogType.USER_CONNECTED_TO_SHOP,
+                  shopId: shop.id,
+                },
+              });
+            }
 
             await prisma.logs.create({
               data: {
                 userId: user.id,
-                type: LogType.USER_CONNECTED_TO_SHOP,
-                shopId: shop.id,
+                type: LogType.USER_CREATED,
               },
             });
           }
-
-          await prisma.logs.create({
-            data: {
-              userId: user.id,
-              type: LogType.USER_CREATED,
-            },
-          });
 
           userToCreateJobAs = user.id;
         }

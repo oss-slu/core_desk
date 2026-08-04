@@ -378,6 +378,68 @@ if (process.env.JACK == "true") {
 
   // app.use("/api", await router());
 
+  // Routes for TDX Web API
+
+  app.get('/api/tdx-auth', async (req, res) => {
+    const { shopId } = req.query;
+    
+    try {
+      const response = await fetch(`${process.env.TDX_URL}/auth/loginSSO`);
+      const r = await response.text();
+
+      // gets token from html code returned from fetch (matches token characters)
+      // basically an extraction (thanks, Gemini)
+      // eslint-disable-next-line max-len
+      const t = r.match(/([A-Za-z0-9-_]{20,}\.){2}[A-Za-z0-9-_]{20,}|[A-Za-z0-9]{32,}/);
+
+      if (t) {
+        const token = t[0];
+        
+        const destination = `${process.env.BASE_URL}/shops/${shopId}/jobs?token=${encodeURIComponent(token)}#`;
+        
+        res.redirect(destination);
+      } else {
+        res.status(500).send("SSO Success, but no token found in HTML output.");
+        console.log(`${res.status(500)}: SSO Success, but no token found in HTML output.`);
+      }
+    } catch (error) {
+      res.status(500).send(error);  
+    }
+  });
+
+  app.get('/api/tdx-ticket', async (req, res) => {
+    const { ticketId, token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({error: "Token is required"});
+    }
+
+    if (!ticketId) {
+      return res.status(400).json({ error: "Ticket ID is required" });
+    }
+
+    try {
+      const ticketRes = await fetch(`${process.env.TDX_URL}/${process.env.TDX_APP_ID}/tickets/${ticketId}`, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!ticketRes.ok) {
+        return res.status(ticketRes.status).json({ error: "Ticket not found" });
+      }
+
+      const data = await ticketRes.json();
+      
+      res.json(data);
+
+    } catch (error) {
+      console.error("TDX Proxy Error:", error);
+      res.status(500).json({ error: "Internal Server Error", details: error.message });
+    }
+  });
+
   // This route is used for training purposes only. It is not used in production.
   app.use((req, res, next) => {
     if (req.url.includes("joke/emoji")) {

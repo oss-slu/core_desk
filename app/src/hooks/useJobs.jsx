@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import toast from "react-hot-toast";
 import { authFetch } from "#url";
 import { useModal } from "#modal";
 import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
@@ -8,6 +9,7 @@ import { useUserShop } from "./useUserShop";
 import { useAuth } from "#useAuth";
 import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../components/billingGroupPicker/BillingGroupPicker";
+import { useTDXTickets } from "./useTDXTickets";
 
 const toLocalDateInputValue = (date) => {
   const localDate = new Date(date);
@@ -185,6 +187,69 @@ const CreateJobModalContent = ({
   );
 };
 
+const CreateTDXImportModalContent = ({
+    onSubmit
+  }) => {
+  const {shopId} = useParams('');
+  const [auth] = useState({ tdxToken: localStorage.getItem('tdx_bearer_token') });
+  const [ticketId, setTicketId] = useState('');
+  const { loading, handleLogin, fetchTicket } = useTDXTickets();
+  if (!auth.tdxToken) {
+    return (
+      <div>
+          <div>
+              <Button
+                  loading={loading}
+                  onClick={async () => {
+                      handleLogin(shopId);
+                  }}
+              >
+                  Log Into TDNext
+              </Button>
+          </div>
+      </div>
+    )
+  }
+  return (
+    <div className="gap-2 border-b-5 border-b-black">
+        <Input
+            value={ticketId}
+            onChange={(e) => setTicketId(e)}
+            label="TDNext Ticket ID"
+            placeholder="Ticket ID"
+        />
+        <Button 
+            loading={loading}
+            onClick={async () => {
+                const data = await fetchTicket(ticketId);
+                toast.promise(data, {
+                    loading: "Fetching ticket from TDX...",
+                    success: "Successfully imported ticket.",
+                    error: "Error when fetching",
+                });
+                if (data && onSubmit) {
+                    // Call onSubmit with positional arguments to match _createJob
+                    onSubmit(
+                        data.title,
+                        data.description,
+                        data.dueDate,
+                        data.onBehalfOf,
+                        data.onBehalfOfUserId,
+                        data.onBehalfOfUserEmail,
+                        data.onBehalfOfUserFirstName,
+                        data.onBehalfOfUserLastName,
+                        data.onBehalfOfBillingGroup,
+                        data.onBehalfOfBillingGroupId
+                    );
+                }
+            }}
+        >
+            Import Ticket
+        </Button>
+    </div>
+  );
+};
+
 export const useJobs = (shopId) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -233,6 +298,11 @@ export const useJobs = (shopId) => {
   const { modal, ModalElement } = useModal({
     title: "Create a new Job",
     text: <CreateJobModalContent onSubmit={_createJob} />,
+  });
+
+  const { modal: tdxModal, ModalElement: TDXModalElement } = useModal({
+    title: "Import from TDNext",
+    text: <CreateTDXImportModalContent onSubmit={_createJob}/>
   });
 
   const CreateSimpleSubPage = () => {
@@ -337,6 +407,15 @@ export const useJobs = (shopId) => {
     });
   };
 
+  const importTDXJob = async () => {
+    tdxModal({
+      title: "Import ticket from TDNext",
+      text: (
+        <CreateTDXImportModalContent onSubmit={_createJob} />
+      )
+    })
+  };
+
   const updateJob = async (jobId, newJob) => {
     const job = jobs.find((j) => j.id === jobId);
     if (job.finalized) {
@@ -383,7 +462,9 @@ export const useJobs = (shopId) => {
     refetch: fetchJobs,
     CreateSimpleSubPage,
     ModalElement,
+    TDXModalElement,
     createJob,
+    importTDXJob,
     opLoading,
     updateJob,
   };
