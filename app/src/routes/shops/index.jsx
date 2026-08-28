@@ -4,7 +4,6 @@ import { useShops, useUser } from "#hooks";
 import { Loading } from "#loading";
 import { Typography, Util } from "tabler-react-2";
 import { ShopCard } from "../../components/shopcard/ShopCard";
-import { NotFound } from "../../components/404/404";
 import { Page, sidenavItems } from "#page";
 import { Button } from "#button";
 
@@ -21,8 +20,6 @@ export const Shops = () => {
   const { user: activeUser } = useUser(user?.id);
 
   if (loading) return <Loading />;
-
-  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenavItems("Shops", user.admin)}>

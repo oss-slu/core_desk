@@ -6,7 +6,7 @@ import { Typography, Util, Input, Switch } from "tabler-react-2";
 import { Icon } from "#icon";
 import { useParams } from "react-router-dom";
 const { H1, H2 } = Typography;
-import { useShop, useUser } from "#hooks";
+import { useShop } from "#hooks";
 import { Button } from "#button";
 import { MarkdownRender } from "#markdownRender";
 import { MarkdownEditor } from "#markdownEditor";
@@ -135,7 +135,6 @@ export const ShopPage = () => {
     deleteShop,
     deleteModalElement,
   } = useShop(shopId);
-  const { user: activeUser } = useUser(user?.id);
   const [editing, setEditing] = useState(false);
   const [newShop, setNewShop] = useState(shop);
   useEffect(() => {
@@ -157,7 +156,7 @@ export const ShopPage = () => {
       </Page>
     );
 
-  if (!shop || activeUser?.simple === true) return <NotFound />;
+  if (!shop) return <NotFound />;
 
   return (
     <Page

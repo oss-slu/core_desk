@@ -14,7 +14,6 @@ import {
 } from "tabler-react-2";
 const { H1, H3, H4 } = Typography;
 import { useJobs } from "../../../../hooks/useJobs";
-import { useUser } from "../../../../hooks/useUser";
 import { Button } from "#button";
 import moment from "moment";
 import { Loading } from "#loading";
@@ -246,10 +245,8 @@ export const Jobs = () => {
     jobs,
     loading: jobsLoading,
     ModalElement,
-    CreateSimpleSubPage,
     createJob,
   } = useJobs(shopId);
-  const { user } = useUser(activeUser.id);
 
   // State variables for filters
   const [statusFilter, setStatusFilter] = useState([
@@ -640,104 +637,96 @@ export const Jobs = () => {
     return <Loading />;
   }
 
-  if (user?.simple === false) {
-    return (
-      <Page
-        sidenavItems={shopSidenavItems(
-          "Jobs",
-          shopId,
-          activeUser?.admin,
-          userShop.accountType,
-          userShop.balance < 0,
-        )}
-      >
-        <Util.Row justify="between" align="center">
-          <div>
-            <H1>Jobs</H1>
-          </div>
-          <Button onClick={createJob}>Create Job</Button>
-        </Util.Row>
-        <Util.Spacer size={1} />
-
-        <div
-          style={{
-            padding: 16,
-            borderBottom: "1px solid rgb(218 223 228)",
-            backgroundColor: "#F8FAFC",
-          }}
-        >
-          <H3>Filters</H3>
-          <SearchBar
-            onSearch={(value) => {
-              setSearchTerm(value);
-              setPage(1);
-            }}
-          />
-          <NEWFilters
-            {...{
-              statusOptions,
-              handleStatusToggle,
-              statusFilter,
-              activeUser,
-              userShop,
-              submitterFilter,
-              setSubmitterFilter,
-              startDateFilter,
-              setStartDateFilter,
-              endDateFilter,
-              setEndDateFilter,
-              columnsOptions,
-              handleColumnToggle,
-              columnsToShow,
-              handleFinalizedToggle,
-              finalizedFilter,
-              finalizedOptions,
-            }}
-          />
+  return (
+    <Page
+      sidenavItems={shopSidenavItems(
+        "Jobs",
+        shopId,
+        activeUser?.admin,
+        userShop.accountType,
+        userShop.balance < 0,
+      )}
+    >
+      <Util.Row justify="between" align="center">
+        <div>
+          <H1>Jobs</H1>
         </div>
-        {/* <Util.Spacer size={2} /> */}
+        <Button onClick={createJob}>Create Job</Button>
+      </Util.Row>
+      <Util.Spacer size={1} />
 
-        {/* Jobs Table */}
-        {filteredJobs.length === 0 ? (
-          <i>
-            No jobs found. Adjust your filters or click the "Create Job" button
-            above to create a new job.
-          </i>
-        ) : (
-          <>
-            <TableV2
-              columns={visibleColumns}
-              data={pageData}
-              page={page}
-              size={size}
-              totalRows={filteredJobs.length}
-              onPageChange={setPage}
-              onSizeChange={(n) => {
-                setPage(1);
-                setSize(n);
-              }}
-              sorting={sorting}
-              onSortingChange={(next) => {
-                setPage(1);
-                setSorting(next);
-              }}
-            />
-            <Util.Spacer size={1} />
-            <i className="text-secondary">
-              * Total cost is an estimate reflecting the current state of the
-              job. Because the job is not finalized, the cost may change as the
-              job progresses.
-            </i>
-          </>
-        )}
-        {ModalElement}
-      </Page>
-    );
-  } else {
-    return (
-      <div>
-        <CreateSimpleSubPage />
+      <div
+        style={{
+          padding: 16,
+          borderBottom: "1px solid rgb(218 223 228)",
+          backgroundColor: "#F8FAFC",
+        }}
+      >
+        <H3>Filters</H3>
+        <SearchBar
+          onSearch={(value) => {
+            setSearchTerm(value);
+            setPage(1);
+          }}
+        />
+        <NEWFilters
+          {...{
+            statusOptions,
+            handleStatusToggle,
+            statusFilter,
+            activeUser,
+            userShop,
+            submitterFilter,
+            setSubmitterFilter,
+            startDateFilter,
+            setStartDateFilter,
+            endDateFilter,
+            setEndDateFilter,
+            columnsOptions,
+            handleColumnToggle,
+            columnsToShow,
+            handleFinalizedToggle,
+            finalizedFilter,
+            finalizedOptions,
+          }}
+        />
       </div>
-    );
-  }
+      {/* <Util.Spacer size={2} /> */}
+
+      {/* Jobs Table */}
+      {filteredJobs.length === 0 ? (
+        <i>
+          No jobs found. Adjust your filters or click the "Create Job" button
+          above to create a new job.
+        </i>
+      ) : (
+        <>
+          <TableV2
+            columns={visibleColumns}
+            data={pageData}
+            page={page}
+            size={size}
+            totalRows={filteredJobs.length}
+            onPageChange={setPage}
+            onSizeChange={(n) => {
+              setPage(1);
+              setSize(n);
+            }}
+            sorting={sorting}
+            onSortingChange={(next) => {
+              setPage(1);
+              setSorting(next);
+            }}
+          />
+          <Util.Spacer size={1} />
+          <i className="text-secondary">
+            * Total cost is an estimate reflecting the current state of the
+            job. Because the job is not finalized, the cost may change as the
+            job progresses.
+          </i>
+        </>
+      )}
+      {ModalElement}
+    </Page>
+  );
 };

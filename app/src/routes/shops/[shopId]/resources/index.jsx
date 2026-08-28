@@ -8,7 +8,6 @@ import {
     useResources,
     useResourceTypes,
   useMaterials,
-  useUser,
 } from "#hooks";
 import {
   Typography,
@@ -25,7 +24,6 @@ import { Icon } from "#icon";
 import { Table } from "#table";
 import { Spinner } from "#spinner";
 import { useModal } from "#modal";
-import { NotFound } from "../../../../components/404/404";
 import toast from "react-hot-toast";
 import {
   getEnabledCostingCriteria,
@@ -43,7 +41,6 @@ export const ResourcesPage = () => {
     ModalElement: CreateResourceModalElement,
     createResource,
   } = useResources(shopId);
-  const { user: activeUser } = useUser(user?.id);
 
   const {
     resourceTypes,
@@ -78,8 +75,6 @@ export const ResourcesPage = () => {
         <Loading />
       </Page>
     );
-
-  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page

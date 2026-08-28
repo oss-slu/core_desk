@@ -3,12 +3,11 @@ import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
 import { useAuth } from "#useAuth";
-import { useShop, useUser } from "#hooks";
+import { useShop } from "#hooks";
 import { Loading } from "#loading";
 import { Typography, Util, Badge } from "tabler-react-2";;
 import moment from "moment";
 import { Price } from "#renderPrice";
-import { NotFound } from "../../../../components/404/404";
 import { Avatar } from "#avatar";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
 import { TableV2 } from "tabler-react-2";
@@ -49,7 +48,6 @@ export const ShopUsersPage = () => {
   const { userShop, loading, users } = useShop(shopId, {
     includeUsers: true,
   });
-  const { user: activeUser } = useUser(user?.id);
 
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(25);
@@ -181,9 +179,6 @@ export const ShopUsersPage = () => {
         <Loading />
       </Page>
     );
-
-  if (activeUser?.simple === true) return <NotFound />;
-
 
   return (
     <Page

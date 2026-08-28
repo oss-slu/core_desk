@@ -2,14 +2,13 @@ import React from "react";
 import { Page } from "#page";
 import { shopSidenavItems } from "..";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useShop, useUser } from "#hooks";
+import { useAuth, useShop } from "#hooks";
 import { useLedger } from "../../../../hooks/useLedger";
 import { Loading } from "#loading";
 import { Card, Typography, Util } from "tabler-react-2";
 import { Price } from "#renderPrice";
 import { Alert } from "#alert";
 import { LedgerTable } from "../../../../components/ledger/LedgerTable";
-import { NotFound } from "../../../../components/404/404";
 const { H1 } = Typography;
 
 /*
@@ -30,7 +29,6 @@ export const Billing = () => {
   const { user } = useAuth();
   const { userShop, shop } = useShop(shopId);
   const { ledger, loading } = useLedger(shopId, user.id);
-  const { user: activeUser } = useUser(user?.id);
 
   if (loading)
     return (
@@ -46,8 +44,6 @@ export const Billing = () => {
         <Loading />
       </Page>
     );
-
-  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page

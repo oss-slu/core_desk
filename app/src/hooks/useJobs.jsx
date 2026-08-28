@@ -235,76 +235,6 @@ export const useJobs = (shopId) => {
     text: <CreateJobModalContent onSubmit={_createJob} />,
   });
 
-  const CreateSimpleSubPage = () => {
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [dueDate, setDueDate] = useState(getDefaultDueDate);
-    const [loading, setLoading] = useState(false);
-    const [onBehalfOf] = useState(false);
-    const [onBehalfOfUserId] = useState(null);
-    const [onBehalfOfUserEmail] = useState("");
-    const [onBehalfOfUserFirstName] = useState("");
-    const [onBehalfOfUserLastName] = useState("");
-    const [onBehalfOfBillingGroup] = useState(false);
-    const [onBehalfOfBillingGroupId] = useState(null);
-
-    return (
-      <div>
-        <p>Step 2</p>
-        <h1>Set up your job</h1>
-        <div>
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e)}
-            label="Job Name"
-            placeholder="e.g. Wind Mill Assembly"
-            required
-          />
-          <Input
-            value={description}
-            onChange={(e) => setDescription(e)}
-            label="Job Description (optional)"
-            placeholder="e.g. Parts for version 2 of the wind mill design project"
-            optional
-          />
-          <Input
-            type="date"
-            label="Due Date"
-            onChange={(e) => setDueDate(e + "T00:00:00")}
-            value={dueDate?.split("T")[0]}
-            required
-          />
-        </div>
-        <br></br>
-        {title.length > 0 && dueDate.length > 0 ? (
-        <Button
-          variant="primary"
-          loading={loading}
-          onClick={() => {
-            setLoading(true);
-            _createJob(
-              title,
-              description,
-              dueDate,
-              onBehalfOf,
-              onBehalfOfUserId,
-              onBehalfOfUserEmail,
-              onBehalfOfUserFirstName,
-              onBehalfOfUserLastName,
-              onBehalfOfBillingGroup,
-              onBehalfOfBillingGroupId
-            );
-          }}
-        >
-          Next
-        </Button>
-      ) : (
-        <Button disabled>Next</Button>
-      )}
-      </div>
-    );
-  };
-
   const fetchJobs = async (shouldSetLoading = true) => {
     try {
       shouldSetLoading ? setLoading(true) : setMicroLoading(true);
@@ -381,7 +311,6 @@ export const useJobs = (shopId) => {
     error,
     meta,
     refetch: fetchJobs,
-    CreateSimpleSubPage,
     ModalElement,
     createJob,
     opLoading,

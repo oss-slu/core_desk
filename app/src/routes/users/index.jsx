@@ -3,14 +3,13 @@ import { Page, sidenavItems } from "#page";
 import { useAuth } from "#useAuth";
 import { Typography, Util, Badge } from "tabler-react-2";
 import { useModal } from "#modal";
-import { useUser, useUsers } from "#hooks";
+import { useUsers } from "#hooks";
 import { Spinner } from "#spinner";
 import { Avatar } from "#avatar";
 import { Icon } from "#icon";
 import { Link } from "react-router-dom";
 import moment from "moment";
 import { SearchBar } from "../../components/searchBar/SearchBar";
-import { NotFound } from "../../components/404/404";
 import { TableV2 } from "tabler-react-2";
 
 const { H1 } = Typography;
@@ -18,7 +17,6 @@ const { H1 } = Typography;
 export const UsersPage = () => {
   const { user } = useAuth();
   const { users, loading: usersLoading } = useUsers();
-  const { user: activeUser } = useUser(user?.id);
 
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -197,9 +195,6 @@ export const UsersPage = () => {
       },
     },
   ], []);
-
-
-  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenav}>

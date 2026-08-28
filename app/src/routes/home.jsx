@@ -3,9 +3,7 @@ import { useAuth } from "#useAuth";
 import { Loading } from "#loading";
 import { Page, sidenavItems } from "#page";
 import { MarkdownRender } from "#markdownRender";
-import { useUser } from "../hooks/useUser";
 import { Typography, Util } from "tabler-react-2";
-import { ShopChooser } from "../components/shopChooser/ShopChooser";
 
 const content = `
 # Welcome to CoreDesk!
@@ -20,31 +18,19 @@ billing groups of users that allow users to submit jobs to a shop, but to have t
 
 export const Home = () => {
   const { user: activeUser, loading } = useAuth();
-  const { user } = useUser(activeUser?.id);
 
   if (loading) return <Loading />;
 
-  if (user?.simple === false) {
-    return (
-      <Page sidenavItems={sidenavItems("Home", activeUser.admin)}>
-        <MarkdownRender markdown={content} />
-        <Util.Hr />
-        {import.meta.env.VITE_HASH && import.meta.env.VITE_BUILD_DATE && (
-          <Typography.Text>
-            CoreDesk version {import.meta.env.VITE_HASH} built
-            on {new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()}
-          </Typography.Text>
-        )}
-      </Page>
-    );
-  } else {
-    return (
-      <div>
-        <p>Step 1</p>
-        <h1>Select a shop</h1>
-        <ShopChooser/>
-        <Util.Hr />
-      </div>
-    );
-  }
+  return (
+    <Page sidenavItems={sidenavItems("Home", activeUser.admin)}>
+      <MarkdownRender markdown={content} />
+      <Util.Hr />
+      {import.meta.env.VITE_HASH && import.meta.env.VITE_BUILD_DATE && (
+        <Typography.Text>
+          CoreDesk version {import.meta.env.VITE_HASH} built
+          on {new Date(import.meta.env.VITE_BUILD_DATE).toLocaleString()}
+        </Typography.Text>
+      )}
+    </Page>
+  );
 };

@@ -133,34 +133,6 @@ export const useUser = (userId) => {
     setOpLoading(false);
   };
 
-  const setSimple = async (simple) => {
-    console.log("2. setSimple function executed with value:", simple); // <-- ADD THIS
-    try {
-      setLoading(true);
-      const r = await authFetch(`/api/users/${userId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userId, simple }),
-      });
-
-      if (r.ok) {
-        // SUCCESS! Now refetch the data to update the UI.
-        // Pass 'false' to avoid a jarring full-page loading spinner.
-        await fetchUser(false);
-      } else {
-        // Handle non-ok responses if needed
-        setError(await r.json());
-        setLoading(false);
-      }
-
-    } catch (error) {
-      setError(error);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
     fetchUser();
   }, [userId]);
@@ -179,6 +151,5 @@ export const useUser = (userId) => {
     suspendUser,
     unSuspendUser,
     updateSuspensionReason,
-    setSimple,
   };
 };

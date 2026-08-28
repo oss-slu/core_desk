@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useAuth, useShop, useUserShop, useUser } from "#hooks";
+import { useAuth, useShop, useUserShop } from "#hooks";
 import { Link, useParams } from "react-router-dom";
 import { shopSidenavItems } from "../..";
 import { Page } from "#page";
@@ -13,7 +13,6 @@ import { switchStatusToUI } from "../../../../../components/jobitem/JobItem";
 import { Price } from "#renderPrice";
 import { useLedger } from "../../../../../hooks/useLedger";
 import { LedgerTable } from "../../../../../components/ledger/LedgerTable";
-import { NotFound } from "../../../../../components/404/404";
 import { Button } from "#button";
 import { useModal } from "#modal";
 const { H1, H2 } = Typography;
@@ -93,7 +92,6 @@ export const ShopUserPage = () => {
   const { user: currentUser } = useAuth();
   const { ledger, ledgerLoading, balance, postLedgerItem, opLoading } =
     useLedger(shopId, userId);
-  const { user: activeUser } = useUser(currentUser?.id);
   const { modal: addBalance, ModalElement: AddBalanceModal } = useModal({
     title: "Post ledger item",
     text: (
@@ -120,8 +118,6 @@ export const ShopUserPage = () => {
         <Loading />
       </Page>
     );
-
-  if (activeUser?.simple === true) return <NotFound />;
   
   return (
     <Page
