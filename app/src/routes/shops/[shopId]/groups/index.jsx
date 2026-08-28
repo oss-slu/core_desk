@@ -2,13 +2,12 @@ import React, { useEffect } from "react";
 import { Loading } from "#loading";
 import { shopSidenavItems } from "..";
 import { Page } from "#page";
-import { useAuth, useBillingGroups, useShop, useUser } from "#hooks";
+import { useAuth, useBillingGroups, useShop } from "#hooks";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Util } from "tabler-react-2";
 import { Button } from "#button";
 import { useModal } from "#modal";
 import { CreateBillingGroup } from "../../../../components/billingGroup/CreateBillingGroup";
-import { NotFound } from "../../../../components/404/404";
 import { Table } from "#table";
 import moment from "moment";
 import { MOMENT_FORMAT } from "#constants";
@@ -21,7 +20,6 @@ export const BillingGroupsPage = () => {
   const { userShop } = useShop(shopId);
   const { billingGroups, loading, createBillingGroup, opLoading } =
     useBillingGroups(shopId);
-  const { user: activeUser } = useUser(user?.id);
 
   const { modal, ModalElement, update } = useModal({
     title: "Create Billing Group",
@@ -54,8 +52,6 @@ export const BillingGroupsPage = () => {
         <Loading />
       </Page>
     );
-
-  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page

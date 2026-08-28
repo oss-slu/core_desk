@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/jackcrane/cypress-yaml-plugin/main/schema.json
 
-name: Admins can create jobs within standard flow
+name: Admins can create jobs
 seedFile: fixtures/users.sql
 
 steps:

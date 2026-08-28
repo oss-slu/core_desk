@@ -3,7 +3,6 @@ import { useAuth } from "#useAuth";
 import styles from "./Header.module.css";
 import logo from "#coreDeskLogo";
 import { Dropdown } from "tabler-react-2";
-import { UserShopToggle } from "../userShopToggle/UserShopToggle";
 import { Icon } from "#icon";
 import { useShop } from "#index";
 const IconLogout = () => <Icon i={"logout"} size={18} />;
@@ -48,15 +47,12 @@ export const Header = () => {
             loggedIn
               ? [
                   {
-                    text: <a className="btn" href="https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog" style={{height: 36,}}>Feedback</a>,
+                    text: "Feedback",
+                    onclick: () => {
+                      window.open("https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog", "_blank");
+                    },
                     type: "item",
-                  },
-                  {
-                    type: "divider",
-                  },
-                  {
-                    text: <UserShopToggle userId={user.id} />,
-                    type: "item"
+                    icon: <Icon i={"message-circle"} size={18} />,
                   },
                   {
                     type: "divider",

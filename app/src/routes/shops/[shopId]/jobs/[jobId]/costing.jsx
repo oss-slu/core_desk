@@ -2,7 +2,7 @@ import React from "react";
 import { Page } from "#page";
 import { sidenavItems } from ".";
 import { Link, useParams } from "react-router-dom";
-import { useAuth, useJob, useJobItem, useShop, useUser } from "#hooks";
+import { useAuth, useJob, useJobItem, useShop } from "#hooks";
 import { Loading } from "#loading";
 import { Card, Typography, Util } from "tabler-react-2";
 import { ProjectWideEditCosting } from "../../../../../components/jobitem/ProjectWideEditCosting";
@@ -17,7 +17,6 @@ import { useConfirm } from "#confirm";
 import { Alert } from "#alert";
 import { Icon } from "#icon";
 import { downloadFile } from "../../../../../components/jobitem/JobItem";
-import { NotFound } from "../../../../../components/404/404";
 
 export const JobCostingPage = () => {
   const { shopId, jobId } = useParams();
@@ -35,7 +34,6 @@ export const JobCostingPage = () => {
   } = useJob(shopId, jobId);
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
-  const { user: activeUser } = useUser(user?.id);
 
   const userIsPrivileged =
     user?.admin ||
@@ -56,8 +54,6 @@ export const JobCostingPage = () => {
         <Loading />
       </Page>
     );
-
-  if (activeUser?.simple === true) return <NotFound />;
 
   return (
     <Page sidenavItems={sidenavItems("costing", shopId, jobId)}>

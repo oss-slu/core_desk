@@ -8,7 +8,7 @@ import { Loading } from "#loading";
 import { Page } from "#page";
 import { NotFound } from "#notFound";
 import { Price } from "#renderPrice";
-import { useAuth, useShop, useShopLedger, useUser } from "#hooks";
+import { useAuth, useShop, useShopLedger } from "#hooks";
 import { shopSidenavItems } from "..";
 
 const { H1 } = Typography;
@@ -43,7 +43,6 @@ const downloadCsv = (rows, shopId) => {
 export const ShopLedgerPage = () => {
   const { shopId } = useParams();
   const { user } = useAuth();
-  const { user: activeUser } = useUser(user?.id);
   const { userShop, shop, loading: shopLoading } = useShop(shopId);
 
   const userIsStaff =
@@ -76,7 +75,7 @@ export const ShopLedgerPage = () => {
     );
   }
 
-  if (!shop || activeUser?.simple === true || !userIsStaff) return <NotFound />;
+  if (!shop || !userIsStaff) return <NotFound />;
 
   return (
     <Page
