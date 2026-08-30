@@ -1,6 +1,6 @@
 # CoreDesk
 
-[![codecov](https://codecov.io/gh/jackcrane/slu-open-project/graph/badge.svg?token=OUAS5BV7BW)](https://codecov.io/gh/jackcrane/slu-open-project)
+Code Coverage: 77.20%
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/oss-slu/core_desk)
 
 This is an open source project management platform for distributed manufacturing, processing, and toolshops within an organization. It was specifically designed for the Saint Louis University Center for Additive Manufacturing, but can be adapted for other organizations.
