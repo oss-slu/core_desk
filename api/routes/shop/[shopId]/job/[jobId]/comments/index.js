@@ -1,11 +1,10 @@
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
+import { LogType } from "#prisma-client";
 import { z } from "zod";
 
-const logSchema = z.object({
-  message: z.string().optional(),
-  userId: z.string().min(1, "User ID Required"),
-  jobId: z.string().optional()
+const commentSchema = z.object({
+  message: z.string().trim().min(1, "Message is required"),
 });
 
 export const get = [
@@ -57,6 +56,9 @@ export const get = [
           },
         },
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
 
     res.json({ comments });
@@ -90,27 +92,32 @@ export const post = [
       return res.status(400).json({ message: "Job not found" });
     }
 
-    const { message } = req.body;
-
-    if (!message) {
-      return res.status(400).json({ message: "Message is required" });
+    const validationResult = commentSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      return res.status(400).json({
+        error: "Invalid data",
+        issues: validationResult.error.format(),
+      });
     }
 
-    const validationResult = logSchema.safeParse(req.user);
-      if (!validationResult.success) {
-        return res.status(400).json({
-          error: "Invalid data",
-          issues: validationResult.error.format(),
-        });
-      }
+    const { message } = validationResult.data;
 
-    const validatedData = validationResult.data;
-
-    await prisma.jobComment.create({
+    const comment = await prisma.jobComment.create({
       data: {
-        message: validatedData.message,
-        userId: validatedData.userId,
-        jobId: validatedData.jobId,
+        message,
+        userId: req.user.id,
+        jobId,
+      },
+    });
+
+    await prisma.logs.create({
+      data: {
+        type: LogType.COMMENT_CREATED,
+        userId: req.user.id,
+        shopId,
+        jobId,
+        commentId: comment.id,
+        message,
       },
     });
 
@@ -177,8 +184,20 @@ export const post = [
             id: true,
             firstName: true,
             lastName: true,
+            shops: {
+              where: {
+                shopId: shopId,
+              },
+              select: {
+                accountTitle: true,
+                accountType: true,
+              },
+            },
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       },
     });
 
