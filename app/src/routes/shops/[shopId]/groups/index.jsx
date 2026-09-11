@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Loading } from "#loading";
 import { shopSidenavItems } from "..";
 import { Page } from "#page";
@@ -12,14 +12,20 @@ import { Table } from "#table";
 import moment from "moment";
 import { MOMENT_FORMAT } from "#constants";
 import { Price } from "#renderPrice";
+import { SearchBar } from "../../../../components/searchBar/SearchBar";
 
 export const BillingGroupsPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
   const { shopId } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
   const { billingGroups, loading, createBillingGroup, opLoading } =
     useBillingGroups(shopId);
+
+  const filteredBillingGroups = billingGroups.filter((billingGroup) =>
+    billingGroup.title?.toLowerCase().includes(searchTerm.trim().toLowerCase())
+  );
 
   const { modal, ModalElement, update } = useModal({
     title: "Create Billing Group",
@@ -69,6 +75,11 @@ export const BillingGroupsPage = () => {
         <Button onClick={modal}>Create Billing Group</Button>
       </Util.Row>
       <Util.Spacer size={1} />
+      <SearchBar
+        label="Search Billing Groups"
+        placeholder="Ex: Materials Lab"
+        onSearch={setSearchTerm}
+      />
       <Table
         columns={[
           {
@@ -100,7 +111,7 @@ export const BillingGroupsPage = () => {
             render: (balance) => <Price value={balance || 0} icon />,
           },
         ]}
-        data={billingGroups}
+        data={filteredBillingGroups}
       />
     </Page>
   );
