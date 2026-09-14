@@ -102,7 +102,7 @@ export const post = [
 
     const { message } = validationResult.data;
 
-    const comment = await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx) => {
       const newComment = await tx.jobComment.create({
         data: {
           message,
@@ -121,8 +121,6 @@ export const post = [
           message,
         },
       });
-
-      return newComment;
     });
 
     console.log("Email Sent! - mock");
