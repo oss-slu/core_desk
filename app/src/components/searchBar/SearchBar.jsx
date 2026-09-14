@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { Input } from "tabler-react-2";
 
-export const SearchBar = ({ onSearch }) => {
+export const SearchBar = ({
+  onSearch,
+  label = "Search by name or email",
+  placeholder = "Ex: Edward Fesser",
+}) => {
   const [query, setQuery] = useState("");
 
   const handleChange = (value) => {
@@ -14,8 +18,8 @@ export const SearchBar = ({ onSearch }) => {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
       <Input
-        label="Search by name or email"
-        placeholder = "Ex: Edward Fesser"
+        label={label}
+        placeholder = {placeholder}
         value={query}
         onChange={handleChange}
         style={{
