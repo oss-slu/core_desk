@@ -492,24 +492,22 @@ export const JobPage = () => {
           This job has no items. You can attach files in the dropzone above
         </i>
       ) : (
-        <div>
-          <Util.Col gap={0.5}>
-            {job.items?.map((item) => (
-              <JobItem
-                key={item.id}
-                item={item}
-                refetchJobs={refetchJobs}
-                userIsPrivileged={userIsPrivileged}
-                group={job.group}
-              />
-            ))}
-          </Util.Col>
-          <hr />
-          <div className={styles.commentsSection}>
-            <Comments jobId={jobId} shopId={shopId} />
-          </div>
-        </div>
+        <Util.Col gap={0.5}>
+          {job.items?.map((item) => (
+            <JobItem
+              key={item.id}
+              item={item}
+              refetchJobs={refetchJobs}
+              userIsPrivileged={userIsPrivileged}
+              group={job.group}
+            />
+          ))}
+        </Util.Col>
       )}
+      <hr />
+      <div className={styles.commentsSection}>
+        <Comments jobId={jobId} shopId={shopId} />
+      </div>
     </Page>
   );
 };
