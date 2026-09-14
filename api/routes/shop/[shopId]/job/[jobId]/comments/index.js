@@ -102,23 +102,27 @@ export const post = [
 
     const { message } = validationResult.data;
 
-    const comment = await prisma.jobComment.create({
-      data: {
-        message,
-        userId: req.user.id,
-        jobId,
-      },
-    });
+    const comment = await prisma.$transaction(async (tx) => {
+      const newComment = await tx.jobComment.create({
+        data: {
+          message,
+          userId: req.user.id,
+          jobId,
+        },
+      });
 
-    await prisma.logs.create({
-      data: {
-        type: LogType.COMMENT_CREATED,
-        userId: req.user.id,
-        shopId,
-        jobId,
-        commentId: comment.id,
-        message,
-      },
+      await tx.logs.create({
+        data: {
+          type: LogType.COMMENT_CREATED,
+          userId: req.user.id,
+          shopId,
+          jobId,
+          commentId: newComment.id,
+          message,
+        },
+      });
+
+      return newComment;
     });
 
     console.log("Email Sent! - mock");
