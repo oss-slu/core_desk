@@ -11,10 +11,10 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@mdxeditor/editor": "^3.14.0",
+    "@mdxeditor/editor": "^4.2.5",
     "@sentry/react": "^8.37.1",
     "@sentry/vite-plugin": "^2.22.6",
-    "@tabler/icons-webfont": "^3.19.0",
+    "@tabler/icons-webfont": "^3.46.0",
     "@uidotdev/usehooks": "^2.4.1",
     "@uploadthing/react": "^7.0.3",
     "@vitejs/plugin-react": "^4.3.2",
