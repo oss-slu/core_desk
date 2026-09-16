@@ -5,6 +5,15 @@ import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
 import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../util/costingCriteria.js";
 import client from "#postmark";
 
+const escapeHtml = (text) => {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 const getUserBalanceMap = async (shopId, userIds) => {
   if (!userIds.length) return {};
 
@@ -268,14 +277,16 @@ export const post = [
           if (requesterOptsIn && !emails.includes(req.user.email)) {
             emails.push(req.user.email);
           }
+          const safeTitle = escapeHtml(title);
+          const safeShopName = escapeHtml(shopName);
 
           if (emails.length > 0) {
             await client.sendEmail({
               From: `${process.env.POSTMARK_FROM_EMAIL}`,
               To: emails.join(","),
               Subject: `A Job was Created on Your Shop`,
-              HtmlBody: `The job <strong>${title}</strong> was created on the <strong>${shopName}</strong> shop.`,
-              TextBody: `The job ${title} was created on the ${shopName} shop.`,
+              HtmlBody: `The job <strong>${safeTitle}</strong> was created on the <strong>${safeShopName}</strong> shop.`,
+              TextBody: `The job ${safeTitle} was created on the ${safeShopName} shop.`,
               MessageStream: "outbound",
             });
           }
@@ -430,17 +441,17 @@ export const get = [
         job.user.name = `${job.user.firstName} ${job.user.lastName}`;
         job.billingAccount = job.groupId
           ? {
-              type: "GROUP",
-              id: job.groupId,
-              name: job.group?.title || "Billing Group",
-              balance: groupBalanceMap[job.groupId] || 0,
-            }
+            type: "GROUP",
+            id: job.groupId,
+            name: job.group?.title || "Billing Group",
+            balance: groupBalanceMap[job.groupId] || 0,
+          }
           : {
-              type: "USER",
-              id: job.user.id,
-              name: job.user.name,
-              balance: userBalanceMap[job.user.id] || 0,
-            };
+            type: "USER",
+            id: job.user.id,
+            name: job.user.name,
+            balance: userBalanceMap[job.user.id] || 0,
+          };
 
         delete job._count;
         delete job.items;

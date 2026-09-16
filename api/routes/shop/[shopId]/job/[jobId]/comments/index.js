@@ -8,6 +8,15 @@ const commentSchema = z.object({
   message: z.string().trim().min(1, "Message is required"),
 });
 
+const escapeHtml = (text) => {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
 export const get = [
   verifyAuth,
   async (req, res) => {
@@ -181,13 +190,28 @@ export const post = [
           emails.push(req.user.email);
         }
 
+        const commenterName = `${req.user.firstName} ${req.user.lastName}`.trim();
+
+        const safeCommenterName = escapeHtml(commenterName);
+        const safeMessage = escapeHtml(message);
+        const safeJobTitle = escapeHtml(job.title);
+        const safeShopName = escapeHtml(shopName);
+
         if (emails.length > 0) {
           await client.sendEmail({
-            From: `${process.env.POSTMARK_FROM_EMAIL}`,
+            From: process.env.POSTMARK_FROM_EMAIL,
             To: emails.join(","),
             Subject: `Comment created on job ${job.title} in shop ${shopName}`,
-            HtmlBody: `The comment <em>"${message}"</em> was created on the job <strong>${job.title}</strong> in shop <strong>${shopName}</strong>.`,
-            TextBody: `The comment "${message}" was created on the job ${job.title} in shop ${shopName}.`,
+            HtmlBody: `
+              <p>
+                <strong>${safeCommenterName}</strong> commented on the job
+                <strong>${safeJobTitle}</strong> in shop
+                <strong>${safeShopName}</strong>.
+              </p>
+              <p><strong>Comment:</strong></p>
+              <p><em>"${safeMessage}"</em></p>
+            `,
+            TextBody: `${commenterName} commented on the job ${job.title} in shop ${shopName}. Comment: "${message}" Shop: ${shopName}`,
             MessageStream: "outbound",
           });
         }
