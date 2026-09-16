@@ -16,7 +16,7 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 import { Readable } from "stream";
 import { startStlRenderQueue } from "./util/stlRenderQueue.js";
 
-// import client from "#postmark";
+import client from "#postmark";
 
 // Define __dirname for ES modules
 import { createUser } from "./util/createUser.js"; //import the createUser function
@@ -123,7 +123,7 @@ if (process.env.JACK == "true") {
         const userEmail =
           profile.email ||
           profile[
-            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
           ];
 
         let user = await prisma.user.findUnique({
@@ -296,18 +296,18 @@ if (process.env.JACK == "true") {
 
       console.log("[SAML][ACS] Email notification mock.");
 
-      /*
 
-        client.sendEmail({
-          "From": `${process.env.POSTMARK_FROM_EMAIL}`,
-          "To": `${user.email}`,
-          "Subject": "User Login detected for OpenSLU",
-          "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.` ,
-          "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
-          "MessageStream": "outbound"
-        });
 
-        */
+      client.sendEmail({
+        "From": `${process.env.POSTMARK_FROM_EMAIL}`,
+        "To": `${user.email}`,
+        "Subject": "User Login detected for OpenSLU",
+        "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
+        "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
+        "MessageStream": "outbound"
+      });
+
+
 
       // Send token to the client
       const redirectTo =

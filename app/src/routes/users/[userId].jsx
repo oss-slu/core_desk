@@ -19,7 +19,7 @@ import { Alert } from "#alert";
 import { useConfirm } from "#confirm";
 import { NotFound } from "#notFound";
 import { useUserLogs } from "../../hooks/useUserLogs";
-import toast from "react-hot-toast"
+import toast from "react-hot-toast";
 import { authFetch } from "#url";
 const { H2, H3 } = Typography;
 
@@ -133,7 +133,7 @@ const ChangePassword = ({ user }) => {
 
   const updatePassword = async (user) => {
     try {
-      if (password.length < 8){
+      if (password.length < 8) {
         toast.error("Password must be at least 8 characters.");
         return;
       }
@@ -159,7 +159,7 @@ const ChangePassword = ({ user }) => {
     } catch (error) {
       toast.error(error.message || "Something went wrong.");
     }
-    finally{
+    finally {
       setPassword("");
 
     }

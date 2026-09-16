@@ -2,6 +2,7 @@ import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { LogType } from "#prisma-client";
 import { z } from "zod";
+import client from "#postmark";
 
 const commentSchema = z.object({
   message: z.string().trim().min(1, "Message is required"),
@@ -123,58 +124,78 @@ export const post = [
       });
     });
 
-    console.log("Email Sent! - mock");
+    // Send email notification (fire-and-forget — errors must not fail the request)
+    (async () => {
+      try {
+        const { name: shopName } = await prisma.shop.findFirst({
+          where: { id: shopId },
+        });
 
-    /* - When you uncomment this don't forget to remove the comment for importing postmark!!!
-
-    const { name: shopName } = await prisma.shop.findFirst({
-        where: {
-          id: shopId,
-        }
-      });
-
-    const operators = await prisma.userShop.findMany({
-      where: {
-        shopId: shopId,
-        accountType: 'OPERATOR',
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            email: true,
+        const operators = await prisma.userShop.findMany({
+          where: {
+            shopId: shopId,
+            accountType: "OPERATOR",
           },
-        },
-      },
-    });
-    
-    let emails = [];
-    for (const operator of operators) {
-      const jobLog = await prisma.logs.findFirst({
-        where: {
-          shopId: shopId,
-          userId: operator.user.id,
-          jobId: jobId,
+          include: {
+            user: {
+              select: {
+                id: true,
+                email: true,
+                notificationSettings: {
+                  select: { emailCommentCreated: true },
+                },
+              },
+            },
+          },
+        });
+
+        const emails = [];
+        for (const operator of operators) {
+          // Only notify operators who have interacted with this job
+          const jobLog = await prisma.logs.findFirst({
+            where: {
+              shopId: shopId,
+              userId: operator.user.id,
+              jobId: jobId,
+            },
+          });
+
+          if (jobLog) {
+            const optsIn =
+              operator.user.notificationSettings?.emailCommentCreated ?? true;
+            if (optsIn && operator.user.email) {
+              emails.push(operator.user.email);
+            }
+          }
         }
-      });
 
-      jobLog && emails.push(operator.user.email);
-    }
+        // Include the commenter themselves if opted in
+        const commenterSettings =
+          await prisma.userNotificationSettings.findUnique({
+            where: { userId: req.user.id },
+            select: { emailCommentCreated: true },
+          });
+        const commenterOptsIn =
+          commenterSettings?.emailCommentCreated ?? true;
+        if (commenterOptsIn && !emails.includes(req.user.email)) {
+          emails.push(req.user.email);
+        }
 
-    if (!emails.includes(req.user.email)) {
-      emails.push(req.user.email);
-    }
+        if (emails.length > 0) {
+          await client.sendEmail({
+            From: `${process.env.POSTMARK_FROM_EMAIL}`,
+            To: emails.join(","),
+            Subject: `Comment created on job ${job.title} in shop ${shopName}`,
+            HtmlBody: `The comment <em>"${message}"</em> was created on the job <strong>${job.title}</strong> in shop <strong>${shopName}</strong>.`,
+            TextBody: `The comment "${message}" was created on the job ${job.title} in shop ${shopName}.`,
+            MessageStream: "outbound",
+          });
+        }
+      } catch (emailErr) {
+        console.error("[comments/post] Email notification failed:", emailErr);
+      }
+    })();
 
-    client.sendEmail({
-      "From": `${process.env.POSTMARK_FROM_EMAIL}`, 
-      "To": `${emails.join(',')}`,
-      "Subject": `Comment created on job ${job.title} and shop ${shopName}`,
-      "HtmlBody": `The comment "${message}" was created on the job ${job.title} and shop ${shopName}`, 
-      "TextBody": `The comment "${message}" was created on the job ${job.title} and shop ${shopName}`,
-      "MessageStream": "outbound"
-    }); 
-
-    */
 
     const comments = await prisma.jobComment.findMany({
       where: {
