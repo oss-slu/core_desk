@@ -300,7 +300,7 @@ if (process.env.JACK == "true") {
 
       client.sendEmail({
         "From": `${process.env.POSTMARK_FROM_EMAIL}`,
-        "To": `${user.email}`,
+        "To": `${req.user.email}`,
         "Subject": "User Login detected for OpenSLU",
         "HtmlBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
         "TextBody": `A login was detected at ${new Date(Date.now()).toLocaleString()} and ip TODO.`,
