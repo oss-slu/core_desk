@@ -11,6 +11,8 @@ import { Price } from "#renderPrice";
 import { Avatar } from "#avatar";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
 import { TableV2 } from "tabler-react-2";
+import { Button } from "tabler-react-2/dist/button";
+import { useUsers } from "../../../../hooks/useUsers";
 const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {
@@ -48,6 +50,7 @@ export const ShopUsersPage = () => {
   const { userShop, loading, users } = useShop(shopId, {
     includeUsers: true,
   });
+  const { inviteUser, ModalElement } = useUsers(shopId);
 
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(25);
@@ -190,7 +193,10 @@ export const ShopUsersPage = () => {
         userShop.balance < 0
       )}
     >
-      <H1>Shop Users</H1>
+      <Util.Row justify="between" align="center">
+        <H1>Shop Users</H1>
+        <Button onClick={inviteUser}>Invite New User</Button>
+      </Util.Row>
       <Util.Spacer size={2} />
       <SearchBar
         onSearch={(value) => {
@@ -217,6 +223,7 @@ export const ShopUsersPage = () => {
           setSorting(next);
         }}
       />
+      {ModalElement}
     </Page>
   );
 };
