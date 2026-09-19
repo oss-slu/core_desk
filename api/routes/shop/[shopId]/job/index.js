@@ -3,7 +3,16 @@ import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
 import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../util/costingCriteria.js";
-// import client from "#postmark";
+import client from "#postmark";
+
+const escapeHtml = (text) => {
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
 
 const getUserBalanceMap = async (shopId, userIds) => {
   if (!userIds.length) return {};
@@ -222,51 +231,70 @@ export const post = [
         },
       });
 
-      console.log("Email Sent! - mock");
+      // Send email notification (fire-and-forget — errors must not fail the request)
+      (async () => {
+        try {
+          const { name: shopName } = await prisma.shop.findFirst({
+            where: { id: shopId },
+          });
 
-      /* - When you uncomment this don't forget to remove the comment for importing postmark!!!
-
-      const { name: shopName } = await prisma.shop.findFirst({
-        where: {
-          id: shopId,
-        }
-      });
-
-      const adminsOperators = await prisma.userShop.findMany({
-        where: {
-          shopId: shopId,
-          accountType: {
-            in: ['ADMIN', 'OPERATOR'],
-          },
-        },
-        include: {
-          user: {
-            select: {
-              email: true,
+          const adminsOperators = await prisma.userShop.findMany({
+            where: {
+              shopId: shopId,
+              accountType: { in: ["ADMIN", "OPERATOR"] },
             },
-          },
-        },
-      });
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                  notificationSettings: {
+                    select: { emailJobCreated: true },
+                  },
+                },
+              },
+            },
+          });
 
-      let emails = [];
-      adminsOperators.forEach((userShop) => {
-        userShop.user.email && emails.push(userShop.user.email);
-      });
+          // Collect emails for users who have opted in (default: opted in)
+          const emails = [];
+          for (const us of adminsOperators) {
+            const optsIn =
+              us.user.notificationSettings?.emailJobCreated ?? true;
+            if (optsIn && us.user.email) {
+              emails.push(us.user.email);
+            }
+          }
 
-      if (!emails.includes(req.user.email)) {
-        emails.push(req.user.email);
-      }
+          // Include the requesting user if opted in and not already present
+          const requesterSettings =
+            await prisma.userNotificationSettings.findUnique({
+              where: { userId: req.user.id },
+              select: { emailJobCreated: true },
+            });
+          const requesterOptsIn =
+            requesterSettings?.emailJobCreated ?? true;
+          if (requesterOptsIn && !emails.includes(req.user.email)) {
+            emails.push(req.user.email);
+          }
+          const safeTitle = escapeHtml(title);
+          const safeShopName = escapeHtml(shopName);
 
-      client.sendEmail({
-        "From": `${process.env.POSTMARK_FROM_EMAIL}`,
-        "To": `${emails.join(',')}`,
-        "Subject": `A Job was Created on Your Shop`,
-        "HtmlBody": `The job ${title} was created on the ${shopName} shop.` ,
-        "TextBody": `The job ${title} was created on the ${shopName} shop.`,
-        "MessageStream": "outbound"
-      });
+          if (emails.length > 0) {
+            await client.sendEmail({
+              From: `${process.env.POSTMARK_FROM_EMAIL}`,
+              To: emails.join(","),
+              Subject: `A Job was Created on Your Shop`,
+              HtmlBody: `The job <strong>${safeTitle}</strong> was created on the <strong>${safeShopName}</strong> shop.`,
+              TextBody: `The job ${safeTitle} was created on the ${safeShopName} shop.`,
+              MessageStream: "outbound",
+            });
+          }
+        } catch (emailErr) {
+          console.error("[job/post] Email notification failed:", emailErr);
+        }
+      })();
 
-      */
 
       if (billingGroupToCreateJobAs) {
         await prisma.logs.create({
@@ -413,17 +441,17 @@ export const get = [
         job.user.name = `${job.user.firstName} ${job.user.lastName}`;
         job.billingAccount = job.groupId
           ? {
-              type: "GROUP",
-              id: job.groupId,
-              name: job.group?.title || "Billing Group",
-              balance: groupBalanceMap[job.groupId] || 0,
-            }
+            type: "GROUP",
+            id: job.groupId,
+            name: job.group?.title || "Billing Group",
+            balance: groupBalanceMap[job.groupId] || 0,
+          }
           : {
-              type: "USER",
-              id: job.user.id,
-              name: job.user.name,
-              balance: userBalanceMap[job.user.id] || 0,
-            };
+            type: "USER",
+            id: job.user.id,
+            name: job.user.name,
+            balance: userBalanceMap[job.user.id] || 0,
+          };
 
         delete job._count;
         delete job.items;
