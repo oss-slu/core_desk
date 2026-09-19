@@ -109,7 +109,11 @@ export const get = [
       }
     }
 
-    if (job.userId && job.userId !== req.user.id && !notifiableMap.has(job.userId)) {
+    if (
+      job.userId &&
+      job.userId !== req.user.id &&
+      !notifiableMap.has(job.userId)
+    ) {
       const jobUserShop = await prisma.userShop.findFirst({
         where: {
           shopId,
