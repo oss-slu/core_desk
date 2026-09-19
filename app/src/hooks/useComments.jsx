@@ -7,6 +7,7 @@ export const useComments = (shopId, jobId) => {
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [comments, setComments] = useState([]);
+  const [notifiableUsers, setNotifiableUsers] = useState([]);
 
   const fetchComments = async (shouldSetLoading = true) => {
     if (!shopId || !jobId) return;
@@ -16,6 +17,9 @@ export const useComments = (shopId, jobId) => {
       const data = await r.json();
       if (r.ok && data.comments) {
         setComments(data.comments);
+        if (data.notifiableUsers) {
+          setNotifiableUsers(data.notifiableUsers);
+        }
         setLoading(false);
       } else {
         setError(data);
@@ -66,6 +70,7 @@ export const useComments = (shopId, jobId) => {
 
   return {
     comments,
+    notifiableUsers,
     loading,
     error,
     refetch: fetchComments,
