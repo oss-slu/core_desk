@@ -84,6 +84,12 @@ export const useShop = (shopId, options) => {
     });
 
   useEffect(() => {
+    if (!shopId) {
+      setShop({});
+      setLoading(false);
+      return;
+    }
+
     fetchShop();
   }, [shopId]);
 
