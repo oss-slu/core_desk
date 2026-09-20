@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import postmark from "postmark";
 
 const sendEmailMock = vi.fn().mockResolvedValue(true);
 
@@ -17,7 +18,6 @@ import { LogType } from "#prisma-client";
 import request from "supertest";
 import { app } from "#index";
 import { tc } from "#setup";
-import postmark from "postmark";
 import jwt from "jsonwebtoken";
 
 
