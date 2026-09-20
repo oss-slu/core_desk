@@ -1,7 +1,7 @@
 import { LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
-import client from "#postmark";
+import postmark from "#postmark";
 
 export const get = [
   verifyAuth,
@@ -147,7 +147,9 @@ export const post = [
 
         const link = `${process.env.BASE_URL}`;
 
-        client.sendEmail({
+        const client = new postmark.ServerClient(process.env.POSTMARK_API_KEY);
+
+        await client.sendEmail({
           "From": `${process.env.POSTMARK_FROM_EMAIL}`,
           "To": `${emails.join(',')}`,
           "Subject": `You are invited to join CoreDesk!`,
