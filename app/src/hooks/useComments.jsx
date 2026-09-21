@@ -22,10 +22,17 @@ export const useComments = (shopId, jobId) => {
         }
         setLoading(false);
       } else {
+        const errorMessage =
+          data?.message ||
+          data?.error ||
+          "Failed to load comments";
+
+        toast.error(errorMessage);
         setError(data);
         setLoading(false);
       }
     } catch (error) {
+      toast.error(error.message || "Failed to load comments");
       setError(error);
       setLoading(false);
     }
@@ -42,23 +49,23 @@ export const useComments = (shopId, jobId) => {
       const updatedComments = await r.json();
       if (r.ok && updatedComments.comments) {
         setComments(updatedComments.comments);
-        setOpLoading(false);
         return true;
-      } else {
-        const errorMessage =
-          updatedComments?.message ||
-          updatedComments?.error ||
-          "Failed to post comment";
-        toast.error(errorMessage);
-        setError(updatedComments);
-        setOpLoading(false);
-        return false;
       }
+
+      const errorMessage =
+        updatedComments?.message ||
+        updatedComments?.error ||
+        "Failed to post comment";
+
+      toast.error(errorMessage);
+      setError(updatedComments);
+      return false;
     } catch (error) {
       toast.error(error.message || "Failed to post comment");
       setError(error);
-      setOpLoading(false);
       return false;
+    } finally {
+      setOpLoading(false);
     }
   };
 
