@@ -2,6 +2,7 @@ import { LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { SHOP_SELECT } from "../shared.js";
+import { backfillAutoJoin } from "../../../scripts/backfill-shops.js";
 import { z } from "zod";
 
 const shopSchema = z.object({
@@ -220,34 +221,44 @@ export const put = [
       }
 
       const validatedData = validationResult.data;
+      const shouldBackfillAutoJoin =
+        req.user.admin && validatedData.autoJoin === true && !shop.autoJoin;
 
-      const updatedShop = await prisma.shop.update({
-        where: {
-          id: shop.id,
-        },
-        data: {
-          name: validatedData.name,
-          address: validatedData.address,
-          phone: validatedData.phone,
-          email: validatedData.email,
-          website: validatedData.website,
-          description: validatedData.description,
-          imageUrl: validatedData.imageUrl,
-          color: validatedData.color,
-          startingDeposit: validatedData.startingDeposit,
-          autoJoin: req.user.admin ? validatedData.autoJoin : undefined,
-        },
-        select: SHOP_SELECT,
-      });
+      const updatedShop = await prisma.$transaction(async (tx) => {
+        const updatedShop = await tx.shop.update({
+          where: {
+            id: shop.id,
+          },
+          data: {
+            name: validatedData.name,
+            address: validatedData.address,
+            phone: validatedData.phone,
+            email: validatedData.email,
+            website: validatedData.website,
+            description: validatedData.description,
+            imageUrl: validatedData.imageUrl,
+            color: validatedData.color,
+            startingDeposit: validatedData.startingDeposit,
+            autoJoin: req.user.admin ? validatedData.autoJoin : undefined,
+          },
+          select: SHOP_SELECT,
+        });
 
-      await prisma.logs.create({
-        data: {
-          type: LogType.SHOP_MODIFIED,
-          userId: req.user.id,
-          shopId: shop.id,
-          from: JSON.stringify(shop),
-          to: JSON.stringify(updatedShop),
-        },
+        if (shouldBackfillAutoJoin) {
+          await backfillAutoJoin({ prismaClient: tx, shopId: shop.id });
+        }
+
+        await tx.logs.create({
+          data: {
+            type: LogType.SHOP_MODIFIED,
+            userId: req.user.id,
+            shopId: shop.id,
+            from: JSON.stringify(shop),
+            to: JSON.stringify(updatedShop),
+          },
+        });
+
+        return updatedShop;
       });
 
       res.json({ shop: updatedShop });

@@ -222,7 +222,7 @@ export const ShopPage = () => {
               <Switch
                 value={newShop.autoJoin || false}
                 onChange={(autoJoin) => setNewShop({ ...newShop, autoJoin})}
-                label="Automatically add users to shop"
+                label="Publish shop: adds new and existing users to shop"
               />)
             }
             <Input
