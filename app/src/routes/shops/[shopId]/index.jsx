@@ -219,11 +219,13 @@ export const ShopPage = () => {
               label="Shop Name"
             />
             {user.admin && (
-              <Switch
-                value={newShop.autoJoin || false}
-                onChange={(autoJoin) => setNewShop({ ...newShop, autoJoin})}
-                label="Automatically add users to shop"
-              />)
+              <div title="When enabled, all existing users are added to this shop, and future users will be added automatically. Disabling this does NOT remove users from the shop.">
+                <Switch
+                  value={newShop.autoJoin || false}
+                  onChange={(autoJoin) => setNewShop({ ...newShop, autoJoin})}
+                  label="Publish shop"
+                />
+              </div>)
             }
             <Input
               value={newShop.startingDeposit}
