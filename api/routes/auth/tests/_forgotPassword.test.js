@@ -7,19 +7,19 @@ import { tc } from "#setup";
 import postmark from "postmark";
 import jwt from "jsonwebtoken";
 
-
-const sendEmailMock = vi.fn().mockResolvedValue(true);
+const { sendEmailMock } = vi.hoisted(() => ({
+  sendEmailMock: vi.fn().mockResolvedValue(true),
+}));
 
 vi.mock("postmark", () => {
-  const ServerClient = vi.fn().mockImplementation(() => ({
-    sendEmail: sendEmailMock,
-  }));
-
   return {
-    default: { ServerClient }, 
+    default: {
+      ServerClient: vi.fn().mockImplementation(() => ({
+        sendEmail: sendEmailMock,
+      })),
+    },
   };
 });
-
 
 describe("/api/auth/forgotPassword", () => {
     describe("POST", () => {
