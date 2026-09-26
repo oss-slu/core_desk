@@ -51,7 +51,13 @@ services:
         esac
         curl -fsSL "https://dl.min.io/client/mc/release/linux-$${mc_arch}/mc" -o /usr/local/bin/mc
         chmod +x /usr/local/bin/mc
+        attempt=1
         until mc alias set local http://minio:9000 "$${AWS_ACCESS_KEY_ID}" "$${AWS_SECRET_ACCESS_KEY}"; do
+          if [ "$${attempt}" -ge 60 ]; then
+            echo "MinIO at http://minio:9000 did not accept the configured credentials after 60 attempts." >&2
+            exit 1
+          fi
+          attempt=$$((attempt + 1))
           sleep 1
         done
         mc mb -p local/"$${AWS_BUCKET}" || true
