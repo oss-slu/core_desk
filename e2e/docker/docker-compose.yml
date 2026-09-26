@@ -16,9 +16,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   minio:
-    # MinIO publishes its maintained container images on Quay. The Docker Hub
-    # paths are unavailable and fail CI pulls with "access denied".
-    image: quay.io/minio/minio:latest
+    # MinIO's upstream Quay image currently fails anonymous pulls in GitHub
+    # Actions. Use the community-maintained compatible image on Docker Hub.
+    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
