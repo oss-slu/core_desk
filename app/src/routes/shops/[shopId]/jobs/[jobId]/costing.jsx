@@ -108,19 +108,8 @@ export const JobCostingPage = () => {
               </Link>
             </>
           ) : (
-            calculateTotalCostOfJob(job) > payerBalance &&
-            userIsPrivileged && (
-              <>
-                <Util.Spacer size={1} />
-                <span className="text-danger">
-                  <Icon i="alert-triangle" /> Insufficient balance: This job
-                  will put the billing account into a negative balance. You can
-                  still finalize the job, but the account owner will need to
-                  refill before placing another order.
-                </span>
-              </>
-            )
-          )}
+              null /* negative balance warning disabled per issue #220 - group balances can go negative by design. */   
+      )}
           <Util.Spacer size={1} />
           <Button
             onClick={job.finalized ? regenerateInvoice : downloadDraftInvoice}
