@@ -18,7 +18,7 @@ services:
   minio:
     # MinIO's upstream Quay image currently fails anonymous pulls in GitHub
     # Actions. Use the community-maintained compatible image on Docker Hub.
-    image: pgsty/minio:RELEASE.2026-08-04T00-00-00Z
+    image: quay.io/minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
@@ -32,7 +32,7 @@ services:
   minio-init:
     # Pulling MinIO's mc image from Quay can fail with an unauthorized response
     # on GitHub Actions. Use Alpine and download the standalone client instead.
-    image: alpine:3.22
+    image: quay.io/minio/mc:latest
     environment:
       AWS_ACCESS_KEY_ID: minioadmin
       AWS_SECRET_ACCESS_KEY: minioadmin
@@ -43,21 +43,7 @@ services:
       - /bin/sh
       - -c
       - |
-        apk add --no-cache ca-certificates curl
-        case "$$(uname -m)" in
-          x86_64) mc_arch=amd64 ;;
-          aarch64) mc_arch=arm64 ;;
-          *) echo "Unsupported architecture: $$(uname -m)" >&2; exit 1 ;;
-        esac
-        curl -fsSL "https://dl.min.io/client/mc/release/linux-$${mc_arch}/mc" -o /usr/local/bin/mc
-        chmod +x /usr/local/bin/mc
-        attempt=1
         until mc alias set local http://minio:9000 "$${AWS_ACCESS_KEY_ID}" "$${AWS_SECRET_ACCESS_KEY}"; do
-          if [ "$${attempt}" -ge 60 ]; then
-            echo "MinIO at http://minio:9000 did not accept the configured credentials after 60 attempts." >&2
-            exit 1
-          fi
-          attempt=$$((attempt + 1))
           sleep 1
         done
         mc mb -p local/"$${AWS_BUCKET}" || true
