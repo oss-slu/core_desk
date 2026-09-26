@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import request from "supertest";
 import { app } from "#index";
 import { gt } from "#gt";
@@ -19,7 +19,6 @@ describe("/shop/[shopId]/job/[jobId]/comments - notifications", () => {
 
   describe("GET notifiableUsers", () => {
     it("returns notifiableUsers correctly", async () => {
-      // Create a user who opts out
       const optOutUser = await prisma.user.create({
         data: {
           firstName: "Opt",
@@ -40,7 +39,6 @@ describe("/shop/[shopId]/job/[jobId]/comments - notifications", () => {
         },
       });
 
-      // Create a user who opts in
       const optInUser = await prisma.user.create({
         data: {
           firstName: "Opt",
@@ -75,21 +73,26 @@ describe("/shop/[shopId]/job/[jobId]/comments - notifications", () => {
 
       expect(res.status).toBe(200);
       expect(res.body.notifiableUsers).toBeDefined();
-      
-      const notifiableIds = res.body.notifiableUsers.map(u => u.id);
+
+      const notifiableIds = res.body.notifiableUsers.map((u) => u.id);
+
       expect(notifiableIds).toContain(optOutUser.id);
       expect(notifiableIds).toContain(optInUser.id);
-      
-      const returnedOptOut = res.body.notifiableUsers.find(u => u.id === optOutUser.id);
+
+      const returnedOptOut = res.body.notifiableUsers.find(
+        (u) => u.id === optOutUser.id
+      );
       expect(returnedOptOut.emailCommentCreated).toBe(false);
 
-      const returnedOptIn = res.body.notifiableUsers.find(u => u.id === optInUser.id);
+      const returnedOptIn = res.body.notifiableUsers.find(
+        (u) => u.id === optInUser.id
+      );
       expect(returnedOptIn.emailCommentCreated).toBe(true);
     });
   });
 
   describe("POST notifications", () => {
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
     it("sends email to opted-in user", async () => {
       const optInUser = await prisma.user.create({
@@ -130,11 +133,12 @@ describe("/shop/[shopId]/job/[jobId]/comments - notifications", () => {
 
       expect(res.status).toBe(200);
 
-      // Wait for fire-and-forget promise to resolve
       await sleep(100);
 
       expect(client.sendEmail).toHaveBeenCalledTimes(1);
+
       const emailArgs = client.sendEmail.mock.calls[0][0];
+
       expect(emailArgs.To).toBe("notify@example.com");
       expect(emailArgs.Subject).toContain("Comment created on job");
     });
@@ -179,14 +183,19 @@ describe("/shop/[shopId]/job/[jobId]/comments - notifications", () => {
       expect(res.status).toBe(200);
 
       await sleep(100);
+
       expect(client.sendEmail).not.toHaveBeenCalled();
     });
 
     it("sends email to opted-out user when adminOverride is true and sender is admin", async () => {
-      // Ensure tc.user is an ADMIN in the shop to test override
       await prisma.userShop.updateMany({
-        where: { userId: tc.user.id, shopId: tc.shop.id },
-        data: { accountType: "ADMIN" },
+        where: {
+          userId: tc.user.id,
+          shopId: tc.shop.id,
+        },
+        data: {
+          accountType: "ADMIN",
+        },
       });
 
       const optOutUser = await prisma.user.create({
@@ -231,7 +240,9 @@ describe("/shop/[shopId]/job/[jobId]/comments - notifications", () => {
       await sleep(100);
 
       expect(client.sendEmail).toHaveBeenCalledTimes(1);
+
       const emailArgs = client.sendEmail.mock.calls[0][0];
+
       expect(emailArgs.To).toBe("override@example.com");
       expect(emailArgs.Subject).toContain("Urgent / Admin Notice");
       expect(emailArgs.HtmlBody).toContain("Administrator Notice:");
