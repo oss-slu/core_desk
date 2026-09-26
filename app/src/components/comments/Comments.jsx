@@ -5,25 +5,36 @@ import { Loading } from "#loading";
 import { Button } from "#button";
 import { Avatar } from "#avatar";
 import moment from "moment";
-import { useAuth } from "#hooks";
+import { useAuth, useShop } from "#hooks";
 const { H2, H4 } = Typography;
 import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import { NotifyUserPicker } from "./NotifyUserPicker";
 import styles from "./comments.module.css";
 
 export const Comments = ({ jobId, shopId }) => {
-  const { comments, postComment, opLoading, loading } = useComments(
-    shopId,
-    jobId
-  );
+  const { comments, notifiableUsers, postComment, opLoading, loading } =
+    useComments(shopId, jobId);
+  const { user } = useAuth();
+  const { userShop } = useShop(shopId);
 
   const [newCommentMessage, setNewCommentMessage] = useState("");
+  const [selectedUserIds, setSelectedUserIds] = useState([]);
+  const [adminOverride, setAdminOverride] = useState(false);
+
+  const isAdmin = Boolean(user?.admin || userShop?.accountType === "ADMIN");
 
   const handlePostComment = async () => {
     if (!newCommentMessage.trim()) return;
-    const success = await postComment({ message: newCommentMessage.trim() });
+    const success = await postComment({
+      message: newCommentMessage.trim(),
+      notifyUserIds: selectedUserIds,
+      adminOverride,
+    });
     if (success) {
       setNewCommentMessage("");
+      setSelectedUserIds([]);
+      setAdminOverride(false);
     }
   };
 
@@ -53,6 +64,14 @@ export const Comments = ({ jobId, shopId }) => {
                   handlePostComment();
                 }
               }}
+            />
+            <NotifyUserPicker
+              users={notifiableUsers}
+              selectedUserIds={selectedUserIds}
+              onSelectUserIds={setSelectedUserIds}
+              isAdmin={isAdmin}
+              adminOverride={adminOverride}
+              onToggleAdminOverride={setAdminOverride}
             />
             <Button
               onClick={handlePostComment}

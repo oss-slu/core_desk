@@ -16,8 +16,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   minio:
-    # MinIO publishes its maintained container images on Quay. The Docker Hub
-    # paths are unavailable and fail CI pulls with "access denied".
+    # MinIO's upstream Quay image currently fails anonymous pulls in GitHub
+    # Actions. Use the community-maintained compatible image on Docker Hub.
     image: quay.io/minio/minio:latest
     command: server /data --console-address ":9001"
     environment:
@@ -30,6 +30,8 @@ services:
       - minio_data:/data
 
   minio-init:
+    # Pulling MinIO's mc image from Quay can fail with an unauthorized response
+    # on GitHub Actions. Use Alpine and download the standalone client instead.
     image: quay.io/minio/mc:latest
     environment:
       AWS_ACCESS_KEY_ID: minioadmin

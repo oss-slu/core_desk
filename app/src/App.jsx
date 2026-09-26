@@ -5,6 +5,7 @@ import { Home } from "#home";
 import { useAuth } from "#useAuth";
 import { UsersPage } from "#usersPage";
 import { UserPage } from "#userPage";
+import { SettingsPage } from "./routes/settings";
 import { ShopPage } from "#shopPage";
 import { Shops } from "#shops";
 import { Jobs } from "#jobs";
@@ -71,6 +72,7 @@ export default () => {
                 <Route path="/shops" element={<Shops />} />
                 <Route path="/shops/:shopId" element={<ShopPage />} />
                 <Route path="/shops/:shopId/billing" element={<Billing />} />
+                <Route path="/settings" element={<SettingsPage />} />
                 <Route
                   path="/shops/:shopId/ledger"
                   element={<ShopLedgerPage />}
@@ -92,8 +94,8 @@ export default () => {
                   path="/shops/:shopId/jobs/:jobId/costing"
                   element={<JobCostingPage />}
                 />
-                <Route 
-                  path="/shops/:shopId/schedule" 
+                <Route
+                  path="/shops/:shopId/schedule"
                   element={<SchedulePage />} />
                 <Route
                   path="/shops/:shopId/resources"
@@ -125,7 +127,7 @@ export default () => {
             ) : (
               <Route
                 path="*"
-                element={ <Login />
+                element={<Login />
 
                 }
               />

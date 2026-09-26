@@ -99,6 +99,7 @@
     "#useAppointments": "./src/hooks/useAppointments",
     "#useResources": "./src/hooks/useResources",
     "#resourcePicker": "./src/components/resourcePicker/ResourcePicker",
-    "#useCalendarSettings": "./src/hooks/useCalendarSettings"
+    "#useCalendarSettings": "./src/hooks/useCalendarSettings",
+    "#useNotificationSettings": "./src/hooks/useNotificationSettings"
   }
 }
