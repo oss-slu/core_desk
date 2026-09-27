@@ -16,34 +16,21 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   localstack:
-    image: localstack/localstack:latest
-    container_name: localstack_s3
+    container_name: '${LOCALSTACK_DOCKER_NAME:-localstack-main}'
+    image: localstack/localstack
     ports:
-      - "4566:4566"
+      - '127.0.0.1:4566:4566' # LocalStack Gateway
+      - '127.0.0.1:4510-4559:4510-4559' # external services port range
+      - '127.0.0.1:443:443' # LocalStack HTTPS Gateway
     environment:
-      - SERVICES=s3
-      - AWS_DEFAULT_REGION=us-east-1
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
-  localstack-init:
-    image: amazon/aws-cli:latest
-    container_name: localstack_init
-    depends_on:
-      localstack:
-        condition: service_healthy
-    environment:
-      - AWS_ACCESS_KEY_ID=minioadmin
-      - AWS_SECRET_ACCESS_KEY=minioadmin
-      - AWS_DEFAULT_REGION=us-east-1
-    entrypoint: >
-      /bin/sh -c "
-      aws --endpoint-url=http://localstack:4566 s3 mb s3://test-bucket;
-      exit 0;
-      "
+      # Activate LocalStack for AWS: https://docs.localstack.cloud/getting-started/auth-token/
+      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+      - PERSISTENCE=${PERSISTENCE:-0}
+    volumes:
+      - '${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack'
+      - '/var/run/docker.sock:/var/run/docker.sock'
 
   app:
     build:
@@ -53,20 +40,20 @@ services:
       - ./.env.e2e
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://test_user:test_password@db:5432/test_db
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/coredesk_e2e
       - PORT=3030
       # AWS S3 variables pointing to LocalStack
       - AWS_ACCESS_KEY_ID=test
       - AWS_SECRET_ACCESS_KEY=test
       - AWS_REGION=us-east-1
       - S3_ENDPOINT=http://localstack:4566
-      - S3_BUCKET=test-bucket
+      - S3_BUCKET=coredesk-e2e
       - S3_FORCE_PATH_STYLE=true
       - SAML_ALLOW_UNSIGNED="true"
     depends_on:
       postgres:
         condition: service_healthy
-      localstack:
+      localstack-init:
         condition: service_healthy
     ports:
       - "3030:3030"
