@@ -28,6 +28,11 @@ services:
       # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
       - DEBUG=${DEBUG:-0}
       - PERSISTENCE=${PERSISTENCE:-0}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4566/_localstack/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     volumes:
       - '${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack'
       - '/var/run/docker.sock:/var/run/docker.sock'
@@ -40,14 +45,14 @@ services:
       - ./.env.e2e
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/coredesk_e2e
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/coredesk_e2e?schema=public
       - PORT=3030
       # AWS S3 variables pointing to LocalStack
-      - AWS_ACCESS_KEY_ID=test
-      - AWS_SECRET_ACCESS_KEY=test
+      - AWS_ACCESS_KEY_ID=minioadmin
+      - AWS_SECRET_ACCESS_KEY=minioadmin
       - AWS_REGION=us-east-1
-      - S3_ENDPOINT=http://localstack:4566
-      - S3_BUCKET=coredesk-e2e
+      - AWS_ENDPOINT=http://localstack:4566
+      - AWS_BUCKET=coredesk-e2e
       - S3_FORCE_PATH_STYLE=true
       - SAML_ALLOW_UNSIGNED="true"
     depends_on:
@@ -65,4 +70,3 @@ services:
 
 volumes:
   postgres_data:
-  minio_data:
