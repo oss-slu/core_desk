@@ -53,7 +53,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      localstack-init:
+      localstack:
         condition: service_healthy
     ports:
       - "3030:3030"
