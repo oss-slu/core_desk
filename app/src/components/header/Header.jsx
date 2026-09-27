@@ -46,32 +46,40 @@ export const Header = () => {
           items={
             loggedIn
               ? [
-                  {
-                    text: "Feedback",
-                    onclick: () => {
-                      window.open("https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog", "_blank");
-                    },
-                    type: "item",
-                    icon: <Icon i={"message-circle"} size={18} />,
+                {
+                  text: "Settings",
+                  onclick: () => {
+                    window.location.href = "/settings";
                   },
-                  {
-                    type: "divider",
+                  type: "item",
+                  icon: <Icon i={"settings"} size={18} />,
+                },
+                {
+                  text: "Feedback",
+                  onclick: () => {
+                    window.open("https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog", "_blank");
                   },
-                  {
-                    text: "Log Out",
-                    onclick: logout,
-                    type: "item",
-                    icon: <IconLogout />,
-                  },
-                ]
+                  type: "item",
+                  icon: <Icon i={"message-circle"} size={18} />,
+                },
+                {
+                  type: "divider",
+                },
+                {
+                  text: "Log Out",
+                  onclick: logout,
+                  type: "item",
+                  icon: <IconLogout />,
+                },
+              ]
               : [
-                  {
-                    text: "Log In",
-                    onclick: login,
-                    type: "item",
-                    icon: <IconLogin2 />,
-                  },
-                ]
+                {
+                  text: "Log In",
+                  onclick: login,
+                  type: "item",
+                  icon: <IconLogin2 />,
+                },
+              ]
           }
         />
       </div>

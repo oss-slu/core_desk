@@ -1,4 +1,17 @@
 import { describe, expect, it, vi } from "vitest";
+
+const { sendEmailMock } = vi.hoisted(() => ({
+  sendEmailMock: vi.fn().mockResolvedValue(true),
+}));
+
+vi.mock("postmark", () => ({
+  default: {
+    ServerClient: vi.fn().mockImplementation(() => ({
+      sendEmail: sendEmailMock,
+    })),
+  },
+}));
+
 import prisma from "#prisma";
 import { LogType } from "#prisma-client";
 import request from "supertest";
@@ -6,19 +19,6 @@ import { app } from "#index";
 import { tc } from "#setup";
 import postmark from "postmark";
 import jwt from "jsonwebtoken";
-
-
-const sendEmailMock = vi.fn().mockResolvedValue(true);
-
-vi.mock("postmark", () => {
-  const ServerClient = vi.fn().mockImplementation(() => ({
-    sendEmail: sendEmailMock,
-  }));
-
-  return {
-    default: { ServerClient }, 
-  };
-});
 
 
 describe("/api/auth/forgotPassword", () => {
