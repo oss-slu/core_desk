@@ -39,7 +39,9 @@ export const JobCostingPage = () => {
     user?.admin ||
     userShop?.accountType === "ADMIN" ||
     userShop?.accountType === "OPERATOR";
-  const payerBalance = job?.billingAccount?.balance ?? userShop?.balance ?? 0;
+ 
+    // const payerBalance = job?.billingAccount?.balance ?? userShop?.balance ?? 0; 
+    // unused now that the negative-balance warning is disabled per issue #220
 
   const { confirm, ConfirmModal: ConfirmFinalizeModal } = useConfirm({
     title: "Finalize job",
