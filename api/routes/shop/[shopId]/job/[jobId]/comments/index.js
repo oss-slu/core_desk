@@ -278,23 +278,25 @@ export const post = [
           : "";
 
         if (emails.length > 0) {
-          await client.sendEmail({
-            From: process.env.POSTMARK_FROM_EMAIL,
-            To: emails.join(","),
-            Subject: subject,
-            HtmlBody: `
-              ${overrideBannerHtml}
-              <p>
-                <strong>${safeCommenterName}</strong> commented on the job
-                <strong>${safeJobTitle}</strong> in shop
-                <strong>${safeShopName}</strong>.
-              </p>
-              <p><strong>Comment:</strong></p>
-              <p><em>"${safeMessage}"</em></p>
-            `,
-            TextBody: `${overrideBannerText}${commenterName} commented on the job ${job.title} in shop ${shopName}. Comment: "${message}" Shop: ${shopName}`,
-            MessageStream: "outbound",
-          });
+          for (const email of emails) {
+            await client.sendEmail({
+              From: process.env.POSTMARK_FROM_EMAIL,
+              To: email,
+              Subject: subject,
+              HtmlBody: `
+                ${overrideBannerHtml}
+                <p>
+                  <strong>${safeCommenterName}</strong> commented on the job
+                  <strong>${safeJobTitle}</strong> in shop
+                  <strong>${safeShopName}</strong>.
+                </p>
+                <p><strong>Comment:</strong></p>
+                <p><em>"${safeMessage}"</em></p>
+              `,
+              TextBody: `${overrideBannerText}${commenterName} commented on the job ${job.title} in shop ${shopName}. Comment: "${message}" Shop: ${shopName}`,
+              MessageStream: "outbound",
+            });
+          }
         }
       } catch (emailErr) {
         console.error("[comments/post] Email notification failed:", emailErr);
