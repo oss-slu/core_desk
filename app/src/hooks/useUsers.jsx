@@ -78,11 +78,14 @@ export const useUsers = (shopId) => {
         body: JSON.stringify({ userEmail, userFirstName, userLastName }),
       });
       if (!r.ok) {
-        // toast.error(data.error); we are not going to put up a toast, we just wont send an email if they dont exist in our db
+        if (r.status === 409) {
+          toast.error("This user already exists in this shop.");
+        }
         return;
+      } else {
+        toast.success(`Invite sent to ${userEmail}`);
       }
       document.location.href = `/shops/${shopId}/users`;
-      toast.success(`Invite sent to ${userEmail}`);
     } catch (error) {
       toast.error(error);
       console.error("Error sending email: ", error.message);
