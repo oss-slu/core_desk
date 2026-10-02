@@ -3,17 +3,28 @@
 
 import { PrismaClient } from "#prisma-client";
 
-const prisma = new PrismaClient();
+let prisma;
+
+const getPrisma = () => {
+  prisma ??= new PrismaClient();
+  return prisma;
+};
 
 /**
  * Backfill memberships so that every user is added to every shop
  * where `autoJoin` is true and the user isn't already a member.
  * New memberships default to AccountType.CUSTOMER.
  */
-export const backfillAutoJoin = async () => {
+export const backfillAutoJoin = async ({ prismaClient, shopId } = {}) => {
+  const client = prismaClient ?? getPrisma();
+
   // 1) Load shops that should auto-join
-  const shops = await prisma.shop.findMany({
-    where: { autoJoin: true, active: true },
+  const shops = await client.shop.findMany({
+    where: {
+      autoJoin: true,
+      active: true,
+      ...(shopId ? { id: shopId } : {}),
+    },
     select: { id: true },
   });
 
@@ -26,7 +37,7 @@ export const backfillAutoJoin = async () => {
     };
 
   // 2) Load all users (ids only)
-  const users = await prisma.user.findMany({
+  const users = await client.user.findMany({
     select: { id: true },
   });
 
@@ -39,7 +50,7 @@ export const backfillAutoJoin = async () => {
     };
 
   // 3) Build a set of existing memberships to avoid dupes
-  const existingMemberships = await prisma.userShop.findMany({
+  const existingMemberships = await client.userShop.findMany({
     where: {
       shopId: { in: shops.map((s) => s.id) },
       userId: { in: users.map((u) => u.id) },
@@ -70,7 +81,7 @@ export const backfillAutoJoin = async () => {
 
   let created = 0;
   if (rowsToCreate.length > 0) {
-    const res = await prisma.userShop.createMany({
+    const res = await client.userShop.createMany({
       data: rowsToCreate,
       skipDuplicates: true,
     });
@@ -99,7 +110,7 @@ export const main = async () => {
     console.error("Backfill failed:", err);
     process.exitCode = 1;
   } finally {
-    await prisma.$disconnect();
+    await prisma?.$disconnect();
   }
 };
 

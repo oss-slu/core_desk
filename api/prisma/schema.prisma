@@ -18,16 +18,17 @@ model user {
   suspensionReason String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  jobs             Job[]
-  comments         JobComment[]
-  jobItems         JobItem[]
-  ledgerItems      LedgerItem[]
-  billingGroups    UserBillingGroup[]
-  shops            UserShop[]
-  logs             logs[]
-  navigation       Navigation[]
-  files            File[]
-  appointments     Appointment[]
+  jobs                 Job[]
+  comments             JobComment[]
+  jobItems             JobItem[]
+  ledgerItems          LedgerItem[]
+  billingGroups        UserBillingGroup[]
+  shops                UserShop[]
+  logs                 logs[]
+  navigation           Navigation[]
+  files                File[]
+  appointments         Appointment[]
+  notificationSettings UserNotificationSettings?
 }
 
 model File {
@@ -622,6 +623,18 @@ model Navigation {
   user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   url String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserNotificationSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   user   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  emailJobCreated     Boolean @default(true)
+  emailCommentCreated Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,26 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useAuth } from "#useAuth";
 import styles from "./Header.module.css";
 import logo from "#coreDeskLogo";
 import { Dropdown } from "tabler-react-2";
 import { Icon } from "#icon";
-import { useShop } from "#index";
 const IconLogout = () => <Icon i={"logout"} size={18} />;
 const IconLogin2 = () => <Icon i={"login-2"} size={18} />;
-import classNames from "classnames";
 
 export const Header = () => {
   const { user, loggedIn, login, logout } = useAuth();
-  const [shopId, setShopId] = useState("");
-
-  useEffect(() => {
-    setInterval(() => {
-      const _shopId = document.location.href.match(/\/shops\/([a-z0-9]+)/)?.[1];
-      if (_shopId !== shopId) setShopId(_shopId);
-    }, 1000);
-  }, []);
-
-  const { shop } = useShop(shopId);
 
   return (
     <header className={styles.header}>
@@ -28,17 +16,6 @@ export const Header = () => {
         <a href="/">
           <img src={logo} className={styles.headerLogo} alt="CoreDesk Logo" />
         </a>
-        <h1 className={classNames(styles.headerTitle, "hos-600")}>
-          {shop?.logo?.location ? (
-            <img
-              src={shop?.logo?.location}
-              className={styles.headerLogo}
-              alt={shop?.name}
-            />
-          ) : (
-            shop?.name
-          )}
-        </h1>
       </div>
       <div className={styles.headerGroup}>
         <Dropdown
@@ -46,32 +23,40 @@ export const Header = () => {
           items={
             loggedIn
               ? [
-                  {
-                    text: "Feedback",
-                    onclick: () => {
-                      window.open("https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog", "_blank");
-                    },
-                    type: "item",
-                    icon: <Icon i={"message-circle"} size={18} />,
+                {
+                  text: "Settings",
+                  onclick: () => {
+                    window.location.href = "/settings";
                   },
-                  {
-                    type: "divider",
+                  type: "item",
+                  icon: <Icon i={"settings"} size={18} />,
+                },
+                {
+                  text: "Feedback",
+                  onclick: () => {
+                    window.open("https://docs.google.com/forms/d/e/1FAIpQLSeuVXfyYgGUAIiZWXb9NA7JyG1OdWqdfY7lOGsfmQBboKwwMg/viewform?usp=dialog", "_blank");
                   },
-                  {
-                    text: "Log Out",
-                    onclick: logout,
-                    type: "item",
-                    icon: <IconLogout />,
-                  },
-                ]
+                  type: "item",
+                  icon: <Icon i={"message-circle"} size={18} />,
+                },
+                {
+                  type: "divider",
+                },
+                {
+                  text: "Log Out",
+                  onclick: logout,
+                  type: "item",
+                  icon: <IconLogout />,
+                },
+              ]
               : [
-                  {
-                    text: "Log In",
-                    onclick: login,
-                    type: "item",
-                    icon: <IconLogin2 />,
-                  },
-                ]
+                {
+                  text: "Log In",
+                  onclick: login,
+                  type: "item",
+                  icon: <IconLogin2 />,
+                },
+              ]
           }
         />
       </div>

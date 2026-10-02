@@ -33,12 +33,6 @@
   gap: 24px;
 }
 
-.headerTitle {
-  font-size: 1rem;
-  color: var(--tblr-text-color);
-  margin: 0;
-}
-
 .toggle {
   display: none;
   flex-direction: column;

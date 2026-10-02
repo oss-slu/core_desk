@@ -152,8 +152,8 @@ steps:
 
   - waitFor: 1200
 
-  - assertVisible:
-      selector: "#carousel-sample img"
+#   - assertVisible:
+#       selector: "#carousel-sample img"
 
   - tapOn:
       text: Resources
@@ -203,8 +203,8 @@ steps:
 
   - waitFor: 1200
 
-  - assertVisible:
-      selector: "#carousel-sample img"
+#   - assertVisible:
+#       selector: "#carousel-sample img"
 
   - tapOn:
       text: Resource

@@ -488,6 +488,13 @@ describe("/shop/[shopId]", () => {
 
     it("allows global admins to update autoJoin", async () => {
       const shop = await prisma.shop.findFirst({});
+      const userToBackfill = await prisma.user.create({
+        data: {
+          email: "auto-join-backfill@example.com",
+          firstName: "Auto",
+          lastName: "Join",
+        },
+      });
 
       const res = await request(app)
         .put(`/api/shop/${shop.id}`)
@@ -504,6 +511,14 @@ describe("/shop/[shopId]", () => {
       });
 
       expect(updatedShop.autoJoin).toBe(true);
+
+      const membership = await prisma.userShop.findFirst({
+        where: { userId: userToBackfill.id, shopId: shop.id },
+      });
+      expect(membership).toMatchObject({
+        active: true,
+        accountType: "CUSTOMER",
+      });
     });
 
     it("does not allow a shop-level admin to update autoJoin", async () => {
