@@ -123,7 +123,7 @@ export const post = [
         const link = `${process.env.BASE_URL}`;
 
         await client.sendEmail({
-          "From": `${process.env.POSTMARK_FROM_EMAIL}`,
+          "From": `"CoreDesk Notifications" <${process.env.POSTMARK_FROM_EMAIL}>`,
           "To": `${userEmail}`,
           "Subject": `You are invited to join CoreDesk!`,
           "HtmlBody": `
