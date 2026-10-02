@@ -6,34 +6,21 @@ import { Button } from "#button";
 import { Input } from "tabler-react-2";
 
 const CreateInviteUserModalContent = ({onSubmit}) => {
-  const [userEmail, setUserEmail] = useState("");
-  const [userFirstName, setUserFirstName] = useState("");
-  const [userLastName, setUserLastName] = useState("");
+  const [userEmails, setUserEmails] = useState("");
 
   return (
     <div>
       <Input
-        value={userEmail}
-        onChange={(e) => setUserEmail(e)}
-        label="Email"
-        placeholder="first.last@slu.edu"
-      />
-      <Input
-        value={userFirstName}
-        onChange={(e) => setUserFirstName(e)}
-        label="First Name"
-      />
-      <Input
-        value={userLastName}
-        onChange={(e) => setUserLastName(e)}
-        label="Last Name"
+        value={userEmails}
+        type="text"
+        onChange={(e) => setUserEmails(e)}
+        label="Email(s)"
+        placeholder="Enter email addresses separated by commas"
       />
       <Button variant="primary" 
         onClick={() => {
           onSubmit(
-            userEmail, 
-            userFirstName, 
-            userLastName
+            userEmails
           );
         }}
       >
@@ -65,24 +52,22 @@ export const useUsers = (shopId) => {
     }
   };
 
-  const _inviteUser = async (userEmail, userFirstName, userLastName) => {
+  const _inviteUser = async (userEmails) => {
     try {
-      console.log("email", userEmail);
-      console.log("first name", userFirstName);
-      console.log("last name", userLastName);
+      console.log("emails", userEmails);
       const r = await authFetch(`/api/shop/${shopId}/user`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userEmail, userFirstName, userLastName }),
+        body: JSON.stringify({ userEmails }),
       });
       if (!r.ok) {
         // toast.error(data.error); we are not going to put up a toast, we just wont send an email if they dont exist in our db
         return;
       }
       document.location.href = `/shops/${shopId}/users`;
-      toast.success(`Invite sent to ${userEmail}`);
+      toast.success(`Invite sent to ${userEmails}`);
     } catch (error) {
       toast.error(error);
       console.error("Error sending email: ", error.message);

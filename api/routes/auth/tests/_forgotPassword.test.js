@@ -1,16 +1,16 @@
 import { describe, expect, it, vi } from "vitest";
 
-const { sendEmailMock } = vi.hoisted(() => ({
-  sendEmailMock: vi.fn().mockResolvedValue(true),
-}));
+// const { sendEmailMock } = vi.hoisted(() => ({
+//   sendEmailMock: vi.fn().mockResolvedValue(true),
+// }));
 
-vi.mock("postmark", () => ({
-  default: {
-    ServerClient: vi.fn().mockImplementation(() => ({
-      sendEmail: sendEmailMock,
-    })),
-  },
-}));
+// vi.mock("postmark", () => ({
+//   default: {
+//     ServerClient: vi.fn().mockImplementation(() => ({
+//       sendEmail: sendEmailMock,
+//     })),
+//   },
+// }));
 
 import prisma from "#prisma";
 import { LogType } from "#prisma-client";

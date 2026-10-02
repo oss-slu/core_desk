@@ -195,7 +195,7 @@ export const ShopUsersPage = () => {
     >
       <Util.Row justify="between" align="center">
         <H1>Shop Users</H1>
-        <Button onClick={inviteUser}>Invite New User</Button>
+        <Button onClick={inviteUser}>Invite New Users</Button>
       </Util.Row>
       <Util.Spacer size={2} />
       <SearchBar
