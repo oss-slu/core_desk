@@ -38,6 +38,14 @@ export const ShopCard = ({ shop }) => {
     <Link className={styles.shopCardlink} to={`/shops/${shop.id}`}>
       <Card style={{ backgroundImage }} className={styles.shopCard}>
         <H2>{shop.name}</H2>
+        {shop.logo?.location && (
+          <img
+            src={shop.logo.location}
+            alt={`${shop.name} logo`}
+            className={styles.shopLogo}
+            loading="lazy"
+          />
+        )}
       </Card>
     </Link>
   );

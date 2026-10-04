@@ -3,6 +3,17 @@
   background-position: center;
   aspect-ratio: 5/3;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.shopLogo {
+  display: block;
+  max-width: 100%;
+  height: 64px;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .shopCardlink {
