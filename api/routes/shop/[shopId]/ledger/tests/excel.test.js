@@ -52,8 +52,8 @@ describe("/shop/[shopId]/ledger/excel", () => {
           groupId: group.id,
           finalized: true,
           finalizedAt: new Date("2026-03-10T10:00:00.000Z"),
-          status: "Finalized",
-          ledgerItem: {
+          status: "COMPLETED",
+          ledgerItems: {
             create: {
               shopId: tc.shop.id,
               userId: tc.user.id,
@@ -73,8 +73,8 @@ describe("/shop/[shopId]/ledger/excel", () => {
           userId: tc.targetUser.id,
           finalized: true,
           finalizedAt: new Date("2026-03-20T14:30:00.000Z"),
-          status: "Finalized",
-          ledgerItem: {
+          status: "COMPLETED",
+          ledgerItems: {
             create: {
               shopId: tc.shop.id,
               userId: tc.targetUser.id,
@@ -93,8 +93,8 @@ describe("/shop/[shopId]/ledger/excel", () => {
           userId: tc.user.id,
           finalized: true,
           finalizedAt: new Date("2026-02-28T23:59:59.000Z"),
-          status: "Finalized",
-          ledgerItem: {
+          status: "COMPLETED",
+          ledgerItems: {
             create: {
               shopId: tc.shop.id,
               userId: tc.user.id,
@@ -113,8 +113,8 @@ describe("/shop/[shopId]/ledger/excel", () => {
           userId: tc.user.id,
           finalized: true,
           finalizedAt: new Date("2026-04-01T00:00:01.000Z"),
-          status: "Finalized",
-          ledgerItem: {
+          status: "COMPLETED",
+          ledgerItems: {
             create: {
               shopId: tc.shop.id,
               userId: tc.user.id,
@@ -132,7 +132,7 @@ describe("/shop/[shopId]/ledger/excel", () => {
           shopId: tc.shop.id,
           userId: tc.user.id,
           finalized: false,
-          status: "In Progress",
+          status: "IN_PROGRESS",
         },
       });
 
@@ -144,7 +144,7 @@ describe("/shop/[shopId]/ledger/excel", () => {
           userId: tc.user.id,
           finalized: true,
           finalizedAt: new Date("2026-03-15T12:00:00.000Z"),
-          status: "Finalized",
+          status: "COMPLETED",
         },
       });
 
