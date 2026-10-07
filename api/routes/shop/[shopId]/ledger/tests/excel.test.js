@@ -53,7 +53,7 @@ describe("/shop/[shopId]/ledger/excel", () => {
           finalized: true,
           finalizedAt: new Date("2026-03-10T10:00:00.000Z"),
           status: "Finalized",
-          ledgerItems: {
+          ledgerItem: {
             create: {
               shopId: tc.shop.id,
               userId: tc.user.id,
@@ -74,7 +74,7 @@ describe("/shop/[shopId]/ledger/excel", () => {
           finalized: true,
           finalizedAt: new Date("2026-03-20T14:30:00.000Z"),
           status: "Finalized",
-          ledgerItems: {
+          ledgerItem: {
             create: {
               shopId: tc.shop.id,
               userId: tc.targetUser.id,
@@ -94,7 +94,7 @@ describe("/shop/[shopId]/ledger/excel", () => {
           finalized: true,
           finalizedAt: new Date("2026-02-28T23:59:59.000Z"),
           status: "Finalized",
-          ledgerItems: {
+          ledgerItem: {
             create: {
               shopId: tc.shop.id,
               userId: tc.user.id,
@@ -114,7 +114,7 @@ describe("/shop/[shopId]/ledger/excel", () => {
           finalized: true,
           finalizedAt: new Date("2026-04-01T00:00:01.000Z"),
           status: "Finalized",
-          ledgerItems: {
+          ledgerItem: {
             create: {
               shopId: tc.shop.id,
               userId: tc.user.id,
