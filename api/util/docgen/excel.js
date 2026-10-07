@@ -14,14 +14,16 @@ import ExcelJS from "exceljs";
 export const sanitizeWorksheetName = (name, existingNames = new Set()) => {
   let cleaned = (name || "Sheet")
     .replace(/[\\/?*:[\]]/g, "_")
-    .trim();
+    .trim()
+    .slice(0, 31);
   if (!cleaned) cleaned = "Sheet";
 
   let finalName = cleaned;
   let counter = 1;
   while (existingNames.has(finalName.toLowerCase())) {
     const suffix = ` (${counter})`;
-    finalName = `${cleaned}${suffix}`;
+    const maxBaseLength = 31 - suffix.length;
+    finalName = `${cleaned.slice(0, maxBaseLength)}${suffix}`;
     counter++;
   }
   existingNames.add(finalName.toLowerCase());

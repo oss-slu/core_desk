@@ -172,8 +172,10 @@ describe("/shop/[shopId]/ledger/excel", () => {
       expect(sheetNames[1]).toBe("Billing Group Totals");
       expect(sheetNames).toContain("Engineering Labs");
       expect(
-        sheetNames.some((name) =>
-          name.includes("TARGET_TestFirstName TARGET_TestLastName")
+        sheetNames.some(
+          (name) =>
+            name.includes("TARGET_TestFirstName TARGET_TestLas") ||
+            name.includes("TARGET_TestFirstName TARGET_Tes")
         )
       ).toBe(true);
 
