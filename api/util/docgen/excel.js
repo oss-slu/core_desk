@@ -14,16 +14,14 @@ import ExcelJS from "exceljs";
 export const sanitizeWorksheetName = (name, existingNames = new Set()) => {
   let cleaned = (name || "Sheet")
     .replace(/[\\/?*:[\]]/g, "_")
-    .trim()
-    .slice(0, 31);
+    .trim();
   if (!cleaned) cleaned = "Sheet";
 
   let finalName = cleaned;
   let counter = 1;
   while (existingNames.has(finalName.toLowerCase())) {
     const suffix = ` (${counter})`;
-    const maxBaseLength = 31 - suffix.length;
-    finalName = `${cleaned.slice(0, maxBaseLength)}${suffix}`;
+    finalName = `${cleaned}${suffix}`;
     counter++;
   }
   existingNames.add(finalName.toLowerCase());
@@ -111,15 +109,9 @@ export const generateBillingExcelWorkbook = async (
       job.user?.email ||
       "Unknown";
 
-    // ledgerItems is a Prisma relation and therefore an array.
-    const ledgerItems = Array.isArray(job.ledgerItems)
-      ? job.ledgerItems
-      : [];
-
-    // Prefer a ledger item explicitly associated with a billing group.
-    const groupLedgerItem = ledgerItems.find(
-      (item) => item.billingGroupId,
-    );
+    const groupLedgerItem = Array.isArray(job.ledgerItems)
+      ? job.ledgerItems.find((item) => item.billingGroupId)
+      : (job.ledgerItems?.billingGroupId ? job.ledgerItems : null);
 
     const billingGroupId =
       groupLedgerItem?.billingGroupId ?? job.groupId;

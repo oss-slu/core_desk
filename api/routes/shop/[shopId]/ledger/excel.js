@@ -136,7 +136,9 @@ export const get = [
       });
 
       const jobsWithCosts = jobs.map((job) => {
-        const ledgerItem = job.ledgerItems?.[0];
+        const ledgerItem = Array.isArray(job.ledgerItems)
+          ? job.ledgerItems[0]
+          : (job.ledgerItems || job.ledgerItem);
 
         return {
           ...job,
