@@ -176,21 +176,26 @@ export const ShopLedgerPage = () => {
       </Util.Row>
       <Util.Spacer size={1} />
       <Util.Row gap={1} align="center" wrap="wrap">
-        <Button
-          onClick={handleExportExcel}
-          disabled={!isDateRangeValid || excelLoading}
-          loading={excelLoading}
-        >
-          <Icon i="file-spreadsheet" size={16} />
-          Export to Excel
-        </Button>
-        <Button
-          onClick={() => downloadCsv(debtRows, shopId)}
-          disabled={debtRows.length === 0}
-        >
-          <Icon i="download" size={16} />
-          Download CSV
-        </Button>
+        <div title="Export to Excel is formatted for Workday.">
+          <Button
+            onClick={handleExportExcel}
+            disabled={!isDateRangeValid || excelLoading}
+            loading={excelLoading}
+          >
+            <Icon i="file-spreadsheet" size={16} />
+            Export to Excel
+          </Button>
+        </div>
+
+        <div title="Intended for general/internal ledger use.">
+          <Button
+            onClick={() => downloadCsv(debtRows, shopId)}
+            disabled={debtRows.length === 0}
+          >
+            <Icon i="download" size={16} />
+            Download CSV
+          </Button>
+        </div>
       </Util.Row>
       <Util.Spacer size={1} />
       {debtRows.length === 0 ? (
