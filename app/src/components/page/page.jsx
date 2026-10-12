@@ -8,17 +8,17 @@ export const sidenavItems = (activeText, userIsAdmin) => {
   const items = [
     {
       type: "item",
-      href: `/`,
-      text: `Home`,
-      active: activeText === "Home",
-      icon: <Icon i={"home"} size={18} />,
-    },
-    {
-      type: "item",
       href: `/shops`,
       text: `Shops`,
       active: activeText === "Shops",
       icon: <Icon i="building-store" size={18} />,
+    },
+    {
+      type: "item",
+      href: `/about`,
+      text: `About`,
+      active: activeText === "About",
+      icon: <Icon i={"info-circle"} size={18} />,
     },
     // {
     //   type: "item",
