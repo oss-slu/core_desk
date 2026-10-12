@@ -18,5 +18,8 @@
   "devDependencies": {
     "concurrently": "^9.2.1",
     "start-server-and-test": "^2.0.0"
+  },
+  "dependencies": {
+    "esbuild": "^0.21.5"
   }
 }
