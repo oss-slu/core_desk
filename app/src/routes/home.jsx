@@ -22,7 +22,7 @@ export const Home = () => {
   if (loading) return <Loading />;
 
   return (
-    <Page sidenavItems={sidenavItems("Home", activeUser.admin)}>
+    <Page sidenavItems={sidenavItems("About", activeUser.admin)}>
       <MarkdownRender markdown={content} />
       <Util.Hr />
       {import.meta.env.VITE_HASH && import.meta.env.VITE_BUILD_DATE && (
