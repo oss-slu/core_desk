@@ -130,5 +130,219 @@ describe("/shop/[shopId]/job", () => {
                 expectedDueDate.toISOString(),
             );
         });
+
+        it("creates a job for a new user who does not already exist", async () => {
+            const adminUser = tc.user;
+            findFirstSpy.mockImplementation(async (args) => {
+                if (args?.where?.userId === adminUser.id) {
+                    return {
+                        id: "admin-usershop-id",
+                        userId: adminUser.id,
+                        shopId: tc.shop.id,
+                        active: true,
+                        accountType: "ADMIN",
+                    };
+                }
+                return null;
+            });
+
+            const newEmail = `newuser_${Date.now()}@slu.edu`;
+            const res = await request(app)
+                .post(`/api/shop/${tc.shop.id}/job`)
+                .set(...(await gt({ ga: true, user: adminUser })))
+                .send({
+                    title: "Job for New User",
+                    description: "Job description for new user",
+                    dueDate: new Date(),
+                    onBehalfOf: true,
+                    onBehalfOfUserEmail: newEmail,
+                    onBehalfOfUserFirstName: "New",
+                    onBehalfOfUserLastName: "User",
+                });
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("job");
+            expect(res.body.job.title).toBe("Job for New User");
+
+            const createdUser = await prisma.user.findFirst({
+                where: { email: newEmail },
+            });
+            expect(createdUser).not.toBeNull();
+            expect(createdUser.firstName).toBe("New");
+            expect(res.body.job.userId).toBe(createdUser.id);
+        });
+
+        it("creates a job for an existing user and adds them to the shop without creating a duplicate account", async () => {
+            const adminUser = tc.user;
+            const existingEmail = `existing_${Date.now()}@slu.edu`;
+
+            const existingUser = await prisma.user.create({
+                data: {
+                    email: existingEmail,
+                    firstName: "Existing",
+                    lastName: "User",
+                },
+            });
+
+            findFirstSpy.mockImplementation(async (args) => {
+                if (args?.where?.userId === adminUser.id) {
+                    return {
+                        id: "admin-usershop-id",
+                        userId: adminUser.id,
+                        shopId: tc.shop.id,
+                        active: true,
+                        accountType: "ADMIN",
+                    };
+                }
+                if (args?.where?.userId === existingUser.id) {
+                    return null; // Not yet in shop
+                }
+                return null;
+            });
+
+            const countBefore = await prisma.user.count({
+                where: { email: existingEmail },
+            });
+            expect(countBefore).toBe(1);
+
+            const res = await request(app)
+                .post(`/api/shop/${tc.shop.id}/job`)
+                .set(...(await gt({ ga: true, user: adminUser })))
+                .send({
+                    title: "Job for Existing User",
+                    description: "Job description",
+                    dueDate: new Date(),
+                    onBehalfOf: true,
+                    onBehalfOfUserEmail: existingEmail,
+                    onBehalfOfUserFirstName: "Existing",
+                    onBehalfOfUserLastName: "User",
+                });
+
+            expect(res.status).toBe(200);
+            expect(res.body).toHaveProperty("job");
+            expect(res.body.job.userId).toBe(existingUser.id);
+
+            const countAfter = await prisma.user.count({
+                where: { email: existingEmail },
+            });
+            expect(countAfter).toBe(1);
+
+            const userShopRecord = await prisma.userShop.findFirst({
+                where: {
+                    userId: existingUser.id,
+                    shopId: tc.shop.id,
+                    active: true,
+                },
+            });
+            expect(userShopRecord).not.toBeNull();
+        });
+
+        it("creates a job for an existing user who is already in the shop without creating duplicate accounts", async () => {
+            const adminUser = tc.user;
+            const inShopEmail = `inshop_${Date.now()}@slu.edu`;
+
+            const existingUser = await prisma.user.create({
+                data: {
+                    email: inShopEmail,
+                    firstName: "InShop",
+                    lastName: "User",
+                },
+            });
+
+            await prisma.userShop.create({
+                data: {
+                    userId: existingUser.id,
+                    shopId: tc.shop.id,
+                    active: true,
+                },
+            });
+
+            findFirstSpy.mockImplementation(async (args) => {
+                if (args?.where?.userId === adminUser.id) {
+                    return {
+                        id: "admin-usershop-id",
+                        userId: adminUser.id,
+                        shopId: tc.shop.id,
+                        active: true,
+                        accountType: "ADMIN",
+                    };
+                }
+                if (args?.where?.userId === existingUser.id) {
+                    return {
+                        id: "target-usershop-id",
+                        userId: existingUser.id,
+                        shopId: tc.shop.id,
+                        active: true,
+                    };
+                }
+                return null;
+            });
+
+            const res = await request(app)
+                .post(`/api/shop/${tc.shop.id}/job`)
+                .set(...(await gt({ ga: true, user: adminUser })))
+                .send({
+                    title: "Job for User Already in Shop",
+                    description: "Job description",
+                    dueDate: new Date(),
+                    onBehalfOf: true,
+                    onBehalfOfUserEmail: inShopEmail,
+                });
+
+            expect(res.status).toBe(200);
+            expect(res.body.job.userId).toBe(existingUser.id);
+
+            const count = await prisma.user.count({
+                where: { email: inShopEmail },
+            });
+            expect(count).toBe(1);
+        });
+
+        it("returns an appropriate error message instead of crashing when an existing user cannot be added automatically to the shop", async () => {
+            const operatorUser = tc.user;
+            const externalEmail = `external_${Date.now()}@slu.edu`;
+
+            const externalUser = await prisma.user.create({
+                data: {
+                    email: externalEmail,
+                    firstName: "External",
+                    lastName: "User",
+                },
+            });
+
+            // The requester is an OPERATOR (not admin) and not global admin
+            findFirstSpy.mockImplementation(async (args) => {
+                if (args?.where?.userId === operatorUser.id) {
+                    return {
+                        id: "operator-usershop-id",
+                        userId: operatorUser.id,
+                        shopId: tc.shop.id,
+                        active: true,
+                        accountType: "OPERATOR",
+                    };
+                }
+                if (args?.where?.userId === externalUser.id) {
+                    return null; // Not connected to shop
+                }
+                return null;
+            });
+
+            const res = await request(app)
+                .post(`/api/shop/${tc.shop.id}/job`)
+                .set(...(await gt({ ga: false, user: operatorUser })))
+                .send({
+                    title: "Job by Operator for External User",
+                    description: "Should fail gracefully",
+                    dueDate: new Date(),
+                    onBehalfOf: true,
+                    onBehalfOfUserEmail: externalEmail,
+                });
+
+            expect(res.status).toBe(409);
+            expect(res.body.error).toBe("User already exists");
+            expect(res.body.message).toContain(
+                "Global Admins can visit the general Users page to add the existing user to the shop"
+            );
+        });
     })
 })
