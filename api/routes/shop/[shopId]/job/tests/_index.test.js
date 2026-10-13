@@ -1,4 +1,5 @@
-import { describe, expect, it , vi, beforeEach, afterEach} from "vitest";
+
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { LogType } from "#prisma-client";
 import request from "supertest";
 import { app } from "#index";
@@ -10,8 +11,14 @@ describe("/shop/[shopId]/job", () => {
     describe("POST", () => {
         let findFirstSpy;
         let createLogsSpy;
+        let originalUserShopFindFirst;
 
         beforeEach(async () => {
+            // Preserve the original implementation for DB verification.
+            originalUserShopFindFirst = prisma.userShop.findFirst.bind(
+                prisma.userShop,
+            );
+
             createLogsSpy = vi.spyOn(prisma.logs, "create");
             findFirstSpy = vi.spyOn(prisma.userShop, "findFirst");
         });
@@ -19,7 +26,7 @@ describe("/shop/[shopId]/job", () => {
         afterEach(async () => {
             vi.restoreAllMocks();
         });
-        
+
         it("allows job creation if a user exists on the shop", async () => {
             prisma.userShop.findFirst = findFirstSpy.mockResolvedValue({
                 userId: "example-id",
@@ -45,19 +52,19 @@ describe("/shop/[shopId]/job", () => {
                 userId: expect.any(String),
                 dueDate: expect.any(String),
             });
-            
+
             expect(createLogsSpy).toHaveBeenCalledOnce();
             expect(createLogsSpy).toHaveBeenCalledWith(
                 expect.objectContaining({
-                  data: expect.objectContaining({
-                    type: LogType.JOB_CREATED,
-                    user: { connect: { id: expect.any(String) } },
-                    shop: { connect: { id: expect.any(String) } },
-                    job: { connect: { id: expect.any(String) } },
-                    to: expect.any(String), 
-                  }),
-                })  
-            );    
+                    data: expect.objectContaining({
+                        type: LogType.JOB_CREATED,
+                        user: { connect: { id: expect.any(String) } },
+                        shop: { connect: { id: expect.any(String) } },
+                        job: { connect: { id: expect.any(String) } },
+                        to: expect.any(String),
+                    }),
+                }),
+            );
         });
 
         it("denies job creation if a user doesn't exist on the shop", async () => {
@@ -71,9 +78,9 @@ describe("/shop/[shopId]/job", () => {
                     description: "JobCreationExample description",
                     dueDate: new Date(),
                 });
-            
+
             expect(res.status).toBe(400);
-            expect(res.body.error).toBe("Unauthorized")
+            expect(res.body.error).toBe("Unauthorized");
             expect(createLogsSpy).not.toHaveBeenCalled();
         });
 
@@ -89,7 +96,7 @@ describe("/shop/[shopId]/job", () => {
                 data: {
                     shopId: tc.shop.id,
                     title: "Billing Group Test Group",
-                }
+                },
             });
 
             const res = await request(app)
@@ -105,7 +112,7 @@ describe("/shop/[shopId]/job", () => {
             expect(res.status).toBe(200);
             expect(res.body.job.groupId).toBe(group.id);
         });
-            
+
         it("defaults due date to two weeks out when dueDate is not provided", async () => {
             prisma.userShop.findFirst = findFirstSpy.mockResolvedValue({
                 userId: "example-id",
@@ -133,6 +140,7 @@ describe("/shop/[shopId]/job", () => {
 
         it("creates a job for a new user who does not already exist", async () => {
             const adminUser = tc.user;
+
             findFirstSpy.mockImplementation(async (args) => {
                 if (args?.where?.userId === adminUser.id) {
                     return {
@@ -195,7 +203,7 @@ describe("/shop/[shopId]/job", () => {
                     };
                 }
                 if (args?.where?.userId === existingUser.id) {
-                    return null; // Not yet in shop
+                    return null; // Not yet in shop.
                 }
                 return null;
             });
@@ -227,7 +235,9 @@ describe("/shop/[shopId]/job", () => {
             });
             expect(countAfter).toBe(1);
 
-            const userShopRecord = await prisma.userShop.findFirst({
+            // Use the original Prisma method to query the actual DB,
+            // bypassing the mocked findFirst used by the route.
+            const userShopRecord = await originalUserShopFindFirst({
                 where: {
                     userId: existingUser.id,
                     shopId: tc.shop.id,
@@ -310,7 +320,7 @@ describe("/shop/[shopId]/job", () => {
                 },
             });
 
-            // The requester is an OPERATOR (not admin) and not global admin
+            // The requester is an OPERATOR (not admin) and not global admin.
             findFirstSpy.mockImplementation(async (args) => {
                 if (args?.where?.userId === operatorUser.id) {
                     return {
@@ -322,7 +332,7 @@ describe("/shop/[shopId]/job", () => {
                     };
                 }
                 if (args?.where?.userId === externalUser.id) {
-                    return null; // Not connected to shop
+                    return null; // Not connected to shop.
                 }
                 return null;
             });
@@ -341,8 +351,8 @@ describe("/shop/[shopId]/job", () => {
             expect(res.status).toBe(409);
             expect(res.body.error).toBe("User already exists");
             expect(res.body.message).toContain(
-                "Global Admins can visit the general Users page to add the existing user to the shop"
+                "Global Admins can visit the general Users page to add the existing user to the shop",
             );
         });
-    })
-})
+    });
+});
