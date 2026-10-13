@@ -11,15 +11,10 @@ describe("/shop/[shopId]/job", () => {
     describe("POST", () => {
         let findFirstSpy;
         let createLogsSpy;
-        let originalUserShopFindFirst;
 
         beforeEach(async () => {
-            // Preserve the original implementation for DB verification.
-            originalUserShopFindFirst = prisma.userShop.findFirst.bind(
-                prisma.userShop,
-            );
-
             createLogsSpy = vi.spyOn(prisma.logs, "create");
+
             findFirstSpy = vi.spyOn(prisma.userShop, "findFirst");
         });
 
@@ -237,14 +232,14 @@ describe("/shop/[shopId]/job", () => {
 
             // Use the original Prisma method to query the actual DB,
             // bypassing the mocked findFirst used by the route.
-            const userShopRecord = await originalUserShopFindFirst({
+            const userShopRecord = await prisma.userShop.findMany({
                 where: {
                     userId: existingUser.id,
                     shopId: tc.shop.id,
                     active: true,
                 },
             });
-            expect(userShopRecord).not.toBeNull();
+            expect(userShopRecord.length).toBeGreaterThan(0);
         });
 
         it("creates a job for an existing user who is already in the shop without creating duplicate accounts", async () => {
