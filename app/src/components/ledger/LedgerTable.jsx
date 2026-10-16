@@ -83,6 +83,10 @@ export const LedgerTable = ({ data, shopId }) => (
         sortable: true,
       },
       {
+        label: "Notes",
+        accessor: "notes",
+      },
+      {
         label: "Job",
         accessor: "job",
         render: (job, context) => (

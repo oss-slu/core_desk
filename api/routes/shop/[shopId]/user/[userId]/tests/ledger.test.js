@@ -141,6 +141,7 @@ describe("/shop/[shopId]/user/[userId]/ledger", () => {
         .send({
           type: "MANUAL_TOPUP",
           value: 100,
+          notes: "Marketplace transaction MP-123",
         });
 
       expect(res.status).toBe(200);
@@ -155,6 +156,10 @@ describe("/shop/[shopId]/user/[userId]/ledger", () => {
       expect(ledgerItem).toBeDefined();
       expect(ledgerItem.type).toBe("MANUAL_TOPUP");
       expect(ledgerItem.value).toBe(100);
+      expect(ledgerItem.notes).toBe("Marketplace transaction MP-123");
+      expect(res.body.ledgerItems[0].notes).toBe(
+        "Marketplace transaction MP-123",
+      );
     });
 
     it("does not allow customers to post manual deposits", async () => {
