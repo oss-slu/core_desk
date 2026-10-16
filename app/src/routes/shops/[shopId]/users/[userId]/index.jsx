@@ -20,6 +20,7 @@ const { H1, H2 } = Typography;
 const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
   const [type, setType] = useState(null);
   const [value, setValue] = useState(0);
+  const [notes, setNotes] = useState("");
 
   return (
     <Util.Col gap={1}>
@@ -46,6 +47,13 @@ const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
         placeholder="Select a topup amount"
         prependedText="$"
       />
+      <Input
+        type="text"
+        label="Notes"
+        value={notes}
+        onChange={(v) => setNotes(v)}
+        placeholder="Payment reference or other details"
+      />
       <i>
         A topup will bring the user's balance to the specified amount if it is
         lower than the specified amount. A deposit will add the fixed specified
@@ -71,7 +79,7 @@ const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
       <Button
         loading={opLoading}
         onClick={async () => {
-          await postLedgerItem({ type, value });
+          await postLedgerItem({ type, value, notes });
           document.location.reload();
         }}
       >

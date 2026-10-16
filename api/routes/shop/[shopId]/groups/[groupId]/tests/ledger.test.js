@@ -62,6 +62,7 @@ describe("/shop/[shopId]/groups/[groupId]/ledger", () => {
         .send({
           type: "MANUAL_DEPOSIT",
           value: 50,
+          notes: "ISD 98765 / PO 456",
         });
 
       expect(res.status).toBe(200);
@@ -78,6 +79,8 @@ describe("/shop/[shopId]/groups/[groupId]/ledger", () => {
       expect(posted.billingGroupId).toBe(group.id);
       expect(posted.value).toBe(50);
       expect(posted.type).toBe("MANUAL_DEPOSIT");
+      expect(posted.notes).toBe("ISD 98765 / PO 456");
+      expect(res.body.ledgerItems[0].notes).toBe("ISD 98765 / PO 456");
     });
 
     it("allows shop admins and operators to post group ledger items", async () => {
