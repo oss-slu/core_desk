@@ -318,6 +318,7 @@ model LedgerItem {
   shopId         String
   jobId          String?        @unique
   type           LedgerItemType
+  notes          String?
   invoiceUrl     String?
   invoiceKey     String?
   costingCriteriaSnapshot Json?
