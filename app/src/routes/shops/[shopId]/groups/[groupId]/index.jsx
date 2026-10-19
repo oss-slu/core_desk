@@ -73,7 +73,7 @@ const AddUserToBillingGroupModal = () => {
   );
 };
 
-const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading }) => {
+const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading, onPosted }) => {
   const [type, setType] = useState(null);
   const [value, setValue] = useState(0);
   const [notes, setNotes] = useState("");
@@ -117,7 +117,8 @@ const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading }) => {
       <Button
         loading={opLoading}
         onClick={async () => {
-          await postLedgerItem({ type, value, notes });
+          const success = await postLedgerItem({ type, value, notes });
+          if (success) onPosted();
         }}
       >
         Post Ledger Item
@@ -178,13 +179,17 @@ export const BillingGroupPage = () => {
         />
       ),
     });
-  const { modal: addLedgerItemModal, ModalElement: AddLedgerItemModal } =
-    useModal({
+  const {
+    modal: addLedgerItemModal,
+    ModalElement: AddLedgerItemModal,
+    close: closeAddLedgerItemModal,
+  } = useModal({
       title: "Post ledger item",
       text: (
         <AddGroupBalanceModalContent
           postLedgerItem={postLedgerItem}
           opLoading={ledgerOpLoading}
+          onPosted={() => closeAddLedgerItemModal(true)}
         />
       ),
     });

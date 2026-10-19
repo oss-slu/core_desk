@@ -17,7 +17,7 @@ import { Button } from "#button";
 import { useModal } from "#modal";
 const { H1, H2 } = Typography;
 
-const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
+const AddBalanceModalContent = ({ postLedgerItem, opLoading, onPosted }) => {
   const [type, setType] = useState(null);
   const [value, setValue] = useState(0);
   const [notes, setNotes] = useState("");
@@ -79,8 +79,8 @@ const AddBalanceModalContent = ({ postLedgerItem, opLoading }) => {
       <Button
         loading={opLoading}
         onClick={async () => {
-          await postLedgerItem({ type, value, notes });
-          document.location.reload();
+          const success = await postLedgerItem({ type, value, notes });
+          if (success) onPosted();
         }}
       >
         Post Ledger Item
@@ -100,14 +100,17 @@ export const ShopUserPage = () => {
   const { user: currentUser } = useAuth();
   const { ledger, ledgerLoading, balance, postLedgerItem, opLoading } =
     useLedger(shopId, userId);
-  const { modal: addBalance, ModalElement: AddBalanceModal } = useModal({
+  const {
+    modal: addBalance,
+    ModalElement: AddBalanceModal,
+    close: closeAddBalanceModal,
+  } = useModal({
     title: "Post ledger item",
     text: (
       <AddBalanceModalContent
-        shopId={shopId}
-        userId={userId}
         postLedgerItem={postLedgerItem}
         opLoading={opLoading}
+        onPosted={() => closeAddBalanceModal(true)}
       />
     ),
   });
