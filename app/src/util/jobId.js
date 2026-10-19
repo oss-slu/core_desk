@@ -1,5 +1,5 @@
 export const formatJobId = (id) => {
-  const numericSuffix = [...id.slice(-6)].reduce(
+  const numericSuffix = [...String(id).slice(-6)].reduce(
     (value, character) => value * 36n + BigInt(parseInt(character, 36)),
     0n,
   );
