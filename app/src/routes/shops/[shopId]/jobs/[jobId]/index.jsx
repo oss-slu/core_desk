@@ -30,6 +30,7 @@ import { ShopUserPicker } from "#shopUserPicker";
 import { BillingGroupPicker } from "../../../../../components/billingGroupPicker/BillingGroupPicker";
 import { useModal } from "#modal";
 import { authFetch } from "../../../../../util/url";
+import { formatJobId } from "../../../../../util/jobId";
 import styles from "./index.module.css";
 import toast from "react-hot-toast";
 
@@ -236,6 +237,7 @@ export const JobPage = () => {
             >
               <Util.Col gap={1} align="start" className={styles.jobOverview}>
                 <H1>{job.title}</H1>
+                <p>Job ID: {formatJobId(job.id)}</p>
                 <p>{job.description}</p>
               </Util.Col>
               <Util.Col gap={0.5} align="start" className={styles.jobMeta}>

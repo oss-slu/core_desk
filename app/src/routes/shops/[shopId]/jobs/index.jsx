@@ -23,6 +23,7 @@ import { ShopUserPicker } from "#shopUserPicker";
 import { Price } from "#renderPrice";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
 import { TableV2 } from "tabler-react-2";
+import { formatJobId } from "../../../../util/jobId";
 
 export const switchStatusForBadge = (status) => {
   switch (status) {
@@ -342,6 +343,7 @@ export const Jobs = () => {
   };
 
   const columnsOptions = [
+    "Job ID",
     "Title",
     "Submitter",
     "Payer",
@@ -357,6 +359,7 @@ export const Jobs = () => {
     "Created At",
   ];
   const [columnsToShow, setColumnsToShow] = useState([
+    "Job ID",
     "Title",
     "Submitter",
     "Payer",
@@ -368,6 +371,7 @@ export const Jobs = () => {
   ]);
 
   const columnLabelToIdMap = {
+    "Job ID": "jobId",
     Title: "title",
     Submitter: "submitter",
     Payer: "payer",
@@ -426,6 +430,12 @@ export const Jobs = () => {
   });
   const columns = useMemo(
     () => [
+      {
+        id: "jobId",
+        header: "Job ID",
+        accessorFn: (row) => formatJobId(row.id),
+        enableSorting: true,
+      },
       {
         id: "title",
         header: "Title",
