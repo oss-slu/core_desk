@@ -1,1 +1,0 @@
-ALTER TYPE "UserBillingGroupRole" ADD VALUE 'BUSINESS_MANAGER';
