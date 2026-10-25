@@ -66,8 +66,9 @@ const requireGroupAccess = async (req) => {
     reqUserShop.accountType === "ADMIN" ||
     reqUserShop.accountType === "OPERATOR";
 
+  let groupMembership = null;
   if (!isStaff) {
-    const groupMembership = await prisma.userBillingGroup.findFirst({
+    groupMembership = await prisma.userBillingGroup.findFirst({
       where: {
         userId: req.user.id,
         billingGroupId: groupId,
@@ -84,6 +85,8 @@ const requireGroupAccess = async (req) => {
     shopId,
     groupId,
     isStaff,
+    canPostLedgerItems:
+      isStaff || groupMembership?.role === "BUSINESS_MANAGER",
   };
 };
 
@@ -113,7 +116,7 @@ export const post = [
       return res.status(access.error.status).json(access.error.body);
     }
 
-    if (!access.isStaff) {
+    if (!access.canPostLedgerItems) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
