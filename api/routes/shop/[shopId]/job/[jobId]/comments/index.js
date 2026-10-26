@@ -3,6 +3,7 @@ import { verifyAuth } from "#verifyAuth";
 import { LogType } from "#prisma-client";
 import { z } from "zod";
 import client from "#postmark";
+import { canAccessJob } from "../../../../../../util/billingGroupOperator.js";
 
 const commentSchema = z.object({
   message: z.string().trim().min(1, "Message is required"),
@@ -44,6 +45,18 @@ export const get = [
 
     if (!job) {
       return res.status(400).json({ message: "Job not found" });
+    }
+
+    if (
+      !(await canAccessJob(
+        req.user.id,
+        shopId,
+        userShop,
+        req.user.admin,
+        job,
+      ))
+    ) {
+      return res.status(404).json({ message: "Job not found" });
     }
 
     const comments = await prisma.jobComment.findMany({
@@ -179,6 +192,18 @@ export const post = [
 
     if (!job) {
       return res.status(400).json({ message: "Job not found" });
+    }
+
+    if (
+      !(await canAccessJob(
+        req.user.id,
+        shopId,
+        userShop,
+        req.user.admin,
+        job,
+      ))
+    ) {
+      return res.status(404).json({ message: "Job not found" });
     }
 
     const validationResult = commentSchema.safeParse(req.body);

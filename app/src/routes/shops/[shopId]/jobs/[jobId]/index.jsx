@@ -109,10 +109,14 @@ export const JobPage = () => {
 
   const [createItemLoading, setCreateItemLoading] = useState(false);
 
+  const userIsShopOperator = Boolean(
+    activeUser?.admin ||
+      userShop?.accountType === "ADMIN" ||
+      userShop?.accountType === "OPERATOR",
+  );
   const userIsPrivileged =
-    activeUser.admin ||
-    userShop.accountType === "ADMIN" ||
-    userShop.accountType === "OPERATOR";
+    job?.operatorAccess ||
+    userIsShopOperator;
 
   const noFilePreviewDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="280" viewBox="0 0 700 280">
@@ -426,7 +430,7 @@ export const JobPage = () => {
               <Util.Row gap={1} wrap align="end" className={styles.billingRow}>
                 <Util.Col gap={0} className={styles.pickerField}>
                   <label className="form-label">Requested By</label>
-                  {userIsPrivileged ? (
+                  {userIsShopOperator ? (
                     <ShopUserPicker
                       value={job.userId}
                       onChange={(value) => {
@@ -442,7 +446,7 @@ export const JobPage = () => {
                 </Util.Col>
                 <Util.Col gap={0} className={styles.pickerField}>
                   <label className="form-label">Billing Group</label>
-                  {userIsPrivileged ? (
+                  {userIsShopOperator ? (
                     <BillingGroupPicker
                       value={job.groupId}
                       onChange={(value) => {

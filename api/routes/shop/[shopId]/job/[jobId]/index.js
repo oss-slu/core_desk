@@ -7,6 +7,11 @@ import {
   RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
   sanitizeCostingInputForResourceType,
 } from "../../../../../util/costingCriteria.js";
+import {
+  canOperateJob,
+  hasBillingGroupOperatorAccess,
+  isShopOperator,
+} from "../../../../../util/billingGroupOperator.js";
 
 /** @type {Prisma.JobInclude} */
 const JOB_INCLUDE = {
@@ -255,17 +260,21 @@ export const get = [
           .json({ error: "You are not a member of this shop" });
       }
 
-      const shouldLoadAll =
-        req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR";
-
       const initialJob = await prisma.job.findFirst({
         where: {
           id: jobId,
           shopId,
         },
       });
+      const shouldLoadAll =
+        initialJob &&
+        (await canOperateJob(
+          userId,
+          shopId,
+          userShop,
+          req.user.admin,
+          initialJob.groupId,
+        ));
 
       let job;
       if (initialJob?.groupId && !shouldLoadAll) {
@@ -312,6 +321,7 @@ export const get = [
         return res.status(404).json({ error: "Not found" });
       }
 
+      job.operatorAccess = shouldLoadAll;
       const jobWithBillingAccount = await attachBillingAccount(job, shopId);
 
       return res.json({ job: jobWithBillingAccount });
@@ -341,17 +351,35 @@ export const put = [
         return res.status(400).json({ error: "Forbidden" });
       }
 
-      let job;
-
-      const shouldLoadAll =
-        req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR";
-
-      job = await prisma.job.findFirst({
+      const existingJob = await prisma.job.findFirst({
         where: {
           id: jobId,
-          userId: shouldLoadAll ? undefined : userId,
+          shopId,
+        },
+      });
+
+      if (!existingJob) {
+        return res.status(404).json({ error: "Not found" });
+      }
+
+      const isGroupOperator =
+        !isShopOperator(userShop, req.user.admin) &&
+        (await hasBillingGroupOperatorAccess(
+          userId,
+          shopId,
+          existingJob.groupId,
+        ));
+      const shouldLoadAll =
+        isShopOperator(userShop, req.user.admin) || isGroupOperator;
+
+      if (!shouldLoadAll && existingJob.userId !== userId) {
+        return res.status(404).json({ error: "Not found" });
+      }
+
+      const job = await prisma.job.findFirst({
+        where: {
+          id: jobId,
+          shopId,
         },
         include: {
           additionalCosts: {
@@ -418,6 +446,20 @@ export const put = [
         if (!requesterOnShop) {
           return res.status(400).json({ error: "Requester is not in this shop" });
         }
+
+        if (isGroupOperator) {
+          const requesterInGroup = await prisma.userBillingGroup.findFirst({
+            where: {
+              userId: jobUpdateData.userId,
+              billingGroupId: job.groupId,
+              active: true,
+            },
+            select: { id: true },
+          });
+          if (!requesterInGroup) {
+            return res.status(403).json({ error: "Requester is not in this billing group" });
+          }
+        }
       }
 
       if (jobUpdateData.groupId === job.groupId) {
@@ -450,6 +492,13 @@ export const put = [
         "groupId"
       );
       if (groupIsBeingUpdated) {
+        if (
+          isGroupOperator &&
+          sanitizedJobUpdateData.groupId !== job.groupId
+        ) {
+          return res.status(403).json({ error: "Forbidden" });
+        }
+
         if (
           sanitizedJobUpdateData.groupId !== null &&
           typeof sanitizedJobUpdateData.groupId !== "string"
@@ -494,11 +543,7 @@ export const put = [
       let updatedJob;
       if (sanitizedJobUpdateData.finalized && !job.finalized) {
         if (
-          !(
-            userShop.accountType === "ADMIN" ||
-            userShop.accountType === "OPERATOR" ||
-            req.user.admin
-          )
+          !shouldLoadAll
         ) {
           return res.status(400).json({ error: "Forbidden" });
         }
@@ -594,7 +639,9 @@ export const put = [
         shopId
       );
 
-      return res.json({ job: updatedJobWithBillingAccount });
+      return res.json({
+        job: { ...updatedJobWithBillingAccount, operatorAccess: shouldLoadAll },
+      });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ error: "An error occurred" });

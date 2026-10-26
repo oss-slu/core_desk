@@ -5,6 +5,7 @@ import {
   RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
   sanitizeCostingInputForResourceType,
 } from "../../../../../../../util/costingCriteria.js";
+import { canAccessJob } from "../../../../../../../util/billingGroupOperator.js";
 import { z } from "zod";
 
 export const jobItemUpdateSchema = z.object({
@@ -41,6 +42,20 @@ export const get = [
       });
 
       if (!userShop) {
+        return res.status(404).json({ error: "Not found" });
+      }
+
+      const job = await prisma.job.findFirst({
+        where: {
+          id: jobId,
+          shopId,
+        },
+      });
+
+      if (
+        !job ||
+        !(await canAccessJob(userId, shopId, userShop, req.user.admin, job))
+      ) {
         return res.status(404).json({ error: "Not found" });
       }
 
@@ -120,36 +135,17 @@ export const put = [
         return res.status(400).json({ error: "User shop not found" });
       }
 
-      let firstJob = await prisma.job.findFirst({
+      const job = await prisma.job.findFirst({
         where: {
           id: jobId,
           shopId,
         },
       });
 
-      let job;
       if (
-        userShop.accountType === "CUSTOMER" &&
-        !req.user.admin &&
-        !firstJob.groupId
+        !job ||
+        !(await canAccessJob(userId, shopId, userShop, req.user.admin, job))
       ) {
-        job = await prisma.job.findFirst({
-          where: {
-            id: jobId,
-            shopId,
-            userId,
-          },
-        });
-      } else {
-        job = await prisma.job.findFirst({
-          where: {
-            id: jobId,
-            shopId,
-          },
-        });
-      }
-
-      if (!job) {
         return res.status(404).json({ error: "Not found" });
       }
 
@@ -311,9 +307,27 @@ export const del = [
       return res.status(404).json({ error: "Not found" });
     }
 
-    await prisma.jobItem.update({
+    if (
+      !(await canAccessJob(userId, shopId, userShop, req.user.admin, job))
+    ) {
+      return res.status(404).json({ error: "Not found" });
+    }
+
+    const jobItem = await prisma.jobItem.findFirst({
       where: {
         id: jobItemId,
+        jobId,
+        active: true,
+      },
+    });
+
+    if (!jobItem) {
+      return res.status(404).json({ error: "Not found" });
+    }
+
+    await prisma.jobItem.update({
+      where: {
+        id: jobItem.id,
       },
       data: {
         active: false,

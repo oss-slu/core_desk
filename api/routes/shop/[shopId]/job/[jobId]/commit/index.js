@@ -3,6 +3,7 @@ import { LedgerItemType } from "#prisma-client";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../../util/docgen/invoice.js";
 import { z } from "zod";
+import { canOperateJob } from "../../../../../../util/billingGroupOperator.js";
 
 const jobSchema = z.object({
   finalized: z.boolean(),
@@ -24,16 +25,6 @@ export const post = [
 
     if (!userShop) {
       return res.status(404).json({ error: "Shop not found" });
-    }
-
-    if (
-      !(
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR" ||
-        req.user.admin
-      )
-    ) {
-      return res.status(400).json({ error: "Forbidden" });
     }
 
     const job = await prisma.job.findFirst({
@@ -79,6 +70,18 @@ export const post = [
 
     if (!job) {
       return res.status(404).json({ error: "Job not found" });
+    }
+
+    if (
+      !(await canOperateJob(
+        req.user.id,
+        shopId,
+        userShop,
+        req.user.admin,
+        job.groupId,
+      ))
+    ) {
+      return res.status(400).json({ error: "Forbidden" });
     }
 
     if (job.finalized) {

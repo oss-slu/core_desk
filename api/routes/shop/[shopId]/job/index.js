@@ -4,6 +4,10 @@ import { verifyAuth } from "#verifyAuth";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
 import { RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE } from "../../../../util/costingCriteria.js";
 import client from "#postmark";
+import {
+  getBillingGroupOperatorGroupIds,
+  isShopOperator,
+} from "../../../../util/billingGroupOperator.js";
 
 const escapeHtml = (text) => {
   return String(text)
@@ -450,18 +454,24 @@ export const get = [
         return res.status(400).json({ error: "Unauthorized" });
       }
 
-      const shouldLoadAll =
-        req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR";
+      const shouldLoadAll = isShopOperator(userShop, req.user.admin);
+      const operatorGroupIds = shouldLoadAll
+        ? []
+        : await getBillingGroupOperatorGroupIds(userId, shopId);
+      const jobWhere = {
+        shopId,
+        ...(shouldLoadAll
+          ? {}
+          : {
+              OR: [
+                { userId },
+                { groupId: { in: operatorGroupIds } },
+              ],
+            }),
+      };
 
       let jobs = await prisma.job.findMany({
-        where: {
-          shopId,
-          user: {
-            id: shouldLoadAll ? undefined : userId,
-          },
-        },
+        where: jobWhere,
         include: {
           _count: {
             select: {
@@ -528,6 +538,8 @@ export const get = [
       ]);
 
       jobs = jobs.map((job) => {
+        job.operatorAccess =
+          shouldLoadAll || operatorGroupIds.includes(job.groupId);
         job.itemsCount = job._count.items;
 
         job.progress = {};
@@ -574,12 +586,7 @@ export const get = [
       });
 
       const count = await prisma.job.count({
-        where: {
-          shopId,
-          user: {
-            id: userId,
-          },
-        },
+        where: jobWhere,
       });
 
       return res.json({
