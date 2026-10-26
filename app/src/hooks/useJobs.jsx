@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { authFetch } from "#url";
 import { useModal } from "#modal";
+import toast from "react-hot-toast";
+import { Alert } from "#alert";
 import { Input, Spinner, Util, Switch, Card } from "tabler-react-2";
 import { Button } from "#button";
 import { useParams } from "react-router-dom";
@@ -30,6 +32,7 @@ const CreateJobModalContent = ({
   const [description, setDescription] = useState("");
   const [dueDate, setDueDate] = useState(getDefaultDueDate);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [onBehalfOf, setOnBehalfOf] = useState(false);
   const [onBehalfOfUserId, setOnBehalfOfUserId] = useState(null);
   const [onBehalfOfUserEmail, setOnBehalfOfUserEmail] = useState("");
@@ -155,25 +158,43 @@ const CreateJobModalContent = ({
           )}
         </>
       ) : null}
+      {errorMessage && (
+        <>
+          <Alert variant="danger" title="Error">
+            {errorMessage}
+          </Alert>
+          <Util.Spacer size={2} />
+        </>
+      )}
       <Util.Spacer size={2} />
       {title.length > 0 && dueDate.length > 0 ? (
         <Button
           variant="primary"
           loading={loading}
-          onClick={() => {
+          onClick={async () => {
             setLoading(true);
-            onSubmit(
-              title,
-              description,
-              dueDate,
-              onBehalfOf,
-              onBehalfOfUserId,
-              onBehalfOfUserEmail,
-              onBehalfOfUserFirstName,
-              onBehalfOfUserLastName,
-              onBehalfOfBillingGroup,
-              onBehalfOfBillingGroupId
-            );
+            setErrorMessage(null);
+            try {
+              const res = await onSubmit(
+                title,
+                description,
+                dueDate,
+                onBehalfOf,
+                onBehalfOfUserId,
+                onBehalfOfUserEmail,
+                onBehalfOfUserFirstName,
+                onBehalfOfUserLastName,
+                onBehalfOfBillingGroup,
+                onBehalfOfBillingGroupId
+              );
+              if (res?.error) {
+                setLoading(false);
+                setErrorMessage(res.message || "Failed to create job");
+              }
+            } catch (err) {
+              setLoading(false);
+              setErrorMessage(err.message || "An unexpected error occurred");
+            }
           }}
         >
           Submit
@@ -206,6 +227,7 @@ export const useJobs = (shopId) => {
     onBehalfOfBillingGroupId,
   ) => {
     try {
+      setOpLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/job`, {
         method: "POST",
         body: JSON.stringify({
@@ -222,11 +244,64 @@ export const useJobs = (shopId) => {
         }),
       });
       const data = await r.json();
-      document.location.href = `/shops/${shopId}/jobs/${data.job.id}`;
 
+      if (!r.ok || data.error || !data.job) {
+        setOpLoading(false);
+        const errorText =
+          data.message ||
+          data.error ||
+          "Failed to create job. Please try again.";
+
+        if (
+          r.status === 409 ||
+          data.error === "User already exists" ||
+          data.message?.includes("already exists")
+        ) {
+          toast.error("This user already exists in CoreDesk.");
+          modal({
+            title: "User Already Exists",
+            text: (
+              <div>
+                <p>
+                  This user already exists in CoreDesk, but could not be added to this shop automatically.
+                </p>
+                <p>
+                  Global Admins can visit the general{" "}
+                  <a
+                    href="/users"
+                    style={{ textDecoration: "underline", fontWeight: "bold" }}
+                  >
+                    Users page
+                  </a>{" "}
+                  to add the existing user to the shop.
+                </p>
+              </div>
+            ),
+            buttons: [
+              {
+                text: "Close",
+                variant: "secondary",
+                value: false,
+              },
+            ],
+          });
+        } else {
+          toast.error(errorText);
+        }
+
+        setError(errorText);
+        return { error: true, message: errorText };
+      }
+
+      document.location.href = `/shops/${shopId}/jobs/${data.job.id}`;
       setOpLoading(false);
+      return { success: true, job: data.job };
     } catch (error) {
-      setError(error);
+      setOpLoading(false);
+      const errMsg = error.message || "Failed to create job";
+      setError(errMsg);
+      toast.error(errMsg);
+      return { error: true, message: errMsg };
     }
   };
 
