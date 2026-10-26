@@ -85,8 +85,7 @@ export const canAccessJob = async (
     return true;
   }
 
-  if (job.userId === userId) return true;
-  if (!job.groupId) return false;
+  if (!job.groupId) return job.userId === userId;
 
   const membership = await prisma.userBillingGroup.findFirst({
     where: {
