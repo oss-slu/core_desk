@@ -28,7 +28,7 @@ export const useLedger = (shopId, userId) => {
     }
   };
 
-  const postLedgerItem = async ({ type, value }) => {
+  const postLedgerItem = async ({ type, value, notes }) => {
     try {
       setOpLoading(true);
       const r = await authFetch(`/api/shop/${shopId}/user/${userId}/ledger`, {
@@ -36,6 +36,7 @@ export const useLedger = (shopId, userId) => {
         body: JSON.stringify({
           type,
           value,
+          notes,
         }),
       });
       const data = await r.json();

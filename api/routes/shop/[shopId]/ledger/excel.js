@@ -135,6 +135,41 @@ export const get = [
         },
       });
 
+      const ledgerItems = await prisma.ledgerItem.findMany({
+        where: {
+          shopId,
+          type: {
+            in: [
+              LedgerItemType.MANUAL_TOPUP,
+              LedgerItemType.MANUAL_DEPOSIT,
+              LedgerItemType.FUNDS_PURCHASED,
+              LedgerItemType.MANUAL_REDUCTION,
+            ],
+          },
+          createdAt: {
+            gte: startDateTime,
+            lt: endExclusive,
+          },
+        },
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+          billingGroup: {
+            select: {
+              title: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
       const jobsWithCosts = jobs.map((job) => {
         const ledgerItem = Array.isArray(job.ledgerItems)
           ? job.ledgerItems[0]
@@ -154,6 +189,7 @@ export const get = [
           shopId,
           startDate,
           endDate,
+          ledgerItems,
         },
       );
 

@@ -148,6 +148,43 @@ describe("/shop/[shopId]/ledger/excel", () => {
         },
       });
 
+      await prisma.ledgerItem.createMany({
+        data: [
+          {
+            shopId: tc.shop.id,
+            billingGroupId: group.id,
+            type: "MANUAL_DEPOSIT",
+            value: 125,
+            notes: "Invoice INV-2026-42",
+            createdAt: new Date("2026-03-12T11:00:00.000Z"),
+          },
+          {
+            shopId: tc.shop.id,
+            userId: tc.targetUser.id,
+            type: "FUNDS_PURCHASED",
+            value: 45,
+            notes: "Marketplace TXN-789",
+            createdAt: new Date("2026-03-14T11:00:00.000Z"),
+          },
+          {
+            shopId: tc.shop.id,
+            userId: tc.user.id,
+            type: "MANUAL_DEPOSIT",
+            value: 60,
+            notes: "Outside date range",
+            createdAt: new Date("2026-04-01T00:00:00.000Z"),
+          },
+          {
+            shopId: otherShop.id,
+            userId: tc.user.id,
+            type: "MANUAL_DEPOSIT",
+            value: 80,
+            notes: "Other shop reference",
+            createdAt: new Date("2026-03-15T12:00:00.000Z"),
+          },
+        ],
+      });
+
       const res = await request(app)
         .get(
           `/api/shop/${tc.shop.id}/ledger/excel?startDate=2026-03-01&endDate=2026-03-31`
@@ -170,6 +207,7 @@ describe("/shop/[shopId]/ledger/excel", () => {
       const sheetNames = workbook.worksheets.map((ws) => ws.name);
       expect(sheetNames[0]).toBe("All Print Jobs");
       expect(sheetNames[1]).toBe("Billing Group Totals");
+      expect(sheetNames).toContain("Ledger Transactions");
       expect(sheetNames).toContain("Engineering Labs");
       expect(
         sheetNames.some(
@@ -227,6 +265,16 @@ describe("/shop/[shopId]/ledger/excel", () => {
       );
       expect(stringifiedIndividual).toContain(individualJob.id);
       expect(stringifiedIndividual).toContain("42");
+
+      const ledgerSheet = workbook.getWorksheet("Ledger Transactions");
+      const stringifiedLedger = JSON.stringify(ledgerSheet.getSheetValues());
+      expect(stringifiedLedger).toContain("Entry Date Range: 2026-03-01 to 2026-03-31");
+      expect(stringifiedLedger).toContain("Invoice INV-2026-42");
+      expect(stringifiedLedger).toContain("Marketplace TXN-789");
+      expect(stringifiedLedger).toContain("Engineering Labs");
+      expect(stringifiedLedger).toContain("TARGET_TestFirstName TARGET_TestLastName");
+      expect(stringifiedLedger).not.toContain("Outside date range");
+      expect(stringifiedLedger).not.toContain("Other shop reference");
     });
   });
 
@@ -319,9 +367,10 @@ describe("/shop/[shopId]/ledger/excel", () => {
       });
 
       expect(workbook).toBeInstanceOf(ExcelJS.Workbook);
-      expect(workbook.worksheets).toHaveLength(2);
+      expect(workbook.worksheets).toHaveLength(3);
       expect(workbook.worksheets[0].name).toBe("All Print Jobs");
       expect(workbook.worksheets[1].name).toBe("Billing Group Totals");
+      expect(workbook.worksheets[2].name).toBe("Ledger Transactions");
     });
 
     it("properly separates multiple billing groups and individual users with sanitized sheet names", async () => {
@@ -354,7 +403,7 @@ describe("/shop/[shopId]/ledger/excel", () => {
         endDate: "2026-03-31",
       });
 
-      expect(workbook.worksheets.length).toBe(4);
+      expect(workbook.worksheets.length).toBe(5);
       const sheetNames = workbook.worksheets.map((s) => s.name);
       expect(sheetNames).toContain("All Print Jobs");
       expect(sheetNames).toContain("Billing Group Totals");

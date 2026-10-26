@@ -45,11 +45,12 @@ const applyHeaderStyle = (row) => {
 };
 
 /**
- * Generates an ExcelJS workbook for job billing exports.
+ * Generates an ExcelJS workbook for job billing and ledger exports.
  * Worksheets included in order:
  * 1. All Print Jobs: All qualifying jobs within date range
  * 2. Billing Group Totals: Totals for each billing group
  * 3. Individual Billing Groups: Separate worksheet for each billing group
+ * 4. Ledger Transactions: Manual entries filtered by entry date
  *
  * @param {Array} jobs
  * @param {Object} options
@@ -59,7 +60,7 @@ export const generateBillingExcelWorkbook = async (
   jobs = [],
   options = {}
 ) => {
-  const { startDate = "", endDate = "" } = options;
+  const { startDate = "", endDate = "", ledgerItems = [] } = options;
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "CoreDesk";
   workbook.created = new Date();
@@ -68,7 +69,7 @@ export const generateBillingExcelWorkbook = async (
     workbook.title = `Billing Export: ${startDate} to ${endDate}`;
     workbook.subject = `Date Range: ${startDate} to ${endDate}`;
     workbook.description =
-      `Export of finalized print jobs from ${startDate} to ${endDate}`;
+      `Export of finalized print jobs and manual ledger entries from ${startDate} to ${endDate}`;
   }
 
   const existingSheetNames = new Set();
@@ -292,6 +293,55 @@ export const generateBillingExcelWorkbook = async (
       { width: 16 },
     ];
   });
+
+  // Manual ledger entries use their entry date, unlike job sheets above.
+  const ledgerSheet = workbook.addWorksheet(
+    sanitizeWorksheetName("Ledger Transactions", existingSheetNames)
+  );
+  const ledgerTitleRow = ledgerSheet.addRow(["Ledger Transactions"]);
+  ledgerTitleRow.font = { bold: true, size: 14, color: { argb: "FF1E293B" } };
+
+  if (dateRangeText) {
+    const ledgerDateRow = ledgerSheet.addRow([
+      `Entry Date Range: ${startDate} to ${endDate}`,
+    ]);
+    ledgerDateRow.font = { italic: true, size: 10, color: { argb: "FF64748B" } };
+  }
+
+  ledgerSheet.addRow([]);
+  const ledgerHeaderRow = ledgerSheet.addRow([
+    "Entry Date",
+    "Payer",
+    "Type",
+    "Amount",
+    "Notes",
+  ]);
+  applyHeaderStyle(ledgerHeaderRow);
+
+  ledgerItems.forEach((item) => {
+    const payerName = item.billingGroup
+      ? item.billingGroup.title
+      : `${item.user?.firstName || ""} ${item.user?.lastName || ""}`.trim() ||
+        item.user?.email ||
+        "Unknown";
+    const row = ledgerSheet.addRow([
+      item.createdAt ? new Date(item.createdAt).toISOString().slice(0, 10) : "",
+      payerName,
+      item.type,
+      Number(item.value),
+      item.notes || "",
+    ]);
+    row.getCell(4).numFmt = '"$"#,##0.00;[Red]("$"#,##0.00)';
+    row.getCell(4).alignment = { horizontal: "right" };
+  });
+
+  ledgerSheet.columns = [
+    { width: 16 },
+    { width: 32 },
+    { width: 22 },
+    { width: 16 },
+    { width: 40 },
+  ];
 
   return workbook;
 };
