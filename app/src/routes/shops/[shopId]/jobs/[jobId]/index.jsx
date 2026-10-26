@@ -110,6 +110,7 @@ export const JobPage = () => {
   const [createItemLoading, setCreateItemLoading] = useState(false);
 
   const userIsPrivileged =
+    job?.operatorAccess ||
     activeUser.admin ||
     userShop.accountType === "ADMIN" ||
     userShop.accountType === "OPERATOR";

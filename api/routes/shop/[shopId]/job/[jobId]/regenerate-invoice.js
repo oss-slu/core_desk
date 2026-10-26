@@ -2,6 +2,7 @@ import { prisma } from "#prisma";
 import { LedgerItemType } from "#prisma-client";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";
+import { canOperateJob } from "../../../../../util/billingGroupOperator.js";
 
 export const post = [
   verifyAuth,
@@ -22,11 +23,6 @@ export const post = [
         return res.status(403).json({ error: "Forbidden" });
       }
 
-      const shouldLoadAll =
-        req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR";
-
       const job = await prisma.job.findFirst({
         where: {
           id: jobId,
@@ -37,6 +33,14 @@ export const post = [
       if (!job) {
         return res.status(404).json({ error: "Not found" });
       }
+
+      const shouldLoadAll = await canOperateJob(
+        userId,
+        shopId,
+        userShop,
+        req.user.admin,
+        job.groupId,
+      );
 
       if (!shouldLoadAll) {
         if (job.groupId) {

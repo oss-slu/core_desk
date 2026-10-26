@@ -134,7 +134,7 @@ export const post = [
       return res.status(400).json({ error: "Forbidden" });
     }
 
-    if (!["ADMIN", "MEMBER"].includes(role)) {
+    if (!["ADMIN", "MEMBER", "BILLING_GROUP_OPERATOR"].includes(role)) {
       return res.status(400).json({ error: "Invalid role" });
     }
 

@@ -4,6 +4,7 @@ import {
   RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
   sanitizeCostingInputForResourceType,
 } from "../../../../../../../util/costingCriteria.js";
+import { canOperateJob } from "../../../../../../../util/billingGroupOperator.js";
 
 export const get = [
   verifyAuth,
@@ -26,20 +27,24 @@ export const get = [
           .json({ error: "You are not a member of this shop" });
       }
 
-      const shouldLoadAll =
-        req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR";
-
       const job = await prisma.job.findFirst({
         where: {
           id: jobId,
           shopId,
-          userId: shouldLoadAll ? undefined : userId,
         },
       });
 
-      if (!job) {
+      const shouldLoadAll =
+        job &&
+        (await canOperateJob(
+          userId,
+          shopId,
+          userShop,
+          req.user.admin,
+          job.groupId,
+        ));
+
+      if (!job || (!shouldLoadAll && job.userId !== userId)) {
         return res.status(400).json({ error: "Job not found" });
       }
 
@@ -108,30 +113,28 @@ export const put = [
           .json({ error: "You are not a member of this shop" });
       }
 
-      const shouldLoadAll =
-        req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR";
-
       const job = await prisma.job.findFirst({
         where: {
           id: jobId,
           shopId,
-          userId: shouldLoadAll ? undefined : userId,
         },
       });
 
-      if (!job) {
+      const shouldLoadAll =
+        job &&
+        (await canOperateJob(
+          userId,
+          shopId,
+          userShop,
+          req.user.admin,
+          job.groupId,
+        ));
+
+      if (!job || (!shouldLoadAll && job.userId !== userId)) {
         return res.status(400).json({ error: "Job not found" });
       }
 
-      if (
-        !(
-          req.user.admin ||
-          userShop.accountType === "ADMIN" ||
-          userShop.accountType === "OPERATOR"
-        )
-      ) {
+      if (!shouldLoadAll) {
         return res.status(400).json({ error: "Unauthorized" });
       }
 
@@ -286,20 +289,24 @@ export const del = [
           .json({ error: "You are not a member of this shop" });
       }
 
-      const shouldLoadAll =
-        req.user.admin ||
-        userShop.accountType === "ADMIN" ||
-        userShop.accountType === "OPERATOR";
-
       const job = await prisma.job.findFirst({
         where: {
           id: jobId,
           shopId,
-          userId: shouldLoadAll ? undefined : userId,
         },
       });
 
-      if (!job) {
+      const shouldLoadAll =
+        job &&
+        (await canOperateJob(
+          userId,
+          shopId,
+          userShop,
+          req.user.admin,
+          job.groupId,
+        ));
+
+      if (!job || (!shouldLoadAll && job.userId !== userId)) {
         return res.status(400).json({ error: "Job not found" });
       }
 
