@@ -31,7 +31,7 @@ const AddUserToBillingGroupModal = () => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState("member");
+  const [role, setRole] = useState("MEMBER");
   const { shopId, groupId } = useParams();
   const { opLoading, addUserToGroup } = useBillingGroup(shopId, groupId);
 
@@ -44,7 +44,7 @@ const AddUserToBillingGroupModal = () => {
       <label className="form-label mt-2">Role</label>
       <DropdownInput
         value={role}
-        onChange={setRole}
+        onChange={(value) => setRole(value.id)}
         prompt="Pick a role"
         values={[
           {
@@ -55,13 +55,17 @@ const AddUserToBillingGroupModal = () => {
             id: "MEMBER",
             label: "Member",
           },
+          {
+            id: "BUSINESS_MANAGER",
+            label: "Business Manager",
+          },
         ]}
       />
       <Button
         className="mt-2"
         variant="primary"
         onClick={async () => {
-          await addUserToGroup(user, role.id);
+          await addUserToGroup(user, role);
           navigate(0);
         }}
         disabled={!user || !role}
@@ -308,7 +312,7 @@ export const BillingGroupPage = () => {
         <>
           <Util.Row justify="between" align="center">
             <h2>Ledger</h2>
-            {userIsStaff && (
+            {(userIsStaff || billingGroup.userRole === "BUSINESS_MANAGER") && (
               <Button onClick={addLedgerItemModal}>Post ledger item</Button>
             )}
           </Util.Row>
@@ -448,7 +452,9 @@ export const BillingGroupPage = () => {
                 accessor: "role",
                 render: (role) => (
                   <Badge color="blue" soft>
-                    {role.charAt(0) + role.slice(1).toLowerCase()}
+                    {role === "BUSINESS_MANAGER"
+                      ? "Business Manager"
+                      : role.charAt(0) + role.slice(1).toLowerCase()}
                   </Badge>
                 ),
               },
