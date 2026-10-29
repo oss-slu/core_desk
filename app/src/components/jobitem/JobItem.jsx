@@ -129,11 +129,11 @@ export const JobItem = ({
   const [resourceEditorOpen, setResourceEditorOpen] = useState(false);
   const [costEditorOpen, setCostEditorOpen] = useState(false);
 
-  if (!item) return null;
-
   useEffect(() => {
     setLocalQty(item?.qty);
   }, [item?.qty]);
+
+  if (!item) return null;
 
   const resolvedResourceType =
     item.resourceType ||
