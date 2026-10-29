@@ -437,6 +437,16 @@ export const Jobs = () => {
         enableSorting: true,
       },
       {
+        id: "createdAt",
+        header: "Created At",
+        accessorFn: (row) => row.createdAt,
+        cell: ({ getValue }) => {
+          const value = getValue();
+          return value ? moment(value).format("MM/DD/YY hh:mm a") : "-";
+        },
+        enableSorting: true,
+      },
+      {
         id: "title",
         header: "Title",
         accessorFn: (row) => row.title,
@@ -559,16 +569,6 @@ export const Jobs = () => {
               )}
             </>
           );
-        },
-        enableSorting: true,
-      },
-      {
-        id: "createdAt",
-        header: "Created At",
-        accessorFn: (row) => row.createdAt,
-        cell: ({ getValue }) => {
-          const value = getValue();
-          return value ? moment(value).format("MM/DD/YY hh:mm a") : "-";
         },
         enableSorting: true,
       },
