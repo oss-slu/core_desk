@@ -47,7 +47,7 @@ const switchAccountTypeForBadge = (type) => {
 };
 
 const BulkTopupModalContent = ({ bulkTopup, opLoading }) => {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(null);
 
   return (
     <Util.Col gap={1}>
