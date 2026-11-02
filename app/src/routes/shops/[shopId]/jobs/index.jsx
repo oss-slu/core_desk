@@ -264,7 +264,7 @@ export const Jobs = () => {
 
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(25);
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([{ id: "createdAt", desc: true }]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const statusOptions = [
