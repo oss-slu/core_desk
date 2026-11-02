@@ -63,6 +63,53 @@ function getRoutePathFromFile(filePath, routesDir) {
 }
 
 /**
+ * Compares two route paths so that static segments take precedence
+ * over parameter segments (:param) and wildcards (*).
+ * @param {string} a - First route path.
+ * @param {string} b - Second route path.
+ * @returns {number} - Sort order.
+ */
+function compareRoutePaths(a, b) {
+  const aSegs = a.split("/").filter(Boolean);
+  const bSegs = b.split("/").filter(Boolean);
+  const minLen = Math.min(aSegs.length, bSegs.length);
+
+  for (let i = 0; i < minLen; i++) {
+    const aSeg = aSegs[i];
+    const bSeg = bSegs[i];
+
+    if (aSeg === bSeg) {
+      continue;
+    }
+
+    const aIsParam = aSeg.startsWith(":");
+    const bIsParam = bSeg.startsWith(":");
+    const aIsWild = aSeg.includes("*");
+    const bIsWild = bSeg.includes("*");
+
+    // Static segments come before dynamic params or wildcards
+    if (!aIsParam && !aIsWild && (bIsParam || bIsWild)) {
+      return -1;
+    }
+    if (!bIsParam && !bIsWild && (aIsParam || aIsWild)) {
+      return 1;
+    }
+
+    // Param segments come before wildcards
+    if (aIsParam && bIsWild) {
+      return -1;
+    }
+    if (bIsParam && aIsWild) {
+      return 1;
+    }
+
+    return aSeg.localeCompare(bSeg);
+  }
+
+  return bSegs.length - aSegs.length;
+}
+
+/**
  * Recursively traverses the routes directory and registers routes with Express.
  * @param {express.Application} app - The Express application instance.
  * @param {string} routesDir - The absolute path to the routes directory.
@@ -150,7 +197,9 @@ async function registerRoutes(app, routesDir) {
     };
   }
 
-  async function traverseDir(dir) {
+  const routeEntries = [];
+
+  function collectRouteFiles(dir) {
     const files = fs.readdirSync(dir);
     for (const file of files) {
       const filePath = path.join(dir, file);
@@ -159,61 +208,65 @@ async function registerRoutes(app, routesDir) {
       }
       const stat = fs.statSync(filePath);
       if (stat.isDirectory()) {
-        await traverseDir(filePath); // Recursively traverse subdirectories
+        collectRouteFiles(filePath); // Recursively traverse subdirectories
       } else if (stat.isFile() && file.endsWith(".js")) {
-        // Process route file
-        const routePath = getRoutePathFromFile(filePath, routesDir);
-        const routeModule = await import("file://" + filePath);
-
-        // Supported HTTP methods
-        ["get", "post", "put", "patch", "head", "options"].forEach((method) => {
-          if (routeModule[method]) {
-            // If it's an array, use it as middleware chain
-            const handlers = Array.isArray(routeModule[method])
-              ? routeModule[method]
-              : [routeModule[method]];
-            app[method](
-              routePath,
-              ...handlers.map((handler, index) =>
-                wrapHandler({
-                  handler,
-                  method,
-                  routePath,
-                  filePath,
-                  index,
-                }),
-              ),
-            );
-            // console.log(
-            //   `Registered route ${method.toUpperCase()} ${routePath}`
-            // );
-          }
+        routeEntries.push({
+          filePath,
+          routePath: getRoutePathFromFile(filePath, routesDir),
         });
-
-        // Handle `del` for DELETE method
-        if (routeModule.del) {
-          const handlers = Array.isArray(routeModule.del)
-            ? routeModule.del
-            : [routeModule.del];
-          app.delete(
-            routePath,
-            ...handlers.map((handler, index) =>
-              wrapHandler({
-                handler,
-                method: "delete",
-                routePath,
-                filePath,
-                index,
-              }),
-            ),
-          );
-          // console.log(`Registered route DELETE ${routePath}`);
-        }
       }
     }
   }
 
-  await traverseDir(routesDir);
+  collectRouteFiles(routesDir);
+  routeEntries.sort((a, b) => compareRoutePaths(a.routePath, b.routePath));
+
+  for (const { filePath, routePath } of routeEntries) {
+    // Process route file
+    const routeModule = await import("file://" + filePath);
+
+    // Supported HTTP methods
+    ["get", "post", "put", "patch", "head", "options"].forEach((method) => {
+      if (routeModule[method]) {
+        // If it's an array, use it as middleware chain
+        const handlers = Array.isArray(routeModule[method])
+          ? routeModule[method]
+          : [routeModule[method]];
+        app[method](
+          routePath,
+          ...handlers.map((handler, index) =>
+            wrapHandler({
+              handler,
+              method,
+              routePath,
+              filePath,
+              index,
+            }),
+          ),
+        );
+      }
+    });
+
+    // Handle `del` for DELETE method
+    if (routeModule.del) {
+      const handlers = Array.isArray(routeModule.del)
+        ? routeModule.del
+        : [routeModule.del];
+      app.delete(
+        routePath,
+        ...handlers.map((handler, index) =>
+          wrapHandler({
+            handler,
+            method: "delete",
+            routePath,
+            filePath,
+            index,
+          }),
+        ),
+      );
+      // console.log(`Registered route DELETE ${routePath}`);
+    }
+  }
 }
 
 export default registerRoutes;

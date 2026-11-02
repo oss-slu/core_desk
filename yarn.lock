@@ -5493,7 +5493,7 @@ anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-"app@file:/Users/justinzhang/Documents/Capstone1/core_desk/app":
+"app@file:/Users/bellaott/Documents/Higher Ed/core_desk/app":
   version "0.1.0"
   resolved "file:app"
   dependencies:
@@ -6997,7 +6997,7 @@ duplexer2@~0.1.4:
   dependencies:
     readable-stream "^2.0.2"
 
-"e2e@file:/Users/justinzhang/Documents/Capstone1/core_desk/e2e":
+"e2e@file:/Users/bellaott/Documents/Higher Ed/core_desk/e2e":
   version "1.0.0"
   resolved "file:e2e"
   dependencies:
@@ -13297,7 +13297,7 @@ tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   resolved "https://registry.npmjs.org/tweetnacl/-/tweetnacl-0.14.5.tgz"
   integrity sha512-KXXFFdAbFXY4geFIwoyNK+f5Z1b7swfXABfL7HXCmoIWMKU3dmS26672A4EeQtDzLKy7SXmfBu51JolvEKwtGA==
 
-"two@file:/Users/justinzhang/Documents/Capstone1/core_desk/api":
+"two@file:/Users/bellaott/Documents/Higher Ed/core_desk/api":
   version "1.0.0"
   resolved "file:api"
   dependencies:

@@ -5,13 +5,15 @@ import { Link, useParams } from "react-router-dom";
 import { useAuth } from "#useAuth";
 import { useShop } from "#hooks";
 import { Loading } from "#loading";
-import { Typography, Util, Badge } from "tabler-react-2";;
+import { Typography, Util, Badge, Input } from "tabler-react-2";
 import moment from "moment";
 import { Price } from "#renderPrice";
 import { Avatar } from "#avatar";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
 import { TableV2 } from "tabler-react-2";
-import { Button } from "tabler-react-2/dist/button";
+import { Button } from "#button";
+import { useModal } from "#modal";
+import { useBulkTopup } from "../../../../hooks/useBulkTopup";
 import { useUsers } from "../../../../hooks/useUsers";
 const { H1 } = Typography;
 
@@ -44,6 +46,37 @@ const switchAccountTypeForBadge = (type) => {
   }
 };
 
+const BulkTopupModalContent = ({ bulkTopup, opLoading }) => {
+  const [value, setValue] = useState(null);
+
+  return (
+    <Util.Col gap={1}>
+      <Input
+        type="number"
+        label="Top up amount"
+        value={value}
+        onChange={(v) => setValue(v)}
+        placeholder="Enter an amount"
+        prependedText="$"
+      />
+      <i>
+        Every user in this shop whose balance is below this amount will be
+        topped up to exactly this amount. Users already at or above it are
+        left untouched.
+      </i>
+      <Button
+        loading={opLoading}
+        onClick={async () => {
+          const success = await bulkTopup(value);
+          if (success) document.location.reload();
+        }}
+      >
+        Top up all users
+      </Button>
+    </Util.Col>
+  );
+};
+
 export const ShopUsersPage = () => {
   const { shopId } = useParams();
   const { user } = useAuth();
@@ -56,6 +89,18 @@ export const ShopUsersPage = () => {
   const [size, setSize] = useState(25);
   const [sorting, setSorting] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const { bulkTopup, opLoading } = useBulkTopup(shopId);
+  const { modal: openBulkTopup, ModalElement: BulkTopupModal } = useModal({
+    title: "Top up all users",
+    text: (
+      <BulkTopupModalContent bulkTopup={bulkTopup} opLoading={opLoading} />
+    ),
+  });
+
+  const userIsPrivileged =
+    user?.admin ||
+    userShop?.accountType === "ADMIN" ||
+    userShop?.accountType === "OPERATOR";
 
 
   const filteredUsers = useMemo(() => {
@@ -195,7 +240,14 @@ export const ShopUsersPage = () => {
     >
       <Util.Row justify="between" align="center">
         <H1>Shop Users</H1>
-        <Button onClick={inviteUser}>Invite New Users</Button>
+        <Util.Row justify="end" gap={1}>
+          {userIsPrivileged && (
+            <>
+              <Button onClick={openBulkTopup}>Top up all users</Button>
+            </>
+          )}
+          <Button onClick={inviteUser}>Invite New Users</Button>
+        </Util.Row>
       </Util.Row>
       <Util.Spacer size={2} />
       <SearchBar
@@ -223,6 +275,7 @@ export const ShopUsersPage = () => {
           setSorting(next);
         }}
       />
+      {BulkTopupModal}
       {ModalElement}
     </Page>
   );
