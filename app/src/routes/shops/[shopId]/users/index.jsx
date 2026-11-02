@@ -45,6 +45,7 @@ const switchAccountTypeForBadge = (type) => {
       );
   }
 };
+
 const BulkTopupModalContent = ({ bulkTopup, opLoading }) => {
   const [value, setValue] = useState(0);
 
@@ -75,6 +76,7 @@ const BulkTopupModalContent = ({ bulkTopup, opLoading }) => {
     </Util.Col>
   );
 };
+
 export const ShopUsersPage = () => {
   const { shopId } = useParams();
   const { user } = useAuth();
@@ -90,7 +92,7 @@ export const ShopUsersPage = () => {
   const { bulkTopup, opLoading } = useBulkTopup(shopId);
   const { modal: openBulkTopup, ModalElement: BulkTopupModal } = useModal({
     title: "Top up all users",
-    content: (
+    text: (
       <BulkTopupModalContent bulkTopup={bulkTopup} opLoading={opLoading} />
     ),
   });
@@ -238,10 +240,12 @@ export const ShopUsersPage = () => {
     >
       <Util.Row justify="between" align="center">
         <H1>Shop Users</H1>
-        <Util.Row>
-         {userIsPrivileged && (
-           <Button onClick={openBulkTopup}>Top up all users</Button>
-         )}
+        <Util.Row justify="end" gap={1}>
+          {userIsPrivileged && (
+            <>
+              <Button onClick={openBulkTopup}>Top up all users</Button>
+            </>
+          )}
           <Button onClick={inviteUser}>Invite New Users</Button>
         </Util.Row>
       </Util.Row>

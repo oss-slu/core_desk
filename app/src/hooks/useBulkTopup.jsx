@@ -24,7 +24,7 @@ export const useBulkTopup = (shopId) => {
         setOpLoading(false);
         return false;
       }
-    } catch (error) {
+    } catch {
       toast.error("Something went wrong");
       setOpLoading(false);
       return false;
