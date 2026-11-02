@@ -264,7 +264,7 @@ export const Jobs = () => {
 
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(25);
-  const [sorting, setSorting] = useState([]);
+  const [sorting, setSorting] = useState([{ id: "createdAt", desc: true }]);
   const [searchTerm, setSearchTerm] = useState("");
 
   const statusOptions = [
@@ -437,6 +437,16 @@ export const Jobs = () => {
         enableSorting: true,
       },
       {
+        id: "createdAt",
+        header: "Created At",
+        accessorFn: (row) => row.createdAt,
+        cell: ({ getValue }) => {
+          const value = getValue();
+          return value ? moment(value).format("MM/DD/YY hh:mm a") : "-";
+        },
+        enableSorting: true,
+      },
+      {
         id: "title",
         header: "Title",
         accessorFn: (row) => row.title,
@@ -559,16 +569,6 @@ export const Jobs = () => {
               )}
             </>
           );
-        },
-        enableSorting: true,
-      },
-      {
-        id: "createdAt",
-        header: "Created At",
-        accessorFn: (row) => row.createdAt,
-        cell: ({ getValue }) => {
-          const value = getValue();
-          return value ? moment(value).format("MM/DD/YY hh:mm a") : "-";
         },
         enableSorting: true,
       },
