@@ -64,7 +64,7 @@ export const post = [
   verifyAuth,
   async (req, res) => {
     const { shopId, userId } = req.params;
-    const { type, value: startValue } = req.body;
+    const { type, value: startValue, notes: startNotes } = req.body;
 
     const userShop = await prisma.userShop.findFirst({
       where: {
@@ -95,6 +95,11 @@ export const post = [
     ) {
       return res.status(403).json({ error: "Unauthorized" });
     }
+
+    if (startNotes !== undefined && typeof startNotes !== "string") {
+      return res.status(400).json({ error: "notes must be a string" });
+    }
+    const notes = startNotes?.trim() || null;
 
     let value = null;
     if (startValue) {
@@ -163,6 +168,7 @@ export const post = [
         userId,
         type,
         value: valueToPost,
+        notes,
       },
     });
 
@@ -176,6 +182,7 @@ export const post = [
           postedBy: req.user.id,
           type: type,
           value: value,
+          notes,
         }),
       },
     });

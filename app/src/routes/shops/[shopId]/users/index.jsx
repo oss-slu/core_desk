@@ -14,6 +14,7 @@ import { TableV2 } from "tabler-react-2";
 import { Button } from "#button";
 import { useModal } from "#modal";
 import { useBulkTopup } from "../../../../hooks/useBulkTopup";
+import { useUsers } from "../../../../hooks/useUsers";
 const { H1 } = Typography;
 
 const switchAccountTypeForBadge = (type) => {
@@ -80,6 +81,7 @@ export const ShopUsersPage = () => {
   const { userShop, loading, users } = useShop(shopId, {
     includeUsers: true,
   });
+  const { inviteUser, ModalElement } = useUsers(shopId);
 
   const [page, setPage] = useState(1);
   const [size, setSize] = useState(25);
@@ -234,11 +236,15 @@ export const ShopUsersPage = () => {
         userShop.balance < 0
       )}
     >
-      <H1>Shop Users</H1>
-      {BulkTopupModal}
-   {userIsPrivileged && (
-     <Button onClick={openBulkTopup}>Top up all users</Button>
-   )}
+      <Util.Row justify="between" align="center">
+        <H1>Shop Users</H1>
+        <Util.Row>
+         {userIsPrivileged && (
+           <Button onClick={openBulkTopup}>Top up all users</Button>
+         )}
+          <Button onClick={inviteUser}>Invite New Users</Button>
+        </Util.Row>
+      </Util.Row>
       <Util.Spacer size={2} />
       <SearchBar
         onSearch={(value) => {
@@ -265,6 +271,8 @@ export const ShopUsersPage = () => {
           setSorting(next);
         }}
       />
+      {BulkTopupModal}
+      {ModalElement}
     </Page>
   );
 };

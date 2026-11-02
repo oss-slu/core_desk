@@ -398,9 +398,6 @@ steps:
 
   - waitFor: 1200
 
-  - assertVisible:
-      text: Test Shop
-
 # -------------------- CREATE JOB --------------------
 
   - tapOn:

@@ -66,7 +66,8 @@ export default () => {
             />
             {loggedIn ? (
               <>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Shops />} />
+                <Route path="/about" element={<Home />} />
                 <Route path="/users" element={<UsersPage />} />
                 <Route path="/users/:userId" element={<UserPage />} />
                 <Route path="/shops" element={<Shops />} />

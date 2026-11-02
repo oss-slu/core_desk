@@ -1,4 +1,4 @@
-import { LogType } from "#prisma-client";
+import { LedgerItemType, LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { calculateTotalCostOfJob } from "../../../../util/docgen/invoice.js";
@@ -110,46 +110,161 @@ export const post = [
         }
 
         if (onBehalfOfUserEmail) {
-          const user = await prisma.user.create({
-            data: {
-              email: onBehalfOfUserEmail,
-              firstName: onBehalfOfUserFirstName,
-              lastName: onBehalfOfUserLastName,
-            },
-          });
+          const trimmedEmail = onBehalfOfUserEmail.trim();
 
-          const shopsToJoin = await prisma.shop.findMany({
+          // Check whether the user already exists in CoreDesk before attempting to create a new account
+          let user = await prisma.user.findFirst({
             where: {
-              autoJoin: true,
+              email: {
+                equals: trimmedEmail,
+                mode: "insensitive",
+              },
             },
           });
 
-          for (const shop of shopsToJoin) {
-            await prisma.userShop.create({
-              data: {
+          if (user) {
+            // Retrieve existing account instead of creating a duplicate
+            const existingUserShop = await prisma.userShop.findFirst({
+              where: {
                 userId: user.id,
-                shopId: shop.id,
-                active: true,
+                shopId,
               },
             });
+
+            if (existingUserShop && existingUserShop.active) {
+              // Existing user is already active in this shop
+              userToCreateJobAs = user.id;
+            } else {
+              // If possible, add the existing user to the selected shop
+              const isShopAdmin = userShop.accountType === "ADMIN";
+              const isGlobalAdmin = !!req.user.admin;
+              const canAddUserToShop =
+                (isGlobalAdmin || isShopAdmin) &&
+                !user.suspended &&
+                (!existingUserShop || !existingUserShop.blacklisted);
+
+              if (canAddUserToShop) {
+                if (existingUserShop) {
+                  await prisma.userShop.update({
+                    where: { id: existingUserShop.id },
+                    data: { active: true },
+                  });
+                } else {
+                  await prisma.userShop.create({
+                    data: {
+                      userId: user.id,
+                      shopId,
+                      active: true,
+                      accountType: "CUSTOMER",
+                    },
+                  });
+
+                  const currentShop = await prisma.shop.findUnique({
+                    where: { id: shopId },
+                  });
+
+                  if (currentShop?.startingDeposit) {
+                    const ledgerItem = await prisma.ledgerItem.create({
+                      data: {
+                        userId: user.id,
+                        shopId,
+                        value: currentShop.startingDeposit,
+                        type: LedgerItemType.INITIAL,
+                      },
+                    });
+
+                    await prisma.logs.create({
+                      data: {
+                        userId: user.id,
+                        shopId,
+                        ledgerItemId: ledgerItem.id,
+                        type: LogType.LEDGER_ITEM_CREATED,
+                      },
+                    });
+                  }
+                }
+
+                await prisma.logs.create({
+                  data: {
+                    userId: user.id,
+                    shopId,
+                    type: LogType.USER_CONNECTED_TO_SHOP,
+                  },
+                });
+
+                userToCreateJobAs = user.id;
+              } else {
+                // If the existing user cannot be added to the shop automatically, return clear error
+                return res.status(409).json({
+                  error: "User already exists",
+                  message:
+                    "This user already exists in CoreDesk. Global Admins can visit the general Users page to add the existing user to the shop.",
+                });
+              }
+            }
+          } else {
+            // User does not exist, create a new account
+            const newUser = await prisma.user.create({
+              data: {
+                email: trimmedEmail,
+                firstName: onBehalfOfUserFirstName,
+                lastName: onBehalfOfUserLastName,
+              },
+            });
+
+            const shopsToJoin = await prisma.shop.findMany({
+              where: {
+                OR: [{ autoJoin: true }, { id: shopId }],
+              },
+            });
+
+            for (const shop of shopsToJoin) {
+              await prisma.userShop.create({
+                data: {
+                  userId: newUser.id,
+                  shopId: shop.id,
+                  active: true,
+                },
+              });
+
+              if (shop.startingDeposit) {
+                const ledgerItem = await prisma.ledgerItem.create({
+                  data: {
+                    userId: newUser.id,
+                    shopId: shop.id,
+                    value: shop.startingDeposit,
+                    type: LedgerItemType.INITIAL,
+                  },
+                });
+
+                await prisma.logs.create({
+                  data: {
+                    userId: newUser.id,
+                    shopId: shop.id,
+                    ledgerItemId: ledgerItem.id,
+                    type: LogType.LEDGER_ITEM_CREATED,
+                  },
+                });
+              }
+
+              await prisma.logs.create({
+                data: {
+                  userId: newUser.id,
+                  type: LogType.USER_CONNECTED_TO_SHOP,
+                  shopId: shop.id,
+                },
+              });
+            }
 
             await prisma.logs.create({
               data: {
-                userId: user.id,
-                type: LogType.USER_CONNECTED_TO_SHOP,
-                shopId: shop.id,
+                userId: newUser.id,
+                type: LogType.USER_CREATED,
               },
             });
+
+            userToCreateJobAs = newUser.id;
           }
-
-          await prisma.logs.create({
-            data: {
-              userId: user.id,
-              type: LogType.USER_CREATED,
-            },
-          });
-
-          userToCreateJobAs = user.id;
         }
       }
 

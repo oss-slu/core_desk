@@ -1,0 +1,3 @@
+DROP INDEX IF EXISTS "Job_jobNumber_key";
+
+ALTER TABLE "Job" DROP COLUMN IF EXISTS "jobNumber";

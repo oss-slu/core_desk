@@ -17,15 +17,10 @@ services:
 
   localstack:
     container_name: '${LOCALSTACK_DOCKER_NAME:-localstack-main}'
-    image: localstack/localstack
-    ports:
-      - '127.0.0.1:4566:4566' # LocalStack Gateway
-      - '127.0.0.1:4510-4559:4510-4559' # external services port range
-      - '127.0.0.1:443:443' # LocalStack HTTPS Gateway
+    # LocalStack's current `latest` image requires an account token at startup.
+    # This pinned Community release supports the S3 emulation used by E2E without one.
+    image: localstack/localstack:3.8.1
     environment:
-      # Activate LocalStack for AWS: https://docs.localstack.cloud/getting-started/auth-token/
-      - LOCALSTACK_AUTH_TOKEN=${LOCALSTACK_AUTH_TOKEN:?}
-      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
       - DEBUG=${DEBUG:-0}
       - PERSISTENCE=${PERSISTENCE:-0}
     healthcheck:

@@ -118,7 +118,12 @@ export const post = [
     }
 
     const { shopId, groupId } = access;
-    const { type, value: startValue } = req.body;
+    const { type, value: startValue, notes: startNotes } = req.body;
+
+    if (startNotes !== undefined && typeof startNotes !== "string") {
+      return res.status(400).json({ error: "notes must be a string" });
+    }
+    const notes = startNotes?.trim() || null;
 
     let value = null;
     if (startValue !== undefined && startValue !== null) {
@@ -178,6 +183,7 @@ export const post = [
         billingGroupId: groupId,
         type,
         value: valueToPost,
+        notes,
       },
     });
 
@@ -192,6 +198,7 @@ export const post = [
           postedBy: req.user.id,
           type,
           value,
+          notes,
           target: "BILLING_GROUP",
         }),
       },

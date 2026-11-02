@@ -73,9 +73,10 @@ const AddUserToBillingGroupModal = () => {
   );
 };
 
-const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading }) => {
+const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading, onPosted }) => {
   const [type, setType] = useState(null);
   const [value, setValue] = useState(0);
+  const [notes, setNotes] = useState("");
 
   return (
     <Util.Col gap={1}>
@@ -102,6 +103,13 @@ const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading }) => {
         placeholder="Select an amount"
         prependedText="$"
       />
+      <Input
+        type="text"
+        label="Notes"
+        value={notes}
+        onChange={(v) => setNotes(v)}
+        placeholder="Payment reference or other details"
+      />
       <i>
         A topup will bring the group's balance to the specified amount if it is
         lower than that amount. A deposit will add the fixed amount.
@@ -109,7 +117,8 @@ const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading }) => {
       <Button
         loading={opLoading}
         onClick={async () => {
-          await postLedgerItem({ type, value });
+          const success = await postLedgerItem({ type, value, notes });
+          if (success) onPosted();
         }}
       >
         Post Ledger Item
@@ -170,13 +179,17 @@ export const BillingGroupPage = () => {
         />
       ),
     });
-  const { modal: addLedgerItemModal, ModalElement: AddLedgerItemModal } =
-    useModal({
+  const {
+    modal: addLedgerItemModal,
+    ModalElement: AddLedgerItemModal,
+    close: closeAddLedgerItemModal,
+  } = useModal({
       title: "Post ledger item",
       text: (
         <AddGroupBalanceModalContent
           postLedgerItem={postLedgerItem}
           opLoading={ledgerOpLoading}
+          onPosted={() => closeAddLedgerItemModal(true)}
         />
       ),
     });

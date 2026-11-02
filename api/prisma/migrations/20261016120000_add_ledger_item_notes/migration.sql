@@ -1,0 +1,1 @@
+ALTER TABLE "LedgerItem" ADD COLUMN "notes" TEXT;
