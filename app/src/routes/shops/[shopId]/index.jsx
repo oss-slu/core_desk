@@ -18,7 +18,8 @@ export const shopSidenavItems = (
   shopId,
   isGlobalAdmin,
   accountType,
-  isInDebt = true
+  isInDebt = true,
+  hasBusinessManagerRole = false,
 ) => {
   const userIsStaff =
     accountType === "ADMIN" || accountType === "OPERATOR" || isGlobalAdmin;
@@ -100,6 +101,7 @@ export const shopSidenavItems = (
     accountType === "ADMIN" ||
     accountType === "OPERATOR" ||
     accountType === "GROUP_ADMIN" ||
+    hasBusinessManagerRole ||
     isGlobalAdmin
   ) {
     items.push({
@@ -149,7 +151,8 @@ export const ShopPage = () => {
           shopId,
           false,
           userShop.accountType,
-          userShop.balance < 0
+          userShop.balance < 0,
+          userShop.hasBusinessManagerRole,
         )}
       >
         <Loading />
@@ -165,7 +168,8 @@ export const ShopPage = () => {
         shopId,
         user.admin,
         userShop.accountType,
-        userShop.balance < 0
+        userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       <Util.Row justify="between" align="center">

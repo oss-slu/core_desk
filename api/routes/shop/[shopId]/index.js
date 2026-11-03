@@ -66,6 +66,23 @@ export const get = [
         },
       });
 
+      const businessManagerMembership = userShop
+        ? await prisma.userBillingGroup.findFirst({
+            where: {
+              userId: req.user.id,
+              role: "BUSINESS_MANAGER",
+              active: true,
+              billingGroup: {
+                is: {
+                  shopId: shop.id,
+                  active: true,
+                },
+              },
+            },
+            select: { id: true },
+          })
+        : null;
+
       if (userShop) {
         const userBalance = await prisma.ledgerItem.aggregate({
           where: {
@@ -168,7 +185,16 @@ export const get = [
         });
       }
 
-      res.json({ shop, userShop, users });
+      res.json({
+        shop,
+        userShop: userShop
+          ? {
+              ...userShop,
+              hasBusinessManagerRole: Boolean(businessManagerMembership),
+            }
+          : userShop,
+        users,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Something went wrong" });

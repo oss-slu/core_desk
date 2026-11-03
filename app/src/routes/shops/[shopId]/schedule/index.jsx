@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { Page } from "#page";
 import { Typography, Util, Input, Button, SegmentedControl } from "tabler-react-2";
 import { useAuth } from "#useAuth";
+import { useShop } from "#hooks";
 import { sidenavItems } from "#page";
 import { Icon } from "#icon";
 import { useAppointments } from "#useAppointments";
@@ -305,6 +306,7 @@ export const SchedulePage = () => {
   const cellSize = 70;
 
   const userShop = user?.shops?.find(s => s.shopId === shopId);
+  const { userShop: shopMembership } = useShop(shopId);
   const canEditSettings = user?.admin || userShop?.accountType === "ADMIN" || userShop?.accountType === "OPERATOR";
 
   const filteredAppointments = appointments.filter((evt) => {
@@ -313,7 +315,16 @@ export const SchedulePage = () => {
   });
 
   return (
-    <Page sidenavItems={shopSidenavItems("Schedule", shopId, user?.admin, userShop?.accountType, userShop?.balance < 0)}>
+    <Page
+      sidenavItems={shopSidenavItems(
+        "Schedule",
+        shopId,
+        user?.admin,
+        userShop?.accountType,
+        userShop?.balance < 0,
+        shopMembership?.hasBusinessManagerRole,
+      )}
+    >
       <Util.Col gap={3}>
         <div className={styles.headerRow}>
           <H1>Resource Availability</H1>

@@ -20,6 +20,11 @@ export const BillingGroupsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
+  const canCreateBillingGroups =
+    user?.admin ||
+    userShop.accountType === "ADMIN" ||
+    userShop.accountType === "OPERATOR" ||
+    userShop.accountType === "GROUP_ADMIN";
   const { billingGroups, loading, createBillingGroup, opLoading } =
     useBillingGroups(shopId);
 
@@ -53,6 +58,7 @@ export const BillingGroupsPage = () => {
           user.admin,
           userShop.accountType,
           userShop.balance < 0,
+          userShop.hasBusinessManagerRole,
         )}
       >
         <Loading />
@@ -67,12 +73,15 @@ export const BillingGroupsPage = () => {
         user.admin,
         userShop.accountType,
         userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       {ModalElement}
       <Util.Row justify="between" align="center">
         <h1>Billing Groups</h1>
-        <Button onClick={modal}>Create Billing Group</Button>
+        {canCreateBillingGroups && (
+          <Button onClick={modal}>Create Billing Group</Button>
+        )}
       </Util.Row>
       <Util.Spacer size={1} />
       <SearchBar

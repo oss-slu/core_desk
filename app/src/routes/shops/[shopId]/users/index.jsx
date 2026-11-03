@@ -221,7 +221,8 @@ export const ShopUsersPage = () => {
           shopId,
           user.admin,
           userShop.accountType,
-          userShop.balance < 0
+          userShop.balance < 0,
+          userShop.hasBusinessManagerRole,
         )}
       >
         <Loading />
@@ -235,7 +236,8 @@ export const ShopUsersPage = () => {
         shopId,
         user.admin,
         userShop.accountType,
-        userShop.balance < 0
+        userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       <Util.Row justify="between" align="center">
