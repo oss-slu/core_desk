@@ -112,7 +112,8 @@ export const ShopUserPage = () => {
           shopId,
           currentUser.admin,
           currentUserShop.accountType,
-          currentUserShop.balance < 0
+          currentUserShop.balance < 0,
+          currentUserShop.hasBusinessManagerRole,
         )}
       >
         <Loading />
@@ -126,7 +127,8 @@ export const ShopUserPage = () => {
         shopId,
         currentUser.admin,
         currentUserShop.accountType,
-        currentUserShop.balance < 0
+        currentUserShop.balance < 0,
+        currentUserShop.hasBusinessManagerRole,
       )}
     >
       {AddBalanceModal}

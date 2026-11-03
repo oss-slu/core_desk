@@ -20,7 +20,7 @@ const { H1, H2, Text } = Typography;
 
 export const Printing3d = () => {
   const { shopId } = useParams();
-  const { shop } = useShop(shopId);
+  const { userShop } = useShop(shopId);
   const { user } = useAuth();
   const {
     loading: typesLoading,
@@ -49,7 +49,9 @@ export const Printing3d = () => {
         "3D Printing",
         shopId,
         user.admin,
-        shop.accountType
+        userShop.accountType,
+        userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       <H1>3D Printing</H1>

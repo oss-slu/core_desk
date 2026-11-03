@@ -212,6 +212,7 @@ export const BillingGroupPage = () => {
           user.admin,
           userShop.accountType,
           userShop.balance < 0,
+          userShop.hasBusinessManagerRole,
         )}
       >
         <Loading />
@@ -226,6 +227,7 @@ export const BillingGroupPage = () => {
         user.admin,
         userShop.accountType,
         userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       {ModalElement}

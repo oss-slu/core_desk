@@ -645,6 +645,7 @@ export const Jobs = () => {
         activeUser?.admin,
         userShop.accountType,
         userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       <Util.Row justify="between" align="center">
