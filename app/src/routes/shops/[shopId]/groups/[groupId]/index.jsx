@@ -31,7 +31,7 @@ const AddUserToBillingGroupModal = () => {
   const navigate = useNavigate();
 
   const [user, setUser] = useState(null);
-  const [role, setRole] = useState("member");
+  const [role, setRole] = useState("MEMBER");
   const { shopId, groupId } = useParams();
   const { opLoading, addUserToGroup } = useBillingGroup(shopId, groupId);
 
@@ -44,7 +44,7 @@ const AddUserToBillingGroupModal = () => {
       <label className="form-label mt-2">Role</label>
       <DropdownInput
         value={role}
-        onChange={setRole}
+        onChange={(value) => setRole(value.id)}
         prompt="Pick a role"
         values={[
           {
@@ -55,13 +55,17 @@ const AddUserToBillingGroupModal = () => {
             id: "MEMBER",
             label: "Member",
           },
+          {
+            id: "BILLING_GROUP_OPERATOR",
+            label: "Billing Group Operator",
+          },
         ]}
       />
       <Button
         className="mt-2"
         variant="primary"
         onClick={async () => {
-          await addUserToGroup(user, role.id);
+          await addUserToGroup(user, role);
           navigate(0);
         }}
         disabled={!user || !role}
@@ -448,7 +452,9 @@ export const BillingGroupPage = () => {
                 accessor: "role",
                 render: (role) => (
                   <Badge color="blue" soft>
-                    {role.charAt(0) + role.slice(1).toLowerCase()}
+                    {role === "BILLING_GROUP_OPERATOR"
+                      ? "Billing Group Operator"
+                      : role.charAt(0) + role.slice(1).toLowerCase()}
                   </Badge>
                 ),
               },

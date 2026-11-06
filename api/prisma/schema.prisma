@@ -616,6 +616,7 @@ enum ProgressStatus {
 enum UserBillingGroupRole {
   ADMIN
   MEMBER
+  BILLING_GROUP_OPERATOR
 }
 
 model Navigation {
