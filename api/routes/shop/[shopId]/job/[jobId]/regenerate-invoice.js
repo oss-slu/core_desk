@@ -2,7 +2,7 @@ import { prisma } from "#prisma";
 import { LedgerItemType } from "#prisma-client";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../util/docgen/invoice.js";
-import { canOperateJob } from "../../../../../util/billingGroupOperator.js";
+import { isShopOperator } from "../../../../../util/billingGroupOperator.js";
 
 export const post = [
   verifyAuth,
@@ -34,13 +34,7 @@ export const post = [
         return res.status(404).json({ error: "Not found" });
       }
 
-      const shouldLoadAll = await canOperateJob(
-        userId,
-        shopId,
-        userShop,
-        req.user.admin,
-        job.groupId,
-      );
+      const shouldLoadAll = isShopOperator(userShop, req.user.admin);
 
       if (!shouldLoadAll) {
         if (job.groupId) {

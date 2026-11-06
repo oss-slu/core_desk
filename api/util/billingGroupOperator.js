@@ -73,17 +73,7 @@ export const canAccessJob = async (
 ) => {
   if (!isGlobalAdmin && !userShop) return false;
 
-  if (
-    await canOperateJob(
-      userId,
-      shopId,
-      userShop,
-      isGlobalAdmin,
-      job.groupId,
-    )
-  ) {
-    return true;
-  }
+  if (isShopOperator(userShop, isGlobalAdmin)) return true;
 
   if (!job.groupId) return job.userId === userId;
 

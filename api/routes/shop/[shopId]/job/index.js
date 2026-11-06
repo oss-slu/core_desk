@@ -306,7 +306,10 @@ export const post = [
           billingGroupToCreateJobAs = billingGroup;
         }
 
-        if (userBillingGroup?.role === "ADMIN") {
+        if (
+          userBillingGroup?.role === "ADMIN" ||
+          userBillingGroup?.role === "BILLING_GROUP_OPERATOR"
+        ) {
           billingGroupToCreateJobAs = billingGroup;
         }
       }
@@ -538,8 +541,8 @@ export const get = [
       ]);
 
       jobs = jobs.map((job) => {
-        job.operatorAccess =
-          shouldLoadAll || operatorGroupIds.includes(job.groupId);
+        job.operatorAccess = shouldLoadAll;
+        job.billingGroupOperatorAccess = operatorGroupIds.includes(job.groupId);
         job.itemsCount = job._count.items;
 
         job.progress = {};

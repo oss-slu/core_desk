@@ -2,7 +2,11 @@ import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import { upload } from "#upload";
 import { uploadFileToJob } from "../../../../../util/uploadFileToJob.js";
-import { canAccessJob } from "../../../../../util/billingGroupOperator.js";
+import {
+  canAccessJob,
+  hasBillingGroupOperatorAccess,
+  isShopOperator,
+} from "../../../../../util/billingGroupOperator.js";
 
 export const post = [
   verifyAuth,
@@ -35,6 +39,14 @@ export const post = [
           req.user.admin,
           job,
         ))
+      ) {
+        return res.status(403).json({ error: "Forbidden" });
+      }
+
+      if (
+        !isShopOperator(userShop, req.user.admin) &&
+        job.userId !== userId &&
+        (await hasBillingGroupOperatorAccess(userId, shopId, job.groupId))
       ) {
         return res.status(403).json({ error: "Forbidden" });
       }

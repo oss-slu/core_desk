@@ -52,10 +52,12 @@ export const ProjectWideEditCosting = ({
   const { user } = useAuth();
   const { userShop } = useShop(initialJob.shopId);
 
-  const userIsPrivileged =
+  const userIsShopOperator =
     user?.admin ||
     userShop?.accountType === "ADMIN" ||
     userShop?.accountType === "OPERATOR";
+  const canEditAdditionalCosts =
+    userIsShopOperator || job.billingGroupOperatorAccess;
 
   return (
     <>
@@ -64,7 +66,7 @@ export const ProjectWideEditCosting = ({
           <H2>Project-wide costing</H2>
         </Util.Row>
 
-        {userIsPrivileged && (
+        {userIsShopOperator && (
           <Switch
             label="Override or add to project-wide cost"
             value={job.additionalCostOverride}
@@ -76,7 +78,7 @@ export const ProjectWideEditCosting = ({
             loading={loading}
           />
         )}
-        {userIsPrivileged ? (
+        {userIsShopOperator ? (
           <p>
             {job.additionalCostOverride
               ? "You are overriding the item-based cost"
@@ -99,13 +101,13 @@ export const ProjectWideEditCosting = ({
                   lineItemId={additionalCost.id}
                   refetchLineItems={fetchLineItems}
                   jobFinalized={job.finalized}
-                  userIsPrivileged={userIsPrivileged}
+                  userIsPrivileged={canEditAdditionalCosts}
                   resourceTypes={resourceTypes}
                 />
                 <Util.Spacer size={1} />
               </React.Fragment>
             ))}
-            {userIsPrivileged && (
+            {canEditAdditionalCosts && (
               <Button onClick={createLineItem} loading={createOpLoading}>
                 Add another additional cost
               </Button>
@@ -114,7 +116,7 @@ export const ProjectWideEditCosting = ({
         ) : (
           <Card>
             <p>There are no additional costs for this job.</p>
-            {userIsPrivileged && (
+            {canEditAdditionalCosts && (
               <Button onClick={createLineItem} loading={createOpLoading}>
                 Add additional cost
               </Button>

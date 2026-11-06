@@ -240,7 +240,9 @@ export const useJobs = (shopId) => {
           onBehalfOfUserFirstName,
           onBehalfOfUserLastName,
           onBehalfOfBillingGroup,
-          billingGroupId: onBehalfOfBillingGroupId,
+          billingGroupId: onBehalfOfBillingGroup
+            ? onBehalfOfBillingGroupId
+            : null,
         }),
       });
       const data = await r.json();

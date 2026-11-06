@@ -3,7 +3,7 @@ import { LedgerItemType } from "#prisma-client";
 import { verifyAuth } from "#verifyAuth";
 import { generateInvoice } from "../../../../../../util/docgen/invoice.js";
 import { z } from "zod";
-import { canOperateJob } from "../../../../../../util/billingGroupOperator.js";
+import { isShopOperator } from "../../../../../../util/billingGroupOperator.js";
 
 const jobSchema = z.object({
   finalized: z.boolean(),
@@ -72,15 +72,7 @@ export const post = [
       return res.status(404).json({ error: "Job not found" });
     }
 
-    if (
-      !(await canOperateJob(
-        req.user.id,
-        shopId,
-        userShop,
-        req.user.admin,
-        job.groupId,
-      ))
-    ) {
+    if (!isShopOperator(userShop, req.user.admin)) {
       return res.status(400).json({ error: "Forbidden" });
     }
 

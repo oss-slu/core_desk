@@ -5,7 +5,11 @@ import {
   RESOURCE_TYPE_COSTING_CRITERIA_INCLUDE,
   sanitizeCostingInputForResourceType,
 } from "../../../../../../../util/costingCriteria.js";
-import { canAccessJob } from "../../../../../../../util/billingGroupOperator.js";
+import {
+  canAccessJob,
+  hasBillingGroupOperatorAccess,
+  isShopOperator,
+} from "../../../../../../../util/billingGroupOperator.js";
 import { z } from "zod";
 
 export const jobItemUpdateSchema = z.object({
@@ -147,6 +151,14 @@ export const put = [
         !(await canAccessJob(userId, shopId, userShop, req.user.admin, job))
       ) {
         return res.status(404).json({ error: "Not found" });
+      }
+
+      if (
+        !isShopOperator(userShop, req.user.admin) &&
+        job.userId !== userId &&
+        (await hasBillingGroupOperatorAccess(userId, shopId, job.groupId))
+      ) {
+        return res.status(403).json({ error: "Forbidden" });
       }
 
       const jobItem = await prisma.jobItem.findFirst({
@@ -311,6 +323,14 @@ export const del = [
       !(await canAccessJob(userId, shopId, userShop, req.user.admin, job))
     ) {
       return res.status(404).json({ error: "Not found" });
+    }
+
+    if (
+      !isShopOperator(userShop, req.user.admin) &&
+      job.userId !== userId &&
+      (await hasBillingGroupOperatorAccess(userId, shopId, job.groupId))
+    ) {
+      return res.status(403).json({ error: "Forbidden" });
     }
 
     const jobItem = await prisma.jobItem.findFirst({
