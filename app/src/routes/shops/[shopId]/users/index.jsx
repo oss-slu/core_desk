@@ -189,7 +189,7 @@ export const ShopUsersPage = () => {
     {
       id: "balance",
       header: "Balance",
-      accessorFn: (row) => row.user?.balance,
+      accessorFn: (row) => row.userShop?.balance,
       cell: ({ getValue }) => <Price value={getValue()} icon />,
     },
     {
