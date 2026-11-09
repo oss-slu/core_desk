@@ -107,6 +107,17 @@ const JOB_INCLUDE = {
       lastName: true,
     },
   },
+  assignments: {
+    include: {
+      user: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
+  },
   group: {
     select: {
       id: true,
@@ -313,8 +324,35 @@ export const get = [
       }
 
       const jobWithBillingAccount = await attachBillingAccount(job, shopId);
+      const availableAssignees = shouldLoadAll
+        ? await prisma.userShop
+            .findMany({
+              where: {
+                shopId,
+                active: true,
+                accountType: {
+                  in: ["ADMIN", "OPERATOR"],
+                },
+              },
+              select: {
+                user: {
+                  select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                  },
+                },
+              },
+            })
+            .then((userShops) =>
+              userShops.map(({ user }) => ({
+                ...user,
+                name: `${user.firstName} ${user.lastName}`,
+              }))
+            )
+        : [];
 
-      return res.json({ job: jobWithBillingAccount });
+      return res.json({ job: jobWithBillingAccount, availableAssignees });
     } catch (e) {
       console.error(e);
       return res.status(500).json({ error: "An error occurred" });
@@ -374,11 +412,62 @@ export const put = [
               },
             },
           },
+          assignments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
         },
       });
 
       if (!job) {
         return res.status(404).json({ error: "Not found" });
+      }
+
+      const hasAssignmentUpdate = Object.prototype.hasOwnProperty.call(
+        req.body,
+        "assignedUserIds"
+      );
+      let assignedUserIds;
+      if (hasAssignmentUpdate) {
+        if (!shouldLoadAll) {
+          return res.status(403).json({ error: "Forbidden" });
+        }
+
+        assignedUserIds = req.body.assignedUserIds;
+        if (
+          !Array.isArray(assignedUserIds) ||
+          assignedUserIds.some((id) => typeof id !== "string") ||
+          new Set(assignedUserIds).size !== assignedUserIds.length
+        ) {
+          return res.status(400).json({ error: "Invalid assignees" });
+        }
+
+        const eligibleUsers = await prisma.userShop.findMany({
+          where: {
+            shopId,
+            active: true,
+            accountType: {
+              in: ["ADMIN", "OPERATOR"],
+            },
+            userId: {
+              in: assignedUserIds,
+            },
+          },
+          select: {
+            userId: true,
+          },
+        });
+
+        if (eligibleUsers.length !== assignedUserIds.length) {
+          return res.status(400).json({ error: "Invalid assignees" });
+        }
       }
 
       const jobUpdateData = Object.fromEntries(
@@ -491,6 +580,22 @@ export const put = [
         }
       }
 
+      if (hasAssignmentUpdate) {
+        await prisma.$transaction(async (transaction) => {
+          await transaction.jobAssignment.deleteMany({
+            where: { jobId },
+          });
+          if (assignedUserIds.length > 0) {
+            await transaction.jobAssignment.createMany({
+              data: assignedUserIds.map((assignedUserId) => ({
+                jobId,
+                userId: assignedUserId,
+              })),
+            });
+          }
+        });
+      }
+
       let updatedJob;
       if (sanitizedJobUpdateData.finalized && !job.finalized) {
         if (
@@ -569,13 +674,22 @@ export const put = [
           include: JOB_INCLUDE,
         });
       } else {
-        updatedJob = await prisma.job.update({
-          where: {
-            id: jobId,
-          },
-          data: sanitizedJobUpdateData,
-          include: JOB_INCLUDE,
-        });
+        updatedJob =
+          Object.keys(sanitizedJobUpdateData).length > 0
+            ? await prisma.job.update({
+                where: {
+                  id: jobId,
+                },
+                data: sanitizedJobUpdateData,
+                include: JOB_INCLUDE,
+              })
+            : await prisma.job.findFirst({
+                where: {
+                  id: jobId,
+                  shopId,
+                },
+                include: JOB_INCLUDE,
+              });
 
         await prisma.logs.create({
           data: {

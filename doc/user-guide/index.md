@@ -77,6 +77,8 @@ A job is a request for service that a shop can fulfill. It is a record of a user
 
 Anyone with access to the job can upload files which generates a new job item. Files can be any file type, but only certain file types are supported for viewing. If the file is not supported, the user can always download the file and view it.
 
+Shop admins and operators can assign active shop operators and admins to a job from its detail page. The assignments identify the staff working on the job and are separate from the submitter.
+
 This screenshot is crom the perspective of the submitter, a user without admin or operator permissions. The submitter is able to select the resource type and material, but the exact resource is selected by the admin or operator. The user is also able to request specific resource types or materials on each individual job item. They can also see the status of the job and each item, but cannot modify them.
 
 The comments tab is a place for submitters and staff to communicate about the job. Comments are very simple and are just text. They are not threaded or nested. Comments are visible to all users who have access to the job and are not able to be edited or deleted.
