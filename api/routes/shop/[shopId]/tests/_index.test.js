@@ -278,43 +278,18 @@ describe("/shop/[shopId]", () => {
 
       await prisma.ledgerItem.createMany({
         data: [
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.INITIAL,
-            value: 100,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.JOB,
-            value: -10,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.JOB,
-            value: -20,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.AUTOMATED_TOPUP,
-            value: 30,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.MANUAL_TOPUP,
-            value: 40,
-          },
-          {
-            userId: userShop.userId,
-            shopId: otherShop.id,
-            type: LedgerItemType.MANUAL_TOPUP,
-            value: 500,
-          },
-        ],
+          [userShop.shopId, LedgerItemType.INITIAL, 100],
+          [userShop.shopId, LedgerItemType.JOB, -10],
+          [userShop.shopId, LedgerItemType.JOB, -20],
+          [userShop.shopId, LedgerItemType.AUTOMATED_TOPUP, 30],
+          [userShop.shopId, LedgerItemType.MANUAL_TOPUP, 40],
+          [otherShop.id, LedgerItemType.MANUAL_TOPUP, 500],
+        ].map(([shopId, type, value]) => ({
+          userId: userShop.userId,
+          shopId,
+          type,
+          value,
+        })),
       });
 
       const res = await request(app)
