@@ -30,6 +30,7 @@ import {
   getEditableCostingCriteria,
   moveArrayItem,
 } from "../../../../util/costingCriteria";
+import { sortByTitle } from "../../../../util/sortByTitle";
 const { H1, H2, H3 } = Typography;
 
 export const ResourcesPage = () => {
@@ -109,7 +110,7 @@ export const ResourcesPage = () => {
         shop.
       </p>
 
-      {resourceTypes.map((resourceType) => (
+      {sortByTitle(resourceTypes).map((resourceType) => (
         <ResourceType
           key={resourceType.id}
           resourceType={resourceType}
@@ -219,7 +220,7 @@ const ResourceType = ({
       />
       <Util.Spacer size={1} />
       <Util.Row gap={1} wrap>
-        {resourceType.resources.map((resource) => (
+        {sortByTitle(resourceType.resources).map((resource) => (
           <ResourceCard key={resource.id} resource={resource} shopId={shopId} />
         ))}
       </Util.Row>
@@ -233,7 +234,7 @@ const ResourceType = ({
         </i>
       ) : (
         <Table
-          data={materials}
+          data={sortByTitle(materials)}
           columns={[
             {
               label: "Title",

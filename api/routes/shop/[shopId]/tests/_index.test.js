@@ -275,7 +275,10 @@ describe("/shop/[shopId]", () => {
 
       expect(res.status).toBe(200);
 
-      expect(res.body.users[0].user.jobCounts).toMatchObject({
+      const originalShopUser = res.body.users.find(
+        (shopUser) => shopUser.userId === userShop.userId,
+      );
+      expect(originalShopUser.user.jobCounts).toMatchObject({
         completedCount: 2,
         inProgressCount: 1,
         notStartedCount: 1,

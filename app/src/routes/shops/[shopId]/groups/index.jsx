@@ -13,6 +13,7 @@ import moment from "moment";
 import { MOMENT_FORMAT } from "#constants";
 import { Price } from "#renderPrice";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
+import { sortByTitle } from "../../../../util/sortByTitle";
 
 export const BillingGroupsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -23,9 +24,10 @@ export const BillingGroupsPage = () => {
   const { billingGroups, loading, createBillingGroup, opLoading } =
     useBillingGroups(shopId);
 
-  const filteredBillingGroups = billingGroups.filter((billingGroup) =>
-    billingGroup.title?.toLowerCase().includes(searchTerm.trim().toLowerCase())
-  );
+  const filteredBillingGroups = sortByTitle(billingGroups)
+    .filter((billingGroup) =>
+      billingGroup.title?.toLowerCase().includes(searchTerm.trim().toLowerCase()),
+    );
 
   const { modal, ModalElement, update } = useModal({
     title: "Create Billing Group",
