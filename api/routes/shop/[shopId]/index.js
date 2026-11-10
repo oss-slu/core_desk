@@ -151,18 +151,22 @@ export const get = [
           );
           delete userShop.user.password;
 
+          const balances = userShop.user.ledgerItems.reduce(
+            (totals, item) => {
+              totals.user += item.value;
+              if (item.shopId === shop.id) totals.shop += item.value;
+              return totals;
+            },
+            { shop: 0, user: 0 },
+          );
+
           return {
             ...userShop,
-            balance: userShop.user.ledgerItems
-              .filter((item) => item.shopId === shop.id)
-              .reduce((acc, item) => acc + item.value, 0),
+            balance: balances.shop,
             user: {
               ...userShop.user,
               name: `${userShop.user.firstName} ${userShop.user.lastName}`,
-              balance: userShop.user.ledgerItems.reduce(
-                (acc, item) => acc + item.value,
-                0
-              ),
+              balance: balances.user,
               jobCounts,
               totalJobs: totalJobsToShop,
               ledgerItems: undefined,
