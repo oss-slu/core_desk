@@ -91,15 +91,6 @@ export const get = [
         ) {
           return res.status(403).json({ error: "Unauthorized" });
         }
-
-
-
-        const totalJobsToShop = await prisma.job.count({ //specific to that shop
-          where: {
-            shopId: shop.id,
-          },
-        });
-
         users = await prisma.userShop.findMany({
           where: {
             shopId: shop.id,
@@ -113,6 +104,9 @@ export const get = [
                   },
                 },
                 jobs: {
+                  where: {
+                    shopId: shop.id,
+                  },
                   select: {
                     status: true,
                   },
@@ -160,7 +154,7 @@ export const get = [
                 0
               ),
               jobCounts,
-              totalJobs: totalJobsToShop,
+              totalJobs: userShop.user.jobs.length,
               ledgerItems: undefined,
               jobs: undefined,
             },
