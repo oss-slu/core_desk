@@ -254,12 +254,23 @@ describe("/shop/[shopId]", () => {
 
       expect(res.status).toBe(200);
 
-      expect(res.body.users[0].user.jobCounts).toMatchObject({
+      const originalShopUser = res.body.users.find(
+        (shopUser) => shopUser.userId === userShop.userId,
+      );
+      expect(originalShopUser.user.jobCounts).toMatchObject({
         completedCount: 2,
         inProgressCount: 1,
         notStartedCount: 1,
         excludedCount: 5,
       });
+<<<<<<< Updated upstream
+=======
+      expect(originalShopUser.user.totalJobs).toBe(9);
+      expect(
+        res.body.users.find((shopUser) => shopUser.userId === otherUser.id).user
+          .totalJobs,
+      ).toBe(1);
+>>>>>>> Stashed changes
     });
 
     it("prperly aggregates the user's balance", async () => {

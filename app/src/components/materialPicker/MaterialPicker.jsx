@@ -5,6 +5,7 @@ import { LoadableDropdownInput } from "#loadableDropdown";
 import { Util } from "tabler-react-2";
 import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import { sortByTitle } from "../../util/sortByTitle";
 
 export const MaterialPicker = ({
   value,
@@ -31,7 +32,7 @@ export const MaterialPicker = ({
         value={value}
         onChange={(v) => onChange(v.id)}
         values={[
-          ...materials.map((m) => ({
+          ...sortByTitle(materials).map((m) => ({
             id: m.id,
             label: m.title,
           })),
