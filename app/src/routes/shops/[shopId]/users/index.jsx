@@ -124,8 +124,8 @@ export const ShopUsersPage = () => {
 
       switch (id) {
         case "balance":
-          aVal = a.user?.balance;
-          bVal = b.user?.balance;
+          aVal = a.balance;
+          bVal = b.balance;
           break;
         case "totalJobs":
           aVal = a.user?.totalJobs;
@@ -189,7 +189,7 @@ export const ShopUsersPage = () => {
     {
       id: "balance",
       header: "Balance",
-      accessorFn: (row) => row.user?.balance,
+      accessorFn: (row) => row.balance,
       cell: ({ getValue }) => <Price value={getValue()} icon />,
     },
     {

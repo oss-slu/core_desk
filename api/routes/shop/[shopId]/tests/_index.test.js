@@ -291,7 +291,7 @@ describe("/shop/[shopId]", () => {
       ).toBe(1);
     });
 
-    it("prperly aggregates the user's balance", async () => {
+    it("aggregates the user's balance for the requested shop", async () => {
       const userShop = await prisma.userShop.findFirst({
         where: {
           user: {
@@ -299,40 +299,26 @@ describe("/shop/[shopId]", () => {
           },
         },
       });
+      const otherShop = await prisma.shop.create({
+        data: {
+          name: "Other balance shop",
+        },
+      });
 
       await prisma.ledgerItem.createMany({
         data: [
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.INITIAL,
-            value: 100,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.JOB,
-            value: -10,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.JOB,
-            value: -20,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.AUTOMATED_TOPUP,
-            value: 30,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.MANUAL_TOPUP,
-            value: 40,
-          },
-        ],
+          [userShop.shopId, LedgerItemType.INITIAL, 100],
+          [userShop.shopId, LedgerItemType.JOB, -10],
+          [userShop.shopId, LedgerItemType.JOB, -20],
+          [userShop.shopId, LedgerItemType.AUTOMATED_TOPUP, 30],
+          [userShop.shopId, LedgerItemType.MANUAL_TOPUP, 40],
+          [otherShop.id, LedgerItemType.MANUAL_TOPUP, 500],
+        ].map(([shopId, type, value]) => ({
+          userId: userShop.userId,
+          shopId,
+          type,
+          value,
+        })),
       });
 
       const res = await request(app)
@@ -342,7 +328,8 @@ describe("/shop/[shopId]", () => {
 
       expect(res.status).toBe(200);
 
-      expect(res.body.users[0].user.balance).toBe(140);
+      expect(res.body.users[0].balance).toBe(140);
+      expect(res.body.users[0].user.balance).toBe(640);
     });
 
     it("returns 404 if the shop does not exist", async () => {
