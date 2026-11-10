@@ -247,6 +247,27 @@ describe("/shop/[shopId]", () => {
         ],
       });
 
+      const otherUser = await prisma.user.create({
+        data: {
+          email: "other-shop-user@email.com",
+          firstName: "Other",
+          lastName: "User",
+          shops: {
+            create: {
+              shopId: userShop.shopId,
+            },
+          },
+        },
+      });
+      await prisma.job.create({
+        data: {
+          userId: otherUser.id,
+          shopId: userShop.shopId,
+          title: "Other user's job",
+          status: "COMPLETED",
+        },
+      });
+
       const res = await request(app)
         .get(`/api/shop/${userShop.shopId}?includeUsers=true`)
         .set(...(await gt({ ga: true })))
@@ -260,6 +281,14 @@ describe("/shop/[shopId]", () => {
         notStartedCount: 1,
         excludedCount: 5,
       });
+      expect(
+        res.body.users.find((shopUser) => shopUser.userId === userShop.userId)
+          .user.totalJobs,
+      ).toBe(9);
+      expect(
+        res.body.users.find((shopUser) => shopUser.userId === otherUser.id).user
+          .totalJobs,
+      ).toBe(1);
     });
 
     it("prperly aggregates the user's balance", async () => {
