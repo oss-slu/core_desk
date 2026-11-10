@@ -262,12 +262,17 @@ describe("/shop/[shopId]", () => {
       });
     });
 
-    it("prperly aggregates the user's balance", async () => {
+    it("aggregates the user's balance for the requested shop", async () => {
       const userShop = await prisma.userShop.findFirst({
         where: {
           user: {
             email: "test@email.com",
           },
+        },
+      });
+      const otherShop = await prisma.shop.create({
+        data: {
+          name: "Other balance shop",
         },
       });
 
@@ -303,6 +308,12 @@ describe("/shop/[shopId]", () => {
             type: LedgerItemType.MANUAL_TOPUP,
             value: 40,
           },
+          {
+            userId: userShop.userId,
+            shopId: otherShop.id,
+            type: LedgerItemType.MANUAL_TOPUP,
+            value: 500,
+          },
         ],
       });
 
@@ -313,7 +324,8 @@ describe("/shop/[shopId]", () => {
 
       expect(res.status).toBe(200);
 
-      expect(res.body.users[0].user.balance).toBe(140);
+      expect(res.body.users[0].balance).toBe(140);
+      expect(res.body.users[0].user.balance).toBe(640);
     });
 
     it("returns 404 if the shop does not exist", async () => {

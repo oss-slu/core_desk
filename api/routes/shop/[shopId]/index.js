@@ -110,6 +110,7 @@ export const get = [
                 ledgerItems: {
                   select: {
                     value: true,
+                    shopId: true,
                   },
                 },
                 jobs: {
@@ -152,6 +153,9 @@ export const get = [
 
           return {
             ...userShop,
+            balance: userShop.user.ledgerItems
+              .filter((item) => item.shopId === shop.id)
+              .reduce((acc, item) => acc + item.value, 0),
             user: {
               ...userShop.user,
               name: `${userShop.user.firstName} ${userShop.user.lastName}`,
