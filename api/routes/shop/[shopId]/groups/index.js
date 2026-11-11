@@ -141,6 +141,7 @@ export const post = [
             : {
                 some: {
                   userId,
+                  active: true,
                 },
               },
         },
@@ -239,8 +240,9 @@ export const get = [
             : {
                 some: {
                   userId,
-                },
+                active: true,
               },
+            },
         },
         include: {
           users: {

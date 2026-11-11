@@ -70,7 +70,8 @@ export const ResourcesPage = () => {
           shopId,
           user.admin,
           userShop.accountType,
-          userShop.balance < 0
+          userShop.balance < 0,
+          userShop.hasBusinessManagerRole,
         )}
       >
         <Loading />
@@ -84,7 +85,8 @@ export const ResourcesPage = () => {
         shopId,
         user.admin,
         userShop.accountType,
-        userShop.balance < 0
+        userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       <Util.Responsive threshold={600} justify="between" align="center">
