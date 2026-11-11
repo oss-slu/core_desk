@@ -158,8 +158,8 @@ export const get = [
         include: {
           users: {
             where: {
-              role: userIsPrivileged ? undefined : "ADMIN",
               active: true,
+              role: userIsPrivileged ? undefined : "ADMIN",
             },
             orderBy: {
               createdAt: "asc",
@@ -267,6 +267,8 @@ export const get = [
       if (userShop.accountType === "ADMIN")
         userHasPermissionToCreateJobsOnBillingGroup = true;
       if (group.userRole === "ADMIN")
+        userHasPermissionToCreateJobsOnBillingGroup = true;
+      if (group.userRole === "BILLING_GROUP_OPERATOR")
         userHasPermissionToCreateJobsOnBillingGroup = true;
 
       return res.json({

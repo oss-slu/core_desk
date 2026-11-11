@@ -240,6 +240,8 @@ export const get = [
             : {
                 some: {
                   userId,
+                  active: true,
+                },
                 active: true,
               },
             },
@@ -247,6 +249,7 @@ export const get = [
         include: {
           users: {
             where: {
+              active: true,
               OR: [{ role: "ADMIN" }, { userId: req.user.id }],
             },
             orderBy: {
@@ -285,7 +288,9 @@ export const get = [
 
         const userHasPermissionToCreateJobsOnBillingGroup =
           !!group.users.find(
-            (user) => user.role === "ADMIN" && user.user.id === req.user.id
+            (user) =>
+              user.user.id === req.user.id &&
+              ["ADMIN", "BILLING_GROUP_OPERATOR"].includes(user.role)
           ) ||
           userShop.accountType === "ADMIN" ||
           userShop.accountType === "OPERATOR" ||

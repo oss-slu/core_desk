@@ -109,10 +109,20 @@ export const JobPage = () => {
 
   const [createItemLoading, setCreateItemLoading] = useState(false);
 
+  const userIsShopOperator = Boolean(
+    activeUser?.admin ||
+      userShop?.accountType === "ADMIN" ||
+      userShop?.accountType === "OPERATOR",
+  );
   const userIsPrivileged =
-    activeUser.admin ||
-    userShop.accountType === "ADMIN" ||
-    userShop.accountType === "OPERATOR";
+    job?.operatorAccess ||
+    userIsShopOperator;
+  const userCanEditJob =
+    userIsShopOperator || job?.userId === activeUser?.id;
+  const userCanAddJobItems =
+    userIsShopOperator ||
+    job?.userId === activeUser?.id ||
+    !job?.billingGroupOperatorAccess;
 
   const noFilePreviewDataUri = `data:image/svg+xml;utf8,${encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" width="700" height="280" viewBox="0 0 700 280">
@@ -309,12 +319,14 @@ export const JobPage = () => {
                 </Util.Row>
               </Util.Col>
               <div className={styles.editAction}>
-                <Button
-                  loading={opLoading}
-                  onClick={() => setEditing(true)}
-                >
-                  Edit
-                </Button>
+                {userCanEditJob && (
+                  <Button
+                    loading={opLoading}
+                    onClick={() => setEditing(true)}
+                  >
+                    Edit
+                  </Button>
+                )}
               </div>
             </Util.Row>
           )}
@@ -426,7 +438,7 @@ export const JobPage = () => {
               <Util.Row gap={1} wrap align="end" className={styles.billingRow}>
                 <Util.Col gap={0} className={styles.pickerField}>
                   <label className="form-label">Requested By</label>
-                  {userIsPrivileged ? (
+                  {userIsShopOperator ? (
                     <ShopUserPicker
                       value={job.userId}
                       onChange={(value) => {
@@ -442,7 +454,7 @@ export const JobPage = () => {
                 </Util.Col>
                 <Util.Col gap={0} className={styles.pickerField}>
                   <label className="form-label">Billing Group</label>
-                  {userIsPrivileged ? (
+                  {userIsShopOperator || job.canAssignBillingGroup ? (
                     <BillingGroupPicker
                       value={job.groupId}
                       onChange={(value) => {
@@ -467,28 +479,34 @@ export const JobPage = () => {
       </Util.Responsive>
       <hr />
 
-      <H2 style={{ marginTop: -10 }}> Add Item Without File</H2>
-      <Util.Col gap={0.5} align="start">
-        <Button style={{ marginTop: 5 }} onClick={handleOpenAddItemModal}>
-          Add Item
-        </Button>
-        <i style={{ marginTop: 5 }}>Create a job item now and attatch a file later</i>
-      </Util.Col>
+      {userCanAddJobItems && (
+        <>
+          <H2 style={{ marginTop: -10 }}> Add Item Without File</H2>
+          <Util.Col gap={0.5} align="start">
+            <Button style={{ marginTop: 5 }} onClick={handleOpenAddItemModal}>
+              Add Item
+            </Button>
+            <i style={{ marginTop: 5 }}>Create a job item now and attatch a file later</i>
+          </Util.Col>
 
-      <hr />
+          <hr />
+        </>
+      )}
       <H2 style={{ marginTop: -10 }}>Items</H2>
-      <UploadDropzone
-        scope={"job.fileupload"}
-        metadata={{
-          jobId,
-          shopId,
-        }}
-        onUploadComplete={() => {
-          refetchJobs(false);
-        }}
-        useNewDropzone={true}
-        endpoint={`/api/shop/${shopId}/job/${jobId}/upload`}
-      />
+      {userCanAddJobItems && (
+        <UploadDropzone
+          scope={"job.fileupload"}
+          metadata={{
+            jobId,
+            shopId,
+          }}
+          onUploadComplete={() => {
+            refetchJobs(false);
+          }}
+          useNewDropzone={true}
+          endpoint={`/api/shop/${shopId}/job/${jobId}/upload`}
+        />
+      )}
       {job.items?.length === 0 ? (
         <i>
           This job has no items. You can attach files in the dropzone above

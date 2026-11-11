@@ -36,6 +36,7 @@ export const JobCostingPage = () => {
   const { userShop } = useShop(shopId);
 
   const userIsPrivileged =
+    job?.operatorAccess ||
     user?.admin ||
     userShop?.accountType === "ADMIN" ||
     userShop?.accountType === "OPERATOR";

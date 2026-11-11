@@ -56,6 +56,8 @@ const AddUserToBillingGroupModal = () => {
             label: "Member",
           },
           {
+            id: "BILLING_GROUP_OPERATOR",
+            label: "Billing Group Operator",
             id: "BUSINESS_MANAGER",
             label: "Business Manager",
           },
@@ -454,6 +456,8 @@ export const BillingGroupPage = () => {
                 accessor: "role",
                 render: (role) => (
                   <Badge color="blue" soft>
+                    {role === "BILLING_GROUP_OPERATOR"
+                      ? "Billing Group Operator"
                     {role === "BUSINESS_MANAGER"
                       ? "Business Manager"
                       : role.charAt(0) + role.slice(1).toLowerCase()}
