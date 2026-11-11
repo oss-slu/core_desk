@@ -8,6 +8,7 @@ export const useJob = (shopId, jobId) => {
   const [opLoading, setOpLoading] = useState(false);
   const [error, setError] = useState(null);
   const [job, setJob] = useState({});
+  const [availableAssignees, setAvailableAssignees] = useState([]);
   const [draftInvoiceLoading, setDraftInvoiceLoading] = useState(false);
   const [regenerateInvoiceLoading, setRegenerateInvoiceLoading] =
     useState(false);
@@ -19,6 +20,7 @@ export const useJob = (shopId, jobId) => {
       const data = await r.json();
       if (data.job) {
         setJob(data.job);
+        setAvailableAssignees(data.availableAssignees || []);
         setLoading(false);
       } else {
         setError("Internal server error");
@@ -37,8 +39,8 @@ export const useJob = (shopId, jobId) => {
     cancelText: "Cancel",
   });
 
-  const updateJob = async (newJob) => {
-    if (job.finalized) {
+  const updateJob = async (newJob, { skipFinalizedConfirmation = false } = {}) => {
+    if (job.finalized && !skipFinalizedConfirmation) {
       const result = await confirm();
       if (!result) {
         return;
@@ -51,7 +53,6 @@ export const useJob = (shopId, jobId) => {
         body: JSON.stringify(newJob),
       });
       const data = await r.json();
-      console.log(job, data);
       if (newJob.finalized) {
         fetchJob(false);
         setOpLoading(false);
@@ -60,14 +61,17 @@ export const useJob = (shopId, jobId) => {
           setJob(data.job);
           setOpLoading(false);
         } else {
-          toast.error("Internal server error");
-          setError("Internal server error");
+          const errorMessage = data.error || "Internal server error";
+          toast.error(errorMessage);
+          setError(errorMessage);
           setOpLoading(false);
         }
       }
     } catch (error) {
       setError(error);
       setLoading(false);
+      setOpLoading(false);
+      toast.error("Failed to update job");
     }
   };
 
@@ -126,6 +130,7 @@ export const useJob = (shopId, jobId) => {
 
   return {
     job,
+    availableAssignees,
     loading,
     error,
     refetch: fetchJob,

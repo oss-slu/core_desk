@@ -96,6 +96,7 @@ export const JobPage = () => {
   const { shopId, jobId } = useParams();
   const {
     job: uncontrolledJob,
+    availableAssignees,
     loading,
     refetch: refetchJobs,
     opLoading,
@@ -318,6 +319,58 @@ export const JobPage = () => {
               </div>
             </Util.Row>
           )}
+          <Util.Col gap={0.5} align="start">
+            <H3>Working on this job</H3>
+            {job.assignments?.length > 0 ? (
+              <p>
+                {job.assignments
+                  .map(({ user }) => `${user.firstName} ${user.lastName}`)
+                  .join(", ")}
+              </p>
+            ) : (
+              <p>Unassigned</p>
+            )}
+            {userIsPrivileged && availableAssignees.length > 0 && (
+              <Util.Col gap={0.25} align="start">
+                {availableAssignees.map((assignee) => {
+                  const isAssigned = job.assignments?.some(
+                    (assignment) => assignment.userId === assignee.id
+                  );
+                  return (
+                    <label
+                      key={assignee.id}
+                      style={{
+                        alignItems: "center",
+                        display: "flex",
+                        gap: "0.5rem",
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={!!isAssigned}
+                        disabled={opLoading}
+                        onChange={(event) => {
+                          const assignedUserIds = (job.assignments || []).map(
+                            (assignment) => assignment.userId
+                          );
+                          const nextAssignedUserIds = event.target.checked
+                            ? [...assignedUserIds, assignee.id]
+                            : assignedUserIds.filter(
+                                (userId) => userId !== assignee.id
+                              );
+                          updateJob({
+                            assignedUserIds: nextAssignedUserIds,
+                          }, { skipFinalizedConfirmation: true });
+                        }}
+                      />
+                      {assignee.name}
+                      {assignee.id === activeUser.id ? " (You)" : ""}
+                    </label>
+                  );
+                })}
+              </Util.Col>
+            )}
+          </Util.Col>
           <hr />
           {editing ? (
             <>
