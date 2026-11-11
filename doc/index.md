@@ -16,9 +16,181 @@ SERVER_URL="(tunnel to the outside internet. I recommend Bore.sh)"
 SENTRY_AUTH_TOKEN="(sentry auth token)"
 ```
 
-## Architecture
+## Architecture Diagrams
 
-![architecture](./images/architecture.png)
+### Module Relationships & Architecture (Class Level)
+
+```mermaid
+classDiagram
+    direction TB
+
+    class ReactFrontend {
+        <<Client / UI>>
+        +viewJobs()
+        +uploadSTL()
+        +manageUsers()
+        +exportLedger()
+    }
+
+    class APIRouter {
+        <<Express Gateway>>
+        +routeRequest()
+        +authenticateJWT()
+    }
+
+    class AuthController {
+        +loginOkta()
+        +validateJWT()
+        +getCurrentUser()
+    }
+
+    class JobService {
+        +createJob()
+        +getJobById()
+        +updateJobStatus()
+        +assignMachine()
+    }
+
+    class PrinterController {
+        +getPrinters()
+        +updateStatus()
+        +assignQueue()
+    }
+
+    class STLRendererService {
+        <<Microservice / Cloudflare Worker>>
+        +renderPreview()
+        +parseDimensions()
+    }
+
+    class PrismaORM {
+        <<ORM>>
+        +jobClient
+        +userClient
+        +printerClient
+        +ledgerClient
+    }
+
+    class PostgreSQL {
+        <<Database>>
+        +Users
+        +Jobs
+        +Machines
+        +Transactions
+    }
+
+    ReactFrontend --> APIRouter : HTTP / REST
+    APIRouter --> AuthController : /api/auth
+    APIRouter --> JobService : /api/jobs
+    APIRouter --> PrinterController : /api/machines
+    JobService --> STLRendererService : Dispatch async render
+    JobService --> PrismaORM : Data access
+    PrinterController --> PrismaORM : Data access
+    AuthController --> PrismaORM : Query user/auth
+    PrismaORM --> PostgreSQL : SQL Queries / Migrations
+```
+
+### Data Flow & Processing Diagram
+
+```mermaid
+flowchart LR
+    Client["Client Browser<br/>(React UI)"]
+    API["API Server<br/>(Express Router)"]
+    S3[("S3 / DigitalOcean Spaces<br/>(Object Storage)")]
+    Worker["stl-renderer<br/>(Cloudflare Worker)"]
+    Prisma["Prisma ORM"]
+    DB[("PostgreSQL Database")]
+    Sentry["Sentry.io<br/>(Monitoring & Errors)"]
+
+    %% User Upload & Requests
+    Client -->|"1. Upload STL file & Job metadata"| API
+    
+    %% Storage & Database Operations
+    API -->|"2. Save raw STL artifacts"| S3
+    API -->|"3. Save job records & metadata"| Prisma
+    Prisma -->|"Write / Read"| DB
+
+    %% Microservice Rendering
+    API -->|"4. Dispatch render payload"| Worker
+    Worker -->|"Fetch raw model"| S3
+    Worker -->|"Return 2D/3D render preview"| API
+    API -->|"Store preview artifact"| S3
+
+    %% Monitoring
+    API -.->|"Telemetry & error traces"| Sentry
+    Client -.->|"Client crash reporting"| Sentry
+```
+
+### Complex Workflows & State Diagrams (Job & Billing Lifecycle)
+
+```mermaid
+stateDiagram-v2
+    direction TB
+
+    state "Job Processing Lifecycle" as JobFlow {
+        [*] --> JobSubmitted : Client submits model & specs
+        JobSubmitted --> PendingReview : Queued for review
+        
+        PendingReview --> Approved : Reviewer accepts specifications
+        PendingReview --> Cancelled : Specifications rejected
+
+        Approved --> InProduction : Machine assigned & print started
+        InProduction --> PostProcessing : Printing complete
+        
+        PostProcessing --> QualityControl : Clean/Cure complete
+        
+        QualityControl --> Completed : QC passed (Ready for delivery)
+        QualityControl --> InProduction : QC failed (Rerun print)
+        QualityControl --> Cancelled : Unresolvable failure
+
+        Cancelled --> [*]
+        Completed --> [*]
+    }
+
+    state "Billing & Invoice State" as BillingFlow {
+        [*] --> Unpaid : Cost calculated
+        Unpaid --> Paid : Client payment recorded
+        Paid --> LedgerExported : Exported to accounting/Excel
+        LedgerExported --> [*]
+
+        Paid --> Refunded : Cancelled after payment
+        Refunded --> [*]
+    }
+```
+
+### API Architecture & Endpoint Relationships
+
+```mermaid
+flowchart TD
+    Client["Client / Dev Tools"] --> Router["Express Gateway / Router"]
+
+    subgraph Endpoints ["API Route Groups"]
+        Auth["/api/auth<br/>• OKTA SSO Login<br/>• Local JWT Workaround"]
+        Jobs["/api/jobs<br/>• Job submission<br/>• Unique Job ID gen<br/>• Status tracking"]
+        Files["/api/files<br/>• STL upload & fetch<br/>• Render preview proxy"]
+        Machines["/api/machines<br/>• Printer status<br/>• Queue scheduler"]
+        Ledger["/api/ledger<br/>• Cost calculation<br/>• Export to Excel"]
+    end
+
+    subgraph Services ["Downstream Services & Persistence"]
+        DB[("PostgreSQL via Prisma")]
+        S3[("DigitalOcean Spaces / S3")]
+        Renderer["stl-renderer Worker"]
+    end
+
+    Router --> Auth
+    Router --> Jobs
+    Router --> Files
+    Router --> Machines
+    Router --> Ledger
+
+    Auth --> DB
+    Jobs --> DB
+    Jobs --> Renderer
+    Files --> S3
+    Machines --> DB
+    Ledger --> DB
+```
 
 ## Codebase Organization
 
