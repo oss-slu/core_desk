@@ -247,6 +247,27 @@ describe("/shop/[shopId]", () => {
         ],
       });
 
+      const otherUser = await prisma.user.create({
+        data: {
+          email: "other-shop-user@email.com",
+          firstName: "Other",
+          lastName: "User",
+          shops: {
+            create: {
+              shopId: userShop.shopId,
+            },
+          },
+        },
+      });
+      await prisma.job.create({
+        data: {
+          userId: otherUser.id,
+          shopId: userShop.shopId,
+          title: "Other user's job",
+          status: "COMPLETED",
+        },
+      });
+
       const res = await request(app)
         .get(`/api/shop/${userShop.shopId}?includeUsers=true`)
         .set(...(await gt({ ga: true })))
@@ -254,15 +275,26 @@ describe("/shop/[shopId]", () => {
 
       expect(res.status).toBe(200);
 
-      expect(res.body.users[0].user.jobCounts).toMatchObject({
+      const originalShopUser = res.body.users.find(
+        (shopUser) => shopUser.userId === userShop.userId,
+      );
+      expect(originalShopUser.user.jobCounts).toMatchObject({
         completedCount: 2,
         inProgressCount: 1,
         notStartedCount: 1,
         excludedCount: 5,
       });
+      expect(
+        res.body.users.find((shopUser) => shopUser.userId === userShop.userId)
+          .user.totalJobs,
+      ).toBe(9);
+      expect(
+        res.body.users.find((shopUser) => shopUser.userId === otherUser.id).user
+          .totalJobs,
+      ).toBe(1);
     });
 
-    it("prperly aggregates the user's balance", async () => {
+    it("aggregates the user's balance for the requested shop", async () => {
       const userShop = await prisma.userShop.findFirst({
         where: {
           user: {
@@ -270,40 +302,26 @@ describe("/shop/[shopId]", () => {
           },
         },
       });
+      const otherShop = await prisma.shop.create({
+        data: {
+          name: "Other balance shop",
+        },
+      });
 
       await prisma.ledgerItem.createMany({
         data: [
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.INITIAL,
-            value: 100,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.JOB,
-            value: -10,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.JOB,
-            value: -20,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.AUTOMATED_TOPUP,
-            value: 30,
-          },
-          {
-            userId: userShop.userId,
-            shopId: userShop.shopId,
-            type: LedgerItemType.MANUAL_TOPUP,
-            value: 40,
-          },
-        ],
+          [userShop.shopId, LedgerItemType.INITIAL, 100],
+          [userShop.shopId, LedgerItemType.JOB, -10],
+          [userShop.shopId, LedgerItemType.JOB, -20],
+          [userShop.shopId, LedgerItemType.AUTOMATED_TOPUP, 30],
+          [userShop.shopId, LedgerItemType.MANUAL_TOPUP, 40],
+          [otherShop.id, LedgerItemType.MANUAL_TOPUP, 500],
+        ].map(([shopId, type, value]) => ({
+          userId: userShop.userId,
+          shopId,
+          type,
+          value,
+        })),
       });
 
       const res = await request(app)
@@ -313,7 +331,8 @@ describe("/shop/[shopId]", () => {
 
       expect(res.status).toBe(200);
 
-      expect(res.body.users[0].user.balance).toBe(140);
+      expect(res.body.users[0].balance).toBe(140);
+      expect(res.body.users[0].user.balance).toBe(640);
     });
 
     it("returns 404 if the shop does not exist", async () => {

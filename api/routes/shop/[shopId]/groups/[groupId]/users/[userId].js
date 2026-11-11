@@ -135,6 +135,7 @@ export const post = [
     }
 
     if (!["ADMIN", "MEMBER", "BILLING_GROUP_OPERATOR"].includes(role)) {
+    if (!["ADMIN", "MEMBER", "BUSINESS_MANAGER"].includes(role)) {
       return res.status(400).json({ error: "Invalid role" });
     }
 

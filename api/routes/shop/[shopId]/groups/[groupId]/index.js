@@ -150,7 +150,8 @@ export const get = [
             ? undefined
             : {
                 some: {
-                  user: { id: user.id },
+                  userId: user.id,
+                  active: true,
                 },
               },
         },

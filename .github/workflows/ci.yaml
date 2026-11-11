@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "lts/*"
+          node-version: "22"
 
       - name: Install Docker Compose
         run: |
@@ -57,7 +57,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "lts/*"
+          node-version: "22"
 
       - name: Install backend Dependencies
         working-directory: ./api
@@ -76,7 +76,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "lts/*"
+          node-version: "22"
 
       - name: Install frontend Dependencies
         working-directory: ./app

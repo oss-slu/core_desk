@@ -66,6 +66,23 @@ export const get = [
         },
       });
 
+      const businessManagerMembership = userShop
+        ? await prisma.userBillingGroup.findFirst({
+            where: {
+              userId: req.user.id,
+              role: "BUSINESS_MANAGER",
+              active: true,
+              billingGroup: {
+                is: {
+                  shopId: shop.id,
+                  active: true,
+                },
+              },
+            },
+            select: { id: true },
+          })
+        : null;
+
       if (userShop) {
         const userBalance = await prisma.ledgerItem.aggregate({
           where: {
@@ -91,15 +108,6 @@ export const get = [
         ) {
           return res.status(403).json({ error: "Unauthorized" });
         }
-
-
-
-        const totalJobsToShop = await prisma.job.count({ //specific to that shop
-          where: {
-            shopId: shop.id,
-          },
-        });
-
         users = await prisma.userShop.findMany({
           where: {
             shopId: shop.id,
@@ -110,9 +118,13 @@ export const get = [
                 ledgerItems: {
                   select: {
                     value: true,
+                    shopId: true,
                   },
                 },
                 jobs: {
+                  where: {
+                    shopId: shop.id,
+                  },
                   select: {
                     status: true,
                   },
@@ -150,17 +162,24 @@ export const get = [
           );
           delete userShop.user.password;
 
+          const balances = userShop.user.ledgerItems.reduce(
+            (totals, item) => {
+              totals.user += item.value;
+              if (item.shopId === shop.id) totals.shop += item.value;
+              return totals;
+            },
+            { shop: 0, user: 0 },
+          );
+
           return {
             ...userShop,
+            balance: balances.shop,
             user: {
               ...userShop.user,
               name: `${userShop.user.firstName} ${userShop.user.lastName}`,
-              balance: userShop.user.ledgerItems.reduce(
-                (acc, item) => acc + item.value,
-                0
-              ),
+              balance: balances.user,
               jobCounts,
-              totalJobs: totalJobsToShop,
+              totalJobs: userShop.user.jobs.length,
               ledgerItems: undefined,
               jobs: undefined,
             },
@@ -168,7 +187,16 @@ export const get = [
         });
       }
 
-      res.json({ shop, userShop, users });
+      res.json({
+        shop,
+        userShop: userShop
+          ? {
+              ...userShop,
+              hasBusinessManagerRole: Boolean(businessManagerMembership),
+            }
+          : userShop,
+        users,
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: "Something went wrong" });

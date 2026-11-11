@@ -58,6 +58,8 @@ const AddUserToBillingGroupModal = () => {
           {
             id: "BILLING_GROUP_OPERATOR",
             label: "Billing Group Operator",
+            id: "BUSINESS_MANAGER",
+            label: "Business Manager",
           },
         ]}
       />
@@ -225,6 +227,7 @@ export const BillingGroupPage = () => {
           user.admin,
           userShop.accountType,
           userShop.balance < 0,
+          userShop.hasBusinessManagerRole,
         )}
       >
         <Loading />
@@ -239,6 +242,7 @@ export const BillingGroupPage = () => {
         user.admin,
         userShop.accountType,
         userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       {ModalElement}
@@ -312,7 +316,7 @@ export const BillingGroupPage = () => {
         <>
           <Util.Row justify="between" align="center">
             <h2>Ledger</h2>
-            {userIsStaff && (
+            {(userIsStaff || billingGroup.userRole === "BUSINESS_MANAGER") && (
               <Button onClick={addLedgerItemModal}>Post ledger item</Button>
             )}
           </Util.Row>
@@ -454,6 +458,8 @@ export const BillingGroupPage = () => {
                   <Badge color="blue" soft>
                     {role === "BILLING_GROUP_OPERATOR"
                       ? "Billing Group Operator"
+                    {role === "BUSINESS_MANAGER"
+                      ? "Business Manager"
                       : role.charAt(0) + role.slice(1).toLowerCase()}
                   </Badge>
                 ),

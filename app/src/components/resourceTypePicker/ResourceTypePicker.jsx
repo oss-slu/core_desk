@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 import { LoadableDropdownInput } from "#loadableDropdown";
 import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
+import { sortByTitle } from "../../util/sortByTitle";
 
 export const ResourceTypePicker = ({
   value,
@@ -33,7 +34,7 @@ export const ResourceTypePicker = ({
       value={value}
       onChange={(v) => onChange(v.id)}
       values={[
-        ...resourceTypes.map((resourceType) => ({
+        ...sortByTitle(resourceTypes).map((resourceType) => ({
           id: resourceType.id,
           label: resourceType.title,
         })),

@@ -617,6 +617,7 @@ enum UserBillingGroupRole {
   ADMIN
   MEMBER
   BILLING_GROUP_OPERATOR
+  BUSINESS_MANAGER
 }
 
 model Navigation {

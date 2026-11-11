@@ -13,6 +13,7 @@ import moment from "moment";
 import { MOMENT_FORMAT } from "#constants";
 import { Price } from "#renderPrice";
 import { SearchBar } from "../../../../components/searchBar/SearchBar";
+import { sortByTitle } from "../../../../util/sortByTitle";
 
 export const BillingGroupsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,12 +21,18 @@ export const BillingGroupsPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { userShop } = useShop(shopId);
+  const canCreateBillingGroups =
+    user?.admin ||
+    userShop.accountType === "ADMIN" ||
+    userShop.accountType === "OPERATOR" ||
+    userShop.accountType === "GROUP_ADMIN";
   const { billingGroups, loading, createBillingGroup, opLoading } =
     useBillingGroups(shopId);
 
-  const filteredBillingGroups = billingGroups.filter((billingGroup) =>
-    billingGroup.title?.toLowerCase().includes(searchTerm.trim().toLowerCase())
-  );
+  const filteredBillingGroups = sortByTitle(billingGroups)
+    .filter((billingGroup) =>
+      billingGroup.title?.toLowerCase().includes(searchTerm.trim().toLowerCase()),
+    );
 
   const { modal, ModalElement, update } = useModal({
     title: "Create Billing Group",
@@ -53,6 +60,7 @@ export const BillingGroupsPage = () => {
           user.admin,
           userShop.accountType,
           userShop.balance < 0,
+          userShop.hasBusinessManagerRole,
         )}
       >
         <Loading />
@@ -67,12 +75,15 @@ export const BillingGroupsPage = () => {
         user.admin,
         userShop.accountType,
         userShop.balance < 0,
+        userShop.hasBusinessManagerRole,
       )}
     >
       {ModalElement}
       <Util.Row justify="between" align="center">
         <h1>Billing Groups</h1>
-        <Button onClick={modal}>Create Billing Group</Button>
+        {canCreateBillingGroups && (
+          <Button onClick={modal}>Create Billing Group</Button>
+        )}
       </Util.Row>
       <Util.Spacer size={1} />
       <SearchBar
