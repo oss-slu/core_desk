@@ -357,6 +357,7 @@ export const Jobs = () => {
     "Finalized At",
     "Due Date",
     "Created At",
+    "Assigned Staff",
   ];
   const [columnsToShow, setColumnsToShow] = useState([
     "Job ID",
@@ -368,6 +369,7 @@ export const Jobs = () => {
     "Status",
     "Due Date",
     "Created At",
+    "Assigned Staff",
   ]);
 
   const columnLabelToIdMap = {
@@ -385,6 +387,7 @@ export const Jobs = () => {
     "Finalized At": "finalizedAt",
     "Due Date": "dueDate",
     "Created At": "createdAt",
+    "Assigned Staff": "assignedStaff",
   };
 
   const handleColumnToggle = (id) => {
@@ -571,6 +574,15 @@ export const Jobs = () => {
           );
         },
         enableSorting: true,
+      },
+      {
+        id: "assignedStaff",
+        header: "Assigned Staff",
+        accessorFn: (row) =>
+          row.assignments
+            ?.map(({ user }) => `${user.firstName} ${user.lastName}`)
+            .join(", ") || "Unassigned",
+        enableSorting: false,
       },
     ],
     [shopId, activeUser],

@@ -8,6 +8,7 @@ import {
   Input,
   Button,
   Badge,
+  Dropdown,
 } from "tabler-react-2";
 import { Loading } from "#loading";
 import { UploadDropzone } from "../../../../../components/upload/uploader";
@@ -331,44 +332,44 @@ export const JobPage = () => {
               <p>Unassigned</p>
             )}
             {userIsPrivileged && availableAssignees.length > 0 && (
-              <Util.Col gap={0.25} align="start">
-                {availableAssignees.map((assignee) => {
+              <Dropdown
+                prompt={`Assign staff (${job.assignments?.length || 0})`}
+                items={availableAssignees.map((assignee) => {
                   const isAssigned = job.assignments?.some(
                     (assignment) => assignment.userId === assignee.id
                   );
-                  return (
-                    <label
-                      key={assignee.id}
-                      style={{
-                        alignItems: "center",
-                        display: "flex",
-                        gap: "0.5rem",
-                      }}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={!!isAssigned}
-                        disabled={opLoading}
-                        onChange={(event) => {
-                          const assignedUserIds = (job.assignments || []).map(
-                            (assignment) => assignment.userId
-                          );
-                          const nextAssignedUserIds = event.target.checked
-                            ? [...assignedUserIds, assignee.id]
-                            : assignedUserIds.filter(
-                                (userId) => userId !== assignee.id
-                              );
-                          updateJob({
-                            assignedUserIds: nextAssignedUserIds,
-                          }, { skipFinalizedConfirmation: true });
-                        }}
-                      />
-                      {assignee.name}
-                      {assignee.id === activeUser.id ? " (You)" : ""}
-                    </label>
-                  );
+                  return {
+                    type: "item",
+                    active: isAssigned,
+                    disabled: opLoading,
+                    text: (
+                      <Util.Row justify="between" gap={0.5}>
+                        {isAssigned ? (
+                          <Icon i="square-check" />
+                        ) : (
+                          <Icon i="square" />
+                        )}
+                        {assignee.name}
+                        {assignee.id === activeUser.id ? " (You)" : ""}
+                      </Util.Row>
+                    ),
+                    onclick: () => {
+                      const assignedUserIds = (job.assignments || []).map(
+                        (assignment) => assignment.userId
+                      );
+                      const nextAssignedUserIds = isAssigned
+                        ? assignedUserIds.filter(
+                            (userId) => userId !== assignee.id
+                          )
+                        : [...assignedUserIds, assignee.id];
+                      updateJob(
+                        { assignedUserIds: nextAssignedUserIds },
+                        { skipFinalizedConfirmation: true }
+                      );
+                    },
+                  };
                 })}
-              </Util.Col>
+              />
             )}
           </Util.Col>
           <hr />

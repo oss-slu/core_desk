@@ -492,6 +492,17 @@ export const get = [
               id: true,
             },
           },
+          assignments: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                },
+              },
+            },
+          },
           group: {
             select: {
               id: true,
