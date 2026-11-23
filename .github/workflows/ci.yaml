@@ -34,7 +34,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./api
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       - name: Run Integration Tests
         working-directory: ./api
@@ -70,7 +70,7 @@ jobs:
 
       - name: Install backend Dependencies
         working-directory: ./api
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       - name: Run backend lint
         working-directory: ./api
@@ -89,7 +89,7 @@ jobs:
 
       - name: Install frontend Dependencies
         working-directory: ./app
-        run: yarn install --frozen-lockfile
+        run: yarn install
 
       - name: Run frontend lint
         working-directory: ./app
