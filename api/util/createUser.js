@@ -1,5 +1,6 @@
 import  prisma  from "#prisma";
 import { LogType } from "#prisma-client";
+import { createStartingDeposit } from "./startingDeposit.js";
 
 export const createUser = async ({ firstName, lastName, email },
   logging = false
@@ -57,6 +58,13 @@ export const createUser = async ({ firstName, lastName, email },
         shopId: shop.id,
         active: true,
       },
+    });
+
+    await createStartingDeposit({
+      prismaClient: prisma,
+      userId: user.id,
+      shopId: shop.id,
+      startingDeposit: shop.startingDeposit,
     });
 
     await prisma.logs.create({

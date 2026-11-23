@@ -2,6 +2,7 @@ import { LogType } from "#prisma-client";
 import { prisma } from "#prisma";
 import { verifyAuth } from "#verifyAuth";
 import client from "#postmark";
+import { createStartingDeposit } from "../../../../util/startingDeposit.js";
 
 export const get = [
   verifyAuth,
@@ -103,6 +104,18 @@ export const post = [
             shopId: shopId,
             active: true,
           },
+        });
+
+        const shop = await prisma.shop.findUnique({
+          where: { id: shopId },
+          select: { startingDeposit: true },
+        });
+
+        await createStartingDeposit({
+          prismaClient: prisma,
+          userId: user.id,
+          shopId,
+          startingDeposit: shop?.startingDeposit,
         });
 
         await prisma.logs.create({
