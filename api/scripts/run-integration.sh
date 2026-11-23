@@ -3,7 +3,7 @@
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 
-if [ "${CI:-}" != "true" ]; then
+if [[ "${CI:-}" != "true" ]]; then
   source "$DIR/setenv.sh"
   docker-compose up -d
 
