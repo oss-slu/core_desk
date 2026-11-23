@@ -8,6 +8,7 @@ import {
   Input,
   Button,
   Badge,
+  Dropdown,
 } from "tabler-react-2";
 import { Loading } from "#loading";
 import { UploadDropzone } from "../../../../../components/upload/uploader";
@@ -96,6 +97,7 @@ export const JobPage = () => {
   const { shopId, jobId } = useParams();
   const {
     job: uncontrolledJob,
+    availableAssignees,
     loading,
     refetch: refetchJobs,
     opLoading,
@@ -330,6 +332,58 @@ export const JobPage = () => {
               </div>
             </Util.Row>
           )}
+          <Util.Col gap={0.5} align="start">
+            <H3>Working on this job</H3>
+            {job.assignments?.length > 0 ? (
+              <p>
+                {job.assignments
+                  .map(({ user }) => `${user.firstName} ${user.lastName}`)
+                  .join(", ")}
+              </p>
+            ) : (
+              <p>Unassigned</p>
+            )}
+            {userIsPrivileged && availableAssignees.length > 0 && (
+              <Dropdown
+                prompt={`Assign staff (${job.assignments?.length || 0})`}
+                items={availableAssignees.map((assignee) => {
+                  const isAssigned = job.assignments?.some(
+                    (assignment) => assignment.userId === assignee.id
+                  );
+                  return {
+                    type: "item",
+                    active: isAssigned,
+                    disabled: opLoading,
+                    text: (
+                      <Util.Row justify="between" gap={0.5}>
+                        {isAssigned ? (
+                          <Icon i="square-check" />
+                        ) : (
+                          <Icon i="square" />
+                        )}
+                        {assignee.name}
+                        {assignee.id === activeUser.id ? " (You)" : ""}
+                      </Util.Row>
+                    ),
+                    onclick: () => {
+                      const assignedUserIds = (job.assignments || []).map(
+                        (assignment) => assignment.userId
+                      );
+                      const nextAssignedUserIds = isAssigned
+                        ? assignedUserIds.filter(
+                            (userId) => userId !== assignee.id
+                          )
+                        : [...assignedUserIds, assignee.id];
+                      updateJob(
+                        { assignedUserIds: nextAssignedUserIds },
+                        { skipFinalizedConfirmation: true }
+                      );
+                    },
+                  };
+                })}
+              />
+            )}
+          </Util.Col>
           <hr />
           {editing ? (
             <>
