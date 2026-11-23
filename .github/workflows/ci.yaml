@@ -14,7 +14,7 @@ jobs:
         image: postgres:14.1-alpine
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: ${{secrets.POSTGRES_PASSWORD}}
           POSTGRES_DB: sluop-test
         ports:
           - 5432:5432
@@ -34,7 +34,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./api
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Run Integration Tests
         working-directory: ./api
@@ -70,7 +70,7 @@ jobs:
 
       - name: Install backend Dependencies
         working-directory: ./api
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Run backend lint
         working-directory: ./api
@@ -89,7 +89,7 @@ jobs:
 
       - name: Install frontend Dependencies
         working-directory: ./app
-        run: yarn install
+        run: yarn install --frozen-lockfile
 
       - name: Run frontend lint
         working-directory: ./app
