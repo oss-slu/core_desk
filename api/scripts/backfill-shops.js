@@ -2,6 +2,7 @@
 // ES module, named exports, ready to run with: `node e2e/scripts/backfill-autojoin.js`
 
 import { PrismaClient } from "#prisma-client";
+import { createStartingDeposit } from "../util/startingDeposit.js";
 
 let prisma;
 
@@ -25,7 +26,7 @@ export const backfillAutoJoin = async ({ prismaClient, shopId } = {}) => {
       active: true,
       ...(shopId ? { id: shopId } : {}),
     },
-    select: { id: true },
+    select: { id: true, startingDeposit: true },
   });
 
   if (shops.length === 0)
@@ -61,6 +62,7 @@ export const backfillAutoJoin = async ({ prismaClient, shopId } = {}) => {
   const existing = new Set(
     existingMemberships.map((m) => `${m.userId}::${m.shopId}`)
   );
+  const shopsById = new Map(shops.map((shop) => [shop.id, shop]));
 
   // 4) Prepare createMany payload (skip duplicates at DB level as a safety net)
   const rowsToCreate = [];
@@ -86,6 +88,15 @@ export const backfillAutoJoin = async ({ prismaClient, shopId } = {}) => {
       skipDuplicates: true,
     });
     created = res.count ?? 0;
+
+    for (const membership of rowsToCreate) {
+      await createStartingDeposit({
+        prismaClient: client,
+        userId: membership.userId,
+        shopId: membership.shopId,
+        startingDeposit: shopsById.get(membership.shopId)?.startingDeposit,
+      });
+    }
   }
 
   const totalPairs = shops.length * users.length;

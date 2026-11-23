@@ -540,6 +540,47 @@ describe("/shop/[shopId]", () => {
       });
     });
 
+    it("deposits the starting balance for users added when a shop is published", async () => {
+      const shop = await prisma.shop.findFirst({});
+      const userToBackfill = await prisma.user.create({
+        data: {
+          email: "publish-starting-deposit@example.com",
+          firstName: "Publish",
+          lastName: "Starting Deposit",
+        },
+      });
+
+      const res = await request(app)
+        .put(`/api/shop/${shop.id}`)
+        .set(...(await gt({ ga: true })))
+        .send({
+          name: shop.name,
+          autoJoin: true,
+          startingDeposit: 125,
+        });
+
+      expect(res.status).toBe(200);
+
+      const ledgerItem = await prisma.ledgerItem.findFirst({
+        where: {
+          userId: userToBackfill.id,
+          shopId: shop.id,
+          type: LedgerItemType.INITIAL,
+        },
+      });
+      expect(ledgerItem.value).toBe(125);
+
+      const log = await prisma.logs.findFirst({
+        where: {
+          userId: userToBackfill.id,
+          shopId: shop.id,
+          type: LogType.LEDGER_ITEM_CREATED,
+          ledgerItemId: ledgerItem.id,
+        },
+      });
+      expect(log).toBeDefined();
+    });
+
     it("does not allow a shop-level admin to update autoJoin", async () => {
       const shop = await prisma.shop.findFirst({});
 

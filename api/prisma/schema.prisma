@@ -19,6 +19,7 @@ model user {
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
   jobs                 Job[]
+  jobAssignments       JobAssignment[]
   comments             JobComment[]
   jobItems             JobItem[]
   ledgerItems          LedgerItem[]
@@ -307,8 +308,20 @@ model Job {
   user                   user                     @relation(fields: [userId], references: [id], onDelete: Cascade)
   comments               JobComment[]
   items                  JobItem[]
+  assignments            JobAssignment[]
   ledgerItems            LedgerItem?
   logs                   logs[]
+}
+
+model JobAssignment {
+  jobId     String
+  userId    String
+  createdAt DateTime @default(now())
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user      user     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([jobId, userId])
+  @@index([userId])
 }
 
 model LedgerItem {
