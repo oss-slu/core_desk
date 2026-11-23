@@ -244,7 +244,6 @@ export const get = [
                 },
                 active: true,
               },
-            },
         },
         include: {
           users: {
