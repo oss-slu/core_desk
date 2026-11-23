@@ -58,6 +58,8 @@ const AddUserToBillingGroupModal = () => {
           {
             id: "BILLING_GROUP_OPERATOR",
             label: "Billing Group Operator",
+          },
+          {
             id: "BUSINESS_MANAGER",
             label: "Business Manager",
           },
@@ -458,9 +460,12 @@ export const BillingGroupPage = () => {
                   <Badge color="blue" soft>
                     {role === "BILLING_GROUP_OPERATOR"
                       ? "Billing Group Operator"
+                      : role.charAt(0) + role.slice(1).toLowerCase()
+                    }
                     {role === "BUSINESS_MANAGER"
                       ? "Business Manager"
-                      : role.charAt(0) + role.slice(1).toLowerCase()}
+                      : role.charAt(0) + role.slice(1).toLowerCase()
+                    }
                   </Badge>
                 ),
               },
