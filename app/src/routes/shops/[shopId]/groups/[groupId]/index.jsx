@@ -37,15 +37,22 @@ const AddUserToBillingGroupModal = () => {
 
   return (
     <div>
-      <label className="form-label">
+      <div className="form-label" id="billing-group-user-label">
         Choose a user to add to the billing group
-      </label>
-      <ShopUserPicker value={user} onChange={setUser} />
-      <label className="form-label mt-2">Role</label>
+      </div>
+      <ShopUserPicker
+        value={user}
+        onChange={setUser}
+        ariaLabelledBy="billing-group-user-label"
+      />
+      <div className="form-label mt-2" id="billing-group-role-label">
+        Role
+      </div>
       <DropdownInput
         value={role}
         onChange={(value) => setRole(value.id)}
         prompt="Pick a role"
+        aprops={{ "aria-labelledby": "billing-group-role-label" }}
         values={[
           {
             id: "ADMIN",
@@ -58,6 +65,8 @@ const AddUserToBillingGroupModal = () => {
           {
             id: "BILLING_GROUP_OPERATOR",
             label: "Billing Group Operator",
+          },
+          {
             id: "BUSINESS_MANAGER",
             label: "Business Manager",
           },
@@ -87,9 +96,11 @@ const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading, onPosted }) =>
   return (
     <Util.Col gap={1}>
       <div>
-        <label className="form-label">Add balance type</label>
+        <div className="form-label" id="billing-group-balance-type-label">
+          Add balance type
+        </div>
         <DropdownInput
-          label="Type"
+          showLabel={false}
           values={[
             { label: "Topup", id: "MANUAL_TOPUP" },
             { label: "Deposit", id: "MANUAL_DEPOSIT" },
@@ -99,6 +110,7 @@ const AddGroupBalanceModalContent = ({ postLedgerItem, opLoading, onPosted }) =>
           value={type}
           onChange={(v) => setType(v.id)}
           prompt="Select type"
+          aprops={{ "aria-labelledby": "billing-group-balance-type-label" }}
         />
       </div>
       <Input
@@ -458,9 +470,12 @@ export const BillingGroupPage = () => {
                   <Badge color="blue" soft>
                     {role === "BILLING_GROUP_OPERATOR"
                       ? "Billing Group Operator"
+                      : role.charAt(0) + role.slice(1).toLowerCase()
+                    }
                     {role === "BUSINESS_MANAGER"
                       ? "Business Manager"
-                      : role.charAt(0) + role.slice(1).toLowerCase()}
+                      : role.charAt(0) + role.slice(1).toLowerCase()
+                    }
                   </Badge>
                 ),
               },

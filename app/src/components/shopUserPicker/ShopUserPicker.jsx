@@ -5,7 +5,12 @@ import { LoadableDropdownInput } from "#loadableDropdown";
 import * as Sentry from "@sentry/react";
 import ErrorBoundaries from "../ErrorBoundaries/ErrorBoundaries";
 
-export const ShopUserPicker = ({ value, onChange, includeNone }) => {
+export const ShopUserPicker = ({
+  value,
+  onChange,
+  includeNone,
+  ariaLabelledBy,
+}) => {
   const { shopId } = useParams();
   const { users, loading } = useUsers(shopId);
   const { user: activeUser, loading: authLoading } = useAuth();
@@ -19,6 +24,7 @@ export const ShopUserPicker = ({ value, onChange, includeNone }) => {
           loading={loading || authLoading}
           prompt={"Select a user"}
           showLabel={false}
+          ariaLabelledBy={ariaLabelledBy}
           value={value}
           onChange={(v) => onChange(v.id)}
           values={[

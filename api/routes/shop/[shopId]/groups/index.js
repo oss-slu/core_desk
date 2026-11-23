@@ -242,9 +242,7 @@ export const get = [
                   userId,
                   active: true,
                 },
-                active: true,
               },
-            },
         },
         include: {
           users: {

@@ -16,6 +16,7 @@ export const LoadableDropdownInput = ({
   disabled = false,
   disabledText,
   color,
+  ariaLabelledBy,
 }) => {
   if (loading)
     return (
@@ -31,7 +32,7 @@ export const LoadableDropdownInput = ({
         
         <Util.Col>
           {showLabel && <label className="form-label">{label}</label>}
-          <Button loading disabled>
+          <Button loading disabled aria-labelledby={ariaLabelledBy}>
             {prompt}
           </Button>
         </Util.Col>
@@ -52,7 +53,9 @@ export const LoadableDropdownInput = ({
       
         <Util.Col>
         {showLabel && <label className="form-label">{label}</label>}
-        <Button disabled>{disabledText || prompt}</Button>
+          <Button disabled aria-labelledby={ariaLabelledBy}>
+            {disabledText || prompt}
+          </Button>
       </Util.Col>
       </Sentry.ErrorBoundary>
   
@@ -83,6 +86,7 @@ export const LoadableDropdownInput = ({
               color || (doTheColorThing ? switchStatusToUI(value)[1] : null)
             }
             outline={color || doTheColorThing}
+            aprops={{ "aria-labelledby": ariaLabelledBy }}
           />
         </Util.Col>
       </Sentry.ErrorBoundary>
